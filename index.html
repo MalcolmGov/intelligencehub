@@ -1649,6 +1649,327 @@ section {
   .hero-stats { gap: 30px; }
   .hero { padding: 100px 20px 60px; }
   .transaction-stream-section { padding: 40px 20px; }
+  .brief-panel { width: calc(100vw - 40px) !important; right: 20px !important; }
+}
+
+/* ========== AI EXECUTIVE BRIEFING MODE ========== */
+.brief-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--gradient-neon);
+  border: none;
+  border-radius: 8px;
+  color: var(--bg-primary);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.35), 0 0 40px rgba(139, 92, 246, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.brief-trigger::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.brief-trigger:hover::before { transform: translateX(100%); }
+.brief-trigger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.5), 0 0 60px rgba(139, 92, 246, 0.25);
+}
+
+.brief-trigger-icon {
+  width: 14px; height: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+}
+
+.brief-trigger.briefing-active {
+  background: rgba(255, 0, 110, 0.15);
+  color: var(--neon-pink);
+  box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+}
+
+.brief-trigger.briefing-active::before { display: none; }
+
+/* Briefing overlay — subtle vignette, not full block */
+.brief-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(2, 11, 26, 0.55) 100%);
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.brief-overlay.active { opacity: 1; }
+
+/* Briefing panel — AI analyst */
+.brief-panel {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  width: 420px;
+  background: linear-gradient(135deg, rgba(6, 18, 37, 0.98), rgba(0, 27, 61, 0.98));
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 60px rgba(0, 240, 255, 0.2);
+  z-index: 9999;
+  overflow: hidden;
+  transform: translateY(30px) scale(0.95);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  backdrop-filter: blur(20px);
+}
+
+.brief-panel.active {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.brief-panel-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  background: rgba(0, 240, 255, 0.03);
+}
+
+.brief-analyst-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--gradient-neon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--bg-primary);
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+}
+
+.brief-analyst-avatar::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  animation: briefAvatarPulse 2s ease-in-out infinite;
+}
+
+@keyframes briefAvatarPulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 0; }
+}
+
+.brief-analyst-info { flex: 1; }
+
+.brief-analyst-name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+}
+
+.brief-analyst-role {
+  font-size: 10px;
+  color: var(--neon-cyan);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brief-analyst-role::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  box-shadow: 0 0 8px var(--neon-green);
+  animation: pulse 1.5s infinite;
+}
+
+.brief-close {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.brief-close:hover {
+  background: rgba(255, 0, 110, 0.15);
+  color: var(--neon-pink);
+  border-color: rgba(255, 0, 110, 0.3);
+}
+
+.brief-body {
+  padding: 20px;
+  min-height: 140px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.brief-body::-webkit-scrollbar { width: 4px; }
+.brief-body::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+
+.brief-chapter-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--neon-cyan);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brief-chapter-label::before {
+  content: '';
+  width: 20px; height: 1px;
+  background: var(--neon-cyan);
+}
+
+.brief-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-primary);
+  font-weight: 400;
+  min-height: 60px;
+}
+
+.brief-text .brief-highlight {
+  color: var(--neon-cyan);
+  font-weight: 600;
+}
+
+.brief-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 15px;
+  background: var(--neon-cyan);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: briefCursor 1s infinite;
+}
+
+@keyframes briefCursor {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.brief-controls {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(0, 240, 255, 0.08);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.brief-progress {
+  flex: 1;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-right: 14px;
+  position: relative;
+}
+
+.brief-progress-fill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  background: var(--gradient-neon);
+  width: 0%;
+  transition: width 0.5s linear;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.brief-chapter-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-right: 12px;
+}
+
+.brief-btn {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: var(--neon-cyan);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s;
+  margin-left: 6px;
+}
+
+.brief-btn:hover {
+  background: rgba(0, 240, 255, 0.2);
+  transform: scale(1.08);
+}
+
+.brief-btn.playing {
+  background: rgba(255, 0, 110, 0.12);
+  border-color: rgba(255, 0, 110, 0.3);
+  color: var(--neon-pink);
+}
+
+/* Spotlight pulse on the section currently being briefed */
+.brief-spotlight {
+  position: relative;
+  animation: briefSpotlight 2.5s ease-in-out;
+}
+
+@keyframes briefSpotlight {
+  0% { box-shadow: 0 0 0 rgba(0, 240, 255, 0); }
+  25% { box-shadow: 0 0 40px 8px rgba(0, 240, 255, 0.35), 0 0 80px rgba(139, 92, 246, 0.2); }
+  100% { box-shadow: 0 0 0 rgba(0, 240, 255, 0); }
+}
+
+/* Brief-mode: draw attention, subtle desaturation elsewhere */
+body.brief-active nav { opacity: 0.4; transition: opacity 0.4s; }
+body.brief-active .nav-right { opacity: 1; }
+
+/* KPI counter animation class used during briefing */
+.brief-counting {
+  color: var(--neon-cyan) !important;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+  transition: all 0.3s;
 }
 </style>
 </head>
@@ -1706,6 +2027,10 @@ section {
     <li><a href="#team">Team</a></li>
   </ul>
   <div class="nav-right">
+    <button class="brief-trigger" id="briefTrigger" aria-label="Start AI Executive Briefing">
+      <span class="brief-trigger-icon">&#9654;</span>
+      <span id="briefTriggerLabel">Brief Me</span>
+    </button>
     <div class="nav-cmd-btn" id="navCmdBtn">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <span>Search</span>
@@ -1717,6 +2042,30 @@ section {
     </div>
   </div>
 </nav>
+
+<!-- AI EXECUTIVE BRIEFING -->
+<div class="brief-overlay" id="briefOverlay"></div>
+<aside class="brief-panel" id="briefPanel" role="dialog" aria-label="AI Executive Briefing">
+  <div class="brief-panel-header">
+    <div class="brief-analyst-avatar">AI</div>
+    <div class="brief-analyst-info">
+      <div class="brief-analyst-name">ADA &bull; AI Executive Analyst</div>
+      <div class="brief-analyst-role">Live briefing in progress</div>
+    </div>
+    <button class="brief-close" id="briefClose" aria-label="End briefing">&times;</button>
+  </div>
+  <div class="brief-body">
+    <div class="brief-chapter-label" id="briefChapterLabel">Initialising</div>
+    <div class="brief-text" id="briefText"></div>
+  </div>
+  <div class="brief-controls">
+    <div class="brief-progress"><div class="brief-progress-fill" id="briefProgress"></div></div>
+    <div class="brief-chapter-count" id="briefChapterCount">0 / 0</div>
+    <button class="brief-btn" id="briefPrev" title="Previous">&#9664;</button>
+    <button class="brief-btn playing" id="briefPlayPause" title="Pause/Resume">&#10074;&#10074;</button>
+    <button class="brief-btn" id="briefNext" title="Next">&#9654;</button>
+  </div>
+</aside>
 
 <!-- Hero Section -->
 <section class="hero" id="hero">
@@ -2533,6 +2882,269 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
+
+/* ============================================================
+   AI EXECUTIVE BRIEFING MODE
+   ============================================================ */
+(function() {
+  const chapters = [
+    {
+      label: 'Opening',
+      target: '#hero',
+      text: 'Welcome to the MoMo Fintech <span class="brief-highlight">Intelligence Centre</span>. I am Ada, your AI executive analyst. In the next two minutes, I will walk you through the state of our AI and Automation division \u2014 the numbers, the projects in flight, and where we are heading.'
+    },
+    {
+      label: 'Chapter 01 \u2014 At a glance',
+      target: '#dashboard',
+      text: 'At a glance: we are operating across <span class="brief-highlight">17 African markets</span>, protecting more than <span class="brief-highlight">290 million customers</span>. Our AI systems score live transactions continuously, and today alone we have prevented fraud losses measured in the millions of Rand. This is no longer a pilot \u2014 it is production infrastructure.'
+    },
+    {
+      label: 'Chapter 02 \u2014 Active projects',
+      target: '#projects',
+      text: 'Our project portfolio spans <span class="brief-highlight">fraud prevention, credit scoring, customer intelligence, and agent productivity</span>. Each initiative is tied to a measurable business outcome: reduced loss ratios, approved credit for previously-invisible customers, or hours saved across our agent network. The emphasis is always revenue or risk \u2014 never AI for its own sake.'
+    },
+    {
+      label: 'Chapter 03 \u2014 Use cases',
+      target: '#usecases',
+      text: 'We have identified high-value AI use cases across every stage of the MoMo customer journey \u2014 from <span class="brief-highlight">onboarding and KYC</span>, through transaction intelligence, to retention and recovery. What you see here is a deliberate, prioritised map \u2014 not a scattergun.'
+    },
+    {
+      label: 'Chapter 04 \u2014 Prototypes',
+      target: '#prototypes',
+      text: 'In parallel we run a live prototyping track. These are <span class="brief-highlight">fast, low-cost experiments</span> \u2014 AI agents, vision models, LLM-driven workflows \u2014 that let us validate ideas in weeks, not quarters. The best graduate into production; the rest teach us what not to build.'
+    },
+    {
+      label: 'Chapter 05 \u2014 Live intelligence',
+      target: '.transaction-stream-section',
+      text: 'Below is our <span class="brief-highlight">live transaction intelligence stream</span>. Every dot on the map is a real-time decision our models are making \u2014 approve, flag, or block \u2014 across the continent. This is the heartbeat of the division.'
+    },
+    {
+      label: 'Chapter 06 \u2014 The road ahead',
+      target: '#roadmap',
+      text: 'Our roadmap is anchored in <span class="brief-highlight">three horizons</span>: harden what is in production, scale what is working, and plant bets on what is next \u2014 agentic AI, real-time personalisation, and intelligent automation at the agent tier.'
+    },
+    {
+      label: 'Chapter 07 \u2014 The team',
+      target: '#team',
+      text: 'None of this works without people. The AI and Automation division is being built with <span class="brief-highlight">deep fintech expertise, modern AI craft, and a bias for shipping</span>. We hire for judgement, curiosity, and the discipline to measure what matters.'
+    },
+    {
+      label: 'Close',
+      target: '#hero',
+      text: 'That completes the briefing. The Intelligence Centre is the <span class="brief-highlight">living operating picture</span> of the division \u2014 it will evolve as we do. Thank you for your time.'
+    }
+  ];
+
+  const trigger = document.getElementById('briefTrigger');
+  const triggerLabel = document.getElementById('briefTriggerLabel');
+  const panel = document.getElementById('briefPanel');
+  const overlay = document.getElementById('briefOverlay');
+  const closeBtn = document.getElementById('briefClose');
+  const textEl = document.getElementById('briefText');
+  const labelEl = document.getElementById('briefChapterLabel');
+  const progressEl = document.getElementById('briefProgress');
+  const countEl = document.getElementById('briefChapterCount');
+  const prevBtn = document.getElementById('briefPrev');
+  const nextBtn = document.getElementById('briefNext');
+  const playBtn = document.getElementById('briefPlayPause');
+
+  if (!trigger) return;
+
+  let state = {
+    active: false,
+    index: 0,
+    paused: false,
+    typeTimer: null,
+    advanceTimer: null,
+    utterance: null
+  };
+
+  function stripHtml(html) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || '';
+  }
+
+  function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.0;
+      u.pitch = 1.05;
+      u.volume = 0.9;
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => /en-GB|English \(United Kingdom\)/i.test(v.lang + v.name)) ||
+                        voices.find(v => /Samantha|Karen|Moira|Serena/i.test(v.name)) ||
+                        voices.find(v => /en[-_]/i.test(v.lang));
+      if (preferred) u.voice = preferred;
+      state.utterance = u;
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* speech not available, silent fail */ }
+  }
+
+  function typeText(html, done) {
+    clearTimeout(state.typeTimer);
+    textEl.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'brief-cursor';
+    textEl.appendChild(cursor);
+
+    // Parse html into segments of text/highlight-span
+    const tmpDiv = document.createElement('div');
+    tmpDiv.innerHTML = html;
+    const nodes = Array.from(tmpDiv.childNodes);
+    let nodeIdx = 0, charIdx = 0;
+    let currentContainer = textEl;
+    let currentSpan = null;
+
+    function tick() {
+      if (state.paused) {
+        state.typeTimer = setTimeout(tick, 120);
+        return;
+      }
+      if (nodeIdx >= nodes.length) {
+        cursor.remove();
+        textEl.appendChild(cursor); // keep blinking cursor at end briefly
+        setTimeout(() => cursor.remove(), 800);
+        if (done) done();
+        return;
+      }
+      const node = nodes[nodeIdx];
+      if (node.nodeType === Node.TEXT_NODE) {
+        const str = node.textContent;
+        if (charIdx < str.length) {
+          cursor.insertAdjacentText('beforebegin', str[charIdx]);
+          charIdx++;
+        } else {
+          nodeIdx++; charIdx = 0;
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (!currentSpan) {
+          currentSpan = document.createElement(node.tagName.toLowerCase());
+          currentSpan.className = node.className;
+          textEl.insertBefore(currentSpan, cursor);
+        }
+        const str = node.textContent;
+        if (charIdx < str.length) {
+          currentSpan.textContent += str[charIdx];
+          charIdx++;
+        } else {
+          nodeIdx++; charIdx = 0; currentSpan = null;
+        }
+      } else {
+        nodeIdx++;
+      }
+      state.typeTimer = setTimeout(tick, 22 + Math.random() * 20);
+    }
+    tick();
+  }
+
+  function playChapter(i) {
+    if (i < 0 || i >= chapters.length) return;
+    state.index = i;
+    const ch = chapters[i];
+    labelEl.textContent = ch.label;
+    countEl.textContent = (i + 1) + ' / ' + chapters.length;
+    progressEl.style.width = (((i + 1) / chapters.length) * 100) + '%';
+
+    // Scroll & spotlight
+    const tgt = document.querySelector(ch.target);
+    if (tgt) {
+      tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      tgt.classList.remove('brief-spotlight');
+      void tgt.offsetWidth; // reflow to restart animation
+      tgt.classList.add('brief-spotlight');
+    }
+
+    // Speak
+    const spoken = stripHtml(ch.text);
+    speak(spoken);
+
+    // Type
+    clearTimeout(state.advanceTimer);
+    typeText(ch.text, () => {
+      // After typing complete, schedule auto-advance based on spoken length
+      const ms = Math.max(4000, spoken.length * 55);
+      state.advanceTimer = setTimeout(() => {
+        if (!state.paused && state.active && state.index < chapters.length - 1) {
+          playChapter(state.index + 1);
+        } else if (state.active && state.index === chapters.length - 1) {
+          // End briefing automatically after last chapter
+          setTimeout(() => { if (state.active) endBriefing(); }, 2500);
+        }
+      }, ms);
+    });
+  }
+
+  function startBriefing() {
+    state.active = true;
+    state.paused = false;
+    state.index = 0;
+    document.body.classList.add('brief-active');
+    overlay.classList.add('active');
+    panel.classList.add('active');
+    trigger.classList.add('briefing-active');
+    triggerLabel.textContent = 'Briefing \u00b7 Live';
+
+    // Warm up speech synthesis voices (Chrome loads them lazily)
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.getVoices(); } catch (e) {}
+    }
+
+    playChapter(0);
+  }
+
+  function endBriefing() {
+    state.active = false;
+    state.paused = false;
+    clearTimeout(state.typeTimer);
+    clearTimeout(state.advanceTimer);
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    document.body.classList.remove('brief-active');
+    overlay.classList.remove('active');
+    panel.classList.remove('active');
+    trigger.classList.remove('briefing-active');
+    triggerLabel.textContent = 'Brief Me';
+    document.querySelectorAll('.brief-spotlight').forEach(el => el.classList.remove('brief-spotlight'));
+  }
+
+  function togglePause() {
+    state.paused = !state.paused;
+    if (state.paused) {
+      if ('speechSynthesis' in window) window.speechSynthesis.pause();
+      playBtn.innerHTML = '&#9654;';
+      playBtn.classList.remove('playing');
+      playBtn.title = 'Resume';
+    } else {
+      if ('speechSynthesis' in window) window.speechSynthesis.resume();
+      playBtn.innerHTML = '&#10074;&#10074;';
+      playBtn.classList.add('playing');
+      playBtn.title = 'Pause';
+    }
+  }
+
+  trigger.addEventListener('click', () => {
+    if (state.active) endBriefing(); else startBriefing();
+  });
+  closeBtn.addEventListener('click', endBriefing);
+  playBtn.addEventListener('click', togglePause);
+  prevBtn.addEventListener('click', () => {
+    if (state.index > 0) { clearTimeout(state.advanceTimer); playChapter(state.index - 1); }
+  });
+  nextBtn.addEventListener('click', () => {
+    if (state.index < chapters.length - 1) { clearTimeout(state.advanceTimer); playChapter(state.index + 1); }
+    else endBriefing();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!state.active) return;
+    if (e.key === 'Escape') endBriefing();
+    else if (e.key === ' ') { e.preventDefault(); togglePause(); }
+    else if (e.key === 'ArrowRight') nextBtn.click();
+    else if (e.key === 'ArrowLeft') prevBtn.click();
+  });
+})();
 </script>
 
 </body>
