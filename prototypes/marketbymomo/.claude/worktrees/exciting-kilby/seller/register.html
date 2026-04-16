@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Seller - Market by MoMo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #0A2D55 0%, #0E3A6B 35%, #1B4F8A 70%, #1E5A9A 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 700px;
+            background: #FFFFFF;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, #FFCC00 0%, #FFD633 100%);
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1B4F8A;
+            margin-bottom: 10px;
+        }
+
+        .progress-container {
+            margin-top: 30px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .progress-step {
+            flex: 1;
+            height: 6px;
+            background: rgba(26, 26, 46, 0.2);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background: #1B4F8A;
+        }
+
+        .progress-step.completed {
+            background: #00B074;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 13px;
+            color: #1B4F8A;
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        .register-content {
+            padding: 50px 40px;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-step {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1B4F8A;
+            margin-bottom: 8px;
+        }
+
+        .step-subtitle {
+            font-size: 14px;
+            color: #9E9E9E;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1B4F8A;
+            margin-bottom: 10px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #E0E0E0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #FFFFFF;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #FFCC00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .multiselect-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .multiselect-tile {
+            padding: 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #F8F9FA;
+            text-align: center;
+            font-weight: 500;
+            color: #1B4F8A;
+        }
+
+        .multiselect-tile:hover {
+            border-color: #FFCC00;
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .multiselect-tile.selected {
+            border-color: #FFCC00;
+            background: rgba(255, 204, 0, 0.1);
+            color: #1B4F8A;
+        }
+
+        .color-swatches {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .color-swatch {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.05);
+        }
+
+        .color-swatch.selected {
+            border-color: #1B4F8A;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #1B4F8A;
+        }
+
+        .color-swatch.yellow-navy {
+            background: linear-gradient(135deg, #FFCC00 50%, #0E3A6B 50%);
+        }
+
+        .color-swatch.green-black {
+            background: linear-gradient(135deg, #00B074 50%, #1A1A1A 50%);
+        }
+
+        .color-swatch.red-white {
+            background: linear-gradient(135deg, #FF3B30 50%, #FFFFFF 50%);
+        }
+
+        .color-swatch.blue-gold {
+            background: linear-gradient(135deg, #0EA5E9 50%, #FFD700 50%);
+        }
+
+        .color-swatch.purple-white {
+            background: linear-gradient(135deg, #7C3AED 50%, #FFFFFF 50%);
+        }
+
+        .color-swatch.black {
+            background: #1A1A1A;
+        }
+
+        .upload-zone {
+            border: 2px dashed #FFCC00;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .upload-zone:hover {
+            background: rgba(255, 204, 0, 0.1);
+            border-color: #FFD633;
+        }
+
+        .upload-zone.active {
+            background: rgba(255, 204, 0, 0.15);
+            border-color: #FFCC00;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #1B4F8A;
+            font-weight: 500;
+        }
+
+        .upload-subtext {
+            font-size: 12px;
+            color: #9E9E9E;
+            margin-top: 5px;
+        }
+
+        .payout-option {
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            background: #F8F9FA;
+        }
+
+        .payout-option:hover {
+            border-color: #FFCC00;
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .payout-option.selected {
+            border-color: #FFCC00;
+            background: rgba(255, 204, 0, 0.1);
+        }
+
+        .payout-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .payout-icon {
+            font-size: 24px;
+        }
+
+        .payout-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: #1B4F8A;
+        }
+
+        .payout-description {
+            font-size: 13px;
+            color: #9E9E9E;
+            margin-left: 36px;
+        }
+
+        .review-section {
+            background: #F8F9FA;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #FFCC00;
+        }
+
+        .review-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: #1B4F8A;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #E0E0E0;
+            font-size: 13px;
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-label {
+            color: #9E9E9E;
+        }
+
+        .review-value {
+            color: #1B4F8A;
+            font-weight: 600;
+        }
+
+        .terms-agreement {
+            background: #FFF9E6;
+            border: 1px solid #FFCC00;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 30px 0;
+            font-size: 13px;
+            color: #1B4F8A;
+            line-height: 1.6;
+        }
+
+        .terms-agreement input {
+            margin-right: 10px;
+        }
+
+        .terms-link {
+            color: #FFCC00;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .terms-link:hover {
+            text-decoration: underline;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: #F0F0F0;
+            color: #1B4F8A;
+        }
+
+        .btn-secondary:hover {
+            background: #E0E0E0;
+        }
+
+        .btn-primary {
+            background: #FFCC00;
+            color: #1B4F8A;
+        }
+
+        .btn-primary:hover {
+            background: #FFD633;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+        }
+
+        .btn-primary.launch {
+            width: 100%;
+            background: linear-gradient(135deg, #FFCC00 0%, #FFD633 100%);
+            position: relative;
+            overflow: hidden;
+            animation: launchPulse 2s infinite;
+        }
+
+        @keyframes launchPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(255, 204, 0, 0);
+            }
+        }
+
+        .btn-primary.launch:hover {
+            animation: none;
+            box-shadow: 0 12px 30px rgba(255, 204, 0, 0.4);
+        }
+
+        .success-animation {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .success-animation.active {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            animation: bounceIn 0.6s ease;
+            margin-bottom: 20px;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .success-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1B4F8A;
+            margin-bottom: 10px;
+        }
+
+        .store-preview {
+            background: #F8F9FA;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #9E9E9E;
+        }
+
+        .store-preview-url {
+            color: #FFCC00;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        @media (max-width: 600px) {
+            .register-content {
+                padding: 30px 20px;
+            }
+
+            .multiselect-group {
+                grid-template-columns: 1fr;
+            }
+
+            .color-swatches {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .step-title {
+                font-size: 22px;
+            }
+
+            .button-group {
+                flex-direction: column-reverse;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <div class="logo">Market by MoMo</div>
+            <div class="progress-container">
+                <div class="progress-step active" id="prog-1"></div>
+                <div class="progress-step" id="prog-2"></div>
+                <div class="progress-step" id="prog-3"></div>
+                <div class="progress-step" id="prog-4"></div>
+                <div class="progress-step" id="prog-5"></div>
+            </div>
+            <div class="progress-text">Step <span id="current-step">1</span> of 5</div>
+        </div>
+
+        <div class="register-content">
+            <!-- Step 1: Business Information -->
+            <div class="form-step active" id="step-1">
+                <h1 class="step-title">Start selling on Market by MoMo</h1>
+                <p class="step-subtitle">Tell us about your business</p>
+
+                <div class="form-group">
+                    <label class="form-label">Business Name</label>
+                    <input type="text" class="form-input" id="businessName" placeholder="e.g., TechHub Uganda">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Business Type</label>
+                    <select class="form-select" id="businessType">
+                        <option value="">Select business type</option>
+                        <option value="sole">Sole Trader</option>
+                        <option value="partnership">Partnership</option>
+                        <option value="limited">Limited Company</option>
+                        <option value="ngo">NGO</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Business Category</label>
+                    <div class="multiselect-group">
+                        <div class="multiselect-tile" data-category="electronics">Electronics</div>
+                        <div class="multiselect-tile" data-category="fashion">Fashion</div>
+                        <div class="multiselect-tile" data-category="food">Food & Beverages</div>
+                        <div class="multiselect-tile" data-category="home">Home & Garden</div>
+                        <div class="multiselect-tile" data-category="beauty">Beauty & Personal</div>
+                        <div class="multiselect-tile" data-category="sports">Sports & Outdoors</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Country/Region</label>
+                    <input type="text" class="form-input" value="Uganda" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">District/City</label>
+                    <select class="form-select" id="district">
+                        <option value="">Select district</option>
+                        <option value="kampala">Kampala</option>
+                        <option value="entebbe">Entebbe</option>
+                        <option value="jinja">Jinja</option>
+                        <option value="mbarara">Mbarara</option>
+                        <option value="masaka">Masaka</option>
+                        <option value="fort-portal">Fort Portal</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 2: Contact & Identity -->
+            <div class="form-step" id="step-2">
+                <h1 class="step-title">Contact & Identity</h1>
+                <p class="step-subtitle">Verify your account details</p>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name (Account Owner)</label>
+                    <input type="text" class="form-input" id="ownerName" placeholder="Your full name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" class="form-input" value="+256" style="flex: 0 0 80px;" disabled>
+                        <input type="text" class="form-input" id="phoneNumber" placeholder="7XXXX XXXX" style="flex: 1;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" id="email" placeholder="your@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">National ID / Business Registration Number</label>
+                    <input type="text" class="form-input" id="idNumber" placeholder="ID number">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Upload ID Document</label>
+                    <div class="upload-zone" id="idUploadZone">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">Click to upload or drag & drop</div>
+                        <div class="upload-subtext">PNG, JPG up to 10MB</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Store Setup -->
+            <div class="form-step" id="step-3">
+                <h1 class="step-title">Design your store</h1>
+                <p class="step-subtitle">Create your unique storefront</p>
+
+                <div class="form-group">
+                    <label class="form-label">Store Name</label>
+                    <input type="text" class="form-input" id="storeName" placeholder="Your store name">
+                    <div class="store-preview">
+                        <div style="font-size: 12px; color: #9E9E9E; margin-bottom: 5px;">Preview URL:</div>
+                        <div class="store-preview-url" id="previewUrl">market.momo.africa/store/your-name</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Tagline</label>
+                    <input type="text" class="form-input" id="storeTagline" placeholder="e.g., Premium Electronics">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Description</label>
+                    <textarea class="form-textarea" id="storeDescription" placeholder="Tell customers about your store..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Color Theme</label>
+                    <div class="color-swatches">
+                        <div class="color-swatch yellow-navy selected" data-theme="yellow-navy"></div>
+                        <div class="color-swatch green-black" data-theme="green-black"></div>
+                        <div class="color-swatch red-white" data-theme="red-white"></div>
+                        <div class="color-swatch blue-gold" data-theme="blue-gold"></div>
+                        <div class="color-swatch purple-white" data-theme="purple-white"></div>
+                        <div class="color-swatch black" data-theme="black"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Payout Setup -->
+            <div class="form-step" id="step-4">
+                <h1 class="step-title">Payout Setup</h1>
+                <p class="step-subtitle">How would you like to receive payments?</p>
+
+                <div class="payout-option selected" data-payout="momo">
+                    <div class="payout-header">
+                        <div class="payout-icon">🟡</div>
+                        <div class="payout-title">MTN MoMo</div>
+                    </div>
+                    <div class="payout-description">Instant daily payouts to your MoMo wallet</div>
+                </div>
+
+                <div class="payout-option" data-payout="bank">
+                    <div class="payout-header">
+                        <div class="payout-icon">🏦</div>
+                        <div class="payout-title">Bank Transfer</div>
+                    </div>
+                    <div class="payout-description">Weekly transfers to your bank account</div>
+                </div>
+
+                <div class="payout-option" data-payout="both">
+                    <div class="payout-header">
+                        <div class="payout-icon">💳</div>
+                        <div class="payout-title">Both (Recommended)</div>
+                    </div>
+                    <div class="payout-description">Split payouts between MoMo and bank</div>
+                </div>
+
+                <div id="momo-fields" class="form-group" style="margin-top: 30px;">
+                    <label class="form-label">MoMo Number</label>
+                    <input type="text" class="form-input" id="momoNumber" placeholder="+256 7XX XXX XXX">
+                </div>
+
+                <div id="bank-fields" class="form-group" style="display: none;">
+                    <label class="form-label">Bank Name</label>
+                    <select class="form-select" id="bankName">
+                        <option value="">Select bank</option>
+                        <option value="standard-chartered">Standard Chartered Bank</option>
+                        <option value="barclays">Barclays Bank Uganda</option>
+                        <option value="crdb">CRDB Bank</option>
+                        <option value="dfcu">DFCU Bank</option>
+                        <option value="equity">Equity Bank Uganda</option>
+                    </select>
+
+                    <label class="form-label" style="margin-top: 15px;">Account Number</label>
+                    <input type="text" class="form-input" id="accountNumber" placeholder="Your account number">
+
+                    <label class="form-label" style="margin-top: 15px;">Account Name</label>
+                    <input type="text" class="form-input" id="accountName" placeholder="Name on account">
+                </div>
+            </div>
+
+            <!-- Step 5: Review & Go Live -->
+            <div class="form-step" id="step-5">
+                <h1 class="step-title">Ready to launch?</h1>
+                <p class="step-subtitle">Review your information before going live</p>
+
+                <div class="review-section">
+                    <div class="review-title">Business Information</div>
+                    <div class="review-item">
+                        <span class="review-label">Business Name</span>
+                        <span class="review-value" id="review-businessName">-</span>
+                    </div>
+                    <div class="review-item">
+                        <span class="review-label">Business Type</span>
+                        <span class="review-value" id="review-businessType">-</span>
+                    </div>
+                    <div class="review-item">
+                        <span class="review-label">Category</span>
+                        <span class="review-value" id="review-category">-</span>
+                    </div>
+                </div>
+
+                <div class="review-section">
+                    <div class="review-title">Store Setup</div>
+                    <div class="review-item">
+                        <span class="review-label">Store Name</span>
+                        <span class="review-value" id="review-storeName">-</span>
+                    </div>
+                    <div class="review-item">
+                        <span class="review-label">URL</span>
+                        <span class="review-value" id="review-storeUrl">-</span>
+                    </div>
+                </div>
+
+                <div class="terms-agreement">
+                    <input type="checkbox" id="termsCheckbox">
+                    <label for="termsCheckbox" style="cursor: pointer;">
+                        I agree to the <a class="terms-link" href="#">Seller Terms & Conditions</a> and <a class="terms-link" href="#">Privacy Policy</a>
+                    </label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" id="backBtn" onclick="previousStep()">← Back</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">Continue →</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="success-animation" id="successAnimation">
+        <div class="success-icon">🚀</div>
+        <div class="success-text">Welcome to Market by MoMo!</div>
+        <p style="color: #9E9E9E; margin-top: 10px;">Launching your store...</p>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const selectedCategories = new Set();
+        const formData = {};
+
+        // Initialize event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            setupMultiselect();
+            setupColorThemes();
+            setupPayoutOptions();
+            setupUploadZones();
+            updateButtonStates();
+            setupStoreNamePreview();
+        });
+
+        function setupMultiselect() {
+            document.querySelectorAll('.multiselect-tile').forEach(tile => {
+                tile.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    const category = this.getAttribute('data-category');
+                    if (this.classList.contains('selected')) {
+                        selectedCategories.add(category);
+                    } else {
+                        selectedCategories.delete(category);
+                    }
+                });
+            });
+        }
+
+        function setupColorThemes() {
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.addEventListener('click', function() {
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+        }
+
+        function setupPayoutOptions() {
+            document.querySelectorAll('.payout-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.payout-option').forEach(o => o.classList.remove('selected'));
+                    this.classList.add('selected');
+
+                    const payoutType = this.getAttribute('data-payout');
+                    document.getElementById('momo-fields').style.display =
+                        (payoutType === 'momo' || payoutType === 'both') ? 'block' : 'none';
+                    document.getElementById('bank-fields').style.display =
+                        (payoutType === 'bank' || payoutType === 'both') ? 'block' : 'none';
+                });
+            });
+        }
+
+        function setupUploadZones() {
+            ['idUploadZone'].forEach(zoneId => {
+                const zone = document.getElementById(zoneId);
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('active');
+                });
+                zone.addEventListener('dragleave', () => zone.classList.remove('active'));
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('active');
+                    // Files would be handled here
+                });
+                zone.addEventListener('click', () => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.png,.jpg,.jpeg';
+                    input.click();
+                });
+            });
+        }
+
+        function setupStoreNamePreview() {
+            const storeNameInput = document.getElementById('storeName');
+            storeNameInput.addEventListener('input', function() {
+                const slug = this.value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || 'your-name';
+                document.getElementById('previewUrl').textContent = `market.momo.africa/store/${slug}`;
+            });
+        }
+
+        function nextStep() {
+            if (currentStep === 5) {
+                if (!document.getElementById('termsCheckbox').checked) {
+                    alert('Please agree to the terms and conditions');
+                    return;
+                }
+                launchStore();
+            } else if (currentStep < 5) {
+                currentStep++;
+                updateStepDisplay();
+                populateReview();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepDisplay();
+            }
+        }
+
+        function updateStepDisplay() {
+            // Hide all steps
+            document.querySelectorAll('.form-step').forEach(step => step.classList.remove('active'));
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+
+            // Update progress
+            for (let i = 1; i <= 5; i++) {
+                const progStep = document.getElementById(`prog-${i}`);
+                if (i < currentStep) {
+                    progStep.classList.remove('active');
+                    progStep.classList.add('completed');
+                } else if (i === currentStep) {
+                    progStep.classList.add('active');
+                    progStep.classList.remove('completed');
+                } else {
+                    progStep.classList.remove('active', 'completed');
+                }
+            }
+
+            document.getElementById('current-step').textContent = currentStep;
+            updateButtonStates();
+            window.scrollTo(0, 0);
+        }
+
+        function updateButtonStates() {
+            const backBtn = document.getElementById('backBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            backBtn.style.display = currentStep === 1 ? 'none' : 'block';
+
+            if (currentStep === 5) {
+                nextBtn.innerHTML = '🚀 Launch My Store!';
+                nextBtn.classList.add('launch');
+            } else {
+                nextBtn.innerHTML = 'Continue →';
+                nextBtn.classList.remove('launch');
+            }
+        }
+
+        function populateReview() {
+            if (currentStep === 5) {
+                document.getElementById('review-businessName').textContent =
+                    document.getElementById('businessName').value || '-';
+                document.getElementById('review-businessType').textContent =
+                    document.getElementById('businessType').value || '-';
+                document.getElementById('review-category').textContent =
+                    Array.from(selectedCategories).join(', ') || '-';
+                document.getElementById('review-storeName').textContent =
+                    document.getElementById('storeName').value || '-';
+
+                const storeName = document.getElementById('storeName').value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || 'your-name';
+                document.getElementById('review-storeUrl').textContent =
+                    `market.momo.africa/store/${storeName}`;
+            }
+        }
+
+        function launchStore() {
+            const successAnim = document.getElementById('successAnimation');
+            successAnim.classList.add('active');
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

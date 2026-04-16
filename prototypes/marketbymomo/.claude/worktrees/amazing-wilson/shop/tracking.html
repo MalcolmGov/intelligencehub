@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Your Order — MoMo Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:        #1B4F8A;
+      --navy-dark:   #163f6e;
+      --navy-light:  #2563a8;
+      --yellow:      #FFCC00;
+      --yellow-dark: #e6b800;
+      --yellow-light:#FFE066;
+      --green:       #16A34A;
+      --green-light: #DCFCE7;
+      --red:         #DC2626;
+      --red-light:   #FEE2E2;
+      --orange:      #EA580C;
+      --orange-light:#FFEDD5;
+      --blue-light:  #EFF6FF;
+      --radius:      12px;
+      --radius-sm:   8px;
+      --shadow:      0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.12);
+      --transition:  0.2s ease;
+    }
+
+    /* Light theme */
+    [data-theme="light"] {
+      --bg:          #F4F7FB;
+      --surface:     #FFFFFF;
+      --surface-2:   #F8FAFC;
+      --border:      #E2E8F0;
+      --text:        #0F172A;
+      --text-2:      #475569;
+      --text-3:      #94A3B8;
+      --nav-bg:      #FFFFFF;
+      --track-bg:    #E2E8F0;
+    }
+    /* Dark theme */
+    [data-theme="dark"] {
+      --bg:          #0D1117;
+      --surface:     #161B22;
+      --surface-2:   #1C2230;
+      --border:      #30363D;
+      --text:        #F0F6FC;
+      --text-2:      #8B949E;
+      --text-3:      #6E7681;
+      --nav-bg:      #161B22;
+      --track-bg:    #30363D;
+      --shadow:      0 1px 3px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
+      --shadow-md:   0 4px 16px rgba(0,0,0,.5);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+    }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+    }
+
+    /* ─── Nav ───────────────────────────────────────────────────── */
+    .nav {
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo {
+      width: 36px;
+      height: 36px;
+      background: var(--navy);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      color: var(--yellow);
+      font-size: 16px;
+      letter-spacing: -0.5px;
+    }
+    .nav-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text);
+    }
+    .nav-title span { color: var(--navy); }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .theme-toggle {
+      width: 40px; height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--surface-2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all var(--transition);
+    }
+    .theme-toggle:hover {
+      background: var(--yellow);
+      border-color: var(--yellow);
+      transform: scale(1.05);
+    }
+    .btn-nav-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: var(--text-2);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      transition: all var(--transition);
+    }
+    .btn-nav-back:hover { border-color: var(--navy); color: var(--navy); }
+
+    /* ─── Layout ────────────────────────────────────────────────── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 32px 20px 80px; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h1 { font-size: 28px; font-weight: 800; color: var(--text); }
+    .page-header p { color: var(--text-2); margin-top: 6px; font-size: 15px; }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .grid-main { grid-template-columns: 1fr; }
+    }
+    .col-left { display: flex; flex-direction: column; gap: 20px; }
+    .col-right { display: flex; flex-direction: column; gap: 20px; }
+
+    /* ─── Cards ─────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ─── Lookup ─────────────────────────────────────────────────── */
+    .lookup-card { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); border: none; }
+    .lookup-card .card-title { color: white; font-size: 18px; }
+    .lookup-card p { color: rgba(255,255,255,.75); font-size: 14px; margin-top: 4px; margin-bottom: 20px; }
+    .lookup-form { display: flex; gap: 12px; }
+    .lookup-input {
+      flex: 1;
+      height: 48px;
+      border: 2px solid rgba(255,255,255,.2);
+      border-radius: var(--radius-sm);
+      background: rgba(255,255,255,.12);
+      color: white;
+      padding: 0 16px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all var(--transition);
+      backdrop-filter: blur(4px);
+    }
+    .lookup-input::placeholder { color: rgba(255,255,255,.5); }
+    .lookup-input:focus { border-color: var(--yellow); background: rgba(255,255,255,.18); }
+    .btn-track {
+      height: 48px;
+      padding: 0 24px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--yellow);
+      color: #0F172A;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .btn-track:hover { background: var(--yellow-dark); transform: translateY(-1px); }
+    .btn-track:active { transform: translateY(0); }
+
+    /* ─── Status badge ──────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .badge-blue   { background: var(--blue-light); color: var(--navy); }
+    .badge-green  { background: var(--green-light); color: var(--green); }
+    .badge-orange { background: var(--orange-light); color: var(--orange); }
+    .badge-yellow { background: #FFFBEB; color: #B45309; }
+    .badge-red    { background: var(--red-light); color: var(--red); }
+    [data-theme="dark"] .badge-blue   { background: rgba(27,79,138,.25); color: #7db8f7; }
+    [data-theme="dark"] .badge-green  { background: rgba(22,163,74,.2);  color: #4ade80; }
+    [data-theme="dark"] .badge-orange { background: rgba(234,88,12,.2);  color: #fb923c; }
+    [data-theme="dark"] .badge-yellow { background: rgba(255,204,0,.15); color: #fbbf24; }
+    [data-theme="dark"] .badge-red    { background: rgba(220,38,38,.2);  color: #f87171; }
+
+    /* ─── Order summary ─────────────────────────────────────────── */
+    .order-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) { .order-meta { grid-template-columns: repeat(2, 1fr); } }
+    .meta-item label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-3);
+      margin-bottom: 4px;
+    }
+    .meta-item span {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .meta-item span.highlight { color: var(--navy); }
+    [data-theme="dark"] .meta-item span.highlight { color: #7db8f7; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    .order-items { display: flex; flex-direction: column; gap: 12px; }
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .item-img {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--surface-2);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 1px solid var(--border);
+    }
+    .item-info { flex: 1; min-width: 0; }
+    .item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-meta { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+    .item-price { font-size: 14px; font-weight: 700; color: var(--text); text-align: right; }
+
+    .order-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0 0;
+      border-top: 1px solid var(--border);
+      margin-top: 12px;
+    }
+    .total-label { font-size: 14px; font-weight: 600; color: var(--text-2); }
+    .total-value { font-size: 20px; font-weight: 800; color: var(--navy); }
+    [data-theme="dark"] .total-value { color: #7db8f7; }
+
+    /* ─── Timeline ──────────────────────────────────────────────── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: flex;
+      gap: 16px;
+      position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 48px;
+      width: 2px;
+      height: calc(100% - 16px);
+      background: var(--track-bg);
+      transition: background 0.6s ease;
+    }
+    .step.completed:not(:last-child)::after { background: var(--green); }
+    .step.active:not(:last-child)::after { background: var(--track-bg); }
+
+    .step-dot-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      padding-top: 4px;
+    }
+    .step-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      border: 3px solid var(--track-bg);
+      background: var(--surface);
+      position: relative;
+      z-index: 1;
+      transition: all 0.4s ease;
+    }
+    .step.completed .step-dot {
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .step.active .step-dot {
+      background: var(--navy);
+      border-color: var(--navy);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%   { box-shadow: 0 0 0 0 rgba(27,79,138,.5); }
+      70%  { box-shadow: 0 0 0 12px rgba(27,79,138,0); }
+      100% { box-shadow: 0 0 0 0 rgba(27,79,138,0); }
+    }
+    .step-body {
+      padding: 4px 0 28px;
+      flex: 1;
+    }
+    .step-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .step.pending .step-title { color: var(--text-3); }
+    .step.pending .step-dot { opacity: .45; }
+    .step-sub {
+      font-size: 13px;
+      color: var(--text-2);
+      margin-top: 3px;
+    }
+    .step-time {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+    .step-icon-wrap { font-size: 16px; }
+
+    /* progress bar */
+    .progress-wrap { margin-bottom: 24px; }
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .progress-label .pl { color: var(--text-2); }
+    .progress-label .pr { color: var(--green); }
+    .progress-bar-bg {
+      height: 8px;
+      background: var(--track-bg);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--navy), var(--navy-light));
+      border-radius: 999px;
+      transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ─── Countdown ─────────────────────────────────────────────── */
+    .delivery-banner {
+      background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+      border: 1px solid #FDE68A;
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    [data-theme="dark"] .delivery-banner {
+      background: rgba(255,204,0,.1);
+      border-color: rgba(255,204,0,.25);
+    }
+    .delivery-banner-icon {
+      font-size: 36px;
+      flex-shrink: 0;
+    }
+    .delivery-date {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #92400E;
+    }
+    [data-theme="dark"] .delivery-date { color: #fbbf24; }
+    .delivery-countdown {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .countdown-unit {
+      text-align: center;
+    }
+    .countdown-val {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+    [data-theme="dark"] .countdown-val { color: #7db8f7; }
+    .countdown-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--text-3);
+    }
+    .countdown-sep {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-3);
+      padding-top: 2px;
+      align-self: flex-start;
+    }
+
+    /* ─── Map ───────────────────────────────────────────────────── */
+    .map-container {
+      height: 200px;
+      border-radius: var(--radius-sm);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .map-bg {
+      width: 100%;
+      height: 100%;
+      background:
+        linear-gradient(135deg, #e8f4f8 0%, #d4ebf5 25%, #c8e6f0 50%, #d4ebf5 75%, #e8f4f8 100%);
+      position: relative;
+    }
+    [data-theme="dark"] .map-bg {
+      background: linear-gradient(135deg, #1a2a3a 0%, #1e3448 25%, #1a2e42 50%, #1e3448 75%, #1a2a3a 100%);
+    }
+    /* Grid lines */
+    .map-bg::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(27,79,138,.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(27,79,138,.08) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    /* Route path */
+    .map-route {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      right: 10%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--navy), var(--yellow));
+      border-radius: 2px;
+      transform: translateY(-50%) rotate(-6deg);
+    }
+    .map-route::before, .map-route::after {
+      content: '';
+      position: absolute;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .map-route::before {
+      left: 0;
+      background: var(--navy);
+      box-shadow: 0 0 0 4px rgba(27,79,138,.2);
+    }
+    .map-route::after {
+      right: 0;
+      background: var(--yellow);
+      box-shadow: 0 0 0 4px rgba(255,204,0,.3);
+    }
+    /* Truck icon on route */
+    .map-truck {
+      position: absolute;
+      top: calc(50% - 18px);
+      left: 55%;
+      font-size: 22px;
+      transform: translateY(-50%) rotate(6deg);
+      animation: drive 4s ease-in-out infinite alternate;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.2));
+    }
+    @keyframes drive {
+      from { left: 40%; }
+      to   { left: 65%; }
+    }
+    .map-label {
+      position: absolute;
+      bottom: 8px;
+      left: 10%;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-3);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .3px;
+    }
+    .map-label-right {
+      position: absolute;
+      bottom: 8px;
+      right: 10%;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-3);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .3px;
+      text-align: right;
+    }
+
+    /* ─── Courier card ───────────────────────────────────────────── */
+    .courier-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .courier-avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .courier-info { flex: 1; }
+    .courier-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .courier-sub  { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+    .btn-call {
+      height: 40px;
+      padding: 0 18px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--green);
+      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+    }
+    .btn-call:hover { background: #15803D; transform: translateY(-1px); }
+    .tracking-num {
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tracking-num-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .5px; }
+    .tracking-num-val { font-size: 14px; font-weight: 700; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: .5px; }
+    .btn-copy {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    [data-theme="dark"] .btn-copy { color: #7db8f7; }
+    .btn-copy:hover { background: var(--navy); color: white; border-color: var(--navy); }
+
+    /* ─── Package details ─────────────────────────────────────────── */
+    .package-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .pkg-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      text-align: center;
+    }
+    .pkg-icon { font-size: 22px; margin-bottom: 6px; }
+    .pkg-label { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .4px; }
+    .pkg-val   { font-size: 15px; font-weight: 700; color: var(--text); margin-top: 2px; }
+
+    /* ─── Past orders ────────────────────────────────────────────── */
+    .past-orders { display: flex; flex-direction: column; gap: 12px; }
+    .past-order {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .past-order:hover { border-color: var(--navy); background: var(--surface); box-shadow: var(--shadow); }
+    .past-order-icon { font-size: 24px; flex-shrink: 0; }
+    .past-order-info { flex: 1; min-width: 0; }
+    .past-order-id { font-size: 14px; font-weight: 700; color: var(--text); }
+    .past-order-meta { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+    .past-order-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .past-order-total { font-size: 14px; font-weight: 700; color: var(--text); }
+    .btn-reorder {
+      background: none;
+      border: 1px solid var(--navy);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    [data-theme="dark"] .btn-reorder { color: #7db8f7; border-color: #7db8f7; }
+    .btn-reorder:hover { background: var(--navy); color: white; }
+
+    /* ─── Rating ─────────────────────────────────────────────────── */
+    .rating-section { text-align: center; }
+    .rating-subtitle {
+      font-size: 14px;
+      color: var(--text-2);
+      margin-bottom: 16px;
+    }
+    .stars-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .star {
+      font-size: 36px;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease;
+      filter: grayscale(1) opacity(0.4);
+      user-select: none;
+    }
+    .star.active { filter: none; transform: scale(1.15); }
+    .star:hover { transform: scale(1.2); }
+
+    .feedback-form { display: none; margin-top: 4px; }
+    .feedback-form.visible { display: block; }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 90px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      color: var(--text);
+      padding: 12px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      resize: vertical;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .feedback-textarea:focus { border-color: var(--navy); }
+    .feedback-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+      justify-content: center;
+    }
+    .tag {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      color: var(--text-2);
+      user-select: none;
+    }
+    .tag.active  { background: var(--navy); color: white; border-color: var(--navy); }
+    .tag:hover:not(.active) { border-color: var(--navy); color: var(--navy); }
+    .btn-submit-review {
+      width: 100%;
+      height: 44px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--navy);
+      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin-top: 8px;
+    }
+    .btn-submit-review:hover { background: var(--navy-dark); }
+    .rating-thanks { display: none; text-align: center; padding: 16px 0; }
+    .rating-thanks.visible { display: block; }
+    .rating-thanks-icon { font-size: 48px; }
+    .rating-thanks-title { font-size: 18px; font-weight: 800; margin-top: 8px; color: var(--text); }
+    .rating-thanks-sub   { font-size: 14px; color: var(--text-2); margin-top: 4px; }
+
+    /* ─── Toast ──────────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      box-shadow: var(--shadow-md);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(.4,0,.2,1);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ─── Utility ─────────────────────────────────────────────────── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--text-3);
+      margin-bottom: 16px;
+    }
+    @media (max-width: 480px) {
+      .page { padding: 20px 14px 60px; }
+      .lookup-form { flex-direction: column; }
+      .btn-track { width: 100%; }
+      .order-meta { grid-template-columns: 1fr 1fr; }
+      .package-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Nav ──────────────────────────────────────────────────── -->
+<nav class="nav">
+  <a href="../index.html" class="nav-brand">
+    <div class="nav-logo">MM</div>
+    <span class="nav-title">Momo <span>Market</span></span>
+  </a>
+  <div class="nav-actions">
+    <a href="./browse.html" class="btn-nav-back">← Shop</a>
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+  </div>
+</nav>
+
+<!-- ─── Toast ──────────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<div class="page">
+  <div class="page-header">
+    <h1>Track Your Order</h1>
+    <p>Real-time updates on your delivery status</p>
+  </div>
+
+  <!-- Lookup card (full width) -->
+  <div class="card lookup-card" style="margin-bottom:24px;">
+    <div class="card-title">🔍 Order Lookup</div>
+    <p>Enter your order number to track your package</p>
+    <div class="lookup-form">
+      <input class="lookup-input" id="orderInput" type="text" placeholder="e.g. MM-2024-78234" value="MM-2024-78234" />
+      <button class="btn-track" onclick="trackOrder()">Track Order</button>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="grid-main">
+
+    <!-- ─── LEFT COLUMN ─────────────────────────────────────────── -->
+    <div class="col-left">
+
+      <!-- Delivery countdown -->
+      <div class="delivery-banner" id="deliveryBanner">
+        <div class="delivery-banner-icon">📦</div>
+        <div>
+          <div class="delivery-date">Estimated Delivery: <strong id="deliveryDateText"></strong></div>
+          <div class="delivery-countdown" id="countdown">
+            <div class="countdown-unit">
+              <div class="countdown-val" id="cdDays">00</div>
+              <div class="countdown-label">Days</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-val" id="cdHours">00</div>
+              <div class="countdown-label">Hours</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-val" id="cdMins">00</div>
+              <div class="countdown-label">Mins</div>
+            </div>
+            <div class="countdown-sep">:</div>
+            <div class="countdown-unit">
+              <div class="countdown-val" id="cdSecs">00</div>
+              <div class="countdown-label">Secs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order status card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:#EFF6FF;">🚚</div>
+            Delivery Status
+          </div>
+          <span class="badge badge-orange" id="statusBadge">● Out for Delivery</span>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span class="pl">Progress</span>
+            <span class="pr" id="progressPct">80%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline" id="timeline">
+          <!-- Steps inserted by JS -->
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:#EFF6FF;">🗺️</div>
+            Delivery Route
+          </div>
+          <span style="font-size:12px;color:var(--text-3);">Live tracking</span>
+        </div>
+        <div class="map-container">
+          <div class="map-bg">
+            <div class="map-route"></div>
+            <div class="map-truck">🚚</div>
+            <div class="map-label">📍 Warehouse, Johannesburg</div>
+            <div class="map-label-right">🏠 Your Address</div>
+          </div>
+        </div>
+        <div class="courier-row">
+          <div class="courier-avatar">👨‍✈️</div>
+          <div class="courier-info">
+            <div class="courier-name">Sipho Dlamini</div>
+            <div class="courier-sub">Momo Express Courier • ⭐ 4.9 (832 deliveries)</div>
+          </div>
+          <button class="btn-call" onclick="showToast('📞 Calling Sipho...', '2000')">
+            📞 Call
+          </button>
+        </div>
+        <div class="tracking-num">
+          <div>
+            <div class="tracking-num-label">Tracking Number</div>
+            <div class="tracking-num-val">MM-TRK-9823-ZA-2024</div>
+          </div>
+          <button class="btn-copy" onclick="copyTracking()">Copy</button>
+        </div>
+      </div>
+
+    </div><!-- end col-left -->
+
+    <!-- ─── RIGHT COLUMN ─────────────────────────────────────────── -->
+    <div class="col-right">
+
+      <!-- Order summary -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:#F0FDF4;">🛍️</div>
+            Order Summary
+          </div>
+          <span class="badge badge-blue">#MM-2024-78234</span>
+        </div>
+
+        <div class="order-meta">
+          <div class="meta-item">
+            <label>Order Date</label>
+            <span>12 Apr 2024</span>
+          </div>
+          <div class="meta-item">
+            <label>Payment</label>
+            <span>💳 Card</span>
+          </div>
+          <div class="meta-item">
+            <label>Items</label>
+            <span>3 items</span>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <div class="order-items">
+          <div class="order-item">
+            <div class="item-img">👟</div>
+            <div class="item-info">
+              <div class="item-name">Nike Air Max 270</div>
+              <div class="item-meta">Size 10 · Black/White × 1</div>
+            </div>
+            <div class="item-price">R1,899</div>
+          </div>
+          <div class="order-item">
+            <div class="item-img">🎒</div>
+            <div class="item-info">
+              <div class="item-name">Urban Backpack Pro</div>
+              <div class="item-meta">Charcoal Grey × 1</div>
+            </div>
+            <div class="item-price">R649</div>
+          </div>
+          <div class="order-item">
+            <div class="item-img">🧢</div>
+            <div class="item-info">
+              <div class="item-name">MoMo Cap Classic</div>
+              <div class="item-meta">Navy × 2</div>
+            </div>
+            <div class="item-price">R298</div>
+          </div>
+        </div>
+
+        <div class="order-total">
+          <div>
+            <div class="total-label">Order Total</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:2px;">incl. R65 delivery</div>
+          </div>
+          <div class="total-value">R2,846</div>
+        </div>
+      </div>
+
+      <!-- Package details -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:#FFF7ED;">📐</div>
+            Package Details
+          </div>
+        </div>
+        <div class="package-grid">
+          <div class="pkg-item">
+            <div class="pkg-icon">⚖️</div>
+            <div class="pkg-label">Weight</div>
+            <div class="pkg-val">2.4 kg</div>
+          </div>
+          <div class="pkg-item">
+            <div class="pkg-icon">📏</div>
+            <div class="pkg-label">Dimensions</div>
+            <div class="pkg-val">40×32×18</div>
+          </div>
+          <div class="pkg-item">
+            <div class="pkg-icon">📦</div>
+            <div class="pkg-label">Parcels</div>
+            <div class="pkg-val">1 box</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Past orders -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:#F5F3FF;">🕒</div>
+            Order History
+          </div>
+        </div>
+        <div class="past-orders">
+          <div class="past-order" onclick="loadOrder('MM-2024-78234')">
+            <div class="past-order-icon">🛍️</div>
+            <div class="past-order-info">
+              <div class="past-order-id">#MM-2024-78234</div>
+              <div class="past-order-meta">12 Apr 2024 · 3 items</div>
+            </div>
+            <div class="past-order-right">
+              <div class="past-order-total">R2,846</div>
+              <span class="badge badge-orange" style="font-size:11px;">Out for Delivery</span>
+            </div>
+          </div>
+          <div class="past-order" onclick="loadOrder('MM-2024-71108')">
+            <div class="past-order-icon">📱</div>
+            <div class="past-order-info">
+              <div class="past-order-id">#MM-2024-71108</div>
+              <div class="past-order-meta">28 Mar 2024 · 1 item</div>
+            </div>
+            <div class="past-order-right">
+              <div class="past-order-total">R8,299</div>
+              <span class="badge badge-green" style="font-size:11px;">Delivered</span>
+            </div>
+          </div>
+          <div class="past-order" onclick="loadOrder('MM-2024-66042')">
+            <div class="past-order-icon">👗</div>
+            <div class="past-order-info">
+              <div class="past-order-id">#MM-2024-66042</div>
+              <div class="past-order-meta">15 Mar 2024 · 4 items</div>
+            </div>
+            <div class="past-order-right">
+              <div class="past-order-total">R1,580</div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span class="badge badge-green" style="font-size:11px;">Delivered</span>
+                <button class="btn-reorder" onclick="event.stopPropagation();reorder('MM-2024-66042')">Reorder</button>
+              </div>
+            </div>
+          </div>
+          <div class="past-order" onclick="loadOrder('MM-2024-59871')">
+            <div class="past-order-icon">🏠</div>
+            <div class="past-order-info">
+              <div class="past-order-id">#MM-2024-59871</div>
+              <div class="past-order-meta">02 Feb 2024 · 2 items</div>
+            </div>
+            <div class="past-order-right">
+              <div class="past-order-total">R3,120</div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span class="badge badge-green" style="font-size:11px;">Delivered</span>
+                <button class="btn-reorder" onclick="event.stopPropagation();reorder('MM-2024-59871')">Reorder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating -->
+      <div class="card" id="ratingCard">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-title-icon" style="background:#FFF9C4;">⭐</div>
+            Rate Your Delivery
+          </div>
+        </div>
+        <div id="ratingContent">
+          <div class="rating-section">
+            <div class="rating-subtitle">How was your delivery experience?</div>
+            <div class="stars-row" id="starsRow">
+              <span class="star" data-val="1" onclick="rateStar(1)">⭐</span>
+              <span class="star" data-val="2" onclick="rateStar(2)">⭐</span>
+              <span class="star" data-val="3" onclick="rateStar(3)">⭐</span>
+              <span class="star" data-val="4" onclick="rateStar(4)">⭐</span>
+              <span class="star" data-val="5" onclick="rateStar(5)">⭐</span>
+            </div>
+          </div>
+          <div class="feedback-form" id="feedbackForm">
+            <div class="feedback-tags" id="feedbackTags">
+              <span class="tag" onclick="toggleTag(this)">Fast delivery</span>
+              <span class="tag" onclick="toggleTag(this)">Friendly courier</span>
+              <span class="tag" onclick="toggleTag(this)">Good packaging</span>
+              <span class="tag" onclick="toggleTag(this)">On time</span>
+              <span class="tag" onclick="toggleTag(this)">Handled with care</span>
+            </div>
+            <textarea class="feedback-textarea" id="feedbackText" placeholder="Tell us more about your experience…"></textarea>
+            <button class="btn-submit-review" onclick="submitReview()">Submit Review</button>
+          </div>
+        </div>
+        <div class="rating-thanks" id="ratingThanks">
+          <div class="rating-thanks-icon">🎉</div>
+          <div class="rating-thanks-title">Thank you!</div>
+          <div class="rating-thanks-sub">Your feedback helps us improve the MoMo experience.</div>
+        </div>
+      </div>
+
+    </div><!-- end col-right -->
+  </div><!-- end grid-main -->
+</div><!-- end page -->
+
+<script>
+  /* ─── Theme ──────────────────────────────────────────────────── */
+  const html = document.documentElement;
+  const toggle = document.getElementById('themeToggle');
+  const saved = localStorage.getItem('momo-theme') || 'light';
+  html.setAttribute('data-theme', saved);
+  toggle.textContent = saved === 'dark' ? '☀️' : '🌙';
+
+  toggle.addEventListener('click', () => {
+    const cur = html.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    toggle.textContent = next === 'dark' ? '☀️' : '🌙';
+    localStorage.setItem('momo-theme', next);
+  });
+
+  /* ─── Timeline data ──────────────────────────────────────────── */
+  const steps = [
+    { id:'placed',   icon:'🛒', label:'Order Placed',      sub:'Your order has been received',          time:'12 Apr, 09:12 AM' },
+    { id:'confirmed',icon:'✅', label:'Order Confirmed',   sub:'Payment verified & order confirmed',    time:'12 Apr, 09:35 AM' },
+    { id:'processing',icon:'📦',label:'Processing',        sub:'Items picked and packed at warehouse',  time:'12 Apr, 02:10 PM' },
+    { id:'shipped',  icon:'🏭', label:'Shipped',           sub:'Package dispatched from Johannesburg hub',time:'13 Apr, 07:45 AM' },
+    { id:'out',      icon:'🚚', label:'Out for Delivery',  sub:'Your package is on its way',            time:'15 Apr, 08:20 AM' },
+    { id:'delivered',icon:'🏠', label:'Delivered',         sub:'Package delivered to your door',        time:'Expected today' },
+  ];
+  // Step 5 (out for delivery) is current → first 5 completed/active, last pending
+  const currentStep = 4; // 0-indexed
+
+  function renderTimeline() {
+    const container = document.getElementById('timeline');
+    container.innerHTML = '';
+    steps.forEach((s, i) => {
+      const state = i < currentStep ? 'completed' : i === currentStep ? 'active' : 'pending';
+      const iconColor = state === 'completed' ? 'white' : state === 'active' ? 'white' : '';
+      const dotBg = state === 'completed' ? '#16A34A' : state === 'active' ? 'var(--navy)' : 'var(--surface)';
+      const html = `
+        <div class="step ${state}">
+          <div class="step-dot-wrap">
+            <div class="step-dot" style="background:${dotBg};color:${iconColor};">
+              ${state === 'completed' ? '✓' : `<span class="step-icon-wrap">${s.icon}</span>`}
+            </div>
+          </div>
+          <div class="step-body">
+            <div class="step-title">${s.label}${state==='active' ? ' <span class="badge badge-orange" style="font-size:11px;padding:2px 8px;">Now</span>' : ''}</div>
+            <div class="step-sub">${s.sub}</div>
+            ${state !== 'pending' ? `<div class="step-time">🕐 ${s.time}</div>` : ''}
+          </div>
+        </div>`;
+      container.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  /* ─── Countdown timer ─────────────────────────────────────────── */
+  // Target = 5pm today
+  function getDeliveryTarget() {
+    const d = new Date();
+    d.setHours(17, 0, 0, 0);
+    if (d < new Date()) d.setDate(d.getDate() + 1);
+    return d;
+  }
+
+  function formatDeliveryDate(d) {
+    return d.toLocaleDateString('en-ZA', { weekday:'long', day:'numeric', month:'long' });
+  }
+
+  function pad(n) { return String(Math.max(0,n)).padStart(2,'0'); }
+
+  let deliveryTarget = getDeliveryTarget();
+
+  function tick() {
+    const now = new Date();
+    const diff = Math.max(0, deliveryTarget - now);
+    const secs  = Math.floor(diff / 1000) % 60;
+    const mins  = Math.floor(diff / 60000) % 60;
+    const hours = Math.floor(diff / 3600000) % 24;
+    const days  = Math.floor(diff / 86400000);
+    document.getElementById('cdDays').textContent  = pad(days);
+    document.getElementById('cdHours').textContent = pad(hours);
+    document.getElementById('cdMins').textContent  = pad(mins);
+    document.getElementById('cdSecs').textContent  = pad(secs);
+  }
+
+  document.getElementById('deliveryDateText').textContent = formatDeliveryDate(deliveryTarget);
+  tick();
+  setInterval(tick, 1000);
+
+  /* ─── Progress ─────────────────────────────────────────────────── */
+  function animateProgress(pct) {
+    const fill = document.getElementById('progressFill');
+    const pctEl = document.getElementById('progressPct');
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        fill.style.width = pct + '%';
+        pctEl.textContent = pct + '%';
+      }, 200);
+    });
+  }
+
+  /* ─── Track order ─────────────────────────────────────────────── */
+  function trackOrder() {
+    const val = document.getElementById('orderInput').value.trim();
+    if (!val) {
+      showToast('⚠️ Please enter an order number');
+      return;
+    }
+    showToast('✅ Loaded order ' + val);
+    animateProgress(80);
+  }
+
+  function loadOrder(id) {
+    document.getElementById('orderInput').value = id;
+    showToast('📋 Viewing order ' + id);
+    animateProgress(id === 'MM-2024-78234' ? 80 : 100);
+  }
+
+  /* ─── Copy tracking ─────────────────────────────────────────────── */
+  function copyTracking() {
+    navigator.clipboard.writeText('MM-TRK-9823-ZA-2024').catch(()=>{});
+    showToast('📋 Tracking number copied!');
+  }
+
+  /* ─── Reorder ─────────────────────────────────────────────────── */
+  function reorder(id) {
+    showToast('🛒 Added items from ' + id + ' to cart!');
+  }
+
+  /* ─── Star rating ─────────────────────────────────────────────── */
+  let currentRating = 0;
+  function rateStar(val) {
+    currentRating = val;
+    const stars = document.querySelectorAll('.star');
+    stars.forEach((s, i) => {
+      s.classList.toggle('active', i < val);
+    });
+    document.getElementById('feedbackForm').classList.add('visible');
+  }
+  function toggleTag(el) { el.classList.toggle('active'); }
+
+  function submitReview() {
+    if (!currentRating) { showToast('⭐ Please select a star rating'); return; }
+    document.getElementById('ratingContent').style.display = 'none';
+    document.getElementById('ratingThanks').classList.add('visible');
+    showToast('🎉 Thank you for your review!');
+  }
+
+  /* ─── Toast ──────────────────────────────────────────────────── */
+  let toastTimer;
+  function showToast(msg, dur = 3000) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), +dur);
+  }
+
+  /* ─── Init ─────────────────────────────────────────────────────── */
+  renderTimeline();
+  animateProgress(80);
+</script>
+</body>
+</html>

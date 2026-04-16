@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storefront - Market by MoMo Seller Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background: #1A1A2E;
+            color: #FFFFFF;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 30px 0;
+            border-right: 1px solid rgba(255, 204, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFCC00;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #9E9E9E;
+        }
+
+        .store-info {
+            padding: 20px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 8px;
+            margin: 20px;
+            margin-bottom: 30px;
+        }
+
+        .store-avatar {
+            width: 50px;
+            height: 50px;
+            background: #FFCC00;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #1A1A2E;
+            font-size: 20px;
+        }
+
+        .store-name {
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .store-email {
+            font-size: 11px;
+            color: #9E9E9E;
+            text-align: center;
+        }
+
+        .nav-items {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 8px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 204, 0, 0.1);
+            border-left-color: #FFCC00;
+        }
+
+        .nav-link.active {
+            color: #FFCC00;
+            border-left-color: #FFCC00;
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+            font-size: 12px;
+            color: #9E9E9E;
+            text-align: center;
+        }
+
+        .sidebar-footer-links {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .sidebar-footer-links a {
+            color: #FFCC00;
+            text-decoration: none;
+            font-size: 11px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A2E;
+            grid-column: 1 / -1;
+            margin-bottom: 10px;
+        }
+
+        /* Controls Panel */
+        .controls-panel {
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #E0E0E0;
+            padding: 24px;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .control-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .control-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1A1A2E;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            color: #9E9E9E;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A2E;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #FFCC00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #FFCC00;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(255, 204, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .upload-zone:hover {
+            background: rgba(255, 204, 0, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 12px;
+            color: #1A1A2E;
+            font-weight: 500;
+        }
+
+        /* Color Swatches */
+        .color-swatches {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .color-swatch {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.05);
+        }
+
+        .color-swatch.selected {
+            border-color: #1A1A2E;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #1A1A2E;
+        }
+
+        .color-swatch.yellow-navy {
+            background: linear-gradient(135deg, #FFCC00 50%, #1A1A2E 50%);
+        }
+
+        .color-swatch.green-black {
+            background: linear-gradient(135deg, #00B074 50%, #1A1A1A 50%);
+        }
+
+        .color-swatch.red-white {
+            background: linear-gradient(135deg, #FF3B30 50%, #FFFFFF 50%);
+        }
+
+        /* Feature Toggles */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .toggle-label {
+            font-size: 13px;
+            color: #1A1A2E;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #E0E0E0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .switch.active {
+            background: #FFCC00;
+        }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s ease;
+        }
+
+        .switch.active::after {
+            left: 26px;
+        }
+
+        /* Drag and Drop */
+        .draggable-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .draggable-item {
+            background: #F8F9FA;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .draggable-item:hover {
+            background: #F0F0F0;
+        }
+
+        .drag-handle {
+            color: #9E9E9E;
+            font-size: 16px;
+        }
+
+        /* Preview Section */
+        .preview-pane {
+            background: #FFFFFF;
+            border-radius: 12px;
+            border: 1px solid #E0E0E0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            background: linear-gradient(135deg, #FFCC00, #FFD633);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .preview-banner {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(135deg, #1A1A2E, #16213E);
+            border-radius: 4px;
+            margin-bottom: 16px;
+        }
+
+        .preview-logo {
+            width: 80px;
+            height: 80px;
+            background: #F0F0F0;
+            border-radius: 50%;
+            margin: -40px auto 12px;
+            border: 4px solid #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .preview-store-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A1A2E;
+            margin-bottom: 4px;
+        }
+
+        .preview-tagline {
+            font-size: 12px;
+            color: #9E9E9E;
+            margin-bottom: 16px;
+        }
+
+        .preview-body {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .preview-section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A2E;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            color: #9E9E9E;
+        }
+
+        .preview-products {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .preview-product {
+            background: #F8F9FA;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .preview-product-image {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #E0E0E0;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .preview-product-name {
+            font-size: 11px;
+            color: #1A1A2E;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .preview-product-price {
+            font-size: 10px;
+            color: #FFCC00;
+            font-weight: 600;
+        }
+
+        .preview-about {
+            background: #F8F9FA;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 11px;
+            color: #1A1A2E;
+            line-height: 1.5;
+        }
+
+        .preview-footer {
+            border-top: 1px solid #E0E0E0;
+            padding-top: 12px;
+            margin-top: 12px;
+            display: flex;
+            gap: 12px;
+            font-size: 20px;
+        }
+
+        /* Save Button */
+        .save-button-container {
+            grid-column: 1 / -1;
+            position: sticky;
+            bottom: 0;
+            background: #F8F9FA;
+            padding: 20px 40px;
+            display: flex;
+            gap: 15px;
+            margin-left: -40px;
+            margin-right: -40px;
+            margin-bottom: -40px;
+            padding-left: 40px;
+            padding-right: 40px;
+            border-top: 1px solid #E0E0E0;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #FFCC00;
+            color: #1A1A2E;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #FFD633;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #F0F0F0;
+            color: #1A1A2E;
+        }
+
+        .btn-secondary:hover {
+            background: #E0E0E0;
+        }
+
+        @media (max-width: 1400px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .controls-panel {
+                max-height: none;
+            }
+
+            .save-button-container {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 20px;
+                grid-template-columns: 1fr;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .color-swatches {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .preview-products {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">Market by MoMo</div>
+            <div class="sidebar-subtitle">Seller Center</div>
+        </div>
+
+        <div class="store-info">
+            <div class="store-avatar">TU</div>
+            <div class="store-name">TechHub Uganda</div>
+            <div class="store-email">techhubu@gmail.com</div>
+        </div>
+
+        <ul class="nav-items">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <span>📦</span>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="inventory.html" class="nav-link">
+                    <span>📋</span>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="storefront.html" class="nav-link active">
+                    <span>🏪</span>
+                    <span>My Storefront</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="promotions.html" class="nav-link">
+                    <span>🎁</span>
+                    <span>Promotions</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span>💰</span>
+                    <span>Payouts</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span>📈</span>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span>⭐</span>
+                    <span>Reviews</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-links">
+                <a href="#">View My Store →</a>
+            </div>
+            <div style="margin-bottom: 15px;">Help & Support</div>
+            <div>Logged in as: techhubu@gmail.com</div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">Customize Your Storefront</h1>
+
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <!-- Store Profile -->
+            <div class="control-section">
+                <div class="section-title">Store Profile</div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Name</label>
+                    <input type="text" class="form-input" value="TechHub Uganda" id="storeName" onchange="updatePreview()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Tagline</label>
+                    <input type="text" class="form-input" value="Premium Electronics for Everyone" id="storeTagline" onchange="updatePreview()">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Description</label>
+                    <textarea class="form-input" id="storeDescription" onchange="updatePreview()">We provide the latest and most trusted electronics and gadgets at competitive prices. Fast shipping, secure payments, and excellent customer service.</textarea>
+                </div>
+            </div>
+
+            <!-- Store Logo & Banner -->
+            <div class="control-section">
+                <div class="section-title">Visuals</div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Logo</label>
+                    <div class="upload-zone">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">Click to upload</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Store Banner</label>
+                    <div class="upload-zone">
+                        <div class="upload-icon">🖼️</div>
+                        <div class="upload-text">Click to upload</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Colors -->
+            <div class="control-section">
+                <div class="section-title">Theme Color</div>
+
+                <div class="color-swatches">
+                    <div class="color-swatch yellow-navy selected" onclick="selectColor(this, 'yellow-navy')" title="Yellow & Navy"></div>
+                    <div class="color-swatch green-black" onclick="selectColor(this, 'green-black')" title="Green & Black"></div>
+                    <div class="color-swatch red-white" onclick="selectColor(this, 'red-white')" title="Red & White"></div>
+                </div>
+            </div>
+
+            <!-- Featured Products -->
+            <div class="control-section">
+                <div class="section-title">Featured Products</div>
+                <p style="font-size: 12px; color: #9E9E9E; margin-bottom: 12px;">Drag to reorder (top products appear first)</p>
+
+                <div class="draggable-list">
+                    <div class="draggable-item">
+                        <span class="drag-handle">⋮⋮</span>
+                        <span>Samsung Galaxy A54</span>
+                    </div>
+                    <div class="draggable-item">
+                        <span class="drag-handle">⋮⋮</span>
+                        <span>JBL Bluetooth Speaker</span>
+                    </div>
+                    <div class="draggable-item">
+                        <span class="drag-handle">⋮⋮</span>
+                        <span>HP Pavilion Laptop</span>
+                    </div>
+                    <div class="draggable-item">
+                        <span class="drag-handle">⋮⋮</span>
+                        <span>AirPods Pro</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Store Sections -->
+            <div class="control-section">
+                <div class="section-title">Store Sections</div>
+
+                <div class="toggle-switch">
+                    <span class="toggle-label">About Us</span>
+                    <div class="switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+
+                <div class="toggle-switch">
+                    <span class="toggle-label">Promotions</span>
+                    <div class="switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+
+                <div class="toggle-switch">
+                    <span class="toggle-label">Reviews</span>
+                    <div class="switch active" onclick="toggleSwitch(this)"></div>
+                </div>
+
+                <div class="toggle-switch">
+                    <span class="toggle-label">New Arrivals</span>
+                    <div class="switch" onclick="toggleSwitch(this)"></div>
+                </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="control-section">
+                <div class="section-title">Social & Contact</div>
+
+                <div class="form-group">
+                    <label class="form-label">Facebook URL</label>
+                    <input type="url" class="form-input" placeholder="https://facebook.com/...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Instagram URL</label>
+                    <input type="url" class="form-input" placeholder="https://instagram.com/...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">WhatsApp Business Number</label>
+                    <input type="text" class="form-input" placeholder="+256 7XX XXX XXX">
+                </div>
+            </div>
+
+            <!-- SEO -->
+            <div class="control-section">
+                <div class="section-title">SEO</div>
+
+                <div class="form-group">
+                    <label class="form-label">Meta Title</label>
+                    <input type="text" class="form-input" placeholder="TechHub Uganda - Premium Electronics">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Meta Description</label>
+                    <textarea class="form-input" placeholder="Buy latest electronics and gadgets at TechHub Uganda. Fast shipping, secure payments."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Pane -->
+        <div class="preview-pane">
+            <div class="preview-header">
+                <div class="preview-banner" id="previewBanner"></div>
+                <div class="preview-logo">TU</div>
+                <div class="preview-store-name" id="previewName">TechHub Uganda</div>
+                <div class="preview-tagline" id="previewTagline">Premium Electronics for Everyone</div>
+            </div>
+
+            <div class="preview-body">
+                <!-- Featured Products -->
+                <div style="margin-bottom: 20px;">
+                    <div class="preview-section-title">Featured Products</div>
+                    <div class="preview-products">
+                        <div class="preview-product">
+                            <div class="preview-product-image">📱</div>
+                            <div class="preview-product-name">Samsung Galaxy A54</div>
+                            <div class="preview-product-price">UGX 890K</div>
+                        </div>
+                        <div class="preview-product">
+                            <div class="preview-product-image">🎧</div>
+                            <div class="preview-product-name">JBL Speaker</div>
+                            <div class="preview-product-price">UGX 185K</div>
+                        </div>
+                        <div class="preview-product">
+                            <div class="preview-product-image">💻</div>
+                            <div class="preview-product-name">HP Laptop</div>
+                            <div class="preview-product-price">UGX 1.85M</div>
+                        </div>
+                        <div class="preview-product">
+                            <div class="preview-product-image">🎧</div>
+                            <div class="preview-product-name">AirPods Pro</div>
+                            <div class="preview-product-price">UGX 630K</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About Us Section -->
+                <div style="margin-bottom: 20px;">
+                    <div class="preview-section-title">About Us</div>
+                    <div class="preview-about" id="previewAbout">
+                        We provide the latest and most trusted electronics and gadgets at competitive prices. Fast shipping, secure payments, and excellent customer service.
+                    </div>
+                </div>
+
+                <!-- Social Links -->
+                <div style="margin-bottom: 20px;">
+                    <div class="preview-section-title">Follow Us</div>
+                    <div class="preview-footer">
+                        <a href="#" title="Facebook" style="color: #1877F2; text-decoration: none;">f</a>
+                        <a href="#" title="Instagram" style="color: #E1306C; text-decoration: none;">📷</a>
+                        <a href="#" title="WhatsApp" style="color: #25D366; text-decoration: none;">💬</a>
+                    </div>
+                </div>
+
+                <!-- View Live Store Button -->
+                <div style="margin-top: 24px;">
+                    <a href="#" style="display: block; padding: 12px; background: #FFCC00; color: #1A1A2E; text-align: center; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 12px;">View Live Store →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="save-button-container">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-primary" onclick="saveChanges()">💾 Save Changes</button>
+        </div>
+    </main>
+
+    <script>
+        function updatePreview() {
+            document.getElementById('previewName').textContent = document.getElementById('storeName').value;
+            document.getElementById('previewTagline').textContent = document.getElementById('storeTagline').value;
+            document.getElementById('previewAbout').textContent = document.getElementById('storeDescription').value;
+        }
+
+        function selectColor(element, colorClass) {
+            document.querySelectorAll('.color-swatch').forEach(swatch => swatch.classList.remove('selected'));
+            element.classList.add('selected');
+
+            // Update banner color
+            const bannerElement = document.getElementById('previewBanner');
+            bannerElement.style.background = getColorGradient(colorClass);
+        }
+
+        function getColorGradient(colorClass) {
+            const gradients = {
+                'yellow-navy': 'linear-gradient(135deg, #FFCC00, #FFD633)',
+                'green-black': 'linear-gradient(135deg, #00B074, #1A1A1A)',
+                'red-white': 'linear-gradient(135deg, #FF3B30, #FFFFFF)'
+            };
+            return gradients[colorClass] || gradients['yellow-navy'];
+        }
+
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+
+        function saveChanges() {
+            alert('Your storefront has been updated! The changes will be live shortly.');
+        }
+    </script>
+</body>
+</html>

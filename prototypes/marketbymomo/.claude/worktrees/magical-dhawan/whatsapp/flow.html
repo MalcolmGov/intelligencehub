@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Shopping - Market by MoMo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #F3F4F6; color: #111827; }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        .hero-logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .hero-subtitle {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        .btn-primary {
+            background: white;
+            color: #075E54;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover { transform: scale(1.05); }
+
+        .qr-placeholder {
+            background: white;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #128C7E;
+            font-weight: 600;
+            gap: 12px;
+        }
+
+        /* How It Works */
+        .section {
+            padding: 80px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        .step {
+            text-align: center;
+        }
+        .step-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .step-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .step-desc {
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        /* Chat Simulator */
+        .chat-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        .chat-header-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .chat-header-title {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .chat-header-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .verified-badge {
+            background: rgba(255,255,255,0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-top: 2px;
+        }
+        .chat-header-icons {
+            display: flex;
+            gap: 12px;
+            font-size: 18px;
+        }
+
+        .chat-messages {
+            height: 600px;
+            overflow-y: auto;
+            padding: 16px;
+            background: #E5DDD5;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 4px;
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-bubble {
+            padding: 12px 14px;
+            border-radius: 18px;
+            max-width: 85%;
+            font-size: 13px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message-bot {
+            justify-content: flex-start;
+        }
+        .message-bot .message-bubble {
+            background: white;
+            color: #111827;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-user {
+            justify-content: flex-end;
+        }
+        .message-user .message-bubble {
+            background: #DCF8C6;
+            color: #000;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: #999;
+            margin-top: 2px;
+            text-align: center;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 12px 14px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+        }
+
+        /* Chat Input */
+        .chat-input {
+            background: white;
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .input-field {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #E5E7EB;
+            border-radius: 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+        }
+        .input-button {
+            background: none;
+            border: none;
+            color: #128C7E;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Controls */
+        .chat-controls {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+        .control-button {
+            background: #128C7E;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .control-button:hover { background: #0d6b5c; }
+
+        /* For Sellers */
+        .sellers-section {
+            background: #F9FAFB;
+            padding: 60px 40px;
+        }
+        .sellers-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+        .notification-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #128C7E;
+        }
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #111827;
+        }
+        .notification-text {
+            font-size: 13px;
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        /* Get Started */
+        .cta-section {
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+            color: white;
+            padding: 80px 40px;
+            text-align: center;
+        }
+        .cta-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        .cta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .cta-card {
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        .cta-card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        .cta-card-text {
+            font-size: 14px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        .cta-button {
+            background: white;
+            color: #075E54;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .cta-button:hover { transform: translateY(-2px); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero { padding: 40px 20px; }
+            .hero-title { font-size: 32px; }
+            .section { padding: 40px 20px; }
+            .section-title { font-size: 24px; }
+            .steps-grid { grid-template-columns: 1fr; }
+            .chat-messages { height: 400px; }
+            .cta-section { padding: 40px 20px; }
+            .cta-title { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-logo">📱</div>
+        <h1 class="hero-title">Shop on WhatsApp</h1>
+        <p class="hero-subtitle">Browse products, add to cart, and pay with MoMo — all without leaving WhatsApp!</p>
+        <div class="hero-buttons">
+            <button class="btn-primary">📲 Start Chatting →</button>
+        </div>
+        <div class="qr-placeholder">
+            <div>📱</div>
+            <div>Scan to Start Shopping</div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="section">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-grid">
+            <div class="step">
+                <div class="step-icon">🛍️</div>
+                <h3 class="step-title">Browse Products</h3>
+                <p class="step-desc">Chat with Market by MoMo, browse categories, and search for products easily</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">🛒</div>
+                <h3 class="step-title">Add to Cart</h3>
+                <p class="step-desc">Reply to add items, check your cart anytime, and manage your orders</p>
+            </div>
+            <div class="step">
+                <div class="step-icon">💰</div>
+                <h3 class="step-title">Pay with MoMo</h3>
+                <p class="step-desc">One tap payment via MTN MoMo, get instant confirmation and delivery updates</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Simulator -->
+    <div class="section">
+        <h2 class="section-title">Shopping Experience Preview</h2>
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="chat-header-avatar">🏪</div>
+                    <div>
+                        <div class="chat-header-title">Market by MoMo</div>
+                        <div class="chat-header-status">
+                            Online
+                            <div class="verified-badge">🟢 Verified Business</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-header-icons">
+                    <span>📞</span>
+                    <span>⋮</span>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be added here by JS -->
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input">
+                <input type="text" class="input-field" placeholder="Type a message..." disabled>
+                <button class="input-button">😊</button>
+                <button class="input-button">📎</button>
+                <button class="input-button">🎤</button>
+            </div>
+        </div>
+
+        <div class="chat-controls">
+            <button class="control-button" onclick="startDemo()">▶️ Replay Demo</button>
+        </div>
+    </div>
+
+    <!-- For Sellers -->
+    <div class="sellers-section">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h2 class="section-title" style="margin-bottom: 40px;">📲 WhatsApp Notifications for Sellers</h2>
+            <div class="sellers-grid">
+                <div class="notification-card">
+                    <div class="notification-title">🔔 New Order Alert</div>
+                    <div class="notification-text">Get instant notifications when customers place orders. Receive order details, customer info, and payment status immediately.</div>
+                </div>
+                <div class="notification-card">
+                    <div class="notification-title">📦 Shipment Updates</div>
+                    <div class="notification-text">Notify customers about order status, shipping details, and delivery estimates automatically through WhatsApp.</div>
+                </div>
+                <div class="notification-card">
+                    <div class="notification-title">💰 Payout Confirmations</div>
+                    <div class="notification-text">Receive payout notifications with details of your earnings, MoMo transfer status, and payment history.</div>
+                </div>
+                <div class="notification-card">
+                    <div class="notification-title">⭐ Customer Reviews</div>
+                    <div class="notification-text">Get notified when customers leave reviews and ratings. Engage with feedback to improve your business.</div>
+                </div>
+                <div class="notification-card">
+                    <div class="notification-title">📊 Sales Analytics</div>
+                    <div class="notification-text">Daily summary of sales, orders, and performance metrics sent directly to your WhatsApp.</div>
+                </div>
+                <div class="notification-card">
+                    <div class="notification-title">💬 Customer Messages</div>
+                    <div class="notification-text">Respond to customer inquiries, address concerns, and provide support all on WhatsApp.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Get Started -->
+    <div class="cta-section">
+        <h2 class="cta-title">Ready to Shop on WhatsApp?</h2>
+        <div class="cta-grid">
+            <div class="cta-card">
+                <div class="cta-card-title">WhatsApp Number</div>
+                <div class="cta-card-text">+256 700 000 000</div>
+                <button class="cta-button">📱 Save Contact</button>
+            </div>
+            <div class="cta-card">
+                <div class="cta-card-title">QR Code</div>
+                <div class="cta-card-text">Scan to start shopping instantly</div>
+                <button class="cta-button">📸 Scan QR</button>
+            </div>
+            <div class="cta-card">
+                <div class="cta-card-title">Direct Link</div>
+                <div class="cta-card-text">Open in WhatsApp now</div>
+                <button class="cta-button">💬 Open WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messages = [
+            { type: 'bot', text: '👋 Welcome to Market by MoMo!\nHow can I help you today?\n\n1️⃣ Browse Categories\n2️⃣ Search Product\n3️⃣ Hot Deals Today 🔥\n4️⃣ My Cart 🛒\n5️⃣ My Orders 📦\n6️⃣ Help & Support' },
+            { type: 'user', text: '1' },
+            { type: 'bot', text: '🛍 Select a category:\n\n📱 Electronics\n🛒 Supermarket\n🏠 Home & Furniture\n👗 Fashion\n🏃 Sports & Leisure\n💊 Health & Beauty' },
+            { type: 'user', text: '📱 Electronics' },
+            { type: 'bot', text: '📱 *Top Electronics Deals*\n\n🔥 Samsung Galaxy A54\n💰 UGX 890,000 (was 1,200,000)\n⭐ 4.5/5 | 26% OFF\nReply *A1* to add to cart\n\n🔥 JBL Bluetooth Speaker\n💰 UGX 185,000 (was 250,000)\n⭐ 4.7/5 | 26% OFF\nReply *A2* to add to cart\n\nReply *MORE* for more products\nReply *BACK* for categories' },
+            { type: 'user', text: 'A1' },
+            { type: 'bot', text: '✅ *Samsung Galaxy A54* added to cart!\n\n🛒 Your Cart (1 item):\n• Samsung Galaxy A54 — UGX 890,000\n\nReply *CART* to view cart\nReply *CHECKOUT* to pay now\nReply *CONTINUE* to keep shopping' },
+            { type: 'user', text: 'CHECKOUT' },
+            { type: 'bot', text: '🛒 *Order Summary*\n\n📦 Samsung Galaxy A54 × 1\n💰 UGX 890,000\n\n📍 Deliver to: Kampala, Uganda\n🚚 Delivery: Free (2-3 days)\n\n💳 *Select Payment:*\n1️⃣ Pay with MoMo\n2️⃣ Pay with Card\n3️⃣ Pay Later (3 instalments)' },
+            { type: 'user', text: '1' },
+            { type: 'bot', text: '📲 *MoMo Payment*\nAmount: UGX 890,000\n\nA payment prompt is being sent to:\n📱 +256 772 *** 123\n\n✅ Please approve on your phone\n⏳ Waiting for confirmation...' },
+            { type: 'system', text: '⏳ Processing payment...' },
+            { type: 'bot', text: '🎉 *Payment Successful!*\n\nOrder #MBM-789123 confirmed!\n📦 Samsung Galaxy A54\n💰 UGX 890,000 paid via MoMo\n\n📅 Delivery in 2-3 business days\n🔔 You\'ll receive updates here\n\nTrack order: Reply *TRACK 789123*\nNeed help: Reply *HELP*' }
+        ];
+
+        function startDemo() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+
+            messages.forEach((msg, index) => {
+                setTimeout(() => {
+                    if (msg.type === 'system') {
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'message';
+                        msgDiv.innerHTML = `
+                            <div style="text-align: center; width: 100%; color: #999; font-size: 12px;">
+                                ${msg.text}
+                            </div>
+                        `;
+                        chatMessages.appendChild(msgDiv);
+                    } else if (msg.type === 'bot') {
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'message message-bot';
+                        msgDiv.innerHTML = `
+                            <div>
+                                <div class="message-bubble">${msg.text.replace(/\n/g, '<br>')}</div>
+                                <div class="message-timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                            </div>
+                        `;
+                        chatMessages.appendChild(msgDiv);
+                    } else {
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'message message-user';
+                        msgDiv.innerHTML = `
+                            <div>
+                                <div class="message-bubble">${msg.text}</div>
+                                <div class="message-timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} ✓✓</div>
+                            </div>
+                        `;
+                        chatMessages.appendChild(msgDiv);
+                    }
+
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, index * 800);
+            });
+
+            // Auto-restart after demo completes
+            setTimeout(() => {
+                setTimeout(startDemo, 3000);
+            }, messages.length * 800);
+        }
+
+        // Start demo on page load
+        window.addEventListener('load', startDemo);
+    </script>
+</body>
+</html>

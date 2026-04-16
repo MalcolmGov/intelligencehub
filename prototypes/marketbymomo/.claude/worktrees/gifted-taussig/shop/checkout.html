@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — Market by MoMo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{
+      --blue:#1B4F8A;--blue-d:#0E3A6B;--blue-l:#E8F1FA;--blue-gl:rgba(27,79,138,0.15);
+      --yellow:#FFCC00;--yellow-d:#D4A700;
+      --red:#E53E3E;--green:#00B074;--orange:#F6882A;
+      --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;--r-full:9999px;
+      --fh:'Plus Jakarta Sans',sans-serif;--fb:'Inter',sans-serif;
+      --ease:cubic-bezier(.4,0,.2,1);
+      --bg:#F4F6FF;--bg-1:#FFFFFF;--bg-2:#EEF2FF;--bg-3:#E4EBFF;
+      --border:rgba(0,0,0,0.08);--border-hi:rgba(27,79,138,0.30);
+      --t1:#0A1628;--t2:#4B5675;--t3:#8B98B8;
+      --sh:0 2px 12px rgba(0,0,0,0.07);--sh-hover:0 16px 48px rgba(27,79,138,0.16);
+      --nav:rgba(255,255,255,0.92);
+    }
+    [data-theme="dark"]{
+      --bg:#07070F;--bg-1:#0E0E1A;--bg-2:#141424;--bg-3:#1C1C30;
+      --border:rgba(255,255,255,0.07);--border-hi:rgba(27,79,138,0.55);
+      --t1:#FFFFFF;--t2:#A8A8C0;--t3:#64648A;
+      --sh:0 4px 24px rgba(0,0,0,0.5);--sh-hover:0 20px 60px rgba(0,0,0,0.7);
+      --nav:rgba(7,7,15,0.88);
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--fb);background:var(--bg);color:var(--t1);line-height:1.6;min-height:100vh;transition:background .3s var(--ease),color .3s var(--ease)}
+
+    /* ─── SECURE HEADER ─── */
+    .secure-header{background:var(--nav);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:150;padding:0 32px}
+    .secure-header-inner{max-width:1280px;margin:0 auto;height:64px;display:flex;align-items:center;justify-content:space-between}
+    .nav-logo{font-family:var(--fh);font-weight:900;font-size:20px;color:var(--blue);text-decoration:none}
+    .nav-logo span{color:var(--yellow)}
+    .secure-label{display:flex;align-items:center;gap:8px;font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t2)}
+    .secure-label svg{color:var(--green)}
+    .header-right{display:flex;align-items:center;gap:16px}
+    .theme-toggle{width:36px;height:36px;border-radius:var(--r-full);border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);transition:all .2s var(--ease)}
+    .theme-toggle:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-l)}
+    .back-to-cart{font-family:var(--fh);font-size:13px;font-weight:600;color:var(--t3);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}
+    .back-to-cart:hover{color:var(--blue)}
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-wrap{background:var(--bg-1);border-bottom:1px solid var(--border);padding:20px 32px}
+    .progress-inner{max-width:480px;margin:0 auto}
+    .progress-steps{display:flex;align-items:center;gap:0}
+    .progress-step{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;position:relative}
+    .progress-step:not(:last-child)::after{content:'';position:absolute;top:18px;left:calc(50% + 18px);right:calc(-50% + 18px);height:2px;background:var(--border);transition:background .4s var(--ease)}
+    .progress-step.completed:not(:last-child)::after{background:var(--blue)}
+    .step-circle{width:36px;height:36px;border-radius:var(--r-full);border:2px solid var(--border);background:var(--bg-2);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:13px;font-weight:800;color:var(--t3);transition:all .3s var(--ease);position:relative;z-index:1}
+    .progress-step.active .step-circle{border-color:var(--blue);background:var(--blue);color:#fff;box-shadow:0 0 0 4px var(--blue-gl)}
+    .progress-step.completed .step-circle{border-color:var(--blue);background:var(--blue);color:#fff}
+    .step-label{font-family:var(--fh);font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;transition:color .3s}
+    .progress-step.active .step-label{color:var(--blue)}
+    .progress-step.completed .step-label{color:var(--blue)}
+
+    /* ─── PAGE LAYOUT ─── */
+    .checkout-wrap{max-width:1280px;margin:0 auto;padding:32px 24px 80px;display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
+    @media(max-width:900px){.checkout-wrap{grid-template-columns:1fr}}
+
+    /* ─── SECTION CARD ─── */
+    .section-card{background:var(--bg-1);border-radius:var(--r-xl);border:1px solid var(--border);box-shadow:var(--sh);overflow:hidden;margin-bottom:20px}
+    .section-card-header{padding:22px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+    .section-card-header h2{font-family:var(--fh);font-size:18px;font-weight:800;color:var(--t1)}
+    .section-icon{width:36px;height:36px;border-radius:var(--r-md);background:var(--blue-l);display:flex;align-items:center;justify-content:center;color:var(--blue);flex-shrink:0}
+    .section-body{padding:24px 28px}
+
+    /* ─── FORM ELEMENTS ─── */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .form-grid.full{grid-template-columns:1fr}
+    @media(max-width:560px){.form-grid{grid-template-columns:1fr}}
+
+    .form-group{display:flex;flex-direction:column;gap:6px}
+    .form-label{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--t2)}
+    .form-label .req{color:var(--red)}
+    .form-control{height:46px;border:1.5px solid var(--border);border-radius:var(--r-md);background:var(--bg-2);color:var(--t1);font-family:var(--fb);font-size:14px;padding:0 16px;outline:none;transition:border-color .2s,box-shadow .2s,background .2s;width:100%}
+    .form-control:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-gl);background:var(--bg-1)}
+    .form-control::placeholder{color:var(--t3)}
+    .form-control.textarea{height:90px;padding:12px 16px;resize:vertical}
+    select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%238B98B8' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:40px;cursor:pointer}
+    .phone-group{display:flex;gap:0}
+    .phone-prefix{height:46px;padding:0 14px;border:1.5px solid var(--border);border-radius:var(--r-md) 0 0 var(--r-md);background:var(--bg-3);color:var(--t2);font-family:var(--fh);font-size:14px;font-weight:700;display:flex;align-items:center;white-space:nowrap;border-right:none;flex-shrink:0}
+    .phone-group .form-control{border-radius:0 var(--r-md) var(--r-md) 0}
+
+    /* ─── DELIVERY OPTIONS ─── */
+    .delivery-options{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+    .delivery-opt{border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all .2s var(--ease);position:relative}
+    .delivery-opt:hover{border-color:var(--border-hi);background:var(--bg-2)}
+    .delivery-opt.selected{border-color:var(--blue);background:var(--blue-l)}
+    .delivery-opt input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
+    .radio-dot{width:20px;height:20px;border-radius:var(--r-full);border:2px solid var(--border);flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center}
+    .delivery-opt.selected .radio-dot{border-color:var(--blue);background:var(--blue)}
+    .radio-dot::after{content:'';width:8px;height:8px;border-radius:var(--r-full);background:#fff;opacity:0;transition:opacity .2s}
+    .delivery-opt.selected .radio-dot::after{opacity:1}
+    .delivery-opt-icon{font-size:22px;flex-shrink:0}
+    .delivery-opt-info{flex:1}
+    .delivery-opt-title{font-family:var(--fh);font-size:14px;font-weight:800;color:var(--t1);margin-bottom:2px}
+    .delivery-opt-sub{font-size:12px;color:var(--t2);font-family:var(--fb)}
+    .delivery-opt-price{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--blue);flex-shrink:0}
+    .delivery-opt-price.free{color:var(--green)}
+    .delivery-section-title{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--t2);margin-top:20px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em}
+
+    /* ─── SAVE ADDRESS CHECKBOX ─── */
+    .checkbox-row{display:flex;align-items:center;gap:10px;margin-top:16px;cursor:pointer}
+    .checkbox-row input{width:18px;height:18px;accent-color:var(--blue);cursor:pointer}
+    .checkbox-row label{font-size:13px;font-weight:600;font-family:var(--fb);color:var(--t2);cursor:pointer}
+
+    /* ─── STEP BUTTON ─── */
+    .step-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;border-radius:var(--r-lg);background:var(--blue);color:#fff;font-family:var(--fh);font-size:16px;font-weight:800;border:none;cursor:pointer;margin-top:24px;transition:all .25s var(--ease);letter-spacing:.01em}
+    .step-btn:hover{background:var(--blue-d);box-shadow:var(--sh-hover);transform:translateY(-1px)}
+    .step-btn:active{transform:translateY(0)}
+    .step-btn.yellow{background:var(--yellow);color:var(--blue-d)}
+    .step-btn.yellow:hover{background:var(--yellow-d)}
+    .back-step-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--t2);font-family:var(--fh);font-size:13px;font-weight:600;cursor:pointer;margin-top:12px;padding:8px 0;transition:color .2s}
+    .back-step-btn:hover{color:var(--blue)}
+
+    /* ─── STEP PANELS ─── */
+    .step-panel{display:none}
+    .step-panel.active{display:block}
+
+    /* ─── PAYMENT METHODS ─── */
+    .payment-options{display:flex;flex-direction:column;gap:12px}
+    .pay-opt{border:1.5px solid var(--border);border-radius:var(--r-md);cursor:pointer;overflow:hidden;transition:all .2s var(--ease)}
+    .pay-opt:hover{border-color:var(--border-hi)}
+    .pay-opt.selected{border-color:var(--blue)}
+    .pay-opt-header{padding:16px 18px;display:flex;align-items:center;gap:14px}
+    .pay-opt-icon{width:40px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;font-family:var(--fh);flex-shrink:0}
+    .pay-opt-icon.momo-icon{background:#FFCC00;color:#1a1a1a}
+    .pay-opt-icon.card-icon{background:linear-gradient(135deg,#1a1f71,#00579f);color:#fff}
+    .pay-opt-icon.bnpl-icon{background:linear-gradient(135deg,#7C3AED,#9F67FA);color:#fff}
+    .pay-opt-icon.bank-icon{background:var(--bg-3);color:var(--blue)}
+    .pay-opt-label{flex:1}
+    .pay-opt-name{font-family:var(--fh);font-size:14px;font-weight:800;color:var(--t1)}
+    .pay-opt-sub{font-size:12px;color:var(--t3);font-family:var(--fb)}
+    .pay-opt-radio{width:20px;height:20px;border-radius:var(--r-full);border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .pay-opt.selected .pay-opt-radio{border-color:var(--blue);background:var(--blue)}
+    .pay-opt-radio::after{content:'';width:8px;height:8px;border-radius:var(--r-full);background:#fff;opacity:0;transition:opacity .2s}
+    .pay-opt.selected .pay-opt-radio::after{opacity:1}
+    .pay-opt-body{padding:0 18px;max-height:0;overflow:hidden;transition:max-height .3s var(--ease),padding .3s}
+    .pay-opt.selected .pay-opt-body{max-height:300px;padding:0 18px 18px}
+
+    /* ─── CARD FIELDS ─── */
+    .card-number-wrap{position:relative}
+    .card-brand{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:800;font-family:var(--fh);color:var(--t3);pointer-events:none}
+
+    /* ─── BNPL BREAKDOWN ─── */
+    .bnpl-plan{background:var(--bg-2);border-radius:var(--r-md);padding:14px;margin-top:4px}
+    .bnpl-plan-title{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--t1);margin-bottom:10px}
+    .bnpl-row{display:flex;justify-content:space-between;font-size:12px;font-family:var(--fb);color:var(--t2);padding:4px 0}
+    .bnpl-row:first-of-type{color:var(--t1);font-weight:600;font-family:var(--fh)}
+
+    /* ─── BANK DETAILS ─── */
+    .bank-detail{background:var(--bg-2);border-radius:var(--r-md);padding:14px;margin-top:4px}
+    .bank-row{display:flex;justify-content:space-between;font-size:13px;font-family:var(--fb);color:var(--t2);padding:5px 0;border-bottom:1px solid var(--border)}
+    .bank-row:last-child{border-bottom:none}
+    .bank-row .bval{font-weight:700;color:var(--t1);font-family:var(--fh)}
+
+    /* ─── CONFIRM STEP ─── */
+    .confirm-items{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+    .confirm-item{display:flex;gap:14px;align-items:center;padding:12px;background:var(--bg-2);border-radius:var(--r-md)}
+    .confirm-item-img{width:56px;height:56px;border-radius:var(--r-sm);object-fit:cover;border:1px solid var(--border);flex-shrink:0}
+    .confirm-item-name{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--t1);margin-bottom:2px}
+    .confirm-item-variant{font-size:12px;color:var(--t3);font-family:var(--fb)}
+    .confirm-item-price{font-family:var(--fh);font-size:14px;font-weight:800;color:var(--blue);margin-left:auto;flex-shrink:0}
+    .confirm-totals{background:var(--bg-2);border-radius:var(--r-md);padding:16px;margin-bottom:16px}
+    .confirm-row{display:flex;justify-content:space-between;font-size:13px;font-family:var(--fb);color:var(--t2);padding:5px 0}
+    .confirm-total-row{display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);margin-top:6px}
+    .confirm-total-row .l{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t1)}
+    .confirm-total-row .v{font-family:var(--fh);font-size:18px;font-weight:900;color:var(--blue)}
+    .confirm-warning{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(246,136,42,.1);border:1px solid rgba(246,136,42,.3);border-radius:var(--r-md);font-size:13px;font-family:var(--fb);color:var(--orange);margin-bottom:16px}
+    .place-order-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:56px;border-radius:var(--r-lg);background:var(--blue);color:#fff;font-family:var(--fh);font-size:17px;font-weight:900;border:none;cursor:pointer;transition:all .25s var(--ease);letter-spacing:.01em;text-decoration:none}
+    .place-order-btn:hover{background:var(--blue-d);box-shadow:var(--sh-hover);transform:translateY(-2px)}
+    .place-order-btn:active{transform:translateY(0)}
+
+    /* ─── ORDER SUMMARY SIDEBAR ─── */
+    .order-summary{background:var(--bg-1);border-radius:var(--r-xl);border:1px solid var(--border);box-shadow:var(--sh);padding:24px;position:sticky;top:160px}
+    .summary-title{font-family:var(--fh);font-size:16px;font-weight:800;color:var(--t1);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+    .summary-items{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .sum-item{display:flex;gap:10px;align-items:center}
+    .sum-item-img{width:48px;height:48px;border-radius:var(--r-sm);object-fit:cover;border:1px solid var(--border);flex-shrink:0}
+    .sum-item-info{flex:1;min-width:0}
+    .sum-item-name{font-family:var(--fh);font-size:12px;font-weight:700;color:var(--t1);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .sum-item-variant{font-size:11px;color:var(--t3);font-family:var(--fb)}
+    .sum-item-price{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--blue);flex-shrink:0}
+    .sum-row{display:flex;justify-content:space-between;font-size:13px;font-family:var(--fb);padding:5px 0}
+    .sum-row .l{color:var(--t2)}
+    .sum-row .v{font-weight:600;color:var(--t1)}
+    .sum-row .v.green{color:var(--green);font-weight:700}
+    .sum-row .v.discount{color:var(--green);font-weight:700}
+    .sum-divider{height:1px;background:var(--border);margin:10px 0}
+    .sum-total{display:flex;justify-content:space-between;padding:10px 0 0}
+    .sum-total .l{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t1)}
+    .sum-total .v{font-family:var(--fh);font-size:20px;font-weight:900;color:var(--blue)}
+    .sum-trust{display:flex;flex-direction:column;gap:7px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+    .sum-trust-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t3);font-family:var(--fb)}
+    .sum-trust-item svg{flex-shrink:0;color:var(--green)}
+    .promo-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,176,116,.1);border:1px solid rgba(0,176,116,.3);color:var(--green);font-size:11px;font-weight:700;font-family:var(--fh);padding:3px 8px;border-radius:var(--r-full);margin-bottom:8px}
+
+    @media(max-width:640px){
+      .secure-header{padding:0 16px}
+      .progress-wrap{padding:16px}
+      .checkout-wrap{padding:16px 16px 60px;grid-template-columns:1fr}
+      .section-body{padding:20px 18px}
+      .section-card-header{padding:16px 18px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── SECURE HEADER ─── -->
+<header class="secure-header">
+  <div class="secure-header-inner">
+    <a href="../index.html" class="nav-logo">Market<span>MoMo</span></a>
+    <div class="secure-label">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Secure Checkout
+    </div>
+    <div class="header-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <svg id="themeIcon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      </button>
+      <a href="./cart.html" class="back-to-cart">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+        Back to Cart
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ─── PROGRESS BAR ─── -->
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="progress-steps">
+      <div class="progress-step active" id="step-indicator-1">
+        <div class="step-circle" id="step-circle-1">1</div>
+        <span class="step-label">Delivery</span>
+      </div>
+      <div class="progress-step" id="step-indicator-2">
+        <div class="step-circle" id="step-circle-2">2</div>
+        <span class="step-label">Payment</span>
+      </div>
+      <div class="progress-step" id="step-indicator-3">
+        <div class="step-circle" id="step-circle-3">3</div>
+        <span class="step-label">Confirm</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CHECKOUT BODY ─── -->
+<div class="checkout-wrap">
+
+  <!-- LEFT: Steps -->
+  <div>
+
+    <!-- ── STEP 1: DELIVERY ── -->
+    <div class="step-panel active" id="panel-1">
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-icon">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <h2>Delivery Details</h2>
+        </div>
+        <div class="section-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Full Name <span class="req">*</span></label>
+              <input class="form-control" type="text" placeholder="e.g. Sarah Nakato" autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address <span class="req">*</span></label>
+              <input class="form-control" type="email" placeholder="sarah@email.com" autocomplete="email">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-top:16px">
+            <div class="form-group">
+              <label class="form-label">Phone Number <span class="req">*</span></label>
+              <div class="phone-group">
+                <span class="phone-prefix">🇺🇬 +256</span>
+                <input class="form-control" type="tel" placeholder="700 000 000" autocomplete="tel">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">City / Town <span class="req">*</span></label>
+              <select class="form-control">
+                <option value="">Select your city</option>
+                <option value="kampala" selected>Kampala</option>
+                <option value="entebbe">Entebbe</option>
+                <option value="jinja">Jinja</option>
+                <option value="mbarara">Mbarara</option>
+                <option value="gulu">Gulu</option>
+                <option value="mbale">Mbale</option>
+                <option value="fort-portal">Fort Portal</option>
+                <option value="lira">Lira</option>
+                <option value="arua">Arua</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid full" style="margin-top:16px">
+            <div class="form-group">
+              <label class="form-label">Delivery Address <span class="req">*</span></label>
+              <textarea class="form-control textarea" placeholder="Building name, street, area, landmark…" autocomplete="street-address"></textarea>
+            </div>
+          </div>
+          <div class="form-grid full" style="margin-top:16px">
+            <div class="form-group">
+              <label class="form-label">Additional Instructions <span style="color:var(--t3);font-weight:500">(Optional)</span></label>
+              <textarea class="form-control textarea" placeholder="Gate code, floor number, delivery notes…"></textarea>
+            </div>
+          </div>
+
+          <!-- Delivery Options -->
+          <div class="delivery-section-title">Delivery Method</div>
+          <div class="delivery-options">
+            <label class="delivery-opt selected" onclick="selectDelivery(this)">
+              <input type="radio" name="delivery" value="same-day" checked>
+              <div class="radio-dot"></div>
+              <span class="delivery-opt-icon">⚡</span>
+              <div class="delivery-opt-info">
+                <div class="delivery-opt-title">Same Day Delivery</div>
+                <div class="delivery-opt-sub">Today by 6:00 PM — Kampala only</div>
+              </div>
+              <span class="delivery-opt-price">UGX 5,000</span>
+            </label>
+            <label class="delivery-opt" onclick="selectDelivery(this)">
+              <input type="radio" name="delivery" value="next-day">
+              <div class="radio-dot"></div>
+              <span class="delivery-opt-icon">🚚</span>
+              <div class="delivery-opt-info">
+                <div class="delivery-opt-title">Next Day Delivery</div>
+                <div class="delivery-opt-sub">Tomorrow by 12:00 PM — Free over UGX 50,000</div>
+              </div>
+              <span class="delivery-opt-price free">FREE</span>
+            </label>
+            <label class="delivery-opt" onclick="selectDelivery(this)">
+              <input type="radio" name="delivery" value="standard">
+              <div class="radio-dot"></div>
+              <span class="delivery-opt-icon">📦</span>
+              <div class="delivery-opt-info">
+                <div class="delivery-opt-title">Standard Delivery</div>
+                <div class="delivery-opt-sub">3–5 business days — All Uganda regions</div>
+              </div>
+              <span class="delivery-opt-price free">FREE</span>
+            </label>
+          </div>
+
+          <label class="checkbox-row">
+            <input type="checkbox" checked>
+            <label>Save this address for future orders</label>
+          </label>
+
+          <button class="step-btn" onclick="goToStep(2)">
+            Continue to Payment
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: PAYMENT ── -->
+    <div class="step-panel" id="panel-2">
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-icon">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <h2>Payment Method</h2>
+        </div>
+        <div class="section-body">
+          <div class="payment-options">
+
+            <!-- MoMo -->
+            <div class="pay-opt selected" onclick="selectPayment(this)">
+              <div class="pay-opt-header">
+                <div class="pay-opt-icon momo-icon">MoMo</div>
+                <div class="pay-opt-label">
+                  <div class="pay-opt-name">MTN Mobile Money</div>
+                  <div class="pay-opt-sub">Instant payment via MoMo Push</div>
+                </div>
+                <div class="pay-opt-radio"></div>
+              </div>
+              <div class="pay-opt-body">
+                <div class="form-group" style="margin-bottom:12px">
+                  <label class="form-label">MoMo Phone Number</label>
+                  <div class="phone-group">
+                    <span class="phone-prefix">🇺🇬 +256</span>
+                    <input class="form-control" type="tel" placeholder="700 000 000" value="700 123 456">
+                  </div>
+                </div>
+                <p style="font-size:12px;color:var(--t3);font-family:var(--fb);line-height:1.5">You will receive a MoMo push notification to confirm the payment. Please have your PIN ready.</p>
+              </div>
+            </div>
+
+            <!-- Visa/MC -->
+            <div class="pay-opt" onclick="selectPayment(this)">
+              <div class="pay-opt-header">
+                <div class="pay-opt-icon card-icon">CARD</div>
+                <div class="pay-opt-label">
+                  <div class="pay-opt-name">Visa / Mastercard</div>
+                  <div class="pay-opt-sub">Debit or credit card, 3D Secure</div>
+                </div>
+                <div class="pay-opt-radio"></div>
+              </div>
+              <div class="pay-opt-body">
+                <div class="form-group" style="margin-bottom:12px">
+                  <label class="form-label">Card Number</label>
+                  <div class="card-number-wrap">
+                    <input class="form-control" type="text" placeholder="1234 5678 9012 3456" maxlength="19">
+                    <span class="card-brand">VISA</span>
+                  </div>
+                </div>
+                <div class="form-grid" style="margin-bottom:0">
+                  <div class="form-group">
+                    <label class="form-label">Expiry Date</label>
+                    <input class="form-control" type="text" placeholder="MM / YY" maxlength="7">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">CVV</label>
+                    <input class="form-control" type="text" placeholder="123" maxlength="4">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- BNPL -->
+            <div class="pay-opt" onclick="selectPayment(this)">
+              <div class="pay-opt-header">
+                <div class="pay-opt-icon bnpl-icon">BNPL</div>
+                <div class="pay-opt-label">
+                  <div class="pay-opt-name">Buy Now, Pay Later</div>
+                  <div class="pay-opt-sub">Split into 6 monthly payments</div>
+                </div>
+                <div class="pay-opt-radio"></div>
+              </div>
+              <div class="pay-opt-body">
+                <div class="bnpl-plan">
+                  <div class="bnpl-plan-title">6-Month Payment Plan</div>
+                  <div class="bnpl-row"><span>Monthly payment</span><span>UGX 244,500</span></div>
+                  <div class="bnpl-row"><span>Total amount</span><span>UGX 1,467,000</span></div>
+                  <div class="bnpl-row"><span>Interest</span><span>0% for 6 months</span></div>
+                  <div class="bnpl-row"><span>First payment</span><span>Today</span></div>
+                  <div class="bnpl-row"><span>Final payment</span><span>Oct 2026</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bank Transfer -->
+            <div class="pay-opt" onclick="selectPayment(this)">
+              <div class="pay-opt-header">
+                <div class="pay-opt-icon bank-icon">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="pay-opt-label">
+                  <div class="pay-opt-name">Bank Transfer</div>
+                  <div class="pay-opt-sub">Direct transfer to our account</div>
+                </div>
+                <div class="pay-opt-radio"></div>
+              </div>
+              <div class="pay-opt-body">
+                <div class="bank-detail">
+                  <div class="bank-row"><span>Bank</span><span class="bval">Stanbic Bank Uganda</span></div>
+                  <div class="bank-row"><span>Account Name</span><span class="bval">Market by MoMo Ltd</span></div>
+                  <div class="bank-row"><span>Account No.</span><span class="bval">9030012345678</span></div>
+                  <div class="bank-row"><span>Branch</span><span class="bval">Kampala Road</span></div>
+                  <div class="bank-row"><span>Reference</span><span class="bval">MBM-2025-00847</span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <button class="step-btn yellow" onclick="goToStep(3)">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Pay UGX 1,472,000 Now
+          </button>
+          <button class="back-step-btn" onclick="goToStep(1)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+            Back to Delivery
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: CONFIRM ── -->
+    <div class="step-panel" id="panel-3">
+      <div class="section-card">
+        <div class="section-card-header">
+          <div class="section-icon">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <h2>Review Your Order</h2>
+        </div>
+        <div class="section-body">
+          <div class="confirm-items">
+            <div class="confirm-item">
+              <img class="confirm-item-img" src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=200&h=200&fit=crop" alt="Samsung Galaxy S24 Ultra">
+              <div>
+                <div class="confirm-item-name">Samsung Galaxy S24 Ultra</div>
+                <div class="confirm-item-variant">Midnight Black · 256GB · Qty 1</div>
+              </div>
+              <span class="confirm-item-price">UGX 1,250,000</span>
+            </div>
+            <div class="confirm-item">
+              <img class="confirm-item-img" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop" alt="Nike Air Max">
+              <div>
+                <div class="confirm-item-name">Nike Air Max 270 React</div>
+                <div class="confirm-item-variant">Solar Red / Black · UK 10 · Qty 1</div>
+              </div>
+              <span class="confirm-item-price">UGX 380,000</span>
+            </div>
+          </div>
+
+          <div class="confirm-totals">
+            <div class="confirm-row"><span>Subtotal</span><span>UGX 1,630,000</span></div>
+            <div class="confirm-row" style="color:var(--green)"><span>Discount (MOMO10)</span><span>− UGX 163,000</span></div>
+            <div class="confirm-row"><span>Delivery (Same Day)</span><span>UGX 5,000</span></div>
+            <div class="confirm-total-row">
+              <span class="l">Total</span>
+              <span class="v">UGX 1,472,000</span>
+            </div>
+          </div>
+
+          <div class="confirm-warning">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            By placing your order, you agree to Market by MoMo's Terms of Service and Privacy Policy.
+          </div>
+
+          <a href="./order-success.html" class="place-order-btn">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Confirm &amp; Place Order
+          </a>
+          <button class="back-step-btn" onclick="goToStep(2)">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+            Back to Payment
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: Order Summary Sidebar -->
+  <div>
+    <div class="order-summary">
+      <div class="summary-title">Order Summary</div>
+      <div class="promo-chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        MOMO10 applied
+      </div>
+      <div class="summary-items">
+        <div class="sum-item">
+          <img class="sum-item-img" src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=200&h=200&fit=crop" alt="">
+          <div class="sum-item-info">
+            <div class="sum-item-name">Samsung Galaxy S24 Ultra</div>
+            <div class="sum-item-variant">Midnight Black · 256GB</div>
+          </div>
+          <span class="sum-item-price">UGX 1,250,000</span>
+        </div>
+        <div class="sum-item">
+          <img class="sum-item-img" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop" alt="">
+          <div class="sum-item-info">
+            <div class="sum-item-name">Nike Air Max 270 React</div>
+            <div class="sum-item-variant">Solar Red · UK 10</div>
+          </div>
+          <span class="sum-item-price">UGX 380,000</span>
+        </div>
+      </div>
+      <div class="sum-row"><span class="l">Subtotal</span><span class="v">UGX 1,630,000</span></div>
+      <div class="sum-row"><span class="l">Discount</span><span class="v discount">− UGX 163,000</span></div>
+      <div class="sum-row"><span class="l">Delivery</span><span class="v">UGX 5,000</span></div>
+      <div class="sum-divider"></div>
+      <div class="sum-total">
+        <span class="l">Total</span>
+        <span class="v">UGX 1,472,000</span>
+      </div>
+      <div class="sum-trust">
+        <div class="sum-trust-item">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          256-bit SSL encrypted payment
+        </div>
+        <div class="sum-trust-item">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          Easy 14-day returns
+        </div>
+        <div class="sum-trust-item">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          Fast delivery across Uganda
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ─── THEME TOGGLE ───
+  const html = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  const moonSVG = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+  const sunSVG = `<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>`;
+  const saved = localStorage.getItem('mbm-theme') || 'light';
+  html.setAttribute('data-theme', saved);
+  themeIcon.innerHTML = saved === 'dark' ? sunSVG : moonSVG;
+  themeToggle.addEventListener('click', () => {
+    const cur = html.getAttribute('data-theme');
+    const next = cur === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('mbm-theme', next);
+    themeIcon.innerHTML = next === 'dark' ? sunSVG : moonSVG;
+  });
+
+  // ─── STEP NAVIGATION ───
+  let currentStep = 1;
+  const totalSteps = 3;
+
+  function goToStep(step) {
+    // Hide current panel
+    document.getElementById('panel-' + currentStep).classList.remove('active');
+
+    // Update indicators
+    for (let i = 1; i <= totalSteps; i++) {
+      const ind = document.getElementById('step-indicator-' + i);
+      const circle = document.getElementById('step-circle-' + i);
+      ind.classList.remove('active', 'completed');
+      if (i < step) {
+        ind.classList.add('completed');
+        circle.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+      } else if (i === step) {
+        ind.classList.add('active');
+        circle.textContent = i;
+      } else {
+        circle.textContent = i;
+      }
+    }
+
+    currentStep = step;
+    document.getElementById('panel-' + step).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─── DELIVERY OPTION SELECT ───
+  function selectDelivery(el) {
+    document.querySelectorAll('.delivery-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ─── PAYMENT OPTION SELECT ───
+  function selectPayment(el) {
+    document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // ─── CARD NUMBER FORMAT ───
+  document.querySelectorAll('input[placeholder="1234 5678 9012 3456"]').forEach(input => {
+    input.addEventListener('input', function() {
+      let v = this.value.replace(/\D/g, '').substring(0, 16);
+      this.value = v.replace(/(.{4})/g, '$1 ').trim();
+    });
+  });
+</script>
+</body>
+</html>

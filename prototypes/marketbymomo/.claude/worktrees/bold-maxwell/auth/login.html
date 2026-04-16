@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Market by MoMo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{
+      --bg:#F4F6FF;--bg-1:#FFFFFF;--bg-2:#EEF2FF;
+      --blue:#1B4F8A;--blue-d:#0E3A6B;--blue-l:#EEF4FF;
+      --yellow:#FFCC00;
+      --t1:#0A1628;--t2:#4B5675;--t3:#8B98B8;
+      --border:#E2E8F4;--shadow:0 4px 24px rgba(27,79,138,.08);
+    }
+    [data-theme="dark"]{
+      --bg:#07070F;--bg-1:#0E0E1A;--bg-2:#141424;
+      --blue:#3B82F6;--blue-d:#2563EB;--blue-l:#1E2A45;
+      --t1:#FFFFFF;--t2:#A8A8C0;--t3:#64648A;
+      --border:#1E1E30;--shadow:0 4px 24px rgba(0,0,0,.4);
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;display:flex;transition:background .3s,color .3s}
+
+    /* ── LAYOUT ── */
+    .page{display:flex;min-height:100vh;width:100%}
+
+    /* LEFT PANEL */
+    .left{
+      width:45%;flex-shrink:0;
+      background:linear-gradient(145deg,#0A2D55 0%,#0E3A6B 35%,#1B4F8A 70%,#1E5A9A 100%);
+      display:flex;flex-direction:column;justify-content:space-between;
+      padding:52px 48px;position:relative;overflow:hidden;
+    }
+    .left::before{
+      content:'';position:absolute;top:-120px;right:-120px;
+      width:500px;height:500px;border-radius:50%;
+      background:radial-gradient(circle,rgba(255,204,0,.18) 0%,transparent 65%);
+      filter:blur(50px);
+    }
+    .left::after{
+      content:'';position:absolute;bottom:-100px;left:-60px;
+      width:380px;height:380px;border-radius:50%;
+      background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 65%);
+      filter:blur(40px);
+    }
+
+    .left-content{position:relative;z-index:2}
+
+    /* Logo */
+    .logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:56px}
+    .logo-box{
+      width:44px;height:44px;background:var(--yellow);
+      border-radius:10px;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 20px rgba(255,204,0,.35);flex-shrink:0;
+    }
+    .logo-box svg{width:26px;height:26px}
+    .logo-name{font-family:'Outfit',sans-serif;font-weight:800;font-size:20px;color:#fff;line-height:1}
+    .logo-name span{color:var(--yellow)}
+
+    /* Hero text */
+    .hero-heading{
+      font-family:'Outfit',sans-serif;font-weight:800;
+      font-size:40px;line-height:1.15;color:#fff;margin-bottom:20px;
+    }
+    .hero-heading em{font-style:normal;color:var(--yellow)}
+    .hero-sub{font-size:15px;color:rgba(255,255,255,.75);line-height:1.65;max-width:340px}
+
+    /* Feature list */
+    .features{list-style:none;margin-top:40px;display:flex;flex-direction:column;gap:16px}
+    .features li{display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.88);font-size:14px}
+    .feat-icon{
+      width:32px;height:32px;background:rgba(255,255,255,.12);
+      border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .feat-icon svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Stats */
+    .stats-row{
+      display:flex;gap:0;background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.15);border-radius:16px;
+      overflow:hidden;margin-top:48px;position:relative;z-index:2;
+    }
+    .stat{flex:1;padding:18px 16px;text-align:center;border-right:1px solid rgba(255,255,255,.1)}
+    .stat:last-child{border-right:none}
+    .stat-v{font-family:'Outfit',sans-serif;font-weight:800;font-size:22px;color:var(--yellow);line-height:1}
+    .stat-l{font-size:11px;color:rgba(255,255,255,.6);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+
+    /* Testimonial */
+    .testimonial{
+      background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+      border-radius:16px;padding:20px 22px;margin-top:20px;position:relative;z-index:2;
+    }
+    .test-text{font-size:14px;color:rgba(255,255,255,.88);line-height:1.6;font-style:italic;margin-bottom:12px}
+    .test-author{display:flex;align-items:center;gap:10px}
+    .test-avatar{
+      width:32px;height:32px;border-radius:50%;
+      background:var(--yellow);display:flex;align-items:center;justify-content:center;
+      font-weight:700;font-size:13px;color:#0A1628;
+    }
+    .test-name{font-size:13px;font-weight:600;color:#fff}
+    .test-role{font-size:11px;color:rgba(255,255,255,.6)}
+
+    /* RIGHT PANEL */
+    .right{
+      flex:1;display:flex;flex-direction:column;
+      background:var(--bg-1);overflow-y:auto;
+    }
+    .right-top{
+      display:flex;justify-content:flex-end;align-items:center;
+      padding:24px 40px;gap:16px;border-bottom:1px solid var(--border);
+    }
+    .top-link{font-size:14px;color:var(--t2)}
+    .top-link a{color:var(--blue);font-weight:600;text-decoration:none}
+    .top-link a:hover{text-decoration:underline}
+
+    /* Theme toggle */
+    .theme-btn{
+      width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);
+      background:var(--bg-2);cursor:pointer;display:flex;align-items:center;justify-content:center;
+      transition:all .2s;
+    }
+    .theme-btn:hover{border-color:var(--blue);background:var(--blue-l)}
+    .theme-btn svg{width:18px;height:18px;stroke:var(--t2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+    .right-body{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+    .form-wrap{width:100%;max-width:420px}
+
+    /* Panel system */
+    .panel{display:none}
+    .panel.active{display:block}
+
+    /* Headings */
+    .form-heading{font-family:'Outfit',sans-serif;font-weight:800;font-size:30px;color:var(--t1);margin-bottom:6px}
+    .form-sub{font-size:14px;color:var(--t2);margin-bottom:32px;line-height:1.5}
+
+    /* Tabs */
+    .tabs{display:flex;background:var(--bg-2);border-radius:12px;padding:4px;gap:4px;margin-bottom:28px}
+    .tab{
+      flex:1;padding:10px;border:none;border-radius:9px;cursor:pointer;
+      font-size:14px;font-weight:600;transition:all .2s;
+      background:transparent;color:var(--t3);
+    }
+    .tab.active{background:#fff;color:var(--blue);box-shadow:var(--shadow)}
+    [data-theme="dark"] .tab.active{background:var(--bg-1)}
+
+    /* Form fields */
+    .field{margin-bottom:18px}
+    .field label{display:block;font-size:13px;font-weight:600;color:var(--t2);margin-bottom:6px}
+    .field input{
+      width:100%;padding:12px 14px;border:1.5px solid var(--border);
+      border-radius:10px;font-size:15px;color:var(--t1);background:var(--bg-1);
+      transition:border-color .2s,box-shadow .2s;outline:none;font-family:'Inter',sans-serif;
+    }
+    .field input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(27,79,138,.12)}
+    .field input::placeholder{color:var(--t3)}
+
+    /* Password wrapper */
+    .pw-wrap{position:relative}
+    .pw-wrap input{padding-right:44px}
+    .pw-toggle{
+      position:absolute;right:12px;top:50%;transform:translateY(-50%);
+      background:none;border:none;cursor:pointer;padding:4px;
+      display:flex;align-items:center;
+    }
+    .pw-toggle svg{width:18px;height:18px;stroke:var(--t3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Row */
+    .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
+    .remember{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);cursor:pointer}
+    .remember input[type=checkbox]{accent-color:var(--blue);width:15px;height:15px}
+    .forgot{font-size:13px;color:var(--blue);text-decoration:none;font-weight:500}
+    .forgot:hover{text-decoration:underline}
+
+    /* Buttons */
+    .btn-primary{
+      width:100%;padding:14px;border:none;border-radius:12px;
+      background:var(--blue);color:#fff;font-size:16px;font-weight:700;
+      cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;
+      letter-spacing:.2px;
+    }
+    .btn-primary:hover{background:var(--blue-d);transform:translateY(-1px);box-shadow:0 8px 24px rgba(27,79,138,.3)}
+    .btn-primary:active{transform:none}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    .btn-momo{
+      width:100%;padding:13px;border:1.5px solid #FFCC00;border-radius:12px;
+      background:#FFFBEA;color:#0A1628;font-size:15px;font-weight:700;
+      cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;
+      display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;
+    }
+    .btn-momo:hover{background:#FFCC00;box-shadow:0 6px 20px rgba(255,204,0,.35)}
+    [data-theme="dark"] .btn-momo{background:rgba(255,204,0,.08);color:#fff;border-color:rgba(255,204,0,.3)}
+    [data-theme="dark"] .btn-momo:hover{background:rgba(255,204,0,.2)}
+
+    /* Divider */
+    .divider{display:flex;align-items:center;gap:14px;margin:20px 0}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+    .divider span{font-size:12px;color:var(--t3);font-weight:500;white-space:nowrap}
+
+    /* Social */
+    .socials{display:flex;gap:10px;margin-bottom:22px}
+    .btn-social{
+      flex:1;padding:11px;border:1.5px solid var(--border);border-radius:10px;
+      background:var(--bg-1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+      font-size:13px;font-weight:600;color:var(--t1);transition:all .2s;
+    }
+    .btn-social:hover{border-color:var(--blue);background:var(--blue-l)}
+    .btn-social img{width:18px;height:18px}
+
+    /* Status message */
+    .status-msg{
+      padding:11px 14px;border-radius:10px;font-size:13px;font-weight:500;
+      margin-bottom:16px;display:none;
+    }
+    .status-msg.error{background:#FFF0F0;color:#C0392B;border:1px solid #F5BCBC;display:block}
+    .status-msg.info{background:var(--blue-l);color:var(--blue);border:1px solid rgba(27,79,138,.15);display:block}
+
+    /* OTP panel */
+    .otp-icon{
+      width:64px;height:64px;background:var(--blue-l);border-radius:16px;
+      display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+    }
+    .otp-icon svg{width:32px;height:32px;stroke:var(--blue);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .otp-inputs{display:flex;gap:10px;justify-content:center;margin:24px 0}
+    .otp-inputs input{
+      width:52px;height:58px;border:2px solid var(--border);border-radius:12px;
+      text-align:center;font-size:22px;font-weight:700;color:var(--t1);
+      background:var(--bg-1);outline:none;font-family:'Outfit',sans-serif;
+      transition:border-color .2s,box-shadow .2s;
+    }
+    .otp-inputs input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(27,79,138,.12)}
+    .otp-inputs input.filled{border-color:var(--blue)}
+    .otp-hint{font-size:13px;color:var(--t3);text-align:center;margin-bottom:20px}
+    .otp-hint a{color:var(--blue);cursor:pointer;font-weight:500;text-decoration:none}
+    .otp-hint a:hover{text-decoration:underline}
+    .back-link{
+      display:flex;align-items:center;gap:6px;font-size:13px;color:var(--t3);
+      cursor:pointer;background:none;border:none;margin-bottom:24px;padding:0;font-family:'Inter',sans-serif;
+    }
+    .back-link:hover{color:var(--blue)}
+    .back-link svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+    /* Success panel */
+    .success-icon{
+      width:72px;height:72px;border-radius:50%;
+      background:linear-gradient(135deg,#00B894,#00CEC9);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+      box-shadow:0 8px 24px rgba(0,184,148,.3);
+    }
+    .success-icon svg{width:36px;height:36px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    .success-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:26px;color:var(--t1);text-align:center;margin-bottom:8px}
+    .success-sub{font-size:14px;color:var(--t2);text-align:center;line-height:1.6;margin-bottom:28px}
+    .btn-dashboard{
+      width:100%;padding:14px;border:none;border-radius:12px;
+      background:var(--blue);color:#fff;font-size:15px;font-weight:700;
+      cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .btn-dashboard:hover{background:var(--blue-d);box-shadow:0 8px 24px rgba(27,79,138,.3)}
+    .btn-dashboard svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Loading spinner */
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinner{
+      width:18px;height:18px;border:2.5px solid rgba(255,255,255,.3);
+      border-top-color:#fff;border-radius:50%;
+      animation:spin .7s linear infinite;display:inline-block;
+    }
+
+    /* Floating animation */
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+    /* Mobile */
+    @media(max-width:800px){
+      .left{display:none}
+      .right{width:100%}
+      .right-body{padding:32px 20px}
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ═══ LEFT PANEL ═══ -->
+  <div class="left">
+    <div class="left-content">
+      <div class="logo-wrap">
+        <div class="logo-box">
+          <svg viewBox="0 0 26 26" fill="none">
+            <rect x="2" y="2" width="10" height="10" rx="2.5" fill="#0A1628"/>
+            <rect x="14" y="2" width="10" height="10" rx="2.5" fill="#0A1628" opacity=".6"/>
+            <rect x="2" y="14" width="10" height="10" rx="2.5" fill="#0A1628" opacity=".6"/>
+            <rect x="14" y="14" width="10" height="10" rx="2.5" fill="#0A1628" opacity=".3"/>
+          </svg>
+        </div>
+        <div class="logo-name">Market <span>by MoMo</span></div>
+      </div>
+
+      <div class="hero-heading">
+        Welcome back to<br><em>Uganda's #1</em><br>Marketplace
+      </div>
+      <div class="hero-sub">Sign in to track your orders, manage your wishlist, and access exclusive deals — all in one place.</div>
+
+      <ul class="features">
+        <li>
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16"><path d="M8 1L10 5.5L15 6.3L11.5 9.7L12.5 15L8 12.5L3.5 15L4.5 9.7L1 6.3L6 5.5L8 1Z"/></svg>
+          </div>
+          Exclusive deals for returning customers
+        </li>
+        <li>
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16"><rect x="1" y="3" width="14" height="10" rx="2"/><path d="M1 6h14"/><path d="M5 10h2M9 10h2"/></svg>
+          </div>
+          Instant MoMo wallet payments
+        </li>
+        <li>
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7"/><path d="M8 5v3.5l2.5 1.5"/></svg>
+          </div>
+          Same-day delivery in Kampala
+        </li>
+        <li>
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16"><path d="M8 1.5L1.5 5v4c0 3.3 2.8 5.7 6.5 6 3.7-.3 6.5-2.7 6.5-6V5L8 1.5Z"/></svg>
+          </div>
+          100% buyer protection guarantee
+        </li>
+      </ul>
+    </div>
+
+    <div style="position:relative;z-index:2">
+      <div class="stats-row">
+        <div class="stat"><div class="stat-v">5M+</div><div class="stat-l">Shoppers</div></div>
+        <div class="stat"><div class="stat-v">12K+</div><div class="stat-l">Sellers</div></div>
+        <div class="stat"><div class="stat-v">2hr</div><div class="stat-l">Delivery</div></div>
+      </div>
+      <div class="testimonial" style="margin-top:16px">
+        <div class="test-text">"Market by MoMo saved me so much time — I order groceries and electronics and they're at my door the same day!"</div>
+        <div class="test-author">
+          <div class="test-avatar">A</div>
+          <div>
+            <div class="test-name">Aisha Nakato</div>
+            <div class="test-role">Verified Shopper, Kampala</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ RIGHT PANEL ═══ -->
+  <div class="right">
+    <div class="right-top">
+      <div class="top-link">Don't have an account? <a href="signup.html">Create one free →</a></div>
+      <button class="theme-btn" id="themeBtn" title="Toggle theme">
+        <svg id="themeIcon" viewBox="0 0 24 24">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="right-body">
+      <div class="form-wrap">
+
+        <!-- ── SIGN IN PANEL ── -->
+        <div class="panel active" id="panelSignin">
+          <div class="form-heading">Sign in</div>
+          <div class="form-sub">Access your Market by MoMo account</div>
+
+          <div class="tabs">
+            <button class="tab active" onclick="switchLoginTab('email',this)">Email / Phone</button>
+            <button class="tab" onclick="switchLoginTab('momo',this)">MoMo Wallet</button>
+          </div>
+
+          <!-- Email tab -->
+          <div id="tabEmail">
+            <div id="signinStatus" class="status-msg"></div>
+            <div class="field">
+              <label>Email or Phone Number</label>
+              <input type="text" id="signinId" placeholder="name@email.com or 07XXXXXXXX" autocomplete="username">
+            </div>
+            <div class="field">
+              <label>Password</label>
+              <div class="pw-wrap">
+                <input type="password" id="signinPw" placeholder="Enter your password" autocomplete="current-password">
+                <button class="pw-toggle" onclick="togglePw('signinPw',this)" tabindex="-1">
+                  <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <label class="remember"><input type="checkbox" id="rememberMe"> Remember me</label>
+              <a href="#" class="forgot" onclick="showForgot(event)">Forgot password?</a>
+            </div>
+            <button class="btn-primary" id="signinBtn" onclick="handleSignin()">Sign In</button>
+            <div class="divider"><span>or continue with</span></div>
+            <div class="socials">
+              <button class="btn-social" onclick="handleSocialLogin('Google')">
+                <img src="https://www.google.com/favicon.ico" alt="Google"> Google
+              </button>
+              <button class="btn-social" onclick="handleSocialLogin('Facebook')">
+                <img src="https://www.facebook.com/favicon.ico" alt="Facebook"> Facebook
+              </button>
+            </div>
+          </div>
+
+          <!-- MoMo tab -->
+          <div id="tabMomo" style="display:none">
+            <div id="momoStatus" class="status-msg"></div>
+            <div class="field">
+              <label>MTN MoMo Phone Number</label>
+              <input type="tel" id="momoPhone" placeholder="07XXXXXXXX" maxlength="10" autocomplete="tel">
+            </div>
+            <button class="btn-momo" id="momoBtn" onclick="handleMomoLogin()">
+              💛 Continue with MoMo Wallet
+            </button>
+            <p style="font-size:12px;color:var(--t3);text-align:center;line-height:1.6">We'll send a one-time code to your MTN MoMo number to verify your identity.</p>
+          </div>
+        </div>
+
+        <!-- ── OTP PANEL ── -->
+        <div class="panel" id="panelOtp">
+          <button class="back-link" onclick="goBack()">
+            <svg viewBox="0 0 14 14"><polyline points="9 11 5 7 9 3"/></svg>
+            Back
+          </button>
+          <div class="otp-icon">
+            <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>
+          </div>
+          <div class="form-heading">Enter OTP</div>
+          <div class="form-sub" id="otpSubtext">We sent a 6-digit code to your phone number.</div>
+          <div class="otp-inputs">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" oninput="otpNext(this,0)" onkeydown="otpBack(event,0)">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" oninput="otpNext(this,1)" onkeydown="otpBack(event,1)">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" oninput="otpNext(this,2)" onkeydown="otpBack(event,2)">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" oninput="otpNext(this,3)" onkeydown="otpBack(event,3)">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" oninput="otpNext(this,4)" onkeydown="otpBack(event,4)">
+            <input type="text" maxlength="1" inputmode="numeric" class="otp-digit" oninput="otpNext(this,5)" onkeydown="otpBack(event,5)">
+          </div>
+          <div class="otp-hint">Didn't get it? <a onclick="resendOtp()">Resend code</a> · Expires in <span id="otpTimer">04:59</span></div>
+          <div id="otpStatus" class="status-msg"></div>
+          <button class="btn-primary" id="otpBtn" onclick="verifyOtp()">Verify & Sign In</button>
+        </div>
+
+        <!-- ── FORGOT PASSWORD PANEL ── -->
+        <div class="panel" id="panelForgot">
+          <button class="back-link" onclick="goBack()">
+            <svg viewBox="0 0 14 14"><polyline points="9 11 5 7 9 3"/></svg>
+            Back to Sign In
+          </button>
+          <div class="otp-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div class="form-heading">Reset Password</div>
+          <div class="form-sub">Enter your email and we'll send a reset link.</div>
+          <div id="forgotStatus" class="status-msg"></div>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="forgotEmail" placeholder="name@email.com">
+          </div>
+          <button class="btn-primary" id="forgotBtn" onclick="handleForgot()">Send Reset Link</button>
+        </div>
+
+        <!-- ── SUCCESS PANEL ── -->
+        <div class="panel" id="panelSuccess">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="success-title">Welcome back! 🎉</div>
+          <div class="success-sub" id="successMsg">You're signed in successfully. Redirecting you now...</div>
+          <button class="btn-dashboard" onclick="window.location.href='../index.html'">
+            Go to Marketplace
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <div style="margin-top:12px;text-align:center">
+            <a href="../seller/dashboard.html" style="font-size:13px;color:var(--blue);text-decoration:none;font-weight:500">Go to Seller Dashboard →</a>
+          </div>
+        </div>
+
+      </div><!-- /form-wrap -->
+    </div><!-- /right-body -->
+  </div><!-- /right -->
+
+</div><!-- /page -->
+
+<script>
+  // ── Theme ──
+  const html = document.documentElement;
+  const saved = localStorage.getItem('theme') || 'light';
+  html.setAttribute('data-theme', saved);
+  updateThemeIcon(saved);
+
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const t = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    updateThemeIcon(t);
+  });
+
+  function updateThemeIcon(t) {
+    const icon = document.getElementById('themeIcon');
+    if (t === 'dark') {
+      icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    } else {
+      icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
+    }
+  }
+
+  // ── Tab switching ──
+  let activeLoginTab = 'email';
+
+  function switchLoginTab(tab, btn) {
+    activeLoginTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tabEmail').style.display = tab === 'email' ? 'block' : 'none';
+    document.getElementById('tabMomo').style.display = tab === 'momo' ? 'block' : 'none';
+  }
+
+  // ── Panel nav ──
+  let prevPanel = 'panelSignin';
+
+  function showPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function goBack() {
+    showPanel('panelSignin');
+  }
+
+  // ── Email Sign In ──
+  function handleSignin() {
+    const id = document.getElementById('signinId').value.trim();
+    const pw = document.getElementById('signinPw').value;
+    const status = document.getElementById('signinStatus');
+
+    status.className = 'status-msg';
+    if (!id || !pw) {
+      status.className = 'status-msg error';
+      status.textContent = 'Please fill in your email/phone and password.';
+      return;
+    }
+
+    const btn = document.getElementById('signinBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Signing in…';
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+      document.getElementById('successMsg').textContent = 'Welcome back! You're now signed in.';
+      showPanel('panelSuccess');
+    }, 1400);
+  }
+
+  // ── MoMo Login ──
+  function handleMomoLogin() {
+    const phone = document.getElementById('momoPhone').value.trim();
+    const status = document.getElementById('momoStatus');
+    status.className = 'status-msg';
+
+    if (!phone || phone.length < 10) {
+      status.className = 'status-msg error';
+      status.textContent = 'Please enter a valid 10-digit MoMo number.';
+      return;
+    }
+
+    const btn = document.getElementById('momoBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" style="border-color:rgba(0,0,0,.2);border-top-color:#0A1628"></span> Sending OTP…';
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = '💛 Continue with MoMo Wallet';
+      document.getElementById('otpSubtext').textContent = `We sent a 6-digit code to ${phone}.`;
+      startOtpTimer();
+      showPanel('panelOtp');
+      document.querySelector('.otp-digit').focus();
+    }, 1000);
+  }
+
+  // ── Forgot Password ──
+  function showForgot(e) {
+    e.preventDefault();
+    showPanel('panelForgot');
+  }
+
+  function handleForgot() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const status = document.getElementById('forgotStatus');
+    status.className = 'status-msg';
+
+    if (!email || !email.includes('@')) {
+      status.className = 'status-msg error';
+      status.textContent = 'Please enter a valid email address.';
+      return;
+    }
+
+    const btn = document.getElementById('forgotBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Sending…';
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Send Reset Link';
+      status.className = 'status-msg info';
+      status.textContent = `Reset link sent to ${email}. Check your inbox.`;
+    }, 1500);
+  }
+
+  // ── Social Login ──
+  function handleSocialLogin(provider) {
+    document.getElementById('successMsg').textContent = `Signed in via ${provider} successfully.`;
+    showPanel('panelSuccess');
+  }
+
+  // ── OTP ──
+  function otpNext(input, idx) {
+    input.value = input.value.replace(/\D/g, '');
+    if (input.value) {
+      input.classList.add('filled');
+      const digits = document.querySelectorAll('.otp-digit');
+      if (idx < 5) digits[idx + 1].focus();
+      else verifyOtp();
+    } else {
+      input.classList.remove('filled');
+    }
+  }
+
+  function otpBack(e, idx) {
+    if (e.key === 'Backspace') {
+      const digits = document.querySelectorAll('.otp-digit');
+      if (!digits[idx].value && idx > 0) {
+        digits[idx - 1].value = '';
+        digits[idx - 1].classList.remove('filled');
+        digits[idx - 1].focus();
+      }
+    }
+  }
+
+  function verifyOtp() {
+    const digits = document.querySelectorAll('.otp-digit');
+    const code = Array.from(digits).map(d => d.value).join('');
+    const status = document.getElementById('otpStatus');
+    status.className = 'status-msg';
+
+    if (code.length < 6) {
+      status.className = 'status-msg error';
+      status.textContent = 'Please enter all 6 digits.';
+      return;
+    }
+
+    const btn = document.getElementById('otpBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Verifying…';
+
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = 'Verify & Sign In';
+      document.getElementById('successMsg').textContent = 'MoMo verification successful! You're now signed in.';
+      showPanel('panelSuccess');
+    }, 1200);
+  }
+
+  function resendOtp() {
+    startOtpTimer();
+    const status = document.getElementById('otpStatus');
+    status.className = 'status-msg info';
+    status.textContent = 'A new OTP has been sent to your phone.';
+    setTimeout(() => { status.className = 'status-msg'; }, 3000);
+  }
+
+  // OTP countdown
+  let timerInterval;
+  function startOtpTimer() {
+    clearInterval(timerInterval);
+    let secs = 299;
+    const el = document.getElementById('otpTimer');
+    function tick() {
+      const m = Math.floor(secs / 60).toString().padStart(2, '0');
+      const s = (secs % 60).toString().padStart(2, '0');
+      el.textContent = `${m}:${s}`;
+      if (secs-- <= 0) clearInterval(timerInterval);
+    }
+    tick();
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  // ── Password toggle ──
+  function togglePw(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.querySelector('svg').innerHTML = show
+      ? '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>'
+      : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+
+  // ── Enter key support ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const active = document.querySelector('.panel.active');
+      if (active.id === 'panelSignin') {
+        activeLoginTab === 'email' ? handleSignin() : handleMomoLogin();
+      } else if (active.id === 'panelOtp') {
+        verifyOtp();
+      } else if (active.id === 'panelForgot') {
+        handleForgot();
+      }
+    }
+  });
+</script>
+</body>
+</html>

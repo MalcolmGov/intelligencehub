@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Market by MoMo Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #F3F4F6; color: #111827; }
+
+        .container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            color: white;
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            background: #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .admin-badge {
+            display: inline-block;
+            background: #EF4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .user-profile {
+            background: #1A1A2E;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .user-info { flex: 1; }
+        .user-info p:first-child { font-weight: 600; font-size: 13px; }
+        .user-info p:last-child { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
+
+        .nav-section { margin-bottom: 32px; }
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #D1D5DB;
+            transition: all 0.2s;
+        }
+        .nav-item:hover { background: #1A1A2E; color: #FFCC00; }
+        .nav-item.active { background: #FFCC00; color: #111827; font-weight: 600; }
+
+        .sidebar-bottom {
+            border-top: 1px solid #1A1A2E;
+            padding-top: 16px;
+            margin-top: auto;
+        }
+        .system-status {
+            background: #1A1A2E;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 32px;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        /* Controls */
+        .controls {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .control-select {
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            cursor: pointer;
+        }
+        .export-button {
+            background: #FFCC00;
+            color: #111827;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .export-button:hover { background: #FFD700; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #E5E7EB;
+        }
+        .tab {
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B7280;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: #111827; }
+        .tab.active { color: #FFCC00; border-bottom-color: #FFCC00; }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .summary-label { font-size: 12px; color: #6B7280; margin-bottom: 8px; }
+        .summary-value { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        .summary-change { font-size: 12px; color: #10B981; font-weight: 600; }
+
+        /* Chart Card */
+        .chart-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 32px;
+        }
+        .chart-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 32px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #F9FAFB;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #6B7280;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        tr:hover { background: #F9FAFB; }
+
+        .category-name { font-weight: 600; color: #111827; }
+
+        /* SVG */
+        svg { display: block; width: 100%; height: auto; }
+
+        /* Payout Section */
+        .payout-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .payout-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .payout-label { font-size: 12px; color: #6B7280; margin-bottom: 8px; }
+        .payout-value { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; }
+
+        .process-button {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .process-button:hover { background: #059669; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .payout-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; height: auto; margin-bottom: 20px; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .payout-grid { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; }
+            .control-select { width: 100%; }
+            .export-button { width: 100%; }
+            table { font-size: 12px; }
+            th, td { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle">MB</div>
+                <div>
+                    <div>Market by MoMo</div>
+                    <span class="admin-badge">ADMIN</span>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">MG</div>
+                <div class="user-info">
+                    <p>Malcolm Govender</p>
+                    <p>Super Admin</p>
+                </div>
+            </div>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Overview</div>
+                <div class="nav-item">📊 Dashboard</div>
+                <div class="nav-item">📈 Analytics</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Marketplace</div>
+                <div class="nav-item">📦 All Orders</div>
+                <div class="nav-item">👥 Customers</div>
+                <div class="nav-item">🏪 Sellers</div>
+                <div class="nav-item">🗂 Products</div>
+                <div class="nav-item">🏷 Categories</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <div class="nav-item">💳 Transactions</div>
+                <div class="nav-item">💸 Payouts</div>
+                <div class="nav-item active">📊 Reports</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">System</div>
+                <div class="nav-item">🔔 Notifications</div>
+                <div class="nav-item">🛡 Fraud & Risk</div>
+                <div class="nav-item">⚙️ Settings</div>
+                <div class="nav-item">👤 Admin Users</div>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="system-status">
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-dot"></span>
+                        <strong>System Status: All OK</strong>
+                    </div>
+                    <div style="font-size: 11px; color: #9CA3AF;">Version 2.4.1</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 class="page-title">Financial Reports</h1>
+
+            <!-- Controls -->
+            <div class="controls">
+                <select class="control-select">
+                    <option>This Month</option>
+                    <option>Last Month</option>
+                    <option>Q1 2024</option>
+                    <option>Custom Range</option>
+                </select>
+                <button class="export-button">📥 Export PDF</button>
+                <button class="export-button">📥 Export Excel</button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active">Financial</button>
+                <button class="tab">Sales</button>
+                <button class="tab">Sellers</button>
+                <button class="tab">Products</button>
+                <button class="tab">Marketing</button>
+                <button class="tab">Operations</button>
+            </div>
+
+            <!-- Revenue Summary -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">Gross Merchandise Value</div>
+                    <div class="summary-value">UGX 12.4B</div>
+                    <div class="summary-change">↑ +28%</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Platform Commission</div>
+                    <div class="summary-value">UGX 620M</div>
+                    <div class="summary-change">↑ +28%</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Payment Fees</div>
+                    <div class="summary-value">UGX 124M</div>
+                    <div class="summary-change">↑ +31%</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Net Revenue</div>
+                    <div class="summary-value">UGX 496M</div>
+                    <div class="summary-change">↑ +31%</div>
+                </div>
+            </div>
+
+            <!-- Monthly Revenue Chart -->
+            <div class="chart-card">
+                <div class="chart-title">📊 Monthly Revenue Trend (12 Months)</div>
+                <svg viewBox="0 0 1000 350" height="350">
+                    <!-- Axes -->
+                    <line x1="60" y1="20" x2="60" y2="280" stroke="#E5E7EB" stroke-width="2"/>
+                    <line x1="60" y1="280" x2="950" y2="280" stroke="#E5E7EB" stroke-width="2"/>
+
+                    <!-- Gridlines -->
+                    <line x1="60" y1="250" x2="950" y2="250" stroke="#F3F4F6" stroke-width="1" stroke-dasharray="4"/>
+                    <line x1="60" y1="180" x2="950" y2="180" stroke="#F3F4F6" stroke-width="1" stroke-dasharray="4"/>
+                    <line x1="60" y1="110" x2="950" y2="110" stroke="#F3F4F6" stroke-width="1" stroke-dasharray="4"/>
+                    <line x1="60" y1="40" x2="950" y2="40" stroke="#F3F4F6" stroke-width="1" stroke-dasharray="4"/>
+
+                    <!-- Y-axis labels -->
+                    <text x="50" y="290" font-size="12" fill="#6B7280" text-anchor="end">0B</text>
+                    <text x="50" y="260" font-size="12" fill="#6B7280" text-anchor="end">2B</text>
+                    <text x="50" y="190" font-size="12" fill="#6B7280" text-anchor="end">5B</text>
+                    <text x="50" y="120" font-size="12" fill="#6B7280" text-anchor="end">8B</text>
+                    <text x="50" y="50" font-size="12" fill="#6B7280" text-anchor="end">12B</text>
+
+                    <!-- Bar values (Jan-Dec) -->
+                    <!-- Jan: 6.2B -->
+                    <rect x="75" y="145" width="35" height="135" fill="#FFCC00" rx="2"/>
+                    <text x="92.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Jan</text>
+
+                    <!-- Feb: 5.8B -->
+                    <rect x="120" y="160" width="35" height="120" fill="#FFCC00" rx="2"/>
+                    <text x="137.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Feb</text>
+
+                    <!-- Mar: 7.1B -->
+                    <rect x="165" y="120" width="35" height="160" fill="#FFCC00" rx="2"/>
+                    <text x="182.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Mar</text>
+
+                    <!-- Apr: 8.4B -->
+                    <rect x="210" y="75" width="35" height="205" fill="#FFCC00" rx="2"/>
+                    <text x="227.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Apr</text>
+
+                    <!-- May: 9.2B -->
+                    <rect x="255" y="50" width="35" height="230" fill="#FFCC00" rx="2"/>
+                    <text x="272.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">May</text>
+
+                    <!-- Jun: 10.1B -->
+                    <rect x="300" y="25" width="35" height="255" fill="#FFCC00" rx="2"/>
+                    <text x="317.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Jun</text>
+
+                    <!-- Jul: 11.2B -->
+                    <rect x="345" y="-15" width="35" height="295" fill="#FFCC00" rx="2"/>
+                    <text x="362.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Jul</text>
+
+                    <!-- Aug: 10.8B -->
+                    <rect x="390" y="0" width="35" height="280" fill="#FFCC00" rx="2"/>
+                    <text x="407.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Aug</text>
+
+                    <!-- Sep: 11.5B -->
+                    <rect x="435" y="-25" width="35" height="305" fill="#FFCC00" rx="2"/>
+                    <text x="452.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Sep</text>
+
+                    <!-- Oct: 12B -->
+                    <rect x="480" y="-30" width="35" height="310" fill="#FFCC00" rx="2"/>
+                    <text x="497.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Oct</text>
+
+                    <!-- Nov: 12.3B -->
+                    <rect x="525" y="-45" width="35" height="325" fill="#FFCC00" rx="2"/>
+                    <text x="542.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Nov</text>
+
+                    <!-- Dec: 12.4B -->
+                    <rect x="570" y="-50" width="35" height="330" fill="#FFCC00" rx="2"/>
+                    <text x="587.5" y="295" font-size="11" fill="#6B7280" text-anchor="middle">Dec</text>
+
+                    <!-- Commission overlay line (simplified) -->
+                    <polyline points="92.5,220 137.5,235 182.5,200 227.5,155 272.5,130 317.5,95 362.5,55 407.5,80 452.5,50 497.5,45 542.5,35 587.5,32" fill="none" stroke="#3B82F6" stroke-width="2"/>
+
+                    <!-- Legend -->
+                    <rect x="680" y="20" width="15" height="15" fill="#FFCC00"/>
+                    <text x="705" y="32" font-size="12" fill="#111827" font-weight="600">Gross Merchandise Value</text>
+
+                    <circle cx="687.5" cy="55" r="7.5" fill="none" stroke="#3B82F6" stroke-width="2"/>
+                    <text x="705" y="60" font-size="12" fill="#111827" font-weight="600">Commission Earned</text>
+                </svg>
+            </div>
+
+            <!-- Commission Breakdown Table -->
+            <div class="chart-card">
+                <div class="chart-title">💰 Commission Breakdown by Category</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>GMV</th>
+                                <th>Commission Rate</th>
+                                <th>Commission Earned</th>
+                                <th>% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="category-name">Electronics</span></td>
+                                <td>UGX 4.2B</td>
+                                <td>4%</td>
+                                <td>UGX 168M</td>
+                                <td>27%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="category-name">Fashion</span></td>
+                                <td>UGX 2.8B</td>
+                                <td>8%</td>
+                                <td>UGX 224M</td>
+                                <td>36%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="category-name">Supermarket</span></td>
+                                <td>UGX 1.9B</td>
+                                <td>3%</td>
+                                <td>UGX 57M</td>
+                                <td>9%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="category-name">Home & Furniture</span></td>
+                                <td>UGX 1.2B</td>
+                                <td>5%</td>
+                                <td>UGX 60M</td>
+                                <td>10%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="category-name">Sports & Leisure</span></td>
+                                <td>UGX 0.8B</td>
+                                <td>6%</td>
+                                <td>UGX 48M</td>
+                                <td>8%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="category-name">Health & Beauty</span></td>
+                                <td>UGX 0.5B</td>
+                                <td>7%</td>
+                                <td>UGX 35M</td>
+                                <td>6%</td>
+                            </tr>
+                            <tr style="font-weight: 600; background: #F9FAFB;">
+                                <td>TOTAL</td>
+                                <td>UGX 12.4B</td>
+                                <td>5% (avg)</td>
+                                <td>UGX 620M</td>
+                                <td>100%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="chart-card">
+                <div class="chart-title">💳 Payment Methods Volume</div>
+                <svg viewBox="0 0 1000 250" height="250">
+                    <!-- MoMo -->
+                    <rect x="60" y="40" width="260" height="160" fill="#FFCC00" rx="4"/>
+                    <text x="190" y="130" font-size="14" fill="#111827" text-anchor="middle" font-weight="600">UGX 8.4B</text>
+                    <text x="190" y="155" font-size="12" fill="#111827" text-anchor="middle" font-weight="600">MTN MoMo (68%)</text>
+
+                    <!-- Card -->
+                    <rect x="370" y="80" width="120" height="120" fill="#3B82F6" rx="4"/>
+                    <text x="430" y="140" font-size="13" fill="white" text-anchor="middle" font-weight="600">UGX 2.6B</text>
+                    <text x="430" y="160" font-size="11" fill="white" text-anchor="middle" font-weight="600">Card (21%)</text>
+
+                    <!-- BNPL -->
+                    <rect x="550" y="130" width="80" height="70" fill="#8B5CF6" rx="4"/>
+                    <text x="590" y="167" font-size="12" fill="white" text-anchor="middle" font-weight="600">UGX 1.4B</text>
+                    <text x="590" y="185" font-size="10" fill="white" text-anchor="middle" font-weight="600">BNPL (11%)</text>
+
+                    <!-- Labels -->
+                    <text x="190" y="230" font-size="11" fill="#6B7280" text-anchor="middle">Best performing method</text>
+                    <text x="430" y="230" font-size="11" fill="#6B7280" text-anchor="middle">Growing 15% MoM</text>
+                    <text x="590" y="230" font-size="11" fill="#6B7280" text-anchor="middle">New payment option</text>
+                </svg>
+            </div>
+
+            <!-- Payout Summary -->
+            <div class="chart-card">
+                <div class="chart-title">💸 Seller Payout Summary</div>
+                <div class="payout-grid">
+                    <div class="payout-card">
+                        <div class="payout-label">Total Paid Out to Sellers</div>
+                        <div class="payout-value">UGX 11.78B</div>
+                    </div>
+                    <div class="payout-card">
+                        <div class="payout-label">Pending Payouts</div>
+                        <div class="payout-value">UGX 1.24B</div>
+                    </div>
+                    <div class="payout-card">
+                        <div class="payout-label">Failed/Held</div>
+                        <div class="payout-value">UGX 43M</div>
+                    </div>
+                </div>
+                <button class="process-button">🚀 Process All Pending Payouts</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

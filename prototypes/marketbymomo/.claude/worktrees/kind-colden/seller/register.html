@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Become a Seller — Market by MoMo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{
+      --blue:#1B4F8A;--blue-d:#0E3A6B;--blue-l:#E8F1FA;--blue-gl:rgba(27,79,138,0.15);
+      --yellow:#FFCC00;--yellow-d:#D4A700;
+      --red:#E53E3E;--green:#00B074;
+      --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;--r-full:9999px;
+      --fh:'Plus Jakarta Sans',sans-serif;--fb:'Inter',sans-serif;
+      --ease:cubic-bezier(.4,0,.2,1);
+      --bg:#F4F6FF;--bg-1:#FFFFFF;--bg-2:#EEF2FF;--bg-3:#E4EBFF;
+      --border:rgba(0,0,0,0.08);--border-hi:rgba(27,79,138,0.30);
+      --t1:#0A1628;--t2:#4B5675;--t3:#8B98B8;
+      --sh:0 2px 12px rgba(0,0,0,0.07);
+    }
+    [data-theme="dark"]{
+      --bg:#07070F;--bg-1:#0E0E1A;--bg-2:#141424;--bg-3:#1C1C30;
+      --border:rgba(255,255,255,0.07);--border-hi:rgba(27,79,138,0.55);
+      --t1:#FFFFFF;--t2:#A8A8C0;--t3:#64648A;
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:var(--fb);color:var(--t1);min-height:100vh;
+      background:linear-gradient(145deg,#061C36 0%,#0A2D55 25%,#0E3A6B 55%,#1B4F8A 80%,#1E5A9A 100%);
+      position:relative;overflow-x:hidden;
+      transition:color .3s var(--ease);
+    }
+    [data-theme="dark"] body{background:linear-gradient(145deg,#030A14 0%,#060F1E 30%,#0A1A33 60%,#0E2647 100%)}
+
+    /* Background orbs */
+    .bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0}
+    .bg-orb-1{width:700px;height:700px;top:-200px;right:-200px;background:radial-gradient(circle,rgba(255,204,0,.10) 0%,transparent 65%);filter:blur(80px);animation:drift1 15s ease-in-out infinite alternate}
+    .bg-orb-2{width:500px;height:500px;bottom:-150px;left:-100px;background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 65%);filter:blur(60px);animation:drift2 12s ease-in-out infinite alternate}
+    @keyframes drift1{from{transform:translate(0,0)}to{transform:translate(-40px,50px)}}
+    @keyframes drift2{from{transform:translate(0,0)}to{transform:translate(30px,-40px)}}
+
+    /* Page layout */
+    .page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+
+    /* Floating benefit cards */
+    .float-cards{position:fixed;top:50%;width:calc(50% - 400px);display:flex;flex-direction:column;gap:16px}
+    .float-left{left:24px;transform:translateY(-50%)}
+    .float-right{right:24px;transform:translateY(-50%);left:auto;width:calc(50% - 400px)}
+    .float-card{
+      background:rgba(255,255,255,.08);backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,.12);border-radius:var(--r-lg);
+      padding:20px 18px;
+    }
+    .float-card-icon{width:40px;height:40px;background:rgba(255,204,0,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+    .float-card-icon svg{width:20px;height:20px;fill:none;stroke:var(--yellow);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .float-card-title{font-family:var(--fh);font-weight:700;font-size:14px;color:#fff;margin-bottom:5px}
+    .float-card-text{font-size:12px;color:rgba(255,255,255,.55);line-height:1.55}
+    @media(max-width:1180px){.float-cards{display:none}}
+
+    /* Main card */
+    .card{
+      width:100%;max-width:720px;
+      background:var(--bg-1);border-radius:var(--r-xl);
+      box-shadow:0 32px 80px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+
+    /* Card header */
+    .card-header{
+      background:linear-gradient(135deg,#0A2D55,#1B4F8A);
+      padding:36px 44px 32px;
+      position:relative;overflow:hidden;
+    }
+    .card-header::before{content:'';position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,204,0,.14) 0%,transparent 65%);filter:blur(40px)}
+    .card-header-inner{position:relative;z-index:1}
+    .header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+
+    .logo-wrap{display:flex;align-items:center;gap:12px;text-decoration:none}
+    .logo-box{width:42px;height:42px;background:var(--yellow);border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(255,204,0,.40);flex-shrink:0}
+    .logo-box svg{width:24px;height:24px}
+    .logo-name{font-family:var(--fh);font-weight:800;font-size:19px;color:#fff;line-height:1.1}
+    .logo-name span{color:var(--yellow)}
+    .header-badge{background:rgba(255,204,0,.15);border:1px solid rgba(255,204,0,.25);border-radius:var(--r-full);padding:5px 14px;font-family:var(--fh);font-size:12px;font-weight:700;color:var(--yellow);letter-spacing:.5px;text-transform:uppercase}
+
+    .header-title{font-family:var(--fh);font-weight:900;font-size:26px;color:#fff;letter-spacing:-.4px;margin-bottom:6px}
+    .header-sub{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:24px}
+
+    /* Step progress */
+    .step-progress{display:flex;align-items:center;gap:0}
+    .sp-item{flex:1;display:flex;flex-direction:column;align-items:center;position:relative}
+    .sp-item+.sp-item::before{content:'';position:absolute;top:15px;right:50%;width:100%;height:2px;background:rgba(255,255,255,.15);z-index:0}
+    .sp-item.done+.sp-item::before{background:var(--green)}
+    .sp-item.active+.sp-item::before{background:rgba(255,255,255,.15)}
+    .sp-circle{
+      width:32px;height:32px;border-radius:50%;z-index:1;
+      display:flex;align-items:center;justify-content:center;
+      font-family:var(--fh);font-weight:700;font-size:13px;
+      background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.20);
+      color:rgba(255,255,255,.5);transition:all .35s var(--ease);
+    }
+    .sp-item.active .sp-circle{background:var(--yellow);border-color:var(--yellow);color:#0A1628}
+    .sp-item.done .sp-circle{background:var(--green);border-color:var(--green);color:#fff}
+    .sp-label{font-family:var(--fh);font-size:10.5px;font-weight:600;color:rgba(255,255,255,.4);margin-top:7px;text-align:center;transition:color .35s;white-space:nowrap}
+    .sp-item.active .sp-label{color:#fff}
+    .sp-item.done .sp-label{color:rgba(255,255,255,.65)}
+    .sp-counter{display:inline-block;font-family:var(--fh);font-size:12px;font-weight:600;color:rgba(255,255,255,.5);margin-top:16px}
+
+    /* Card body */
+    .card-body{padding:44px 44px}
+
+    /* Step panels */
+    .step-panel{display:none;animation:fadeUp .35s var(--ease) both}
+    .step-panel.active{display:block}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Breadcrumb summary */
+    .step-summary{
+      background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-md);
+      padding:14px 18px;margin-bottom:28px;display:none;
+    }
+    .step-summary.visible{display:block}
+    .step-summary-title{font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+    .summary-items{display:flex;flex-wrap:wrap;gap:8px}
+    .summary-chip{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-full);padding:4px 12px;font-size:12px;font-weight:600;color:var(--t2);font-family:var(--fh)}
+
+    /* Step icon header */
+    .step-icon-header{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+    .step-icon{width:52px;height:52px;background:rgba(255,204,0,.10);border:1.5px solid rgba(255,204,0,.20);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .step-icon svg{width:26px;height:26px;fill:none;stroke:var(--yellow);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    [data-theme="dark"] .step-icon{background:rgba(255,204,0,.08);border-color:rgba(255,204,0,.15)}
+    .step-heading{font-family:var(--fh);font-weight:900;font-size:22px;color:var(--t1);letter-spacing:-.3px;line-height:1.25}
+    .step-sub{font-size:13.5px;color:var(--t3);margin-top:3px}
+
+    /* Fields */
+    .field{margin-bottom:18px}
+    .field-label{display:block;font-family:var(--fh);font-size:13px;font-weight:600;color:var(--t2);margin-bottom:7px;letter-spacing:.1px}
+    .field-label span{font-weight:400;color:var(--t3);font-size:12px}
+    .input-wrap{position:relative}
+    .input-wrap input,.input-wrap select,.input-wrap textarea{
+      width:100%;height:50px;border-radius:var(--r-md);border:1.5px solid var(--border);
+      background:var(--bg-1);color:var(--t1);font-family:var(--fb);font-size:14px;
+      padding:0 16px;outline:none;transition:border-color .2s,box-shadow .2s;
+      -webkit-appearance:none;
+    }
+    .input-wrap input:focus,.input-wrap select:focus,.input-wrap textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-gl)}
+    .input-wrap input::placeholder,.input-wrap textarea::placeholder{color:var(--t3)}
+    .input-wrap textarea{height:auto;padding:14px 16px;resize:vertical;line-height:1.6}
+    .input-wrap select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B98B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:40px}
+
+    /* URL preview */
+    .url-preview{background:var(--bg-2);border:1.5px solid var(--border);border-radius:var(--r-md);padding:11px 16px;font-family:var(--fb);font-size:13px;color:var(--t3);margin-top:8px;transition:border-color .2s;word-break:break-all}
+    .url-preview .url-base{color:var(--t3)}
+    .url-preview .url-slug{color:var(--blue);font-weight:700}
+
+    /* Business type radio cards */
+    .radio-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:4px}
+    .radio-card{
+      position:relative;cursor:pointer;
+      border:2px solid var(--border);border-radius:var(--r-md);
+      padding:16px 14px;text-align:center;
+      transition:border-color .2s,background .2s,box-shadow .2s;
+      user-select:none;
+    }
+    .radio-card:hover{border-color:var(--border-hi);background:var(--bg-2)}
+    .radio-card input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+    .radio-card.selected{border-color:var(--blue);background:var(--blue-l);box-shadow:0 0 0 2px var(--blue-gl)}
+    .radio-card-icon{font-size:26px;margin-bottom:8px;display:block}
+    .radio-card-title{font-family:var(--fh);font-weight:700;font-size:13px;color:var(--t1);display:block;margin-bottom:3px}
+    .radio-card-desc{font-size:11px;color:var(--t3);line-height:1.45}
+    .radio-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;border:2px solid var(--border);background:var(--bg-1);display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .radio-card.selected .radio-check{background:var(--blue);border-color:var(--blue)}
+    .radio-check-dot{width:6px;height:6px;border-radius:50%;background:#fff;opacity:0;transition:opacity .2s}
+    .radio-card.selected .radio-check-dot{opacity:1}
+
+    /* Phone prefix */
+    .phone-wrap{display:flex;border:1.5px solid var(--border);border-radius:var(--r-md);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+    .phone-wrap:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-gl)}
+    .phone-prefix{display:flex;align-items:center;gap:6px;padding:0 14px;background:var(--bg-2);border-right:1px solid var(--border);font-family:var(--fh);font-size:14px;font-weight:600;color:var(--t2);flex-shrink:0;white-space:nowrap}
+    .phone-prefix img{width:20px;height:14px;object-fit:cover;border-radius:2px}
+    .phone-input{flex:1;height:48px;border:none;background:var(--bg-1);color:var(--t1);font-family:var(--fb);font-size:14px;padding:0 16px;outline:none}
+    .phone-input::placeholder{color:var(--t3)}
+
+    /* Drag-drop upload zone */
+    .upload-zone{
+      border:2px dashed var(--border);border-radius:var(--r-lg);
+      padding:32px 24px;text-align:center;cursor:pointer;
+      transition:border-color .2s,background .2s;
+      position:relative;overflow:hidden;
+    }
+    .upload-zone:hover,.upload-zone.drag-over{border-color:var(--blue);background:var(--blue-l)}
+    [data-theme="dark"] .upload-zone:hover,[data-theme="dark"] .upload-zone.drag-over{background:rgba(27,79,138,.15)}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .upload-icon{width:48px;height:48px;background:var(--bg-2);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+    .upload-icon svg{width:24px;height:24px;fill:none;stroke:var(--t3);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .upload-main{font-family:var(--fh);font-weight:700;font-size:14px;color:var(--t1);margin-bottom:4px}
+    .upload-main span{color:var(--blue)}
+    .upload-hint{font-size:12px;color:var(--t3)}
+    .upload-banner{padding:20px 24px}
+    .upload-preview{margin-top:12px;display:none;align-items:center;gap:10px;background:var(--bg-2);border-radius:var(--r-md);padding:10px 14px}
+    .upload-preview.visible{display:flex}
+    .preview-thumb{width:40px;height:40px;border-radius:6px;object-fit:cover}
+    .preview-name{font-size:13px;font-weight:600;color:var(--t1);font-family:var(--fh);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .preview-remove{background:none;border:none;cursor:pointer;color:var(--t3);padding:4px;display:flex}
+    .preview-remove:hover{color:var(--red)}
+    .preview-remove svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Review step */
+    .review-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+    .review-item{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px}
+    .review-key{font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+    .review-val{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t1)}
+    .review-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:var(--r-full);font-size:12px;font-weight:700;font-family:var(--fh)}
+    .badge-pending{background:rgba(246,136,42,.12);color:#F6882A;border:1px solid rgba(246,136,42,.25)}
+    .badge-ok{background:rgba(0,176,116,.12);color:var(--green);border:1px solid rgba(0,176,116,.25)}
+
+    /* Agreement */
+    .agreement{background:var(--bg-2);border:1.5px solid var(--border);border-radius:var(--r-md);padding:18px;margin-bottom:22px}
+    .agree-label{display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+    .agree-label input[type=checkbox]{width:18px;height:18px;accent-color:var(--blue);margin-top:2px;flex-shrink:0;cursor:pointer}
+    .agree-text{font-size:13.5px;color:var(--t2);line-height:1.6}
+    .agree-text a{color:var(--blue);font-weight:600;text-decoration:none}
+    .agree-text a:hover{text-decoration:underline}
+    .commission-note{font-size:12px;color:var(--t3);margin-top:6px;display:flex;align-items:center;gap:6px}
+    .commission-note svg{width:14px;height:14px;fill:none;stroke:var(--green);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Submit button */
+    .btn-submit{
+      width:100%;height:58px;border-radius:var(--r-md);
+      background:linear-gradient(135deg,#061C36,#0E3A6B,#1B4F8A);
+      color:#fff;font-family:var(--fh);font-size:17px;font-weight:800;
+      border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;
+      letter-spacing:-.2px;box-shadow:0 8px 28px rgba(27,79,138,.40);
+      transition:opacity .2s,transform .15s,box-shadow .2s;
+    }
+    .btn-submit:hover{opacity:.92;transform:translateY(-2px);box-shadow:0 12px 36px rgba(27,79,138,.50)}
+    .btn-submit:active{transform:translateY(0)}
+    .submit-note{text-align:center;font-size:12.5px;color:var(--t3);margin-top:12px;line-height:1.5}
+
+    /* Nav buttons */
+    .btn-row{display:flex;gap:12px;margin-top:32px}
+    .btn-next{
+      flex:1;height:52px;border-radius:var(--r-md);
+      background:linear-gradient(135deg,var(--blue-d),var(--blue));
+      color:#fff;font-family:var(--fh);font-size:15.5px;font-weight:700;
+      border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+      box-shadow:0 6px 22px rgba(27,79,138,.30);transition:opacity .2s,transform .15s,box-shadow .2s;
+    }
+    .btn-next:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 8px 28px rgba(27,79,138,.40)}
+    .btn-next svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+    .btn-back{
+      height:52px;padding:0 22px;border-radius:var(--r-md);border:1.5px solid var(--border);
+      background:transparent;color:var(--t2);font-family:var(--fh);font-size:15px;font-weight:600;
+      cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .2s,border-color .2s;
+    }
+    .btn-back:hover{background:var(--bg-2);border-color:var(--border-hi)}
+    .btn-back svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+    /* Success */
+    .success-panel{text-align:center;padding:24px 0 8px}
+    .success-check{margin:0 auto 24px;width:90px;height:90px}
+    .check-circle{width:90px;height:90px;border-radius:50%;border:3px solid var(--green);display:flex;align-items:center;justify-content:center;animation:popIn .5s var(--ease) both}
+    .check-circle svg{width:44px;height:44px;stroke:var(--green);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:drawCheck .5s .45s var(--ease) forwards}
+    @keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+    @keyframes drawCheck{to{stroke-dashoffset:0}}
+    .success-title{font-family:var(--fh);font-weight:900;font-size:26px;color:var(--t1);letter-spacing:-.4px;margin-bottom:10px}
+    .success-sub{font-size:14.5px;color:var(--t3);line-height:1.65;max-width:400px;margin:0 auto 28px}
+    .success-timeline{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;text-align:left;margin-bottom:24px}
+    .timeline-item{display:flex;align-items:center;gap:12px;font-size:13.5px;color:var(--t2);padding:6px 0}
+    .timeline-item+.timeline-item{border-top:1px solid var(--border)}
+    .tl-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+    .tl-done{background:rgba(0,176,116,.12);color:var(--green)}
+    .tl-pending{background:rgba(255,204,0,.12);color:var(--yellow-d)}
+    .btn-dashboard{
+      width:100%;height:52px;border-radius:var(--r-md);background:var(--yellow);
+      color:#0A1628;font-family:var(--fh);font-size:15.5px;font-weight:800;
+      border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+      box-shadow:0 4px 18px rgba(255,204,0,.35);transition:background .2s,transform .15s;
+      text-decoration:none;
+    }
+    .btn-dashboard:hover{background:var(--yellow-d);transform:translateY(-1px)}
+
+    /* Card footer nav */
+    .card-footer{padding:18px 44px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .footer-link{font-size:13px;color:var(--t3);text-decoration:none;transition:color .2s}
+    .footer-link:hover{color:var(--blue)}
+    .footer-right{display:flex;align-items:center;gap:16px}
+    .theme-toggle{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg-2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+    .theme-toggle:hover{background:var(--bg-3)}
+    .theme-toggle svg{width:16px;height:16px;fill:none;stroke:var(--t2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .icon-moon{display:block}
+    .icon-sun{display:none}
+    [data-theme="dark"] .icon-moon{display:none}
+    [data-theme="dark"] .icon-sun{display:block}
+
+    /* Toast */
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#0A1628;color:#fff;font-family:var(--fh);font-size:14px;font-weight:600;padding:12px 22px;border-radius:var(--r-full);box-shadow:0 8px 32px rgba(0,0,0,.25);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;z-index:9999}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    [data-theme="dark"] .toast{background:#fff;color:#0A1628}
+
+    @media(max-width:640px){
+      .card-body{padding:32px 24px}
+      .card-header{padding:28px 24px 24px}
+      .radio-cards{grid-template-columns:1fr}
+      .review-grid{grid-template-columns:1fr}
+      .card-footer{padding:16px 24px}
+      .btn-row{flex-direction:column-reverse}
+      .btn-back{width:100%;justify-content:center}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background orbs -->
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+
+<!-- Floating benefit cards (desktop only) -->
+<div class="float-cards float-left">
+  <div class="float-card">
+    <div class="float-card-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+    </div>
+    <div class="float-card-title">Reach 2M+ Customers</div>
+    <div class="float-card-text">Tap into Uganda's fastest-growing online marketplace instantly.</div>
+  </div>
+  <div class="float-card">
+    <div class="float-card-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div class="float-card-title">Seller Protection</div>
+    <div class="float-card-text">We protect both buyers and sellers on every transaction.</div>
+  </div>
+</div>
+
+<div class="float-cards float-right">
+  <div class="float-card">
+    <div class="float-card-icon">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+    </div>
+    <div class="float-card-title">Earn with MoMo Payouts</div>
+    <div class="float-card-text">Get paid directly to your MTN MoMo wallet — fast & secure.</div>
+  </div>
+  <div class="float-card">
+    <div class="float-card-icon">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div class="float-card-title">Real-Time Analytics</div>
+    <div class="float-card-text">Track sales, views, and revenue from your seller dashboard.</div>
+  </div>
+</div>
+
+<!-- Main card -->
+<div class="page">
+  <div class="card">
+
+    <!-- Card header -->
+    <div class="card-header">
+      <div class="card-header-inner">
+        <div class="header-top">
+          <a href="../index.html" class="logo-wrap">
+            <div class="logo-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#0A1628" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 01-8 0"/>
+              </svg>
+            </div>
+            <div class="logo-name">Market by <span>MoMo</span></div>
+          </a>
+          <div class="header-badge">Seller Program</div>
+        </div>
+
+        <div class="header-title">Become a Seller</div>
+        <div class="header-sub">Set up your store and start selling to millions across Uganda</div>
+
+        <!-- Step progress -->
+        <div class="step-progress" id="stepProgress">
+          <div class="sp-item active" data-sp="1">
+            <div class="sp-circle">
+              <span class="sp-num">1</span>
+              <svg class="sp-done" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="sp-label">Business Info</div>
+          </div>
+          <div class="sp-item" data-sp="2">
+            <div class="sp-circle">
+              <span class="sp-num">2</span>
+              <svg class="sp-done" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="sp-label">Store Setup</div>
+          </div>
+          <div class="sp-item" data-sp="3">
+            <div class="sp-circle">
+              <span class="sp-num">3</span>
+              <svg class="sp-done" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="sp-label">Verification</div>
+          </div>
+          <div class="sp-item" data-sp="4">
+            <div class="sp-circle">
+              <span class="sp-num">4</span>
+              <svg class="sp-done" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="sp-label">Go Live!</div>
+          </div>
+        </div>
+        <span class="sp-counter" id="stepCounter">Step 1 of 4</span>
+      </div>
+    </div>
+
+    <!-- Card body -->
+    <div class="card-body">
+
+      <!-- ─── STEP 1: Business Info ─── -->
+      <div class="step-panel active" id="step1">
+        <div class="step-icon-header">
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div>
+            <div class="step-heading">Tell us about your business</div>
+            <div class="step-sub">We'll use this to set up your seller profile</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="bizName">Business Name</label>
+          <div class="input-wrap">
+            <input type="text" id="bizName" placeholder="e.g. Kampala Electronics Hub">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Business Type</label>
+          <div class="radio-cards" id="bizTypeCards">
+            <label class="radio-card selected" onclick="selectCard(this)">
+              <input type="radio" name="bizType" value="individual" checked>
+              <div class="radio-check"><div class="radio-check-dot"></div></div>
+              <span class="radio-card-icon">🧑‍💼</span>
+              <span class="radio-card-title">Individual Seller</span>
+              <span class="radio-card-desc">Sell on your own, no registration needed</span>
+            </label>
+            <label class="radio-card" onclick="selectCard(this)">
+              <input type="radio" name="bizType" value="business">
+              <div class="radio-check"><div class="radio-check-dot"></div></div>
+              <span class="radio-card-icon">🏢</span>
+              <span class="radio-card-title">Registered Business</span>
+              <span class="radio-card-desc">Legally registered company or enterprise</span>
+            </label>
+            <label class="radio-card" onclick="selectCard(this)">
+              <input type="radio" name="bizType" value="brand">
+              <div class="radio-check"><div class="radio-check-dot"></div></div>
+              <span class="radio-card-icon">🏷️</span>
+              <span class="radio-card-title">Brand / Manufacturer</span>
+              <span class="radio-card-desc">Own brand or original product line</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="bizCategory">Business Category</label>
+          <div class="input-wrap">
+            <select id="bizCategory">
+              <option value="" disabled selected>Select a category</option>
+              <option>Electronics &amp; Gadgets</option>
+              <option>Fashion &amp; Clothing</option>
+              <option>Food &amp; Grocery</option>
+              <option>Health &amp; Beauty</option>
+              <option>Home &amp; Living</option>
+              <option>Sports &amp; Fitness</option>
+              <option>Automotive</option>
+              <option>Books &amp; Education</option>
+              <option>Baby &amp; Kids</option>
+              <option>Agricultural Products</option>
+              <option>Arts &amp; Crafts</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="bizDesc">Brief Description <span>(optional)</span></label>
+          <div class="input-wrap">
+            <textarea id="bizDesc" rows="3" placeholder="Tell customers what you sell and what makes your business special..."></textarea>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-next" onclick="goNext(1)">
+            Next: Store Setup
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ─── STEP 2: Store Setup ─── -->
+      <div class="step-panel" id="step2">
+        <div class="step-summary" id="summary2">
+          <div class="step-summary-title">From Step 1</div>
+          <div class="summary-items" id="summaryItems2"></div>
+        </div>
+
+        <div class="step-icon-header">
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div>
+            <div class="step-heading">Set up your store</div>
+            <div class="step-sub">Create your storefront that customers will see</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="storeName">Store Name</label>
+          <div class="input-wrap">
+            <input type="text" id="storeName" placeholder="e.g. kampala-electronics" oninput="updateURLPreview(this.value)">
+          </div>
+          <div class="url-preview">
+            <span class="url-base">marketbymomo.com/store/</span><span class="url-slug" id="urlSlug">your-store-name</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="storeDesc">Store Description</label>
+          <div class="input-wrap">
+            <textarea id="storeDesc" rows="3" placeholder="Describe your store to attract customers..."></textarea>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Store Logo</label>
+          <div class="upload-zone" id="logoZone" onclick="triggerUpload('logoInput')">
+            <input type="file" id="logoInput" accept="image/*" style="display:none" onchange="handleFileSelect(this,'logoPreview','logoName')">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="upload-main">Drop your logo here or <span>click to upload</span></div>
+            <div class="upload-hint">SVG, PNG, JPG up to 5MB · Recommended 512×512</div>
+          </div>
+          <div class="upload-preview" id="logoPreview">
+            <img class="preview-thumb" id="logoThumb" src="" alt="">
+            <span class="preview-name" id="logoName"></span>
+            <button class="preview-remove" onclick="removeFile('logoInput','logoPreview','urlSlug')">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Store Banner <span>(optional)</span></label>
+          <div class="upload-zone upload-banner" id="bannerZone" onclick="triggerUpload('bannerInput')">
+            <input type="file" id="bannerInput" accept="image/*" style="display:none" onchange="handleFileSelect(this,'bannerPreview','bannerName')">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="upload-main">Upload a <span>banner image</span></div>
+            <div class="upload-hint">16:9 ratio recommended · JPG or PNG up to 10MB</div>
+          </div>
+          <div class="upload-preview" id="bannerPreview">
+            <img class="preview-thumb" id="bannerThumb" src="" alt="">
+            <span class="preview-name" id="bannerName"></span>
+            <button class="preview-remove" onclick="removeFile('bannerInput','bannerPreview',null)">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goBack(2)">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back
+          </button>
+          <button class="btn-next" onclick="goNext(2)">
+            Next: Verification
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ─── STEP 3: Verification ─── -->
+      <div class="step-panel" id="step3">
+        <div class="step-summary" id="summary3">
+          <div class="step-summary-title">Your Store Details</div>
+          <div class="summary-items" id="summaryItems3"></div>
+        </div>
+
+        <div class="step-icon-header">
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="step-heading">Verify your identity</div>
+            <div class="step-sub">Required to activate payouts and build buyer trust</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">National ID / Passport</label>
+          <div class="upload-zone" id="idZone" onclick="triggerUpload('idInput')">
+            <input type="file" id="idInput" accept="image/*,.pdf" style="display:none" onchange="handleFileSelect(this,'idPreview','idName')">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+            <div class="upload-main">Upload your <span>ID document</span></div>
+            <div class="upload-hint">JPG, PNG or PDF · Front side of document</div>
+          </div>
+          <div class="upload-preview" id="idPreview">
+            <img class="preview-thumb" id="idThumb" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='5' width='20' height='14' rx='2' fill='%23E8F1FA'/%3E%3C/svg%3E" alt="">
+            <span class="preview-name" id="idName"></span>
+            <button class="preview-remove" onclick="removeFile('idInput','idPreview',null)">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Business Registration Certificate <span>(optional)</span></label>
+          <div class="upload-zone" id="regZone" onclick="triggerUpload('regInput')">
+            <input type="file" id="regInput" accept="image/*,.pdf" style="display:none" onchange="handleFileSelect(this,'regPreview','regName')">
+            <div class="upload-icon">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div class="upload-main">Upload <span>registration document</span></div>
+            <div class="upload-hint">For registered businesses only · PDF preferred</div>
+          </div>
+          <div class="upload-preview" id="regPreview">
+            <img class="preview-thumb" id="regThumb" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23E8F1FA'/%3E%3C/svg%3E" alt="">
+            <span class="preview-name" id="regName"></span>
+            <button class="preview-remove" onclick="removeFile('regInput','regPreview',null)">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="momoNum">MoMo Number for Payouts</label>
+          <div class="phone-wrap">
+            <div class="phone-prefix">
+              <img src="https://flagcdn.com/w40/ug.png" alt="UG">
+              +256
+            </div>
+            <input class="phone-input" type="tel" id="momoNum" placeholder="7XX XXX XXX">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Bank Account <span>(optional)</span></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="input-wrap">
+              <select id="bankName">
+                <option value="" disabled selected>Select bank</option>
+                <option>Stanbic Bank Uganda</option>
+                <option>Centenary Bank</option>
+                <option>DFCU Bank</option>
+                <option>Equity Bank Uganda</option>
+                <option>Absa Bank Uganda</option>
+                <option>Standard Chartered Uganda</option>
+                <option>Post Bank Uganda</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="input-wrap">
+              <input type="text" id="bankAcct" placeholder="Account number">
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goBack(3)">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back
+          </button>
+          <button class="btn-next" onclick="goNext(3)">
+            Next: Review
+            <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ─── STEP 4: Go Live ─── -->
+      <div class="step-panel" id="step4">
+        <div class="step-icon-header">
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div>
+            <div class="step-heading">Ready to go live?</div>
+            <div class="step-sub">Review your store details and submit</div>
+          </div>
+        </div>
+
+        <div class="review-grid" id="reviewGrid">
+          <!-- populated by JS -->
+        </div>
+
+        <div class="agreement">
+          <label class="agree-label">
+            <input type="checkbox" id="agreeCheck">
+            <div>
+              <div class="agree-text">I agree to the <a href="#">Market by MoMo Seller Terms of Service</a> and the <a href="#">Commission Structure</a></div>
+              <div class="commission-note">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                8% commission per sale · Payouts every Monday · No listing fees
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <button class="btn-submit" onclick="handleSubmit()">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Submit &amp; Start Selling!
+        </button>
+        <p class="submit-note">Your store will go live within 24 hours of identity verification</p>
+
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn-back" onclick="goBack(4)" style="width:100%;justify-content:center">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Edit Details
+          </button>
+        </div>
+      </div>
+
+      <!-- ─── STEP 5: Success ─── -->
+      <div class="step-panel" id="step5">
+        <div class="success-panel">
+          <div class="success-check">
+            <div class="check-circle">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <h2 class="success-title">Application Submitted!</h2>
+          <p class="success-sub">You're one step away from selling to 2 million customers across Uganda. We'll review your store within 24 hours.</p>
+
+          <div class="success-timeline">
+            <div class="timeline-item">
+              <div class="tl-icon tl-done">✓</div>
+              <span>Store created &amp; application submitted</span>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-icon tl-pending">⏳</div>
+              <span>Identity verification (within 24 hours)</span>
+            </div>
+            <div class="timeline-item">
+              <div class="tl-icon tl-pending">🚀</div>
+              <span>Store goes live &amp; you start selling</span>
+            </div>
+          </div>
+
+          <a href="./dashboard.html" class="btn-dashboard">
+            Go to Seller Dashboard
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#0A1628" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /card-body -->
+
+    <!-- Card footer -->
+    <div class="card-footer">
+      <div>
+        <a href="../auth/login.html" class="footer-link">Already a seller? Sign in</a>
+      </div>
+      <div class="footer-right">
+        <a href="../index.html" class="footer-link">← Back to marketplace</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /page -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Theme
+  const html = document.documentElement;
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('mbm-theme', html.dataset.theme);
+  });
+  (function() { const t = localStorage.getItem('mbm-theme'); if (t) html.dataset.theme = t; })();
+
+  // Toast
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  // Radio card selection
+  function selectCard(card) {
+    card.closest('.radio-cards').querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    card.querySelector('input[type=radio]').checked = true;
+  }
+
+  // Store URL preview
+  function updateURLPreview(val) {
+    const slug = val.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-').slice(0, 40) || 'your-store-name';
+    document.getElementById('urlSlug').textContent = slug;
+  }
+
+  // File upload
+  function triggerUpload(inputId) {
+    document.getElementById(inputId).click();
+  }
+
+  function handleFileSelect(input, previewId, nameId) {
+    const file = input.files[0];
+    if (!file) return;
+    const preview = document.getElementById(previewId);
+    const nameEl = document.getElementById(nameId);
+    if (nameEl) nameEl.textContent = file.name;
+    // Show thumb for images
+    const thumbId = previewId.replace('Preview', 'Thumb');
+    const thumb = document.getElementById(thumbId);
+    if (thumb && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = e => { thumb.src = e.target.result; };
+      reader.readAsDataURL(file);
+    }
+    preview.classList.add('visible');
+    showToast('File uploaded: ' + file.name);
+  }
+
+  function removeFile(inputId, previewId) {
+    document.getElementById(inputId).value = '';
+    document.getElementById(previewId).classList.remove('visible');
+  }
+
+  // Drag-drop
+  document.querySelectorAll('.upload-zone').forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('drag-over');
+      const input = zone.querySelector('input[type=file]');
+      if (!input || !e.dataTransfer.files.length) return;
+      // Transfer files to input
+      const dt = new DataTransfer();
+      dt.items.add(e.dataTransfer.files[0]);
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change'));
+    });
+  });
+
+  // Step state
+  let currentStep = 1;
+
+  function setStep(n) {
+    // Hide all panels (1-4 + success)
+    [1, 2, 3, 4, 5].forEach(i => {
+      const panel = document.getElementById('step' + i);
+      if (panel) panel.classList.toggle('active', i === n);
+    });
+    // Update header progress (steps 1-4)
+    document.querySelectorAll('.sp-item').forEach((item, i) => {
+      const stepNum = i + 1;
+      item.className = 'sp-item';
+      const num = item.querySelector('.sp-num');
+      const done = item.querySelector('.sp-done');
+      if (stepNum < n) {
+        item.classList.add('done');
+        if (num) num.style.display = 'none';
+        if (done) done.style.display = 'block';
+      } else if (stepNum === n) {
+        item.classList.add('active');
+        if (num) num.style.display = 'block';
+        if (done) done.style.display = 'none';
+      } else {
+        if (num) num.style.display = 'block';
+        if (done) done.style.display = 'none';
+      }
+    });
+    const displayStep = Math.min(n, 4);
+    document.getElementById('stepCounter').textContent = 'Step ' + displayStep + ' of 4';
+    currentStep = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function buildSummary(containerId, items) {
+    const el = document.getElementById(containerId);
+    const parent = el.closest('.step-summary') || document.getElementById(containerId.replace('Items', ''));
+    const summaryEl = el.closest ? el.closest('.step-summary') : null;
+    el.innerHTML = items.map(i => `<div class="summary-chip">${i}</div>`).join('');
+    if (summaryEl) summaryEl.classList.add('visible');
+  }
+
+  function goNext(fromStep) {
+    if (fromStep === 1) {
+      const name = document.getElementById('bizName').value.trim();
+      const cat = document.getElementById('bizCategory').value;
+      if (!name) { showToast('Please enter your business name'); return; }
+      if (!cat) { showToast('Please select a business category'); return; }
+      const type = document.querySelector('input[name=bizType]:checked').value;
+      const typeLabel = { individual: 'Individual', business: 'Registered Biz', brand: 'Brand/Manufacturer' }[type];
+      buildSummary('summaryItems2', [name, typeLabel, cat]);
+      document.getElementById('summary2').classList.add('visible');
+    }
+    if (fromStep === 2) {
+      const name = document.getElementById('storeName').value.trim();
+      if (!name) { showToast('Please enter a store name'); return; }
+      const slug = document.getElementById('urlSlug').textContent;
+      buildSummary('summaryItems3', [name, 'marketbymomo.com/store/' + slug]);
+      document.getElementById('summary3').classList.add('visible');
+    }
+    if (fromStep === 3) {
+      const momo = document.getElementById('momoNum').value.trim();
+      if (!momo) { showToast('Please enter your MoMo number for payouts'); return; }
+      buildReview();
+    }
+    setStep(fromStep + 1);
+  }
+
+  function goBack(fromStep) {
+    setStep(fromStep - 1);
+  }
+
+  function buildReview() {
+    const bizName = document.getElementById('bizName').value.trim();
+    const storeName = document.getElementById('storeName').value.trim();
+    const cat = document.getElementById('bizCategory').value;
+    const momo = document.getElementById('momoNum').value.trim();
+    const slug = document.getElementById('urlSlug').textContent;
+    const grid = document.getElementById('reviewGrid');
+    grid.innerHTML = `
+      <div class="review-item"><div class="review-key">Business Name</div><div class="review-val">${bizName||'—'}</div></div>
+      <div class="review-item"><div class="review-key">Store Name</div><div class="review-val">${storeName||'—'}</div></div>
+      <div class="review-item"><div class="review-key">Category</div><div class="review-val">${cat||'—'}</div></div>
+      <div class="review-item"><div class="review-key">Store URL</div><div class="review-val" style="font-size:12px;word-break:break-all">marketbymomo.com/store/${slug}</div></div>
+      <div class="review-item"><div class="review-key">MoMo Payout</div><div class="review-val">+256 ${momo}</div></div>
+      <div class="review-item"><div class="review-key">Verification</div><div class="review-val"><span class="review-badge badge-pending">⏳ Pending Review</span></div></div>
+    `;
+  }
+
+  function handleSubmit() {
+    const agreed = document.getElementById('agreeCheck').checked;
+    if (!agreed) { showToast('Please agree to the Seller Terms to continue'); return; }
+    showToast('Submitting your application...');
+    setTimeout(() => {
+      setStep(5);
+      // Hide header progress on success
+      document.getElementById('stepCounter').textContent = 'Application Submitted';
+    }, 1000);
+  }
+</script>
+</body>
+</html>

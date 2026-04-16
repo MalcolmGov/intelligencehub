@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed! — Market by MoMo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{
+      --blue:#1B4F8A;--blue-d:#0E3A6B;--blue-l:#E8F1FA;--blue-gl:rgba(27,79,138,0.15);
+      --yellow:#FFCC00;--yellow-d:#D4A700;
+      --red:#E53E3E;--green:#00B074;--orange:#F6882A;
+      --r-sm:8px;--r-md:12px;--r-lg:18px;--r-xl:24px;--r-full:9999px;
+      --fh:'Plus Jakarta Sans',sans-serif;--fb:'Inter',sans-serif;
+      --ease:cubic-bezier(.4,0,.2,1);
+      --bg:#F4F6FF;--bg-1:#FFFFFF;--bg-2:#EEF2FF;--bg-3:#E4EBFF;
+      --border:rgba(0,0,0,0.08);--border-hi:rgba(27,79,138,0.30);
+      --t1:#0A1628;--t2:#4B5675;--t3:#8B98B8;
+      --sh:0 2px 12px rgba(0,0,0,0.07);--sh-hover:0 16px 48px rgba(27,79,138,0.16);
+    }
+    [data-theme="dark"]{
+      --bg:#07070F;--bg-1:#0E0E1A;--bg-2:#141424;--bg-3:#1C1C30;
+      --border:rgba(255,255,255,0.07);--border-hi:rgba(27,79,138,0.55);
+      --t1:#FFFFFF;--t2:#A8A8C0;--t3:#64648A;
+      --sh:0 4px 24px rgba(0,0,0,0.5);--sh-hover:0 20px 60px rgba(0,0,0,0.7);
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--fb);background:var(--bg);color:var(--t1);line-height:1.6;min-height:100vh;transition:background .3s var(--ease),color .3s var(--ease);overflow-x:hidden}
+
+    /* ─── CONFETTI CANVAS ─── */
+    #confetti-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999}
+
+    /* ─── MINIMAL HEADER ─── */
+    .success-header{background:var(--bg-1);border-bottom:1px solid var(--border);padding:20px 32px;text-align:center}
+    .header-logo{font-family:var(--fh);font-weight:900;font-size:22px;color:var(--blue);text-decoration:none;display:inline-block}
+    .header-logo span{color:var(--yellow)}
+
+    /* ─── MAIN CONTENT ─── */
+    .success-main{max-width:620px;margin:0 auto;padding:48px 24px 80px}
+
+    /* ─── CHECK ANIMATION ─── */
+    .check-container{display:flex;justify-content:center;margin-bottom:32px}
+    .check-circle{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--blue) 0%,var(--blue-d) 100%);display:flex;align-items:center;justify-content:center;position:relative;animation:circleScaleIn .6s var(--ease) both;box-shadow:0 12px 48px rgba(27,79,138,0.35)}
+    @keyframes circleScaleIn{
+      0%{transform:scale(0);opacity:0}
+      60%{transform:scale(1.1)}
+      80%{transform:scale(0.95)}
+      100%{transform:scale(1);opacity:1}
+    }
+    .check-circle::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:3px solid var(--blue);opacity:.2;animation:ringPulse 2s ease-out 0.6s infinite}
+    @keyframes ringPulse{
+      0%{transform:scale(1);opacity:.3}
+      100%{transform:scale(1.35);opacity:0}
+    }
+    .checkmark-svg{width:56px;height:56px;animation:checkFadeIn .4s ease .5s both}
+    @keyframes checkFadeIn{
+      0%{opacity:0;transform:scale(.7)}
+      100%{opacity:1;transform:scale(1)}
+    }
+    .checkmark-path{stroke-dasharray:80;stroke-dashoffset:80;animation:strokeDraw .5s ease .6s forwards}
+    @keyframes strokeDraw{
+      to{stroke-dashoffset:0}
+    }
+
+    /* ─── HEADINGS ─── */
+    .success-h1{font-family:var(--fh);font-size:36px;font-weight:900;color:var(--blue);text-align:center;margin-bottom:10px;animation:fadeUp .5s ease .3s both}
+    .success-sub{font-size:16px;color:var(--t2);text-align:center;margin-bottom:24px;font-family:var(--fb);animation:fadeUp .5s ease .4s both}
+    @keyframes fadeUp{
+      0%{opacity:0;transform:translateY(16px)}
+      100%{opacity:1;transform:translateY(0)}
+    }
+
+    /* ─── ORDER NUMBER BADGE ─── */
+    .order-badge{display:inline-flex;align-items:center;gap:10px;background:var(--blue);color:var(--yellow);font-family:'Courier New',monospace;font-size:16px;font-weight:700;padding:10px 22px;border-radius:var(--r-full);letter-spacing:.08em;margin:0 auto 32px;display:flex;justify-content:center;max-width:280px;animation:fadeUp .5s ease .5s both}
+
+    /* ─── DELIVERY ESTIMATE CARD ─── */
+    .delivery-estimate{background:linear-gradient(135deg,var(--blue) 0%,#2563a8 50%,var(--blue-d) 100%);border-radius:var(--r-xl);padding:28px 28px;margin-bottom:20px;position:relative;overflow:hidden;animation:fadeUp .5s ease .6s both}
+    .delivery-estimate::before{content:'';position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none}
+    .delivery-estimate::after{content:'';position:absolute;bottom:-60px;left:-20px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none}
+    .delivery-est-icon{font-size:32px;margin-bottom:12px;display:block}
+    .delivery-est-label{font-family:var(--fh);font-size:12px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+    .delivery-est-date{font-family:var(--fh);font-size:26px;font-weight:900;color:#fff;margin-bottom:6px;line-height:1.1}
+    .delivery-est-sub{font-size:13px;color:rgba(255,255,255,0.65);font-family:var(--fb);display:flex;align-items:center;gap:8px}
+    .delivery-est-sub span{color:rgba(255,255,255,.5)}
+
+    /* ─── CARDS ─── */
+    .info-card{background:var(--bg-1);border-radius:var(--r-xl);border:1px solid var(--border);box-shadow:var(--sh);padding:24px;margin-bottom:16px}
+    .card-title{font-family:var(--fh);font-size:14px;font-weight:800;color:var(--t1);margin-bottom:16px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.04em;padding-bottom:12px;border-bottom:1px solid var(--border)}
+    .card-title svg{color:var(--blue)}
+
+    /* ─── ORDER ITEMS ─── */
+    .order-items{display:flex;flex-direction:column;gap:12px;margin-bottom:20px}
+    .order-item{display:flex;gap:14px;align-items:center}
+    .order-item-img{width:60px;height:60px;border-radius:var(--r-md);object-fit:cover;border:1px solid var(--border);flex-shrink:0}
+    .order-item-info{flex:1;min-width:0}
+    .order-item-name{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t1);margin-bottom:2px}
+    .order-item-variant{font-size:12px;color:var(--t3);font-family:var(--fb)}
+    .order-item-price{font-family:var(--fh);font-size:15px;font-weight:800;color:var(--blue);flex-shrink:0}
+
+    /* ─── TOTALS ─── */
+    .totals-block{background:var(--bg-2);border-radius:var(--r-md);padding:16px}
+    .total-row{display:flex;justify-content:space-between;font-size:13px;font-family:var(--fb);color:var(--t2);padding:5px 0}
+    .total-row.discount{color:var(--green)}
+    .total-divider{height:1px;background:var(--border);margin:8px 0}
+    .grand-total{display:flex;justify-content:space-between;padding-top:2px}
+    .grand-total .l{font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t1)}
+    .grand-total .v{font-family:var(--fh);font-size:20px;font-weight:900;color:var(--blue)}
+
+    /* ─── DELIVERY TO ─── */
+    .delivery-to-content{display:grid;gap:8px}
+    .delivery-field{display:flex;align-items:flex-start;gap:10px}
+    .delivery-field-icon{width:32px;height:32px;border-radius:var(--r-sm);background:var(--blue-l);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--blue)}
+    .delivery-field-info .label{font-size:11px;font-weight:600;color:var(--t3);font-family:var(--fb);text-transform:uppercase;letter-spacing:.04em;margin-bottom:1px}
+    .delivery-field-info .val{font-size:14px;font-weight:600;color:var(--t1);font-family:var(--fb)}
+    .edit-link{font-size:12px;color:var(--blue);text-decoration:none;font-weight:700;font-family:var(--fh);float:right;margin-top:-28px}
+    .edit-link:hover{text-decoration:underline}
+
+    /* ─── PAYMENT USED ─── */
+    .payment-used{display:flex;align-items:center;gap:14px}
+    .pay-icon-lg{width:48px;height:32px;border-radius:var(--r-sm);background:#FFCC00;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;font-family:var(--fh);color:#1a1a1a;flex-shrink:0}
+    .pay-used-info .name{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t1)}
+    .pay-used-info .sub{font-size:12px;color:var(--t3);font-family:var(--fb)}
+    .pay-status-chip{margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:rgba(0,176,116,.1);border:1px solid rgba(0,176,116,.3);color:var(--green);font-size:12px;font-weight:700;font-family:var(--fh);padding:4px 10px;border-radius:var(--r-full);flex-shrink:0}
+
+    /* ─── ACTION BUTTONS ─── */
+    .actions{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+    .track-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;border-radius:var(--r-lg);background:var(--blue);color:#fff;font-family:var(--fh);font-size:16px;font-weight:800;border:none;cursor:pointer;text-decoration:none;transition:all .25s var(--ease);letter-spacing:.01em}
+    .track-btn:hover{background:var(--blue-d);box-shadow:var(--sh-hover);transform:translateY(-1px)}
+    .shop-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:50px;border-radius:var(--r-lg);background:transparent;color:var(--blue);font-family:var(--fh);font-size:15px;font-weight:700;border:2px solid var(--border-hi);cursor:pointer;text-decoration:none;transition:all .25s var(--ease)}
+    .shop-btn:hover{background:var(--blue-l);border-color:var(--blue);transform:translateY(-1px)}
+
+    /* ─── NOTIFY TEXT ─── */
+    .notify-text{text-align:center;font-size:13px;color:var(--t3);font-family:var(--fb);margin-top:20px;line-height:1.5}
+    .notify-text a{color:var(--blue);font-weight:600;text-decoration:none}
+    .notify-text a:hover{text-decoration:underline}
+
+    /* ─── FOOTER ─── */
+    .success-footer{background:var(--bg-1);border-top:1px solid var(--border);padding:24px 32px;text-align:center;margin-top:40px}
+    .footer-logo{font-family:var(--fh);font-weight:900;font-size:18px;color:var(--blue);text-decoration:none;display:inline-block;margin-bottom:6px}
+    .footer-logo span{color:var(--yellow)}
+    .footer-copy{font-size:12px;color:var(--t3);font-family:var(--fb)}
+
+    /* ─── ANIMATION DELAYS ─── */
+    .info-card:nth-child(1){animation:fadeUp .5s ease .7s both}
+    .info-card:nth-child(2){animation:fadeUp .5s ease .8s both}
+    .info-card:nth-child(3){animation:fadeUp .5s ease .9s both}
+    .info-card:nth-child(4){animation:fadeUp .5s ease 1s both}
+    .actions{animation:fadeUp .5s ease 1.1s both}
+    .notify-text{animation:fadeUp .4s ease 1.2s both}
+
+    @media(max-width:480px){
+      .success-h1{font-size:28px}
+      .delivery-est-date{font-size:20px}
+      .success-main{padding:32px 16px 60px}
+      .success-header{padding:16px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- Confetti Canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ─── MINIMAL HEADER ─── -->
+<header class="success-header">
+  <a href="../index.html" class="header-logo">Market<span>MoMo</span></a>
+</header>
+
+<!-- ─── MAIN CONTENT ─── -->
+<main class="success-main">
+
+  <!-- Animated Check Circle -->
+  <div class="check-container">
+    <div class="check-circle">
+      <svg class="checkmark-svg" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="checkmark-path" d="M14 27L22 35L38 18" stroke="#FFCC00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Headings -->
+  <h1 class="success-h1">Order Confirmed!</h1>
+  <p class="success-sub">Thank you, Sarah! Your order has been successfully placed and is being prepared.</p>
+
+  <!-- Order Number Badge -->
+  <div class="order-badge">
+    #MBM-2025-00847
+  </div>
+
+  <!-- Delivery Estimate Card -->
+  <div class="delivery-estimate">
+    <span class="delivery-est-icon">🚚</span>
+    <div class="delivery-est-label">Estimated Arrival</div>
+    <div class="delivery-est-date">Tomorrow, 16 April</div>
+    <div class="delivery-est-sub">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Order confirmed at 2:34 PM</span>
+      &nbsp;·&nbsp; Same Day Delivery
+    </div>
+  </div>
+
+  <!-- Order Details Card -->
+  <div class="info-card">
+    <div class="card-title">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Order Details
+    </div>
+    <div class="order-items">
+      <div class="order-item">
+        <img class="order-item-img" src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=200&h=200&fit=crop" alt="Samsung Galaxy S24 Ultra">
+        <div class="order-item-info">
+          <div class="order-item-name">Samsung Galaxy S24 Ultra</div>
+          <div class="order-item-variant">Midnight Black · 256GB · Qty 1</div>
+        </div>
+        <span class="order-item-price">UGX 1,250,000</span>
+      </div>
+      <div class="order-item">
+        <img class="order-item-img" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop" alt="Nike Air Max 270">
+        <div class="order-item-info">
+          <div class="order-item-name">Nike Air Max 270 React</div>
+          <div class="order-item-variant">Solar Red / Black · UK 10 · Qty 1</div>
+        </div>
+        <span class="order-item-price">UGX 380,000</span>
+      </div>
+    </div>
+    <div class="totals-block">
+      <div class="total-row"><span>Subtotal</span><span>UGX 1,630,000</span></div>
+      <div class="total-row discount"><span>Discount (MOMO10 −10%)</span><span>− UGX 163,000</span></div>
+      <div class="total-row"><span>Delivery (Same Day)</span><span>UGX 5,000</span></div>
+      <div class="total-divider"></div>
+      <div class="grand-total">
+        <span class="l">Total Paid</span>
+        <span class="v">UGX 1,472,000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delivery To Card -->
+  <div class="info-card">
+    <div class="card-title">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Delivery To
+      <a href="./checkout.html" class="edit-link" style="margin-left:auto;font-size:12px">Edit →</a>
+    </div>
+    <div class="delivery-to-content">
+      <div class="delivery-field">
+        <div class="delivery-field-icon">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="delivery-field-info">
+          <div class="label">Name</div>
+          <div class="val">Sarah Nakato</div>
+        </div>
+      </div>
+      <div class="delivery-field">
+        <div class="delivery-field-icon">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div class="delivery-field-info">
+          <div class="label">Address</div>
+          <div class="val">Plot 12, Kololo Hill Drive, Kampala, Uganda</div>
+        </div>
+      </div>
+      <div class="delivery-field">
+        <div class="delivery-field-icon">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div class="delivery-field-info">
+          <div class="label">Phone</div>
+          <div class="val">+256 700 ••• 456</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Used -->
+  <div class="info-card">
+    <div class="card-title">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Payment
+    </div>
+    <div class="payment-used">
+      <div class="pay-icon-lg">MoMo</div>
+      <div class="pay-used-info">
+        <div class="name">MTN Mobile Money</div>
+        <div class="sub">+256 700 ••• 456 · Paid in full</div>
+      </div>
+      <div class="pay-status-chip">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Paid
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions">
+    <a href="#" class="track-btn">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Track My Order
+    </a>
+    <a href="../index.html" class="shop-btn">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Continue Shopping
+    </a>
+  </div>
+
+  <!-- Notify Text -->
+  <p class="notify-text">
+    We'll send order updates to <a href="#">sarah@email.com</a><br>
+    Questions? <a href="#">Contact Support</a> or call <a href="tel:+256800100200">0800 100 200</a>
+  </p>
+
+</main>
+
+<!-- ─── FOOTER ─── -->
+<footer class="success-footer">
+  <a href="../index.html" class="footer-logo">Market<span>MoMo</span></a>
+  <p class="footer-copy">&copy; 2025 Market by MoMo Ltd. All rights reserved. Kampala, Uganda.</p>
+</footer>
+
+<script>
+  // ─── CONFETTI ───
+  (function(){
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#FFCC00','#1B4F8A','#00B074','#F6882A','#E53E3E','#7C3AED','#FFFFFF','#FF6B9D','#00C6FF'];
+    const particles = [];
+    const PARTICLE_COUNT = 90;
+
+    function randomBetween(a, b){ return a + Math.random() * (b - a) }
+
+    class Particle {
+      constructor(){
+        this.x = randomBetween(0, canvas.width);
+        this.y = randomBetween(-200, -20);
+        this.size = randomBetween(6, 14);
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.speedY = randomBetween(3, 8);
+        this.speedX = randomBetween(-2, 2);
+        this.rotation = randomBetween(0, 360);
+        this.rotationSpeed = randomBetween(-5, 5);
+        this.shape = Math.random() > 0.5 ? 'rect' : 'circle';
+        this.opacity = 1;
+        this.wobble = randomBetween(0, Math.PI * 2);
+        this.wobbleSpeed = randomBetween(0.05, 0.15);
+      }
+      update(){
+        this.y += this.speedY;
+        this.wobble += this.wobbleSpeed;
+        this.x += this.speedX + Math.sin(this.wobble) * 1.2;
+        this.rotation += this.rotationSpeed;
+        if(this.y > canvas.height * 0.6) this.opacity = Math.max(0, this.opacity - 0.025);
+      }
+      draw(){
+        ctx.save();
+        ctx.globalAlpha = this.opacity;
+        ctx.fillStyle = this.color;
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        if(this.shape === 'rect'){
+          ctx.fillRect(-this.size/2, -this.size/4, this.size, this.size/2);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, this.size/2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    for(let i = 0; i < PARTICLE_COUNT; i++){
+      const p = new Particle();
+      p.y = randomBetween(-600, 0); // stagger start positions
+      particles.push(p);
+    }
+
+    let startTime = null;
+    const DURATION = 3200;
+
+    function animate(ts){
+      if(!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      if(elapsed < DURATION){
+        requestAnimationFrame(animate);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    requestAnimationFrame(animate);
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  })();
+
+  // ─── THEME (reads saved preference) ───
+  const saved = localStorage.getItem('mbm-theme');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+</script>
+</body>
+</html>

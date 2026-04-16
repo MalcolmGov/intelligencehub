@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports — Market by MoMo Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --blue:#1B4F8A;--blue-d:#0E3A6B;--blue-l:#E8F1FA;--blue-gl:rgba(27,79,138,0.12);
+      --yellow:#FFCC00;--yellow-d:#D4A700;--yellow-gl:rgba(255,204,0,0.12);
+      --green:#00B074;--green-gl:rgba(0,176,116,0.12);
+      --red:#E53E3E;--red-gl:rgba(229,62,62,0.12);
+      --orange:#F6882A;--orange-gl:rgba(246,136,42,0.12);
+      --purple:#7C5CFC;--purple-gl:rgba(124,92,252,0.12);
+      --fh:'Plus Jakarta Sans',sans-serif;--fb:'Inter',sans-serif;
+      --ease:cubic-bezier(.4,0,.2,1);
+      --r-sm:6px;--r-md:10px;--r-lg:14px;--r-xl:20px;--r-full:9999px;
+      --sidebar-w:260px;
+    }
+    :root,[data-theme="light"]{
+      --bg:#F4F6FF;--bg-1:#FFFFFF;--bg-2:#EEF2FF;--bg-3:#E4EBFF;
+      --border:rgba(0,0,0,0.08);--border-hi:rgba(27,79,138,0.30);
+      --t1:#0A1628;--t2:#4B5675;--t3:#8B98B8;
+      --sh:0 2px 12px rgba(0,0,0,0.07);--sh-lg:0 8px 32px rgba(27,79,138,0.12);
+      --sidebar-bg:#0A1628;--sidebar-t:#CBD5E1;--sidebar-border:rgba(255,255,255,0.06);
+    }
+    [data-theme="dark"]{
+      --bg:#07070F;--bg-1:#0E0E1A;--bg-2:#141424;--bg-3:#1C1C30;
+      --border:rgba(255,255,255,0.07);--border-hi:rgba(27,79,138,0.55);
+      --t1:#FFFFFF;--t2:#A8A8C0;--t3:#64648A;
+      --sh:0 4px 24px rgba(0,0,0,0.5);--sh-lg:0 12px 40px rgba(0,0,0,0.6);
+      --sidebar-bg:#07070F;--sidebar-t:#94A3B8;--sidebar-border:rgba(255,255,255,0.05);
+    }
+    body{font-family:var(--fb);background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;display:flex;min-height:100vh;transition:background .3s var(--ease),color .3s var(--ease)}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);color:#fff;position:fixed;left:0;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;border-right:1px solid var(--sidebar-border);z-index:200;transition:transform .3s var(--ease)}
+    .sidebar-head{padding:20px 16px;border-bottom:1px solid var(--sidebar-border)}
+    .sb-brand{display:flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:16px}
+    .sb-brand-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--blue-d),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sb-brand-icon svg{width:18px;height:18px;fill:white}
+    .sb-brand-name{font-family:var(--fh);font-weight:900;font-size:.9rem;color:#fff}
+    .sb-brand-name span{color:var(--yellow)}
+    .admin-pill{background:var(--red);color:#fff;padding:2px 8px;border-radius:var(--r-full);font-size:.62rem;font-weight:700;text-transform:uppercase;display:inline-block;margin-top:2px}
+    .admin-profile{background:rgba(255,255,255,.05);border:1px solid var(--sidebar-border);border-radius:var(--r-lg);padding:12px;display:flex;align-items:center;gap:10px}
+    .admin-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--red),#C0392B);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:.82rem;color:#fff;flex-shrink:0}
+    .admin-name{font-family:var(--fh);font-weight:700;font-size:.82rem;color:#fff}
+    .admin-role{font-size:.68rem;color:var(--red);font-weight:600;margin-top:1px}
+    .sb-nav{padding:12px 0;flex:1}
+    .sb-section{padding:0 10px;margin-bottom:6px}
+    .sb-section-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sidebar-t);padding:0 8px;margin-bottom:4px;opacity:.5}
+    .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-md);color:var(--sidebar-t);font-size:.81rem;font-weight:500;cursor:pointer;transition:all .2s;text-decoration:none;margin-bottom:1px}
+    .sb-item:hover{background:rgba(255,255,255,.06);color:#fff}
+    .sb-item.active{background:var(--blue);color:#fff;font-weight:600}
+    .sb-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+    .sb-count{margin-left:auto;background:rgba(255,255,255,.12);color:#fff;border-radius:var(--r-full);font-size:.62rem;font-weight:700;padding:1px 6px}
+    .sb-count.red{background:var(--red)}
+    .sb-count.yellow{background:var(--yellow);color:#0A1628}
+    .sb-footer{padding:12px 10px;border-top:1px solid var(--sidebar-border)}
+    .sb-footer-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-md);color:var(--sidebar-t);font-size:.81rem;cursor:pointer;border:none;background:none;width:100%;transition:all .2s}
+    .sb-footer-item:hover{color:var(--red);background:rgba(229,62,62,.08)}
+    .sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+    /* ── MAIN ── */
+    .main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .topnav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;transition:background .3s var(--ease)}
+    [data-theme="dark"] .topnav{background:rgba(14,14,26,.92)}
+    .topnav-left{display:flex;align-items:center;gap:12px}
+    .hamburger{display:none;padding:7px;border:none;background:transparent;cursor:pointer;border-radius:var(--r-sm);color:var(--t2)}
+    .hamburger svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+    .breadcrumb{font-size:.78rem;color:var(--t3)}
+    .breadcrumb span{color:var(--t1);font-weight:600}
+    .topnav-right{display:flex;align-items:center;gap:8px}
+    .tnav-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;background:var(--bg-1);border:1.5px solid var(--border);border-radius:var(--r-full);color:var(--t2);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--fh);text-decoration:none}
+    .tnav-btn:hover{border-color:var(--border-hi);color:var(--t1)}
+    .tnav-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+    .theme-toggle{width:34px;height:34px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--bg-2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .theme-toggle:hover{border-color:var(--border-hi)}
+    .theme-toggle svg{width:14px;height:14px;stroke:var(--t2);fill:none;stroke-width:2}
+
+    /* ── PAGE ── */
+    .page{padding:28px;flex:1}
+    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+    .page-title{font-family:var(--fh);font-weight:900;font-size:1.5rem;color:var(--t1);letter-spacing:-.02em}
+    .page-sub{font-size:.78rem;color:var(--t3);margin-top:3px}
+    .header-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r-full);font-family:var(--fh);font-weight:700;font-size:.78rem;cursor:pointer;border:none;transition:all .2s;text-decoration:none;white-space:nowrap}
+    .btn-primary{background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(27,79,138,.3)}
+    .btn-primary:hover{background:var(--blue-d);transform:translateY(-1px)}
+    .btn-secondary{background:var(--bg-1);color:var(--t1);border:1.5px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--border-hi);color:var(--blue)}
+    .btn-green{background:var(--green-gl);color:var(--green);border:1.5px solid rgba(0,176,116,.2)}
+    .btn-green:hover{background:var(--green);color:#fff}
+    .btn-yellow{background:var(--yellow);color:#0A1628;border:2px solid var(--yellow-d)}
+    .btn-yellow:hover{background:var(--yellow-d)}
+    .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+    /* ── DATE RANGE ── */
+    .filter-bar{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+    .filter-group{display:flex;align-items:center;gap:8px}
+    .filter-label{font-size:.75rem;font-weight:600;color:var(--t3);white-space:nowrap}
+    .filter-input{padding:8px 12px;background:var(--bg-2);border:1.5px solid var(--border);border-radius:var(--r-lg);font-size:.8rem;color:var(--t1);outline:none;font-family:var(--fb);transition:all .2s}
+    .filter-input:focus{border-color:var(--blue);background:var(--bg-1)}
+    .filter-sep{color:var(--t3);font-size:.8rem}
+    .quick-date-tabs{display:flex;gap:4px;background:var(--bg-2);border-radius:var(--r-full);padding:3px}
+    .qd-tab{padding:5px 12px;border-radius:var(--r-full);font-size:.72rem;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--t3);font-family:var(--fh);transition:all .2s}
+    .qd-tab.active{background:var(--bg-1);color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .filter-bar-right{margin-left:auto;display:flex;gap:8px}
+
+    /* ── REPORT CARDS ── */
+    .report-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+    .report-card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;transition:all .25s;cursor:default;position:relative;overflow:hidden}
+    .report-card:hover{border-color:var(--border-hi);box-shadow:var(--sh-lg);transform:translateY(-2px)}
+    .report-card-icon{width:48px;height:48px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+    .report-card-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2}
+    .report-card-icon.blue{background:var(--blue-gl);color:var(--blue)}
+    .report-card-icon.green{background:var(--green-gl);color:var(--green)}
+    .report-card-icon.purple{background:var(--purple-gl);color:var(--purple)}
+    .report-card-title{font-family:var(--fh);font-weight:800;font-size:1rem;color:var(--t1);margin-bottom:4px}
+    .report-card-desc{font-size:.77rem;color:var(--t3);line-height:1.5;margin-bottom:18px}
+    .report-card-meta{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:14px}
+    .report-meta-text{font-size:.7rem;color:var(--t3)}
+    .report-meta-text strong{color:var(--t1);font-weight:600}
+    .export-btns{display:flex;gap:6px}
+    .export-btn{padding:5px 11px;border-radius:var(--r-sm);font-size:.7rem;font-weight:700;cursor:pointer;border:1.5px solid;font-family:var(--fh);transition:all .2s;display:flex;align-items:center;gap:4px}
+    .export-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2.5}
+    .export-btn.csv{border-color:rgba(0,176,116,.3);color:var(--green);background:var(--green-gl)}
+    .export-btn.csv:hover{background:var(--green);color:#fff;border-color:var(--green)}
+    .export-btn.pdf{border-color:rgba(229,62,62,.3);color:var(--red);background:var(--red-gl)}
+    .export-btn.pdf:hover{background:var(--red);color:#fff;border-color:var(--red)}
+
+    /* ── SUMMARY KPI ── */
+    .summary-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+    .skpi-card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-xl);padding:18px}
+    .skpi-icon{width:36px;height:36px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+    .skpi-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+    .skpi-icon.blue{background:var(--blue-gl);color:var(--blue)}
+    .skpi-icon.green{background:var(--green-gl);color:var(--green)}
+    .skpi-icon.yellow{background:var(--yellow-gl);color:#A07000}
+    .skpi-icon.purple{background:var(--purple-gl);color:var(--purple)}
+    .skpi-label{font-size:.72rem;color:var(--t3);margin-bottom:3px}
+    .skpi-val{font-family:var(--fh);font-weight:900;font-size:1.35rem;color:var(--t1);letter-spacing:-.02em;margin-bottom:2px}
+    .skpi-change{font-size:.68rem;font-weight:600}
+    .skpi-change.up{color:var(--green)}
+    .skpi-change.down{color:var(--red)}
+
+    /* ── CHARTS ROW ── */
+    .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px}
+    .chart-card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-xl);padding:22px}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+    .card-title{font-family:var(--fh);font-weight:800;font-size:.95rem;color:var(--t1)}
+    .card-sub{font-size:.7rem;color:var(--t3);margin-top:2px}
+    .chart-wrap{position:relative;height:220px}
+    .chart-wrap-sm{position:relative;height:200px}
+
+    /* ── LEADERBOARD ── */
+    .section-card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:20px}
+    .section-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .leader-item{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--border);transition:background .2s}
+    .leader-item:last-child{border-bottom:none}
+    .leader-item:hover{background:var(--bg-2)}
+    .leader-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:.78rem;flex-shrink:0}
+    .leader-rank.gold{background:linear-gradient(135deg,#FFD700,#FFA500);color:#0A1628}
+    .leader-rank.silver{background:linear-gradient(135deg,#C0C0C0,#A8A8A8);color:#0A1628}
+    .leader-rank.bronze{background:linear-gradient(135deg,#CD7F32,#A0522D);color:#fff}
+    .leader-rank.normal{background:var(--bg-3);color:var(--t2)}
+    .leader-av{width:36px;height:36px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:.8rem;flex-shrink:0}
+    .leader-info{flex:1;min-width:0}
+    .leader-name{font-weight:700;font-size:.83rem;color:var(--t1);margin-bottom:1px}
+    .leader-store{font-size:.7rem;color:var(--t3)}
+    .leader-stats{text-align:right;flex-shrink:0}
+    .leader-revenue{font-family:var(--fh);font-weight:900;font-size:.9rem;color:var(--t1);margin-bottom:2px}
+    .leader-orders{font-size:.68rem;color:var(--t3)}
+    .leader-badge{padding:3px 8px;border-radius:var(--r-full);font-size:.65rem;font-weight:700;flex-shrink:0}
+    .leader-progress{flex:1;max-width:120px}
+    .progress-bar{height:5px;background:var(--bg-3);border-radius:var(--r-full);overflow:hidden;margin-top:4px}
+    .progress-fill{height:100%;border-radius:var(--r-full);background:linear-gradient(90deg,var(--blue-d),var(--blue))}
+    .progress-fill.gold-fill{background:linear-gradient(90deg,#FFD700,#FFA500)}
+
+    /* ── DATA TABLE ── */
+    table{width:100%;border-collapse:collapse}
+    th{padding:11px 14px;text-align:left;font-size:.68rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);background:var(--bg-2)}
+    td{padding:13px 14px;font-size:.8rem;color:var(--t2);border-bottom:1px solid var(--border);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tbody tr:hover{background:var(--bg-2)}
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:var(--r-full);font-size:.66rem;font-weight:700}
+    .badge::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor}
+    .badge-up{background:var(--green-gl);color:var(--green)}
+    .badge-down{background:var(--red-gl);color:var(--red)}
+    .badge-flat{background:var(--border);color:var(--t3)}
+    .table-wrap{overflow-x:auto}
+
+    /* ── OVERLAY / TOAST ── */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;backdrop-filter:blur(2px)}
+    .overlay.show{display:block}
+    .toast-container{position:fixed;bottom:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+    .toast{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-lg);font-size:.8rem;color:var(--t1);transform:translateX(120%);transition:transform .35s var(--ease);min-width:260px}
+    .toast.show{transform:translateX(0)}
+    .toast-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .toast-icon.success{background:var(--green-gl);color:var(--green)}
+    .toast-icon.error{background:var(--red-gl);color:var(--red)}
+    .toast-icon svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5}
+    .toast-msg{flex:1;font-weight:500}
+    .toast-close{background:none;border:none;color:var(--t3);cursor:pointer}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:1100px){.charts-row{grid-template-columns:1fr};.report-cards{grid-template-columns:1fr 1fr}}
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.open{transform:translateX(0)}
+      .main{margin-left:0}
+      .hamburger{display:flex}
+      .page{padding:16px}
+      .report-cards{grid-template-columns:1fr}
+      .summary-kpi{grid-template-columns:1fr 1fr}
+      .topnav{padding:0 14px}
+      .filter-bar{gap:10px}
+    }
+    @media(max-width:480px){.summary-kpi{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a href="../index.html" class="sb-brand">
+        <div class="sb-brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div>
+          <div class="sb-brand-name">Market<span>MoMo</span></div>
+          <span class="admin-pill">Admin</span>
+        </div>
+      </a>
+      <div class="admin-profile">
+        <div class="admin-avatar">SA</div>
+        <div style="flex:1;min-width:0">
+          <div class="admin-name">Super Admin</div>
+          <div class="admin-role">Platform Administrator</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">
+        <div class="sb-section-label">Overview</div>
+        <a href="dashboard.html" class="sb-item">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="reports.html" class="sb-item active">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Reports
+        </a>
+      </div>
+      <div class="sb-section">
+        <div class="sb-section-label">People</div>
+        <a href="users.html" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Users
+        </a>
+        <a href="sellers.html" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+          Sellers
+          <span class="sb-count yellow">14</span>
+        </a>
+      </div>
+      <div class="sb-section">
+        <div class="sb-section-label">Commerce</div>
+        <a href="orders.html" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/></svg>
+          Orders
+          <span class="sb-count red">47</span>
+        </a>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Products
+        </a>
+      </div>
+      <div class="sb-section">
+        <div class="sb-section-label">Finance</div>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Finance
+        </a>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+          Payouts
+        </a>
+      </div>
+      <div class="sb-section">
+        <div class="sb-section-label">System</div>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          Settings
+        </a>
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <button class="sb-footer-item" onclick="toast('Logged out','success')">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <header class="topnav">
+      <div class="topnav-left">
+        <button class="hamburger" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="breadcrumb">Admin / <span>Reports</span></span>
+      </div>
+      <div class="topnav-right">
+        <button class="tnav-btn" onclick="exportAll()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export All
+        </button>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">Analytics & Reports</div>
+          <div class="page-sub">Platform-wide data insights with downloadable exports</div>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-green" onclick="downloadCSV()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export CSV
+          </button>
+          <button class="btn btn-yellow" onclick="downloadPDF()">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Export PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Date Range Filter -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <span class="filter-label">From</span>
+          <input type="date" class="filter-input" id="dateFrom" value="2026-03-01">
+          <span class="filter-sep">—</span>
+          <input type="date" class="filter-input" id="dateTo" value="2026-04-15">
+        </div>
+        <div class="quick-date-tabs">
+          <button class="qd-tab" onclick="setQuickDate('7d',this)">7D</button>
+          <button class="qd-tab" onclick="setQuickDate('30d',this)">30D</button>
+          <button class="qd-tab active" onclick="setQuickDate('90d',this)">90D</button>
+          <button class="qd-tab" onclick="setQuickDate('1y',this)">1Y</button>
+          <button class="qd-tab" onclick="setQuickDate('all',this)">All Time</button>
+        </div>
+        <div class="filter-bar-right">
+          <button class="btn btn-primary" onclick="applyFilters()">
+            <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            Apply Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary KPIs -->
+      <div class="summary-kpi">
+        <div class="skpi-card">
+          <div class="skpi-icon blue"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="skpi-label">Total Revenue (Period)</div>
+          <div class="skpi-val">R 2.4M</div>
+          <div class="skpi-change up">↑ 22.1% vs prev period</div>
+        </div>
+        <div class="skpi-card">
+          <div class="skpi-icon green"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/></svg></div>
+          <div class="skpi-label">Total Orders</div>
+          <div class="skpi-val">8,924</div>
+          <div class="skpi-change up">↑ 15.7% vs prev period</div>
+        </div>
+        <div class="skpi-card">
+          <div class="skpi-icon yellow"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="skpi-label">New Users</div>
+          <div class="skpi-val">3,840</div>
+          <div class="skpi-change up">↑ 8.4% vs prev period</div>
+        </div>
+        <div class="skpi-card">
+          <div class="skpi-icon purple"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <div class="skpi-label">Platform Commission</div>
+          <div class="skpi-val">R 192K</div>
+          <div class="skpi-change up">↑ 18.3% vs prev period</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Revenue Trend</div>
+              <div class="card-sub">Daily GMV across selected period</div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <span style="display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--t3)"><span style="width:10px;height:2px;background:#1B4F8A;display:inline-block;border-radius:2px"></span>Revenue</span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--t3)"><span style="width:10px;height:2px;background:#FFCC00;display:inline-block;border-radius:2px"></span>Orders</span>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="revTrendChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Sales by Category</div>
+              <div class="card-sub">Revenue distribution</div>
+            </div>
+          </div>
+          <div class="chart-wrap-sm"><canvas id="categoryChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Report Cards (downloadable) -->
+      <div class="report-cards">
+        <div class="report-card">
+          <div class="report-card-icon blue">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="report-card-title">Sales Report</div>
+          <div class="report-card-desc">Complete transaction history with order details, amounts, seller breakdown, and category analysis for the selected date range.</div>
+          <div class="report-card-meta">
+            <div class="report-meta-text">Last generated: <strong>Today 09:14</strong></div>
+            <div class="export-btns">
+              <button class="export-btn csv" onclick="downloadCSV('sales')">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
+                CSV
+              </button>
+              <button class="export-btn pdf" onclick="downloadPDF('sales')">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                PDF
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="report-card">
+          <div class="report-card-icon green">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="report-card-title">User Report</div>
+          <div class="report-card-desc">New registrations, user demographics, activity metrics, retention rates, and cohort analysis across the platform.</div>
+          <div class="report-card-meta">
+            <div class="report-meta-text">Last generated: <strong>Today 07:00</strong></div>
+            <div class="export-btns">
+              <button class="export-btn csv" onclick="downloadCSV('users')">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
+                CSV
+              </button>
+              <button class="export-btn pdf" onclick="downloadPDF('users')">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                PDF
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="report-card">
+          <div class="report-card-icon purple">
+            <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><line x1="12" y1="12" x2="12.01" y2="12"/></svg>
+          </div>
+          <div class="report-card-title">Seller Performance</div>
+          <div class="report-card-desc">Per-seller breakdown of GMV, orders fulfilled, ratings, dispute rates, commission paid, and payout history.</div>
+          <div class="report-card-meta">
+            <div class="report-meta-text">Last generated: <strong>Yesterday 18:00</strong></div>
+            <div class="export-btns">
+              <button class="export-btn csv" onclick="downloadCSV('sellers')">
+                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
+                CSV
+              </button>
+              <button class="export-btn pdf" onclick="downloadPDF('sellers')">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Sellers Leaderboard -->
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <div class="card-title">Top Sellers Leaderboard</div>
+            <div class="card-sub">Ranked by revenue in selected period</div>
+          </div>
+          <button class="btn btn-secondary" onclick="downloadCSV('leaderboard')">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
+            Export
+          </button>
+        </div>
+        <div id="leaderboard"></div>
+      </div>
+
+      <!-- Detailed Sales Table -->
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <div class="card-title">Detailed Sales Breakdown</div>
+            <div class="card-sub">Category-level revenue and order analysis</div>
+          </div>
+          <button class="btn btn-secondary" onclick="downloadCSV('breakdown')">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg>
+            Export
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Revenue</th>
+                <th>Orders</th>
+                <th>Avg Order Value</th>
+                <th>Commission</th>
+                <th>vs Last Period</th>
+              </tr>
+            </thead>
+            <tbody id="salesBreakdown"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    function toggleTheme(){
+      const html=document.documentElement;
+      const dark=html.getAttribute('data-theme')==='dark';
+      html.setAttribute('data-theme',dark?'light':'dark');
+      document.querySelector('.icon-moon').style.display=dark?'':'none';
+      document.querySelector('.icon-sun').style.display=dark?'none':'';
+      updateChartsTheme();
+    }
+    function isDark(){return document.documentElement.getAttribute('data-theme')==='dark'}
+    function toggleSidebar(){
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('show');
+    }
+    function toast(msg,type='success'){
+      const c=document.getElementById('toastContainer');
+      const t=document.createElement('div');t.className='toast';
+      const icons={success:'<polyline points="20 6 9 17 4 12"/>',error:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'};
+      t.innerHTML=`<div class="toast-icon ${type}"><svg viewBox="0 0 24 24">${icons[type]||icons.success}</svg></div><span class="toast-msg">${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
+      c.appendChild(t);setTimeout(()=>t.classList.add('show'),10);
+      setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350)},3500);
+    }
+
+    function setQuickDate(range,btn){
+      document.querySelectorAll('.qd-tab').forEach(t=>t.classList.remove('active'));
+      btn.classList.add('active');
+      const today=new Date();
+      const from=new Date();
+      if(range==='7d')from.setDate(today.getDate()-7);
+      else if(range==='30d')from.setDate(today.getDate()-30);
+      else if(range==='90d')from.setDate(today.getDate()-90);
+      else if(range==='1y')from.setFullYear(today.getFullYear()-1);
+      else from.setFullYear(2023,0,1);
+      document.getElementById('dateFrom').value=from.toISOString().split('T')[0];
+      document.getElementById('dateTo').value=today.toISOString().split('T')[0];
+    }
+
+    function applyFilters(){toast('Filters applied — data refreshed','success')}
+    function downloadCSV(type='all'){
+      const names={all:'platform-report',sales:'sales-report',users:'user-report',sellers:'seller-performance',leaderboard:'top-sellers',breakdown:'sales-breakdown'};
+      toast(`Downloading ${names[type]}.csv…`,'success');
+    }
+    function downloadPDF(type='all'){
+      const names={all:'platform-report',sales:'sales-report',users:'user-report',sellers:'seller-performance'};
+      toast(`Generating ${names[type]||type}.pdf — this may take a moment…`,'success');
+    }
+    function exportAll(){downloadCSV();setTimeout(()=>downloadPDF(),1000)}
+
+    function getColors(){
+      const dark=isDark();
+      return{grid:dark?'rgba(255,255,255,.05)':'rgba(0,0,0,.04)',text:dark?'#64648A':'#8B98B8'};
+    }
+
+    let revChart,catChart;
+
+    function initRevTrend(){
+      const ctx=document.getElementById('revTrendChart').getContext('2d');
+      const c=getColors();
+      const grad=ctx.createLinearGradient(0,0,0,220);
+      grad.addColorStop(0,'rgba(27,79,138,.3)');grad.addColorStop(1,'rgba(27,79,138,0)');
+      const labels=['Mar 1','Mar 5','Mar 9','Mar 13','Mar 17','Mar 21','Mar 25','Mar 29','Apr 2','Apr 6','Apr 10','Apr 14'];
+      revChart=new Chart(ctx,{
+        type:'line',
+        data:{
+          labels,
+          datasets:[
+            {label:'Revenue (R K)',data:[62,78,55,90,82,110,95,125,108,138,120,155],borderColor:'#1B4F8A',backgroundColor:grad,tension:.4,fill:true,pointBackgroundColor:'#1B4F8A',pointRadius:3,pointHoverRadius:6,yAxisID:'y'},
+            {label:'Orders',data:[220,280,195,320,295,395,340,445,385,490,430,550],borderColor:'#FFCC00',backgroundColor:'transparent',tension:.4,fill:false,pointBackgroundColor:'#FFCC00',pointRadius:3,pointHoverRadius:6,borderDash:[],yAxisID:'y2'},
+          ]
+        },
+        options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:c.text,font:{family:'Inter',size:11},usePointStyle:true}},tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?`R ${ctx.parsed.y}K`:`${ctx.parsed.y} orders`}}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{family:'Inter',size:10},maxRotation:0}},y:{grid:{color:c.grid},ticks:{color:c.text,font:{family:'Inter',size:10},callback:v=>`R${v}K`}},y2:{position:'right',grid:{display:false},ticks:{color:c.text,font:{family:'Inter',size:10}}}}}
+      });
+    }
+
+    function initCategoryChart(){
+      const ctx=document.getElementById('categoryChart').getContext('2d');
+      catChart=new Chart(ctx,{
+        type:'doughnut',
+        data:{
+          labels:['Electronics','Fashion','Home & Living','Health & Beauty','Sports','Food & Grocery','Other'],
+          datasets:[{data:[38,22,14,10,8,5,3],backgroundColor:['#1B4F8A','#FFCC00','#00B074','#7C5CFC','#F6882A','#E53E3E','#94A3B8'],borderWidth:0,hoverOffset:8}]
+        },
+        options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'right',labels:{color:getColors().text,font:{family:'Inter',size:10},padding:8,usePointStyle:true,generateLabels:chart=>chart.data.labels.map((l,i)=>({text:`${l} ${chart.data.datasets[0].data[i]}%`,fillStyle:chart.data.datasets[0].backgroundColor[i],hidden:false,index:i}))}}}}
+      });
+    }
+
+    function updateChartsTheme(){
+      [revChart,catChart].forEach(c=>{
+        if(!c)return;
+        const col=getColors();
+        Object.values(c.config.options.scales||{}).forEach(s=>{if(s.grid)s.grid.color=col.grid;if(s.ticks)s.ticks.color=col.text;});
+        if(c.config.options.plugins?.legend?.labels)c.config.options.plugins.legend.labels.color=col.text;
+        c.update();
+      });
+    }
+
+    // ── LEADERBOARD ──
+    const leaders=[
+      {name:'Thabo Khumalo',store:'TechKing Gadgets',av:'TK',color:'#1B4F8A',revenue:'R 284,920',orders:1240,growth:'+22%',pct:100},
+      {name:'Amara Osei',store:'Afro Fashion Hub',av:'AO',color:'#00B074',revenue:'R 192,400',orders:890,growth:'+18%',pct:67},
+      {name:'Kwame Asante',store:'GamingZone Africa',av:'KA',color:'#7C5CFC',revenue:'R 156,800',orders:720,growth:'+31%',pct:55},
+      {name:'Carlos Mensah',store:'Sport Life Store',av:'CM',color:'#F6882A',revenue:'R 88,200',orders:480,growth:'+12%',pct:31},
+      {name:'Liam van Wyk',store:'Pet Paradise',av:'LV',color:'#E53E3E',revenue:'R 62,100',orders:310,growth:'+8%',pct:22},
+      {name:'Priya Naidoo',store:'Home & Living Co',av:'PN',color:'#1B4F8A',revenue:'R 44,600',orders:210,growth:'-3%',pct:16},
+      {name:'Fatima Khalid',store:'Organic Kitchen',av:'FK',color:'#F6882A',revenue:'R 28,400',orders:162,growth:'+44%',pct:10},
+    ];
+    const rankClasses=['gold','silver','bronze','normal','normal','normal','normal'];
+    document.getElementById('leaderboard').innerHTML=leaders.map((l,i)=>`
+      <div class="leader-item">
+        <div class="leader-rank ${rankClasses[i]}">${i+1}</div>
+        <div class="leader-av" style="background:${l.color}20;color:${l.color}">${l.av}</div>
+        <div class="leader-info">
+          <div class="leader-name">${l.name}</div>
+          <div class="leader-store">${l.store}</div>
+        </div>
+        <div class="leader-progress">
+          <div style="font-size:.68rem;color:var(--t3)">${l.orders} orders</div>
+          <div class="progress-bar"><div class="${i===0?'progress-fill gold-fill':'progress-fill'}" style="width:${l.pct}%"></div></div>
+        </div>
+        <div class="leader-stats">
+          <div class="leader-revenue">${l.revenue}</div>
+          <div class="leader-orders" style="color:${l.growth.startsWith('+')?'var(--green)':'var(--red)'}">${l.growth} vs last period</div>
+        </div>
+      </div>`).join('');
+
+    // ── SALES BREAKDOWN ──
+    const breakdown=[
+      {cat:'Electronics',rev:'R 912,000',orders:'3,392',aov:'R 269',comm:'R 72,960',trend:'up'},
+      {cat:'Fashion',rev:'R 528,000',orders:'1,964',aov:'R 269',comm:'R 42,240',trend:'up'},
+      {cat:'Home & Living',rev:'R 336,000',orders:'1,248',aov:'R 269',comm:'R 26,880',trend:'up'},
+      {cat:'Health & Beauty',rev:'R 240,000',orders:'892',aov:'R 269',comm:'R 19,200',trend:'down'},
+      {cat:'Sports & Outdoor',rev:'R 192,000',orders:'714',aov:'R 269',comm:'R 15,360',trend:'up'},
+      {cat:'Food & Grocery',rev:'R 120,000',orders:'446',aov:'R 269',comm:'R 9,600',trend:'flat'},
+      {cat:'Other',rev:'R 72,000',orders:'268',aov:'R 269',comm:'R 5,760',trend:'up'},
+    ];
+    const trendBadge={up:'badge-up',down:'badge-down',flat:'badge-flat'};
+    const trendLabel={up:'↑ Growing',down:'↓ Declining',flat:'→ Stable'};
+    document.getElementById('salesBreakdown').innerHTML=breakdown.map(b=>`
+      <tr>
+        <td style="font-weight:600;color:var(--t1)">${b.cat}</td>
+        <td style="font-family:var(--fh);font-weight:700;color:var(--t1)">${b.rev}</td>
+        <td>${b.orders}</td>
+        <td>${b.aov}</td>
+        <td style="color:var(--green);font-weight:600">${b.comm}</td>
+        <td><span class="badge ${trendBadge[b.trend]}">${trendLabel[b.trend]}</span></td>
+      </tr>`).join('');
+
+    window.addEventListener('DOMContentLoaded',()=>{initRevTrend();initCategoryChart()});
+  </script>
+</body>
+</html>

@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - Market by MoMo Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #F3F4F6; color: #111827; }
+
+        .container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            color: white;
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            background: #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .admin-badge {
+            display: inline-block;
+            background: #EF4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .user-profile {
+            background: #1A1A2E;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .user-info { flex: 1; }
+        .user-info p:first-child { font-weight: 600; font-size: 13px; }
+        .user-info p:last-child { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
+
+        .nav-section { margin-bottom: 32px; }
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #D1D5DB;
+            transition: all 0.2s;
+        }
+        .nav-item:hover { background: #1A1A2E; color: #FFCC00; }
+        .nav-item.active { background: #FFCC00; color: #111827; font-weight: 600; }
+
+        .sidebar-bottom {
+            border-top: 1px solid #1A1A2E;
+            padding-top: 16px;
+            margin-top: auto;
+        }
+        .system-status {
+            background: #1A1A2E;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 32px;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-label { font-size: 13px; color: #6B7280; margin-bottom: 8px; }
+        .stat-value { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #E5E7EB;
+        }
+        .tab {
+            background: none;
+            border: none;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B7280;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: #111827; }
+        .tab.active { color: #FFCC00; border-bottom-color: #FFCC00; }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        .filter-select {
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #F9FAFB;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #6B7280;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        tr:hover { background: #F9FAFB; }
+
+        .order-id {
+            font-weight: 600;
+            color: #3B82F6;
+            cursor: pointer;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-delivered { background: #D1FAE5; color: #065F46; }
+        .status-processing { background: #DBEAFE; color: #1E3A8A; }
+        .status-shipped { background: #CCFBF1; color: #134E4A; }
+        .status-cancelled { background: #FEE2E2; color: #991B1B; }
+        .status-disputed { background: #FEF3C7; color: #92400E; }
+
+        .action-button {
+            background: none;
+            border: none;
+            color: #3B82F6;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 8px;
+            transition: all 0.2s;
+        }
+        .action-button:hover { color: #1E40AF; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .modal.active { display: flex; }
+
+        .modal-panel {
+            background: white;
+            width: 450px;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 32px;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6B7280;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+        .modal-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6B7280;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 13px;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #6B7280; }
+        .info-value { font-weight: 600; color: #111827; }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .item {
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        .item-name { font-weight: 600; margin-bottom: 4px; }
+        .item-detail { color: #6B7280; font-size: 11px; }
+
+        .modal-button {
+            background: #FFCC00;
+            color: #111827;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            margin-right: 8px;
+            margin-top: 12px;
+            transition: all 0.2s;
+        }
+        .modal-button:hover { background: #FFD700; }
+        .modal-button.secondary {
+            background: #E5E7EB;
+            color: #111827;
+        }
+        .modal-button.secondary:hover { background: #D1D5DB; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; height: auto; margin-bottom: 20px; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .stats-row { grid-template-columns: 1fr; }
+            .modal-panel { width: 100%; }
+            table { font-size: 12px; }
+            th, td { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle">MB</div>
+                <div>
+                    <div>Market by MoMo</div>
+                    <span class="admin-badge">ADMIN</span>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">MG</div>
+                <div class="user-info">
+                    <p>Malcolm Govender</p>
+                    <p>Super Admin</p>
+                </div>
+            </div>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Overview</div>
+                <div class="nav-item">📊 Dashboard</div>
+                <div class="nav-item">📈 Analytics</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Marketplace</div>
+                <div class="nav-item active">📦 All Orders</div>
+                <div class="nav-item">👥 Customers</div>
+                <div class="nav-item">🏪 Sellers</div>
+                <div class="nav-item">🗂 Products</div>
+                <div class="nav-item">🏷 Categories</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <div class="nav-item">💳 Transactions</div>
+                <div class="nav-item">💸 Payouts</div>
+                <div class="nav-item">📊 Reports</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">System</div>
+                <div class="nav-item">🔔 Notifications</div>
+                <div class="nav-item">🛡 Fraud & Risk</div>
+                <div class="nav-item">⚙️ Settings</div>
+                <div class="nav-item">👤 Admin Users</div>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="system-status">
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-dot"></span>
+                        <strong>System Status: All OK</strong>
+                    </div>
+                    <div style="font-size: 11px; color: #9CA3AF;">Version 2.4.1</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 class="page-title">All Orders</h1>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-label">Total Orders</div>
+                    <div class="stat-value">847.2K</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Today</div>
+                    <div class="stat-value">1,847</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending</div>
+                    <div class="stat-value">2,341</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Disputes</div>
+                    <div class="stat-value">47</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active">All</button>
+                <button class="tab">Processing</button>
+                <button class="tab">Shipped</button>
+                <button class="tab">Delivered</button>
+                <button class="tab">Cancelled</button>
+                <button class="tab">Disputed</button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <input type="text" class="filter-input" placeholder="Search by order ID or buyer...">
+                <select class="filter-select">
+                    <option>All Payment Methods</option>
+                    <option>MoMo</option>
+                    <option>Card</option>
+                    <option>BNPL</option>
+                </select>
+                <select class="filter-select">
+                    <option>All Statuses</option>
+                    <option>Processing</option>
+                    <option>Shipped</option>
+                    <option>Delivered</option>
+                </select>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox"></th>
+                            <th>Order ID</th>
+                            <th>Buyer</th>
+                            <th>Seller</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="openModal('ord1')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9921</span></td>
+                            <td>Sarah Nakato</td>
+                            <td>TechHub Uganda</td>
+                            <td>UGX 890K</td>
+                            <td>MoMo</td>
+                            <td><span class="status-badge status-delivered">✅ Delivered</span></td>
+                            <td>2 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord2')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9920</span></td>
+                            <td>James Mutua</td>
+                            <td>FashionKampala</td>
+                            <td>UGX 340K</td>
+                            <td>Card</td>
+                            <td><span class="status-badge status-shipped">📦 Shipped</span></td>
+                            <td>4 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord3')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9919</span></td>
+                            <td>Amina Hassan</td>
+                            <td>GrocerFresh UG</td>
+                            <td>UGX 125K</td>
+                            <td>MoMo</td>
+                            <td><span class="status-badge status-processing">⏳ Processing</span></td>
+                            <td>6 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord4')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9918</span></td>
+                            <td>David Okongo</td>
+                            <td>HomeDecor Africa</td>
+                            <td>UGX 2.4M</td>
+                            <td>BNPL</td>
+                            <td><span class="status-badge status-delivered">✅ Delivered</span></td>
+                            <td>8 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord5')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9917</span></td>
+                            <td>Grace Nanjei</td>
+                            <td>SportZone UG</td>
+                            <td>UGX 450K</td>
+                            <td>Card</td>
+                            <td><span class="status-badge status-disputed">⚠️ Disputed</span></td>
+                            <td>10 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord6')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9916</span></td>
+                            <td>Peter Mwangi</td>
+                            <td>MediMart</td>
+                            <td>UGX 280K</td>
+                            <td>MoMo</td>
+                            <td><span class="status-badge status-processing">⏳ Processing</span></td>
+                            <td>12 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord7')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9915</span></td>
+                            <td>Rose Kyambadde</td>
+                            <td>BeautyHouse UG</td>
+                            <td>UGX 180K</td>
+                            <td>Card</td>
+                            <td><span class="status-badge status-shipped">📦 Shipped</span></td>
+                            <td>14 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord8')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9914</span></td>
+                            <td>Michael Kiyimba</td>
+                            <td>BooksWorld KL</td>
+                            <td>UGX 85K</td>
+                            <td>MoMo</td>
+                            <td><span class="status-badge status-cancelled">❌ Cancelled</span></td>
+                            <td>16 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord9')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9913</span></td>
+                            <td>Lucy Achieng</td>
+                            <td>AutoParts Uganda</td>
+                            <td>UGX 620K</td>
+                            <td>Card</td>
+                            <td><span class="status-badge status-delivered">✅ Delivered</span></td>
+                            <td>18 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord10')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9912</span></td>
+                            <td>Henry Walimu</td>
+                            <td>FashionKampala</td>
+                            <td>UGX 240K</td>
+                            <td>MoMo</td>
+                            <td><span class="status-badge status-processing">⏳ Processing</span></td>
+                            <td>20 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord11')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9911</span></td>
+                            <td>Zainab Sekalala</td>
+                            <td>TechHub Uganda</td>
+                            <td>UGX 1.2M</td>
+                            <td>BNPL</td>
+                            <td><span class="status-badge status-delivered">✅ Delivered</span></td>
+                            <td>22 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('ord12')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="order-id">#ORD-9910</span></td>
+                            <td>Emmanuel Tumwine</td>
+                            <td>GrocerFresh UG</td>
+                            <td>UGX 95K</td>
+                            <td>MoMo</td>
+                            <td><span class="status-badge status-shipped">📦 Shipped</span></td>
+                            <td>24 hours ago</td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-panel">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+
+            <div class="modal-title">Order Details</div>
+
+            <!-- Order Info -->
+            <div class="modal-section">
+                <div class="modal-section-title">Order Information</div>
+                <div class="info-row">
+                    <span class="info-label">Order ID</span>
+                    <span class="info-value" id="modalOrderId">#ORD-9921</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date</span>
+                    <span class="info-value">15 Apr 2024, 2:30 PM</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    <span class="info-value" id="modalStatus">Delivered</span>
+                </div>
+            </div>
+
+            <!-- Buyer Info -->
+            <div class="modal-section">
+                <div class="modal-section-title">Buyer Information</div>
+                <div class="info-row">
+                    <span class="info-label">Name</span>
+                    <span class="info-value" id="modalBuyer">Sarah Nakato</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value">+256 772 456 789</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">sarah@email.com</span>
+                </div>
+            </div>
+
+            <!-- Delivery Address -->
+            <div class="modal-section">
+                <div class="modal-section-title">Delivery Address</div>
+                <div class="info-row">
+                    <span class="info-label">Address</span>
+                    <span class="info-value">Kampala, Uganda</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Zone</span>
+                    <span class="info-value">Kampala Central</span>
+                </div>
+            </div>
+
+            <!-- Seller Info -->
+            <div class="modal-section">
+                <div class="modal-section-title">Seller Information</div>
+                <div class="info-row">
+                    <span class="info-label">Store</span>
+                    <span class="info-value" id="modalSeller">TechHub Uganda</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Contact</span>
+                    <span class="info-value">+256 772 123 456</span>
+                </div>
+            </div>
+
+            <!-- Items -->
+            <div class="modal-section">
+                <div class="modal-section-title">Order Items</div>
+                <div class="item-list">
+                    <div class="item">
+                        <div class="item-name">Samsung Galaxy A54</div>
+                        <div class="item-detail">Qty: 1 | UGX 890,000</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment -->
+            <div class="modal-section">
+                <div class="modal-section-title">Payment Details</div>
+                <div class="info-row">
+                    <span class="info-label">Method</span>
+                    <span class="info-value">MTN MoMo</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Amount</span>
+                    <span class="info-value">UGX 890,000</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Status</span>
+                    <span class="info-value">Confirmed</span>
+                </div>
+            </div>
+
+            <!-- Admin Notes -->
+            <div class="modal-section">
+                <div class="modal-section-title">Admin Notes</div>
+                <textarea style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 12px; min-height: 80px; resize: none;" placeholder="Add notes here..."></textarea>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-section">
+                <button class="modal-button" onclick="alert('Refund processed')">Force Refund</button>
+                <button class="modal-button secondary" onclick="alert('Escalated')">Escalate to Seller</button>
+                <button class="modal-button secondary" onclick="alert('Message sent')">Contact Buyer</button>
+                <button class="modal-button secondary" onclick="alert('Closed')">Close Dispute</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const orderData = {
+            ord1: { orderId: '#ORD-9921', buyer: 'Sarah Nakato', seller: 'TechHub Uganda', status: 'Delivered' },
+            ord2: { orderId: '#ORD-9920', buyer: 'James Mutua', seller: 'FashionKampala', status: 'Shipped' },
+            ord3: { orderId: '#ORD-9919', buyer: 'Amina Hassan', seller: 'GrocerFresh UG', status: 'Processing' },
+            ord4: { orderId: '#ORD-9918', buyer: 'David Okongo', seller: 'HomeDecor Africa', status: 'Delivered' },
+            ord5: { orderId: '#ORD-9917', buyer: 'Grace Nanjei', seller: 'SportZone UG', status: 'Disputed' },
+            ord6: { orderId: '#ORD-9916', buyer: 'Peter Mwangi', seller: 'MediMart', status: 'Processing' },
+            ord7: { orderId: '#ORD-9915', buyer: 'Rose Kyambadde', seller: 'BeautyHouse UG', status: 'Shipped' },
+            ord8: { orderId: '#ORD-9914', buyer: 'Michael Kiyimba', seller: 'BooksWorld KL', status: 'Cancelled' },
+            ord9: { orderId: '#ORD-9913', buyer: 'Lucy Achieng', seller: 'AutoParts Uganda', status: 'Delivered' },
+            ord10: { orderId: '#ORD-9912', buyer: 'Henry Walimu', seller: 'FashionKampala', status: 'Processing' },
+            ord11: { orderId: '#ORD-9911', buyer: 'Zainab Sekalala', seller: 'TechHub Uganda', status: 'Delivered' },
+            ord12: { orderId: '#ORD-9910', buyer: 'Emmanuel Tumwine', seller: 'GrocerFresh UG', status: 'Shipped' }
+        };
+
+        function openModal(orderId) {
+            const order = orderData[orderId];
+            document.getElementById('modalOrderId').textContent = order.orderId;
+            document.getElementById('modalBuyer').textContent = order.buyer;
+            document.getElementById('modalSeller').textContent = order.seller;
+            document.getElementById('modalStatus').textContent = order.status;
+            document.getElementById('orderModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('orderModal').classList.remove('active');
+        }
+
+        document.getElementById('orderModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
