@@ -1971,6 +1971,144 @@ body.brief-active .nav-right { opacity: 1; }
   text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
   transition: all 0.3s;
 }
+
+/* ============ PROJECT WORKSPACES ============ */
+#workspaces { position: relative; }
+.ws-grid { display: flex; flex-direction: column; gap: 44px; margin-top: 40px; }
+.ws-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(0,27,61,0.85), rgba(0,10,25,0.95));
+  border: 1px solid rgba(0,240,255,0.18);
+  border-radius: 20px;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 16px 50px rgba(0,0,0,0.5), inset 0 0 40px rgba(0,240,255,0.03);
+}
+.ws-card::before {
+  content: ''; position: absolute; inset: -1px; border-radius: 20px; padding: 1px;
+  background: linear-gradient(135deg, transparent 0%, var(--neon-cyan) 50%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: 0.5; pointer-events: none;
+}
+.ws-card.accent-purple::before { background: linear-gradient(135deg, transparent 0%, var(--neon-purple) 50%, transparent 100%); }
+.ws-card.accent-green::before { background: linear-gradient(135deg, transparent 0%, var(--neon-green) 50%, transparent 100%); }
+.ws-card.accent-pink::before { background: linear-gradient(135deg, transparent 0%, var(--neon-pink) 50%, transparent 100%); }
+
+.ws-scanline {
+  position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0.5; animation: ws-scan 6s ease-in-out infinite;
+}
+@keyframes ws-scan {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(400px); opacity: 0.8; }
+}
+
+.ws-header { display: flex; align-items: center; gap: 24px; padding: 28px 32px; border-bottom: 1px solid rgba(0,240,255,0.1); flex-wrap: wrap; position: relative; }
+.ws-glyph {
+  width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1.3rem; color: #fff; position: relative; flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.ws-glyph::after { content: ''; position: absolute; inset: -4px; border-radius: 20px; border: 1px solid currentColor; opacity: 0.35; animation: ws-pulse-ring 3s infinite; }
+@keyframes ws-pulse-ring { 0%, 100% { transform: scale(1); opacity: 0.35; } 50% { transform: scale(1.1); opacity: 0.08; } }
+
+.ws-title-block { flex: 1; min-width: 240px; }
+.ws-title-block h3 { font-family: 'Orbitron', sans-serif; font-size: 1.55rem; font-weight: 700; color: #fff; letter-spacing: 1px; margin-bottom: 6px; }
+.ws-codename { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--neon-cyan); letter-spacing: 2.5px; text-transform: uppercase; }
+
+.ws-header-meta { display: flex; gap: 18px; align-items: center; }
+.ws-pill { padding: 6px 14px; border-radius: 999px; font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 1.5px; text-transform: uppercase; border: 1px solid; }
+.ws-pill.active { background: rgba(0,255,136,0.12); border-color: rgba(0,255,136,0.35); color: var(--neon-green); }
+.ws-pill.planning { background: rgba(139,92,246,0.12); border-color: rgba(139,92,246,0.35); color: var(--neon-purple); }
+.ws-pill.discovery { background: rgba(0,240,255,0.12); border-color: rgba(0,240,255,0.35); color: var(--neon-cyan); }
+.ws-pill.at-risk { background: rgba(255,0,110,0.12); border-color: rgba(255,0,110,0.35); color: var(--neon-pink); }
+
+.ws-ring { width: 64px; height: 64px; position: relative; }
+.ws-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.ws-ring circle { fill: none; stroke-width: 5; }
+.ws-ring .ring-bg { stroke: rgba(255,255,255,0.08); }
+.ws-ring .ring-fg { stroke: var(--neon-cyan); stroke-linecap: round; transition: stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1); filter: drop-shadow(0 0 6px var(--neon-cyan)); }
+.ws-card.accent-purple .ws-ring .ring-fg { stroke: var(--neon-purple); filter: drop-shadow(0 0 6px var(--neon-purple)); }
+.ws-card.accent-green .ws-ring .ring-fg { stroke: var(--neon-green); filter: drop-shadow(0 0 6px var(--neon-green)); }
+.ws-ring-value { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 0.95rem; font-weight: 700; color: #fff; }
+
+.ws-tabs { display: flex; gap: 2px; padding: 0 24px; border-bottom: 1px solid rgba(0,240,255,0.1); background: rgba(0,5,18,0.5); overflow-x: auto; }
+.ws-tab { padding: 14px 20px; background: none; border: none; color: rgba(255,255,255,0.55); font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; letter-spacing: 1.8px; text-transform: uppercase; cursor: pointer; position: relative; transition: color 0.2s; white-space: nowrap; }
+.ws-tab:hover { color: #fff; }
+.ws-tab.active { color: var(--neon-cyan); }
+.ws-tab.active::after { content: ''; position: absolute; left: 20px; right: 20px; bottom: -1px; height: 2px; background: var(--neon-cyan); box-shadow: 0 0 12px var(--neon-cyan); border-radius: 2px; }
+
+.ws-body { padding: 28px 32px; min-height: 360px; }
+.ws-panel { display: none; animation: ws-fade-in 0.35s ease; }
+.ws-panel.active { display: block; }
+@keyframes ws-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.ws-overview-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; }
+@media (max-width: 900px) { .ws-overview-grid { grid-template-columns: 1fr; } }
+.ws-mission { font-size: 1rem; line-height: 1.7; color: rgba(255,255,255,0.82); margin-bottom: 20px; }
+.ws-sub-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--neon-cyan); letter-spacing: 2px; text-transform: uppercase; margin: 22px 0 12px; }
+.ws-objectives { list-style: none; padding: 0; margin: 0; }
+.ws-objectives li { padding: 10px 0 10px 28px; position: relative; color: rgba(255,255,255,0.78); font-size: 0.92rem; border-bottom: 1px dashed rgba(0,240,255,0.08); line-height: 1.5; }
+.ws-objectives li:last-child { border: none; }
+.ws-objectives li::before { content: '▸'; position: absolute; left: 8px; color: var(--neon-cyan); }
+.ws-meta-stack { display: flex; flex-direction: column; gap: 12px; }
+.ws-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 16px; background: rgba(0,240,255,0.04); border: 1px solid rgba(0,240,255,0.08); border-radius: 10px; font-size: 0.85rem; }
+.ws-meta-label { color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1.5px; }
+.ws-meta-value { color: #fff; font-weight: 500; text-align: right; }
+.ws-stack-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ws-stack-tag { padding: 4px 10px; background: rgba(0,240,255,0.08); border: 1px solid rgba(0,240,255,0.18); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--neon-cyan); letter-spacing: 0.5px; }
+
+/* Kanban */
+.ws-kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (max-width: 900px) { .ws-kanban { grid-template-columns: 1fr; } }
+.ws-col { background: rgba(0,10,25,0.4); border: 1px solid rgba(0,240,255,0.1); border-radius: 14px; padding: 16px; min-height: 320px; display: flex; flex-direction: column; gap: 10px; }
+.ws-col.drop-hover { border-color: var(--neon-cyan); box-shadow: 0 0 0 2px rgba(0,240,255,0.15); }
+.ws-col-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid rgba(0,240,255,0.08); }
+.ws-col-title { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: rgba(255,255,255,0.75); letter-spacing: 1.8px; text-transform: uppercase; }
+.ws-col-count { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: var(--neon-cyan); padding: 2px 10px; background: rgba(0,240,255,0.1); border-radius: 10px; }
+.ws-col.backlog .ws-col-count { color: var(--neon-purple); background: rgba(139,92,246,0.1); }
+.ws-col.done .ws-col-count { color: var(--neon-green); background: rgba(0,255,136,0.1); }
+.ws-task { background: linear-gradient(135deg, rgba(0,27,61,0.8), rgba(0,10,25,0.9)); border: 1px solid rgba(0,240,255,0.12); border-radius: 10px; padding: 14px; cursor: grab; transition: all 0.2s; position: relative; }
+.ws-task:hover { border-color: rgba(0,240,255,0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.ws-task.dragging { opacity: 0.35; }
+.ws-task-title { font-size: 0.92rem; color: #fff; font-weight: 500; margin-bottom: 10px; line-height: 1.4; }
+.ws-task-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.ws-task-tag { font-family: 'JetBrains Mono', monospace; font-size: 0.64rem; padding: 3px 8px; border-radius: 6px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+.ws-task-tag.priority-high { background: rgba(255,0,110,0.15); color: var(--neon-pink); }
+.ws-task-tag.priority-med { background: rgba(0,240,255,0.12); color: var(--neon-cyan); }
+.ws-task-tag.priority-low { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+.ws-task-owner { font-size: 0.68rem; color: rgba(255,255,255,0.55); margin-left: auto; font-family: 'JetBrains Mono', monospace; }
+.ws-task-del { position: absolute; top: 8px; right: 8px; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 1rem; line-height: 1; opacity: 0; transition: opacity 0.2s; padding: 4px; }
+.ws-task:hover .ws-task-del { opacity: 1; }
+.ws-task-del:hover { color: var(--neon-pink); }
+.ws-add-task { display: flex; gap: 6px; margin-top: auto; padding-top: 10px; }
+.ws-add-task input { flex: 1; background: rgba(0,0,0,0.35); border: 1px solid rgba(0,240,255,0.15); border-radius: 8px; padding: 8px 10px; color: #fff; font-size: 0.85rem; font-family: inherit; }
+.ws-add-task input:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 0 2px rgba(0,240,255,0.15); }
+.ws-add-task button { background: var(--neon-cyan); color: #001B3D; border: none; border-radius: 8px; padding: 0 12px; font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: background 0.2s; }
+.ws-add-task button:hover { background: #fff; }
+
+/* Metrics */
+.ws-metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media (max-width: 900px) { .ws-metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+.ws-metric { background: linear-gradient(135deg, rgba(0,27,61,0.6), rgba(0,10,25,0.8)); border: 1px solid rgba(0,240,255,0.12); border-radius: 12px; padding: 18px; position: relative; overflow: hidden; }
+.ws-metric::after { content: ''; position: absolute; right: -30%; bottom: -60%; width: 160px; height: 160px; background: radial-gradient(circle, rgba(0,240,255,0.18), transparent 70%); pointer-events: none; }
+.ws-metric-label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: rgba(255,255,255,0.55); letter-spacing: 1.8px; text-transform: uppercase; margin-bottom: 10px; position: relative; z-index: 1; }
+.ws-metric-value { font-family: 'Orbitron', sans-serif; font-size: 1.9rem; font-weight: 700; color: #fff; position: relative; z-index: 1; }
+.ws-metric-delta { font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: var(--neon-green); margin-top: 6px; position: relative; z-index: 1; }
+.ws-metric-delta.down { color: var(--neon-pink); }
+.ws-metric-delta.flat { color: rgba(255,255,255,0.5); }
+
+/* Activity */
+.ws-activity { display: flex; flex-direction: column; gap: 10px; }
+.ws-activity-item { display: flex; gap: 14px; padding: 12px 14px; background: rgba(0,27,61,0.3); border: 1px solid rgba(0,240,255,0.08); border-radius: 10px; }
+.ws-activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); margin-top: 6px; flex-shrink: 0; }
+.ws-activity-item.t-risk .ws-activity-dot { background: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
+.ws-activity-item.t-win .ws-activity-dot { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+.ws-activity-content { flex: 1; }
+.ws-activity-text { color: rgba(255,255,255,0.88); font-size: 0.9rem; line-height: 1.5; }
+.ws-activity-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: rgba(255,255,255,0.45); margin-top: 4px; letter-spacing: 1.2px; }
 </style>
 </head>
 <body>
@@ -2020,6 +2158,7 @@ body.brief-active .nav-right { opacity: 1; }
   <ul class="nav-links">
     <li><a href="#dashboard" class="active">Dashboard</a></li>
     <li><a href="#projects">Projects</a></li>
+    <li><a href="#workspaces">Workspaces</a></li>
     <li><a href="#usecases">Use Cases</a></li>
     <li><a href="#prototypes">Prototypes</a></li>
     <li><a href="#documents">Documents</a></li>
@@ -2248,6 +2387,16 @@ body.brief-active .nav-right { opacity: 1; }
   </div>
 </section>
 
+<!-- PROJECT WORKSPACES / MISSION CONTROL -->
+<section id="workspaces">
+  <div class="section-header reveal">
+    <div class="section-tag">// MISSION CONTROL</div>
+    <h2 class="section-title">Project Workspaces</h2>
+    <p class="section-desc">Live tracking, tasks, and operational metrics for active AI &amp; Automation initiatives</p>
+  </div>
+  <div class="ws-grid" id="wsGrid"><!-- rendered by JS --></div>
+</section>
+
 <!-- Use Case Library -->
 <section id="usecases">
   <div class="section-header reveal">
@@ -2294,10 +2443,27 @@ body.brief-active .nav-right { opacity: 1; }
     <p class="section-desc">Interactive demos and proof-of-concepts showcasing our AI capabilities</p>
   </div>
 
+  <div class="proto-sub-header reveal" style="display:flex;align-items:center;gap:12px;margin:8px 0 18px;">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--neon-cyan);letter-spacing:2px;text-transform:uppercase;">&#9632; Market by MoMo — End-to-end prototypes</span>
+    <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(0,240,255,0.3),transparent);"></span>
+  </div>
   <div class="proto-grid">
-    <div class="glow-card proto-card reveal"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient1"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">Fraud Detection Dashboard</h3><p class="proto-desc">Live visualisation of transaction monitoring with real-time anomaly detection overlay.</p><div class="proto-meta"><span>v2.1 &bull; Updated Apr 2026</span><span style="color:var(--neon-green);">LIVE</span></div></div></div>
-    <div class="glow-card proto-card reveal"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient2"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">GenAI Code Review Bot</h3><p class="proto-desc">Interactive demo of AI-assisted code review with natural language feedback and auto-fix suggestions.</p><div class="proto-meta"><span>v1.4 &bull; Updated Mar 2026</span><span style="color:var(--neon-cyan);">DEMO</span></div></div></div>
-    <div class="glow-card proto-card reveal"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient3"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">AIOps Incident Simulator</h3><p class="proto-desc">Simulated environment showcasing predictive alerting and automated remediation workflows.</p><div class="proto-meta"><span>v1.0 &bull; Updated Apr 2026</span><span style="color:var(--neon-purple);">BETA</span></div></div></div>
+    <a class="glow-card proto-card reveal" href="./prototypes/marketbymomo/index.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient1"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">Market by MoMo &mdash; Landing</h3><p class="proto-desc">Consumer-facing home experience. Entry point to the MarketByMoMo commerce ecosystem.</p><div class="proto-meta"><span>HTML &bull; Apr 2026</span><span style="color:var(--neon-green);">LIVE</span></div></div></a>
+    <a class="glow-card proto-card reveal" href="./prototypes/marketbymomo/shop/browse.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient2"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">Shopper Experience</h3><p class="proto-desc">Browse, product detail, compare, cart, checkout, order tracking, rewards. 9-screen consumer flow.</p><div class="proto-meta"><span>9 screens &bull; shop/</span><span style="color:var(--neon-cyan);">DEMO</span></div></div></a>
+    <a class="glow-card proto-card reveal" href="./prototypes/marketbymomo/seller/dashboard.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient3"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">Seller Center</h3><p class="proto-desc">Merchant dashboard, storefront, products, inventory, orders, promotions, registration. Full seller console.</p><div class="proto-meta"><span>8 screens &bull; seller/</span><span style="color:var(--neon-purple);">DEMO</span></div></a>
+    <a class="glow-card proto-card reveal" href="./prototypes/marketbymomo/admin/dashboard.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient1"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">Admin Console</h3><p class="proto-desc">Platform operations: users, sellers, orders, and reports. MTN Fintech operator view.</p><div class="proto-meta"><span>5 screens &bull; admin/</span><span style="color:var(--neon-pink);">INTERNAL</span></div></div></a>
+    <a class="glow-card proto-card reveal" href="./prototypes/marketbymomo/whatsapp/flow.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient2"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">WhatsApp Shopping Flow</h3><p class="proto-desc">Conversational commerce prototype &mdash; WhatsApp-driven product discovery and checkout.</p><div class="proto-meta"><span>HTML &bull; whatsapp/</span><span style="color:var(--neon-green);">DEMO</span></div></div></a>
+    <a class="glow-card proto-card reveal" href="./prototypes/marketbymomo/auth/onboarding.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient3"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">Auth &amp; Onboarding</h3><p class="proto-desc">Sign-in, sign-up, and first-run onboarding screens for both shoppers and sellers.</p><div class="proto-meta"><span>3 screens &bull; auth/</span><span style="color:var(--neon-cyan);">DEMO</span></div></div></a>
+  </div>
+
+  <div class="proto-sub-header reveal" style="display:flex;align-items:center;gap:12px;margin:40px 0 18px;">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--neon-cyan);letter-spacing:2px;text-transform:uppercase;">&#9632; AI &amp; Automation Core Demos</span>
+    <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(0,240,255,0.3),transparent);"></span>
+  </div>
+  <div class="proto-grid">
+    <div class="glow-card proto-card reveal"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient1"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">Fraud Detection Dashboard</h3><p class="proto-desc">Live visualisation of transaction monitoring with real-time anomaly detection overlay.</p><div class="proto-meta"><span>v2.1 &bull; Apr 2026</span><span style="color:var(--neon-green);">LIVE</span></div></div></div>
+    <div class="glow-card proto-card reveal"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient2"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">GenAI Code Review Bot</h3><p class="proto-desc">Interactive demo of AI-assisted code review with natural language feedback and auto-fix suggestions.</p><div class="proto-meta"><span>v1.4 &bull; Mar 2026</span><span style="color:var(--neon-cyan);">DEMO</span></div></div></div>
+    <div class="glow-card proto-card reveal"><div class="holo-shimmer"></div><div class="proto-preview"><div class="proto-preview-bg gradient3"></div><div class="play-icon">&#x25B6;</div></div><div class="proto-body"><h3 class="proto-title">AIOps Incident Simulator</h3><p class="proto-desc">Simulated environment showcasing predictive alerting and automated remediation workflows.</p><div class="proto-meta"><span>v1.0 &bull; Apr 2026</span><span style="color:var(--neon-purple);">BETA</span></div></div></div>
   </div>
 </section>
 
@@ -2310,6 +2476,8 @@ body.brief-active .nav-right { opacity: 1; }
   </div>
 
   <div class="docs-grid">
+    <a class="glow-card doc-card reveal" href="./docs/Test_Automation_Strategy.docx" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="doc-icon strategy">&#x1F4C4;</div><div class="doc-info"><h4 class="doc-title">Intelligent Test Automation Strategy</h4><div class="doc-meta">DOCX &bull; Apr 2026 &bull; v1.0 &bull; <span style="color:var(--neon-green);">View / Download</span></div><div class="doc-tags"><span class="doc-tag">Strategy</span><span class="doc-tag">QA</span><span class="doc-tag">Phalanx-03</span></div></div></a>
+    <a class="glow-card doc-card reveal" href="./docs/AI_Multi_Agent_Stack_Briefing.md" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="doc-icon architecture">&#x1F916;</div><div class="doc-info"><h4 class="doc-title">AI Multi-Agent Stack Briefing</h4><div class="doc-meta">MD &bull; Apr 2026 &bull; <span style="color:var(--neon-green);">View / Download</span></div><div class="doc-tags"><span class="doc-tag">Agents</span><span class="doc-tag">Foundation</span><span class="doc-tag">Orion-01</span></div></div></a>
     <div class="glow-card doc-card reveal"><div class="holo-shimmer"></div><div class="doc-icon strategy">&#x1F4C4;</div><div class="doc-info"><h4 class="doc-title">AI & Automation Strategy 2026-2028</h4><div class="doc-meta">PDF &bull; Updated Apr 2026 &bull; 42 pages</div><div class="doc-tags"><span class="doc-tag">Strategy</span><span class="doc-tag">Roadmap</span></div></div></div>
     <div class="glow-card doc-card reveal"><div class="holo-shimmer"></div><div class="doc-icon governance">&#x1F512;</div><div class="doc-info"><h4 class="doc-title">Responsible AI Governance Framework</h4><div class="doc-meta">PDF &bull; Updated Mar 2026 &bull; 28 pages</div><div class="doc-tags"><span class="doc-tag">Governance</span><span class="doc-tag">Compliance</span></div></div></div>
     <div class="glow-card doc-card reveal"><div class="holo-shimmer"></div><div class="doc-icon architecture">&#x1F3D7;</div><div class="doc-info"><h4 class="doc-title">AI Platform Architecture Blueprint</h4><div class="doc-meta">PDF &bull; Updated Feb 2026 &bull; 56 pages</div><div class="doc-tags"><span class="doc-tag">Architecture</span><span class="doc-tag">Technical</span></div></div></div>
@@ -3144,6 +3312,400 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     else if (e.key === 'ArrowRight') nextBtn.click();
     else if (e.key === 'ArrowLeft') prevBtn.click();
   });
+})();
+
+/* ============ PROJECT WORKSPACES ============ */
+(function() {
+  const workspaces = [
+    {
+      id: 'agentic',
+      codename: 'ORION-01',
+      name: 'Agentic AI Platform',
+      glyph: 'A',
+      glyphBg: 'linear-gradient(135deg, #00F0FF, #0066CC)',
+      accent: '',
+      status: { label: 'Active Build', cls: 'active' },
+      mission: 'Foundational multi-agent platform for MTN Group Fintech. Supervisor, swarm, and hierarchical agent patterns running on Claude Agent SDK + LangGraph, with CrewAI for collaborative crews, Mem0 for memory, and Langfuse for observability.',
+      objectives: [
+        'Stand up reference architecture: Agent SDK + LangGraph orchestration + Mem0 memory + Langfuse tracing',
+        'Deliver Fraud Triage MVP as first vertical workload (Weeks 3-6)',
+        'Define agent governance framework: tool scopes, HITL gates, audit logging',
+        'Publish internal SDK + patterns catalogue so other domains can self-serve',
+        'Prove cost envelope: target sub-$0.05 per agent run at P95'
+      ],
+      meta: [
+        { label: 'Owner', value: 'Malcolm Govender' },
+        { label: 'Tech Lead', value: 'TBH — Senior Agent Engineer' },
+        { label: 'Sponsor', value: 'GM Platforms, DevOps & Engineering' },
+        { label: 'Stage', value: 'Foundation (Weeks 1-2)' },
+        { label: 'Target GA', value: 'Q3 2026' },
+        { label: 'Budget', value: '~$15K / month API' }
+      ],
+      stack: ['Claude Agent SDK', 'LangGraph', 'CrewAI', 'Mem0', 'Langfuse', 'Python 3.12', 'FastAPI', 'Postgres'],
+      progress: 18,
+      tasks: {
+        backlog: [
+          { t: 'Draft agent governance framework v1', p: 'high', o: 'MG' },
+          { t: 'Evaluate Mem0 vs custom memory store', p: 'med', o: 'TBH' },
+          { t: 'Wire Langfuse dashboards to Grafana', p: 'low', o: 'Infra' },
+          { t: 'Benchmark CrewAI vs LangGraph crews', p: 'med', o: 'TBH' }
+        ],
+        active: [
+          { t: 'Repo scaffold + CI/CD templates', p: 'high', o: 'MG' },
+          { t: 'Security & Compliance review of Claude API terms', p: 'high', o: 'Sec' }
+        ],
+        done: [
+          { t: 'Multi-agent stack briefing doc signed off', p: 'med', o: 'MG' },
+          { t: 'Hiring spec: Senior Agent Engineer x2', p: 'med', o: 'MG' }
+        ]
+      },
+      metrics: [
+        { label: 'Agents in Repo', value: '0', delta: 'First scaffold this week', cls: 'flat' },
+        { label: 'Test Coverage', value: 'N/A', delta: 'Pre-build', cls: 'flat' },
+        { label: 'Avg Cost / Run', value: '—', delta: 'Target <$0.05', cls: 'flat' },
+        { label: 'Eng Capacity', value: '1 FTE', delta: '+2 hires in flight', cls: '' }
+      ],
+      activity: [
+        { t: 'Strategy briefing document published to Cowork workspace', m: '2026-04-16 · 02:22', cls: 't-win' },
+        { t: '90-day execution plan approved (Weeks 1-12 locked)', m: '2026-04-16 · 02:15', cls: 't-win' },
+        { t: 'Hiring brief drafted for 2 Senior Agent Engineers + 1 Infra', m: '2026-04-15 · 18:40', cls: '' },
+        { t: 'Need: Security sign-off on Claude API data handling', m: '2026-04-14 · 11:00', cls: 't-risk' }
+      ]
+    },
+    {
+      id: 'marketbymomo',
+      codename: 'NOVA-02',
+      name: 'Market by MoMo',
+      glyph: 'M',
+      glyphBg: 'linear-gradient(135deg, #8B5CF6, #FF006E)',
+      accent: 'accent-purple',
+      status: { label: 'In Progress', cls: 'active' },
+      mission: 'Growth and market intelligence surface for MoMo — real-time merchant & agent insights, campaign orchestration, and AI-driven lead prioritisation across 17 African markets. Live work already in the local repo, to be brought under the AI & Automation umbrella.',
+      objectives: [
+        'Consolidate existing marketbymomo code with momobusinessdashboard variants',
+        'Layer an Analyst Agent on top of merchant data for natural-language Q&A',
+        'Deploy campaign triggers driven by behavioural + transactional signals',
+        'Ship a public-style demo for the Intelligence Centre hub',
+        'Prove uplift: baseline conversion vs agent-assisted cohort'
+      ],
+      meta: [
+        { label: 'Owner', value: 'Malcolm Govender' },
+        { label: 'Contributor', value: 'Product / Growth Squad' },
+        { label: 'Markets', value: 'Pilot: ZA, NG, UG' },
+        { label: 'Stage', value: 'Consolidation' },
+        { label: 'Next Milestone', value: 'Demo-ready build — Apr 30' },
+        { label: 'Repo', value: 'marketbymomo (local)' }
+      ],
+      stack: ['Next.js', 'Tailwind', 'Supabase', 'Node', 'Recharts', 'Claude Haiku', 'Mixpanel'],
+      progress: 42,
+      tasks: {
+        backlog: [
+          { t: 'Merge marketbymomo + momobusinessdashboard schemas', p: 'high', o: 'MG' },
+          { t: 'Design Analyst Agent prompt library', p: 'med', o: 'AI' },
+          { t: 'Integrate with MoMo test transaction stream', p: 'high', o: 'Data' },
+          { t: 'Localisation — 3 languages for pilot markets', p: 'low', o: 'Prod' }
+        ],
+        active: [
+          { t: 'Merchant segmentation model v1', p: 'high', o: 'DS' },
+          { t: 'Campaign trigger rules engine', p: 'med', o: 'Eng' },
+          { t: 'Rebrand to MTN Fintech visual language', p: 'med', o: 'MG' }
+        ],
+        done: [
+          { t: 'Product discovery interviews (6 merchants)', p: 'med', o: 'MG' },
+          { t: 'Auth + tenancy model locked', p: 'low', o: 'Eng' },
+          { t: 'Tech stack selection', p: 'low', o: 'MG' }
+        ]
+      },
+      metrics: [
+        { label: 'Merchants Modelled', value: '12.4K', delta: '+8% WoW', cls: '' },
+        { label: 'Agent Queries / Day', value: '—', delta: 'Not yet live', cls: 'flat' },
+        { label: 'Campaign Uplift', value: '+14%', delta: 'Sim only', cls: '' },
+        { label: 'Pilot Markets', value: '3', delta: 'ZA · NG · UG', cls: '' }
+      ],
+      activity: [
+        { t: 'Analyst Agent spec drafted — pattern: single-agent + tool use', m: '2026-04-16 · 01:35', cls: 't-win' },
+        { t: 'Segmentation model v0 running on synthetic merchant set', m: '2026-04-15 · 16:20', cls: '' },
+        { t: 'Blocker: live data access to MoMo pilot tenant still pending', m: '2026-04-14 · 09:10', cls: 't-risk' },
+        { t: 'Discovery interview with ZA super-agent: campaign fatigue is the real pain', m: '2026-04-12 · 14:00', cls: 't-win' }
+      ]
+    },
+    {
+      id: 'testautomation',
+      codename: 'PHALANX-03',
+      name: 'Intelligent Test Automation',
+      glyph: 'T',
+      glyphBg: 'linear-gradient(135deg, #00FF88, #00F0FF)',
+      accent: 'accent-green',
+      status: { label: 'Planning', cls: 'planning' },
+      mission: 'AI-driven QA capability: test generation from requirements, self-healing test suites, flaky-test detection, and defect-risk prediction in the CI/CD pipeline. Targeting 3x coverage and 35% faster release cycles across MoMo engineering squads.',
+      objectives: [
+        'Survey current QA estate across squads — tooling, coverage, pain points',
+        'Pick 2 pilot squads for intelligent test generation',
+        'Integrate AI test-gen agent into PR workflow with HITL review',
+        'Build defect prediction model on historical CI data',
+        'Publish scorecard: release confidence, flakiness, coverage delta'
+      ],
+      meta: [
+        { label: 'Owner', value: 'Malcolm Govender' },
+        { label: 'QA Lead', value: 'TBH — Automation Eng Lead' },
+        { label: 'Sponsor', value: 'Head of Engineering' },
+        { label: 'Stage', value: 'Planning & Discovery' },
+        { label: 'Target Pilot Start', value: 'Q3 2026' },
+        { label: 'Pilot Squads', value: '2 (TBD)' }
+      ],
+      stack: ['Claude Sonnet', 'Playwright', 'pytest', 'GitHub Actions', 'Argo', 'OpenTelemetry'],
+      progress: 22,
+      tasks: {
+        backlog: [
+          { t: 'QA estate survey questionnaire', p: 'high', o: 'MG' },
+          { t: 'Build prototype: generate Playwright specs from Jira story', p: 'high', o: 'AE' },
+          { t: 'Flaky test detector — scan last 90 days of CI runs', p: 'med', o: 'DS' },
+          { t: 'Defect-risk model dataset assembly', p: 'med', o: 'DS' },
+          { t: 'PR workflow design — where does the agent plug in?', p: 'med', o: 'AE' }
+        ],
+        active: [
+          { t: 'Align with Head of Engineering on 2 pilot squads', p: 'high', o: 'MG' },
+          { t: 'Draft QA capability roadmap (Q2-Q4 2026)', p: 'med', o: 'MG' }
+        ],
+        done: [
+          { t: 'Use case framing in Intelligence Centre', p: 'low', o: 'MG' },
+          { t: 'Initial vendor scan (Diffblue, Mabl, CodiumAI)', p: 'med', o: 'MG' }
+        ]
+      },
+      metrics: [
+        { label: 'Pilot Squads', value: '0 / 2', delta: 'Selection in flight', cls: 'flat' },
+        { label: 'Coverage Lift', value: '—', delta: 'Target 3×', cls: 'flat' },
+        { label: 'Flaky Tests ID\'d', value: '—', delta: 'Scanner pending', cls: 'flat' },
+        { label: 'Release Speed', value: '—', delta: 'Target -35% cycle', cls: 'flat' }
+      ],
+      activity: [
+        { t: 'Planning doc v1 drafted — scope split into 4 workstreams', m: '2026-04-15 · 20:30', cls: '' },
+        { t: 'Vendor scan complete: decision favours build-over-buy for core', m: '2026-04-14 · 15:45', cls: 't-win' },
+        { t: 'Risk: no dedicated QA lead in team yet — hiring open', m: '2026-04-13 · 11:20', cls: 't-risk' }
+      ]
+    }
+  ];
+
+  const state = {}; // { [id]: { tab, tasks } }
+  workspaces.forEach(w => {
+    state[w.id] = {
+      tab: 'overview',
+      tasks: JSON.parse(JSON.stringify(w.tasks))
+    };
+  });
+
+  const grid = document.getElementById('wsGrid');
+  if (!grid) return;
+
+  function taskHTML(wsId, col, task, idx) {
+    const prioClass = 'priority-' + task.p;
+    return `<div class="ws-task" draggable="true" data-ws="${wsId}" data-col="${col}" data-idx="${idx}">
+      <button class="ws-task-del" data-action="delete" aria-label="Delete task">×</button>
+      <div class="ws-task-title">${escapeHTML(task.t)}</div>
+      <div class="ws-task-meta">
+        <span class="ws-task-tag ${prioClass}">${task.p}</span>
+        <span class="ws-task-owner">${escapeHTML(task.o)}</span>
+      </div>
+    </div>`;
+  }
+
+  function colHTML(wsId, colKey, colTitle) {
+    const list = state[wsId].tasks[colKey];
+    const tasks = list.map((t, i) => taskHTML(wsId, colKey, t, i)).join('');
+    return `<div class="ws-col ${colKey}" data-col="${colKey}" data-ws="${wsId}">
+      <div class="ws-col-head">
+        <span class="ws-col-title">${colTitle}</span>
+        <span class="ws-col-count">${list.length}</span>
+      </div>
+      <div class="ws-col-tasks">${tasks}</div>
+      <div class="ws-add-task">
+        <input type="text" placeholder="+ New task…" data-ws="${wsId}" data-col="${colKey}" />
+        <button data-action="add-task" data-ws="${wsId}" data-col="${colKey}">Add</button>
+      </div>
+    </div>`;
+  }
+
+  function panelsHTML(w) {
+    const s = state[w.id];
+    const circ = 2 * Math.PI * 28;
+    const offset = circ * (1 - w.progress / 100);
+
+    const overview = `
+      <div class="ws-panel ${s.tab === 'overview' ? 'active' : ''}" data-panel="overview">
+        <div class="ws-overview-grid">
+          <div>
+            <p class="ws-mission">${escapeHTML(w.mission)}</p>
+            <div class="ws-sub-label">// Key Objectives</div>
+            <ul class="ws-objectives">${w.objectives.map(o => `<li>${escapeHTML(o)}</li>`).join('')}</ul>
+          </div>
+          <div>
+            <div class="ws-sub-label">// Mission Parameters</div>
+            <div class="ws-meta-stack">
+              ${w.meta.map(m => `<div class="ws-meta-row"><span class="ws-meta-label">${escapeHTML(m.label)}</span><span class="ws-meta-value">${escapeHTML(m.value)}</span></div>`).join('')}
+            </div>
+            <div class="ws-sub-label">// Stack</div>
+            <div class="ws-stack-tags">${w.stack.map(t => `<span class="ws-stack-tag">${escapeHTML(t)}</span>`).join('')}</div>
+          </div>
+        </div>
+      </div>`;
+
+    const tasks = `
+      <div class="ws-panel ${s.tab === 'tasks' ? 'active' : ''}" data-panel="tasks">
+        <div class="ws-kanban" data-ws="${w.id}">
+          ${colHTML(w.id, 'backlog', 'Backlog')}
+          ${colHTML(w.id, 'active', 'In Flight')}
+          ${colHTML(w.id, 'done', 'Complete')}
+        </div>
+      </div>`;
+
+    const metrics = `
+      <div class="ws-panel ${s.tab === 'metrics' ? 'active' : ''}" data-panel="metrics">
+        <div class="ws-metrics-grid">
+          ${w.metrics.map(m => `<div class="ws-metric">
+            <div class="ws-metric-label">${escapeHTML(m.label)}</div>
+            <div class="ws-metric-value">${escapeHTML(m.value)}</div>
+            <div class="ws-metric-delta ${m.cls || ''}">${escapeHTML(m.delta)}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+
+    const activity = `
+      <div class="ws-panel ${s.tab === 'activity' ? 'active' : ''}" data-panel="activity">
+        <div class="ws-activity">
+          ${w.activity.map(a => `<div class="ws-activity-item ${a.cls || ''}">
+            <div class="ws-activity-dot"></div>
+            <div class="ws-activity-content">
+              <div class="ws-activity-text">${escapeHTML(a.t)}</div>
+              <div class="ws-activity-meta">${escapeHTML(a.m)}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+
+    return `
+      <div class="ws-scanline"></div>
+      <div class="ws-header">
+        <div class="ws-glyph" style="background:${w.glyphBg}">${w.glyph}</div>
+        <div class="ws-title-block">
+          <h3>${escapeHTML(w.name)}</h3>
+          <div class="ws-codename">${w.codename} · ${escapeHTML(w.status.label)}</div>
+        </div>
+        <div class="ws-header-meta">
+          <span class="ws-pill ${w.status.cls}">${escapeHTML(w.status.label)}</span>
+          <div class="ws-ring">
+            <svg viewBox="0 0 64 64">
+              <circle class="ring-bg" cx="32" cy="32" r="28"/>
+              <circle class="ring-fg" cx="32" cy="32" r="28" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+            </svg>
+            <div class="ws-ring-value">${w.progress}%</div>
+          </div>
+        </div>
+      </div>
+      <div class="ws-tabs" data-ws="${w.id}">
+        <button class="ws-tab ${s.tab === 'overview' ? 'active' : ''}" data-tab="overview">Overview</button>
+        <button class="ws-tab ${s.tab === 'tasks' ? 'active' : ''}" data-tab="tasks">Tasks</button>
+        <button class="ws-tab ${s.tab === 'metrics' ? 'active' : ''}" data-tab="metrics">Metrics</button>
+        <button class="ws-tab ${s.tab === 'activity' ? 'active' : ''}" data-tab="activity">Activity</button>
+      </div>
+      <div class="ws-body">${overview}${tasks}${metrics}${activity}</div>`;
+  }
+
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+
+  function render() {
+    grid.innerHTML = workspaces.map(w =>
+      `<div class="ws-card ${w.accent || ''}" data-ws="${w.id}">${panelsHTML(w)}</div>`
+    ).join('');
+    bindCardEvents();
+  }
+
+  function renderCard(wsId) {
+    const w = workspaces.find(x => x.id === wsId);
+    const card = grid.querySelector(`.ws-card[data-ws="${wsId}"]`);
+    if (!card || !w) return;
+    card.innerHTML = panelsHTML(w);
+    bindCardEvents(card);
+  }
+
+  function bindCardEvents(root) {
+    const scope = root || grid;
+    scope.querySelectorAll('.ws-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wsId = btn.parentElement.dataset.ws;
+        state[wsId].tab = btn.dataset.tab;
+        renderCard(wsId);
+      });
+    });
+    scope.querySelectorAll('.ws-add-task input').forEach(inp => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') addTask(inp.dataset.ws, inp.dataset.col, inp.value);
+      });
+    });
+    scope.querySelectorAll('[data-action="add-task"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        addTask(btn.dataset.ws, btn.dataset.col, input.value);
+      });
+    });
+    scope.querySelectorAll('[data-action="delete"]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const task = btn.closest('.ws-task');
+        deleteTask(task.dataset.ws, task.dataset.col, Number(task.dataset.idx));
+      });
+    });
+    scope.querySelectorAll('.ws-task').forEach(t => {
+      t.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', JSON.stringify({ ws: t.dataset.ws, col: t.dataset.col, idx: Number(t.dataset.idx) }));
+        t.classList.add('dragging');
+      });
+      t.addEventListener('dragend', () => t.classList.remove('dragging'));
+    });
+    scope.querySelectorAll('.ws-col').forEach(c => {
+      c.addEventListener('dragover', e => { e.preventDefault(); c.classList.add('drop-hover'); });
+      c.addEventListener('dragleave', () => c.classList.remove('drop-hover'));
+      c.addEventListener('drop', e => {
+        e.preventDefault(); c.classList.remove('drop-hover');
+        try {
+          const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+          if (data.ws !== c.dataset.ws) return;
+          moveTask(data.ws, data.col, data.idx, c.dataset.col);
+        } catch (err) {}
+      });
+    });
+  }
+
+  function addTask(wsId, col, text) {
+    text = (text || '').trim();
+    if (!text) return;
+    state[wsId].tasks[col].push({ t: text, p: 'med', o: 'You' });
+    recalcProgress(wsId);
+    renderCard(wsId);
+  }
+  function deleteTask(wsId, col, idx) {
+    state[wsId].tasks[col].splice(idx, 1);
+    recalcProgress(wsId);
+    renderCard(wsId);
+  }
+  function moveTask(wsId, fromCol, idx, toCol) {
+    if (fromCol === toCol) return;
+    const [task] = state[wsId].tasks[fromCol].splice(idx, 1);
+    state[wsId].tasks[toCol].push(task);
+    recalcProgress(wsId);
+    renderCard(wsId);
+  }
+  function recalcProgress(wsId) {
+    const s = state[wsId].tasks;
+    const total = s.backlog.length + s.active.length + s.done.length;
+    const weight = s.done.length + (s.active.length * 0.5);
+    const pct = total ? Math.round((weight / total) * 100) : 0;
+    const w = workspaces.find(x => x.id === wsId);
+    if (w) w.progress = pct;
+  }
+
+  render();
 })();
 </script>
 
