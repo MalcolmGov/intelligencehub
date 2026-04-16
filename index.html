@@ -2989,6 +2989,18 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.reveal, .metric-card, .project-card').forEach(el => observer.observe(el));
 
+// Fallback: reveal any .reveal elements already in or above the viewport on load / hash-jump
+function revealVisible() {
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 100) {
+      el.classList.add('visible');
+    }
+  });
+}
+window.addEventListener('load', () => { revealVisible(); setTimeout(revealVisible, 500); });
+window.addEventListener('hashchange', () => setTimeout(revealVisible, 300));
+
 // ========== NAV SCROLL EFFECT ==========
 const nav = document.getElementById('main-nav');
 window.addEventListener('scroll', () => {
