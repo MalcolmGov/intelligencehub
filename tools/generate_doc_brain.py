@@ -43,6 +43,7 @@ TITLE_MAP = {
     "docs/02_Governance_and_Policy/AI_Governance_Framework.docx": ("AI Governance Framework", "Governance & Policy"),
     "docs/02_Governance_and_Policy/AI_Council_Charter_and_Decision_Log.docx": ("AI Council Charter & Decision Log", "Governance & Policy"),
     "docs/02_Governance_and_Policy/AI_Acceptable_Use_Policy.docx": ("AI Acceptable Use Policy", "Governance & Policy"),
+    "docs/02_Governance_and_Policy/Spark_Challenge_Charter.docx": ("Spark — Continental Innovation Challenge · Rules & Judging Charter", "Governance & Policy"),
     "docs/03_Operations_and_Controls/AI_Control_Register.docx": ("AI Control Register", "Operations & Controls"),
     "docs/03_Operations_and_Controls/AI_Monitoring_and_Incident_Playbook.docx": ("AI Monitoring & Incident Playbook", "Operations & Controls"),
     "docs/04_Templates_and_Forms/AI_Use_Case_Intake_and_Tier_Rubric.docx": ("Use-Case Intake Form + Tier Scoring Rubric", "Templates & Forms"),
