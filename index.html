@@ -2659,6 +2659,7 @@ body.brief-active .nav-right { opacity: 1; }
     <li><a href="#sdlc20">SDLC 2.0</a></li>
     <li><a href="#prototypes">Prototypes</a></li>
     <li><a href="#documents">Documents</a></li>
+    <li><a href="#concepts">Concepts</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#team">Team</a></li>
   </ul>
@@ -2691,6 +2692,7 @@ body.brief-active .nav-right { opacity: 1; }
   <a href="#sdlc20">SDLC 2.0</a>
   <a href="#prototypes">Prototypes</a>
   <a href="#documents">Documents</a>
+  <a href="#concepts">Concepts</a>
   <a href="#roadmap">Roadmap</a>
   <a href="#team">Team</a>
 </div>
@@ -3171,6 +3173,39 @@ body.brief-active .nav-right { opacity: 1; }
 
     <!-- ===== Pre-existing ===== -->
     <a class="glow-card doc-card reveal" href="./docs/Test_Automation_Strategy.docx" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="holo-shimmer"></div><div class="doc-icon strategy">&#x1F9EA;</div><div class="doc-info"><h4 class="doc-title">Intelligent Test Automation Strategy</h4><div class="doc-meta">DOCX &bull; Apr 2026 &bull; v1.0 &bull; <span style="color:var(--neon-green);">View / Download</span></div><div class="doc-tags"><span class="doc-tag">Strategy</span><span class="doc-tag">QA</span><span class="doc-tag">Phalanx-03</span></div></div></a>
+  </div>
+</section>
+
+<!-- Concept Index Section -->
+<section id="concepts">
+  <div class="section-header reveal">
+    <div class="section-tag">// KNOWLEDGE GRAPH</div>
+    <h2 class="section-title">Concept Index</h2>
+    <p class="section-desc">Every framework, role, tier, technology, and process &mdash; with every doc that mentions it</p>
+    <div class="concept-stats" id="conceptStats">Loading&hellip;</div>
+  </div>
+
+  <div class="concept-controls reveal">
+    <div class="concept-search-wrap">
+      <svg class="concept-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" class="concept-search" id="conceptSearch" placeholder="Search concepts, aliases, or descriptions…" autocomplete="off">
+    </div>
+    <div class="concept-filters" id="conceptFilters">
+      <!-- injected by JS -->
+    </div>
+  </div>
+
+  <div class="concept-workspace reveal">
+    <div class="concept-list" id="conceptList">
+      <div class="concept-loading">Loading concepts&hellip;</div>
+    </div>
+    <div class="concept-detail" id="conceptDetail">
+      <div class="concept-detail-empty">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+        <h4>Pick a concept</h4>
+        <p>Select a concept on the left to see where it appears across all 19 documents &mdash; with the exact section and a snippet from each mention.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -4453,6 +4488,1173 @@ document.querySelectorAll('.proto-screenshot').forEach(img => {
   }
 
   render();
+})();
+</script>
+
+<!-- ============================================================== -->
+<!-- ============ DOC BRAIN — Ask-the-Doc TL;DR + FAQ ============= -->
+<!-- ============================================================== -->
+<style>
+/* Doc card enhancements for Doc Brain */
+.doc-card[data-doc-id] { cursor: pointer; position: relative; }
+.doc-card .doc-tldr {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 10px 0 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.doc-card .doc-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.doc-cta {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s var(--transition-smooth);
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: none;
+  color: inherit;
+}
+.doc-cta.primary {
+  background: rgba(52, 211, 153, 0.12);
+  color: var(--neon-green);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+.doc-cta.primary:hover {
+  background: rgba(52, 211, 153, 0.22);
+  border-color: var(--neon-green);
+  box-shadow: 0 0 12px rgba(52, 211, 153, 0.25);
+}
+.doc-cta.secondary {
+  background: rgba(96, 165, 250, 0.08);
+  color: var(--brand-blue);
+  border-color: rgba(96, 165, 250, 0.25);
+}
+.doc-cta.secondary:hover {
+  background: rgba(96, 165, 250, 0.18);
+  border-color: var(--brand-blue);
+}
+.doc-card .ai-badge {
+  position: absolute;
+  top: 12px; right: 12px;
+  font-size: 9px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.05em;
+  padding: 3px 7px;
+  border-radius: 10px;
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  color: var(--neon-green);
+  pointer-events: none;
+}
+
+/* Modal */
+.doc-brain-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.doc-brain-modal.open { display: flex; }
+.doc-brain-modal .modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.78);
+  backdrop-filter: blur(10px);
+  animation: dbFadeIn 0.2s ease forwards;
+}
+.doc-brain-modal .modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-glow);
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.55), 0 0 40px rgba(52, 211, 153, 0.08);
+  overflow: hidden;
+  animation: dbSlideUp 0.25s var(--transition-smooth) forwards;
+}
+@keyframes dbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dbSlideUp {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+.doc-brain-modal .modal-head {
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--border-glow);
+  background: linear-gradient(180deg, rgba(52,211,153,0.04) 0%, transparent 100%);
+}
+.doc-brain-modal .modal-category {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--neon-green);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.doc-brain-modal .modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 14px;
+  color: var(--text-primary);
+  padding-right: 40px;
+}
+.doc-brain-modal .modal-tldr {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  padding: 14px 16px;
+  background: rgba(96, 165, 250, 0.06);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  border-left: 3px solid var(--brand-blue);
+  border-radius: 8px;
+}
+.doc-brain-modal .modal-tldr .tldr-label {
+  display: block;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--brand-blue);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.doc-brain-modal .modal-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-glow);
+  background: rgba(30, 41, 59, 0.6);
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.doc-brain-modal .modal-close:hover {
+  color: var(--text-primary);
+  border-color: var(--neon-green);
+  background: rgba(52, 211, 153, 0.12);
+}
+.doc-brain-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 26px 10px;
+}
+.doc-brain-modal .modal-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 26px 14px;
+  border-bottom: 1px solid var(--border-glow);
+}
+.doc-brain-modal .modal-search {
+  flex: 1;
+  padding: 10px 14px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-glow);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.doc-brain-modal .modal-search::placeholder { color: var(--text-muted); }
+.doc-brain-modal .modal-search:focus {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12);
+}
+.doc-brain-modal .search-meta {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.doc-brain-modal .faq-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.doc-brain-modal .faq-item {
+  border: 1px solid var(--border-glow);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(15, 23, 42, 0.5);
+  transition: border-color 0.2s;
+}
+.doc-brain-modal .faq-item:hover { border-color: rgba(52, 211, 153, 0.25); }
+.doc-brain-modal .faq-item.open { border-color: rgba(52, 211, 153, 0.4); }
+.doc-brain-modal .faq-q {
+  width: 100%;
+  text-align: left;
+  padding: 13px 16px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.5;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.doc-brain-modal .faq-q .chev {
+  color: var(--text-muted);
+  transition: transform 0.2s, color 0.2s;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.doc-brain-modal .faq-item.open .faq-q .chev {
+  transform: rotate(90deg);
+  color: var(--neon-green);
+}
+.doc-brain-modal .faq-a {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s var(--transition-smooth), padding 0.25s;
+  padding: 0 16px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+  border-top: 1px solid transparent;
+}
+.doc-brain-modal .faq-item.open .faq-a {
+  max-height: 500px;
+  padding: 12px 16px 14px;
+  border-top-color: var(--border-glow);
+}
+.doc-brain-modal .faq-section {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--border-glow);
+}
+.doc-brain-modal .modal-foot {
+  padding: 16px 26px;
+  border-top: 1px solid var(--border-glow);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(15, 23, 42, 0.4);
+  flex-wrap: wrap;
+}
+.doc-brain-modal .foot-note {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+.doc-brain-modal .open-doc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--neon-green);
+  color: var(--bg-primary);
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.doc-brain-modal .open-doc-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(52, 211, 153, 0.35);
+}
+.doc-brain-modal .no-results {
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+@media (max-width: 640px) {
+  .doc-brain-modal { padding: 0; }
+  .doc-brain-modal .modal-panel { max-height: 100vh; height: 100vh; border-radius: 0; max-width: none; }
+  .doc-brain-modal .modal-head { padding: 18px 20px 14px; }
+  .doc-brain-modal .modal-title { font-size: 17px; }
+  .doc-brain-modal .modal-body,
+  .doc-brain-modal .modal-search-wrap,
+  .doc-brain-modal .modal-foot { padding-left: 20px; padding-right: 20px; }
+}
+
+/* Floating "Ask any doc" launcher */
+.doc-brain-launcher {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 9990;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, var(--neon-green), var(--brand-blue));
+  color: var(--bg-primary);
+  font-weight: 600;
+  font-size: 13px;
+  border: none;
+  border-radius: 28px;
+  cursor: pointer;
+  box-shadow: 0 12px 32px rgba(52, 211, 153, 0.35), 0 2px 8px rgba(15,23,42,0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.doc-brain-launcher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(52, 211, 153, 0.45);
+}
+.doc-brain-launcher svg { width: 16px; height: 16px; }
+@media (max-width: 640px) {
+  .doc-brain-launcher { bottom: 16px; right: 16px; padding: 10px 14px; font-size: 12px; }
+}
+</style>
+
+<!-- Modal skeleton (populated by JS) -->
+<div class="doc-brain-modal" id="docBrainModal" role="dialog" aria-modal="true" aria-labelledby="docBrainTitle">
+  <div class="modal-backdrop" data-db-close></div>
+  <div class="modal-panel">
+    <button class="modal-close" data-db-close aria-label="Close">&times;</button>
+    <div class="modal-head">
+      <div class="modal-category" id="docBrainCategory">Category</div>
+      <h3 class="modal-title" id="docBrainTitle">Document title</h3>
+      <div class="modal-tldr">
+        <span class="tldr-label">// TL;DR &mdash; AI-generated summary</span>
+        <span id="docBrainTldr">...</span>
+      </div>
+    </div>
+    <div class="modal-search-wrap">
+      <input type="search" class="modal-search" id="docBrainSearch" placeholder="Ask a question about this document..." autocomplete="off">
+      <span class="search-meta" id="docBrainSearchMeta">0 questions</span>
+    </div>
+    <div class="modal-body">
+      <div class="faq-list" id="docBrainFaqs"></div>
+    </div>
+    <div class="modal-foot">
+      <span class="foot-note" id="docBrainFootNote">AI brief + FAQ generated from doc contents</span>
+      <a class="open-doc-btn" id="docBrainOpenBtn" href="#" target="_blank" rel="noopener">
+        Open full document
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Floating launcher (clicks open the first doc or shows picker) -->
+<button class="doc-brain-launcher" id="docBrainLauncher" title="Ask the docs">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  Ask the docs
+</button>
+
+<!-- Fuse.js for fuzzy search -->
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
+
+<!-- ============================================================== -->
+<!-- =============== CONCEPT INDEX — cross-doc map ================ -->
+<!-- ============================================================== -->
+<style>
+#concepts { padding: 90px 48px 60px; }
+#concepts .section-header { text-align: center; margin-bottom: 32px; }
+.concept-stats {
+  margin-top: 10px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+.concept-stats .dot { color: var(--neon-green); margin: 0 8px; }
+
+.concept-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1200px;
+  margin: 0 auto 24px;
+}
+.concept-search-wrap {
+  position: relative;
+}
+.concept-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.concept-search {
+  width: 100%;
+  padding: 13px 16px 13px 42px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.concept-search::placeholder { color: var(--text-muted); }
+.concept-search:focus {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.10);
+}
+
+.concept-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.filter-chip {
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-glow);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-chip:hover {
+  color: var(--text-primary);
+  border-color: rgba(148, 163, 184, 0.35);
+}
+.filter-chip.active {
+  color: var(--bg-primary);
+  background: var(--neon-green);
+  border-color: var(--neon-green);
+  font-weight: 600;
+}
+.filter-chip .chip-count {
+  font-size: 10px;
+  opacity: 0.85;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.18);
+}
+.filter-chip.active .chip-count { background: rgba(15,23,42,0.25); }
+
+/* Workspace: two-pane on desktop, stacked on mobile */
+.concept-workspace {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 18px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 520px;
+}
+
+.concept-list {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 14px;
+  padding: 10px;
+  max-height: 620px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+.concept-list::-webkit-scrollbar { width: 8px; }
+.concept-list::-webkit-scrollbar-track { background: transparent; }
+.concept-list::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.18); border-radius: 4px; }
+.concept-list::-webkit-scrollbar-thumb:hover { background: rgba(148,163,184,0.35); }
+
+.concept-loading, .concept-none {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.concept-row {
+  padding: 11px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s;
+  border: 1px solid transparent;
+  margin-bottom: 2px;
+}
+.concept-row:hover {
+  background: rgba(96, 165, 250, 0.06);
+  border-color: rgba(96, 165, 250, 0.15);
+}
+.concept-row.active {
+  background: rgba(52, 211, 153, 0.10);
+  border-color: rgba(52, 211, 153, 0.35);
+}
+.concept-row-swatch {
+  width: 4px;
+  height: 26px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.concept-row-main { flex: 1; min-width: 0; }
+.concept-row-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.concept-row-meta {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.concept-row-count {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 3px 9px;
+  border-radius: 10px;
+  background: rgba(30, 41, 59, 0.7);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-glow);
+}
+
+/* Category swatch colors */
+.cat-Governance       { background: var(--accent-purple); box-shadow: 0 0 8px rgba(167,139,250,0.5); }
+.cat-Role             { background: var(--brand-blue);    box-shadow: 0 0 8px rgba(96,165,250,0.45); }
+.cat-Technology       { background: var(--neon-green);    box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+.cat-Process          { background: #22D3EE;              box-shadow: 0 0 8px rgba(34,211,238,0.5); }
+.cat-TierClassification{ background: var(--accent-rose);  box-shadow: 0 0 8px rgba(244,114,182,0.5); }
+.cat-Policy           { background: #C4B5FD;              box-shadow: 0 0 8px rgba(196,181,253,0.45); }
+.cat-Vendor           { background: #FBBF24;              box-shadow: 0 0 8px rgba(251,191,36,0.45); }
+.cat-Programme        { background: #F97316;              box-shadow: 0 0 8px rgba(249,115,22,0.45); }
+.cat-Metric           { background: #34D399;              box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+.cat-IncidentType     { background: #EF4444;              box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+
+/* Detail panel */
+.concept-detail {
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: 14px;
+  padding: 24px 26px;
+  min-height: 100%;
+  max-height: 620px;
+  overflow-y: auto;
+}
+.concept-detail::-webkit-scrollbar { width: 8px; }
+.concept-detail::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.18); border-radius: 4px; }
+.concept-detail-empty {
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted);
+}
+.concept-detail-empty svg { margin-bottom: 16px; color: var(--neon-green); }
+.concept-detail-empty h4 {
+  color: var(--text-primary);
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+.concept-detail-empty p {
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 340px;
+}
+
+.concept-detail-head {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-glow);
+  margin-bottom: 20px;
+}
+.concept-category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid;
+  margin-bottom: 10px;
+}
+.concept-detail-name {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 10px;
+  line-height: 1.2;
+}
+.concept-detail-desc {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+.concept-aliases {
+  margin-top: 14px;
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+.concept-aliases strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.concept-aliases .alias {
+  display: inline-block;
+  padding: 2px 8px;
+  margin: 2px 4px 2px 0;
+  border-radius: 4px;
+  background: rgba(30,41,59,0.6);
+  border: 1px solid var(--border-glow);
+  color: var(--text-secondary);
+}
+
+.mentions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.mentions-header h5 {
+  font-size: 13px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin: 0;
+  font-weight: 500;
+}
+.mentions-count {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--neon-green);
+}
+
+.mention-doc-group {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--border-glow);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+.mention-doc-group:hover { border-color: rgba(52, 211, 153, 0.25); }
+.mention-doc-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.mention-doc-title:hover { color: var(--neon-green); }
+.mention-doc-title svg { width: 12px; height: 12px; opacity: 0.5; }
+.mention-snippet {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  padding: 10px 14px;
+  margin: 8px 0;
+  border-left: 2px solid rgba(52, 211, 153, 0.4);
+  background: rgba(52, 211, 153, 0.04);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+}
+.mention-section {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(30,41,59,0.6);
+  border: 1px solid var(--border-glow);
+  display: inline-block;
+  margin-bottom: 4px;
+}
+.mention-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  #concepts { padding: 60px 20px 40px; }
+  .concept-workspace { grid-template-columns: 1fr; min-height: 0; }
+  .concept-list { max-height: 340px; }
+  .concept-detail { max-height: none; }
+}
+</style>
+
+<script>
+/* =========================================================
+   DOC BRAIN — client-side TL;DR + FAQ, no backend
+   ========================================================= */
+(function () {
+  const MODAL = document.getElementById('docBrainModal');
+  if (!MODAL) return;
+
+  const elTitle = document.getElementById('docBrainTitle');
+  const elCat   = document.getElementById('docBrainCategory');
+  const elTldr  = document.getElementById('docBrainTldr');
+  const elFaqs  = document.getElementById('docBrainFaqs');
+  const elSearch = document.getElementById('docBrainSearch');
+  const elMeta   = document.getElementById('docBrainSearchMeta');
+  const elOpen   = document.getElementById('docBrainOpenBtn');
+  const elFoot   = document.getElementById('docBrainFootNote');
+  const elLauncher = document.getElementById('docBrainLauncher');
+
+  let BRAIN = null;
+  let DOCS_BY_ID = {};
+  let currentDoc = null;
+  let fuse = null;
+
+  /* ---- Derive doc id from href ---- */
+  function idFromHref(href) {
+    if (!href) return null;
+    const base = href.split('/').pop().split('?')[0].split('#')[0];
+    if (!base) return null;
+    const noExt = base.replace(/\.(docx|pdf|pptx|html)$/i, '');
+    return noExt.replace(/\./g, '_');
+  }
+
+  /* ---- Wire up doc cards ---- */
+  function enhanceCards() {
+    const cards = document.querySelectorAll('#documents .doc-card, .docs-grid .doc-card');
+    cards.forEach(card => {
+      const href = card.getAttribute('href');
+      const docId = idFromHref(href);
+      if (!docId || !DOCS_BY_ID[docId]) return;
+      const entry = DOCS_BY_ID[docId];
+
+      card.setAttribute('data-doc-id', docId);
+      card.setAttribute('data-doc-href', href);
+      // neutralise default nav but keep href as fallback / right-click
+      card.addEventListener('click', (e) => {
+        // meta/ctrl click → let original open in new tab
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+        // allow clicks on the "Open file →" secondary button to pass through
+        if (e.target.closest('[data-open-original]')) return;
+        e.preventDefault();
+        openModal(docId);
+      });
+
+      // Inject TL;DR preview + action row into doc-info
+      const info = card.querySelector('.doc-info');
+      if (!info) return;
+      if (!info.querySelector('.doc-tldr')) {
+        const p = document.createElement('p');
+        p.className = 'doc-tldr';
+        p.textContent = entry.tl_dr;
+        // put after doc-meta, before doc-tags
+        const tags = info.querySelector('.doc-tags');
+        if (tags) info.insertBefore(p, tags);
+        else info.appendChild(p);
+      }
+      if (!info.querySelector('.doc-actions')) {
+        const actions = document.createElement('div');
+        actions.className = 'doc-actions';
+        actions.innerHTML = `
+          <button class="doc-cta primary" type="button" data-open-brief>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+            Ask this doc
+          </button>
+          <a class="doc-cta secondary" href="${href}" target="_blank" rel="noopener" data-open-original>
+            Open file
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
+          </a>`;
+        info.appendChild(actions);
+      }
+      if (!card.querySelector('.ai-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'ai-badge';
+        badge.textContent = 'AI brief';
+        card.appendChild(badge);
+      }
+    });
+  }
+
+  /* ---- Modal open / render ---- */
+  function openModal(docId) {
+    const entry = DOCS_BY_ID[docId];
+    if (!entry) return;
+    currentDoc = entry;
+    elTitle.textContent = entry.title;
+    elCat.textContent = '// ' + (entry.category || 'Document').toUpperCase();
+    elTldr.textContent = entry.tl_dr;
+    elOpen.setAttribute('href', './' + entry.path);
+    elSearch.value = '';
+    renderFaqs(entry.faqs);
+    elMeta.textContent = entry.faqs.length + ' question' + (entry.faqs.length === 1 ? '' : 's');
+    fuse = new Fuse(entry.faqs, {
+      keys: [{ name: 'q', weight: 0.7 }, { name: 'a', weight: 0.3 }],
+      threshold: 0.4,
+      ignoreLocation: true,
+      minMatchCharLength: 2
+    });
+    MODAL.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => elSearch.focus({ preventScroll: true }), 80);
+  }
+
+  function closeModal() {
+    MODAL.classList.remove('open');
+    document.body.style.overflow = '';
+    currentDoc = null;
+  }
+
+  function renderFaqs(faqs) {
+    if (!faqs || !faqs.length) {
+      elFaqs.innerHTML = '<div class="no-results">No questions match. Try simpler keywords.</div>';
+      return;
+    }
+    elFaqs.innerHTML = faqs.map((f, i) => `
+      <div class="faq-item" data-i="${i}">
+        <button class="faq-q" type="button">
+          <span>${escapeHtml(f.q)}</span>
+          <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <div class="faq-a">
+          <div>${escapeHtml(f.a)}</div>
+          ${f.section ? `<span class="faq-section">${escapeHtml(f.section)}</span>` : ''}
+        </div>
+      </div>`).join('');
+    // accordion wiring
+    elFaqs.querySelectorAll('.faq-item').forEach(item => {
+      item.querySelector('.faq-q').addEventListener('click', () => {
+        item.classList.toggle('open');
+      });
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  /* ---- Search ---- */
+  elSearch.addEventListener('input', () => {
+    if (!currentDoc) return;
+    const q = elSearch.value.trim();
+    if (!q) {
+      renderFaqs(currentDoc.faqs);
+      elMeta.textContent = currentDoc.faqs.length + ' questions';
+      return;
+    }
+    const hits = fuse.search(q).map(h => h.item);
+    renderFaqs(hits);
+    elMeta.textContent = hits.length + ' match' + (hits.length === 1 ? '' : 'es');
+    // auto-open the first hit
+    const first = elFaqs.querySelector('.faq-item');
+    if (first) first.classList.add('open');
+  });
+
+  /* ---- Close handlers ---- */
+  MODAL.querySelectorAll('[data-db-close]').forEach(el => el.addEventListener('click', closeModal));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && MODAL.classList.contains('open')) closeModal();
+  });
+
+  /* ---- Launcher: open first doc or jump to documents section ---- */
+  elLauncher.addEventListener('click', () => {
+    if (!BRAIN || !BRAIN.docs.length) return;
+    // open a "picker" — for v1, scroll to Documents section and flash the launcher
+    const section = document.getElementById('documents');
+    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  /* ---- Bootstrap ---- */
+  fetch('./doc_brain.json', { cache: 'no-store' })
+    .then(r => r.json())
+    .then(data => {
+      BRAIN = data;
+      DOCS_BY_ID = Object.fromEntries(data.docs.map(d => [d.id, d]));
+      enhanceCards();
+      // expose for concept-index cross-linking
+      window.DocBrain = { openModal, DOCS_BY_ID: DOCS_BY_ID };
+    })
+    .catch(err => {
+      console.warn('[Doc Brain] Failed to load doc_brain.json:', err);
+      elLauncher.style.display = 'none';
+    });
+})();
+</script>
+
+<script>
+/* =========================================================
+   CONCEPT INDEX — cross-doc knowledge graph
+   ========================================================= */
+(function () {
+  const elList   = document.getElementById('conceptList');
+  const elDetail = document.getElementById('conceptDetail');
+  const elSearch = document.getElementById('conceptSearch');
+  const elFilters= document.getElementById('conceptFilters');
+  const elStats  = document.getElementById('conceptStats');
+  if (!elList) return;
+
+  let INDEX = null;
+  let currentCategory = 'all';
+  let currentQuery = '';
+  let activeConceptId = null;
+  let fuse = null;
+
+  const CAT_CLASS = {
+    'Governance': 'Governance',
+    'Role': 'Role',
+    'Technology': 'Technology',
+    'Process': 'Process',
+    'Tier/Classification': 'TierClassification',
+    'Policy': 'Policy',
+    'Vendor': 'Vendor',
+    'Programme': 'Programme',
+    'Metric': 'Metric',
+    'Incident Type': 'IncidentType'
+  };
+
+  function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function renderFilters(concepts) {
+    const counts = { all: concepts.length };
+    concepts.forEach(c => { counts[c.category] = (counts[c.category] || 0) + 1; });
+    const order = ['all', 'Governance', 'Role', 'Technology', 'Process', 'Tier/Classification', 'Policy', 'Vendor', 'Programme', 'Metric', 'Incident Type'];
+    elFilters.innerHTML = order
+      .filter(k => k === 'all' || counts[k])
+      .map(k => {
+        const label = k === 'all' ? 'All' : k;
+        const active = currentCategory === k ? 'active' : '';
+        return `<button type="button" class="filter-chip ${active}" data-cat="${escapeHtml(k)}">
+          ${escapeHtml(label)} <span class="chip-count">${counts[k]}</span>
+        </button>`;
+      }).join('');
+    elFilters.querySelectorAll('.filter-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentCategory = btn.dataset.cat;
+        elFilters.querySelectorAll('.filter-chip').forEach(b => b.classList.toggle('active', b === btn));
+        renderList();
+      });
+    });
+  }
+
+  function filteredConcepts() {
+    if (!INDEX) return [];
+    let list = INDEX.concepts;
+    if (currentCategory !== 'all') list = list.filter(c => c.category === currentCategory);
+    if (currentQuery && fuse) {
+      const qList = (currentCategory === 'all')
+        ? fuse.search(currentQuery).map(h => h.item)
+        : fuse.search(currentQuery).map(h => h.item).filter(c => c.category === currentCategory);
+      list = qList;
+    }
+    return list;
+  }
+
+  function renderList() {
+    const list = filteredConcepts();
+    if (!list.length) {
+      elList.innerHTML = '<div class="concept-none">No concepts match. Try clearing the filter or search.</div>';
+      return;
+    }
+    // sort by mention count desc, then name
+    list.sort((a, b) => b.mentions.length - a.mentions.length || a.name.localeCompare(b.name));
+    elList.innerHTML = list.map(c => {
+      const cls = CAT_CLASS[c.category] || 'Process';
+      const active = c.id === activeConceptId ? 'active' : '';
+      return `<div class="concept-row ${active}" data-id="${escapeHtml(c.id)}">
+        <div class="concept-row-swatch cat-${cls}"></div>
+        <div class="concept-row-main">
+          <div class="concept-row-name">${escapeHtml(c.name)}</div>
+          <div class="concept-row-meta">${escapeHtml(c.category)}</div>
+        </div>
+        <div class="concept-row-count">${c.mentions.length}</div>
+      </div>`;
+    }).join('');
+    elList.querySelectorAll('.concept-row').forEach(row => {
+      row.addEventListener('click', () => selectConcept(row.dataset.id));
+    });
+  }
+
+  function selectConcept(id) {
+    const concept = INDEX.concepts.find(c => c.id === id);
+    if (!concept) return;
+    activeConceptId = id;
+    // update highlighted row
+    elList.querySelectorAll('.concept-row').forEach(r => r.classList.toggle('active', r.dataset.id === id));
+    renderDetail(concept);
+    // scroll detail into view on mobile
+    if (window.innerWidth <= 900) {
+      setTimeout(() => elDetail.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  }
+
+  function renderDetail(c) {
+    const cls = CAT_CLASS[c.category] || 'Process';
+    const catColors = {
+      'Governance': ['rgba(167,139,250,0.15)', 'rgba(167,139,250,0.4)', '#C4B5FD'],
+      'Role': ['rgba(96,165,250,0.15)', 'rgba(96,165,250,0.4)', '#93C5FD'],
+      'Technology': ['rgba(52,211,153,0.15)', 'rgba(52,211,153,0.4)', '#6EE7B7'],
+      'Process': ['rgba(34,211,238,0.15)', 'rgba(34,211,238,0.4)', '#67E8F9'],
+      'Tier/Classification': ['rgba(244,114,182,0.15)', 'rgba(244,114,182,0.4)', '#F9A8D4'],
+      'Policy': ['rgba(196,181,253,0.15)', 'rgba(196,181,253,0.4)', '#DDD6FE'],
+      'Vendor': ['rgba(251,191,36,0.15)', 'rgba(251,191,36,0.4)', '#FCD34D'],
+      'Programme': ['rgba(249,115,22,0.15)', 'rgba(249,115,22,0.4)', '#FDBA74'],
+      'Metric': ['rgba(52,211,153,0.15)', 'rgba(52,211,153,0.4)', '#6EE7B7'],
+      'Incident Type': ['rgba(239,68,68,0.15)', 'rgba(239,68,68,0.4)', '#FCA5A5']
+    };
+    const [bg, border, fg] = catColors[c.category] || catColors['Process'];
+
+    const aliasesHtml = (c.aliases && c.aliases.length)
+      ? `<div class="concept-aliases"><strong>Also known as:</strong> ${c.aliases.map(a => `<span class="alias">${escapeHtml(a)}</span>`).join('')}</div>`
+      : '';
+
+    // group mentions by doc_id and build snippet blocks
+    const byDoc = {};
+    c.mentions.forEach(m => {
+      const k = m.doc_id;
+      if (!byDoc[k]) byDoc[k] = { doc_title: m.doc_title, doc_id: m.doc_id, snippets: [] };
+      byDoc[k].snippets.push({ section: m.section, snippet: m.snippet });
+    });
+
+    const mentionsHtml = Object.values(byDoc).map(g => {
+      const snipsHtml = g.snippets.map(s => `
+        ${s.section ? `<div class="mention-section">${escapeHtml(s.section)}</div>` : ''}
+        <div class="mention-snippet">${escapeHtml(s.snippet)}</div>
+      `).join('');
+      return `<div class="mention-doc-group">
+        <div class="mention-doc-title" data-doc-id="${escapeHtml(g.doc_id)}">
+          ${escapeHtml(g.doc_title)}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        ${snipsHtml}
+        <div class="mention-actions">
+          <button class="doc-cta primary" type="button" data-jump-brief="${escapeHtml(g.doc_id)}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+            Open brief
+          </button>
+          <button class="doc-cta secondary" type="button" data-jump-file="${escapeHtml(g.doc_id)}">
+            Open file
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+
+    elDetail.innerHTML = `
+      <div class="concept-detail-head">
+        <span class="concept-category-tag" style="background:${bg};border-color:${border};color:${fg};">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+          ${escapeHtml(c.category)}
+        </span>
+        <h3 class="concept-detail-name">${escapeHtml(c.name)}</h3>
+        <p class="concept-detail-desc">${escapeHtml(c.description)}</p>
+        ${aliasesHtml}
+      </div>
+      <div class="mentions-header">
+        <h5>// Appears in</h5>
+        <span class="mentions-count">${c.mentions.length} mention${c.mentions.length === 1 ? '' : 's'} · ${Object.keys(byDoc).length} doc${Object.keys(byDoc).length === 1 ? '' : 's'}</span>
+      </div>
+      ${mentionsHtml}
+    `;
+
+    // Wire jump buttons
+    elDetail.querySelectorAll('[data-jump-brief], .mention-doc-title').forEach(el => {
+      el.addEventListener('click', (e) => {
+        const docId = el.dataset.jumpBrief || el.dataset.docId;
+        if (!docId) return;
+        if (window.DocBrain && window.DocBrain.openModal && window.DocBrain.DOCS_BY_ID[docId]) {
+          window.DocBrain.openModal(docId);
+        } else {
+          // fallback: scroll to documents section
+          document.getElementById('documents')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+    elDetail.querySelectorAll('[data-jump-file]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const docId = btn.dataset.jumpFile;
+        const entry = window.DocBrain?.DOCS_BY_ID?.[docId];
+        if (entry?.path) {
+          window.open('./' + entry.path, '_blank', 'noopener');
+        }
+      });
+    });
+  }
+
+  elSearch.addEventListener('input', () => {
+    currentQuery = elSearch.value.trim();
+    renderList();
+  });
+
+  fetch('./concept_index.json', { cache: 'no-store' })
+    .then(r => r.json())
+    .then(data => {
+      INDEX = data;
+      const totalMentions = data.concepts.reduce((s, c) => s + c.mentions.length, 0);
+      const docCount = new Set(data.concepts.flatMap(c => c.mentions.map(m => m.doc_id))).size;
+      elStats.innerHTML = `${data.concepts.length} concepts <span class="dot">·</span> ${totalMentions} mentions <span class="dot">·</span> ${docCount} documents`;
+
+      // Build Fuse index for search
+      fuse = new Fuse(data.concepts, {
+        keys: [
+          { name: 'name', weight: 0.5 },
+          { name: 'aliases', weight: 0.25 },
+          { name: 'description', weight: 0.15 },
+          { name: 'category', weight: 0.1 }
+        ],
+        threshold: 0.35,
+        ignoreLocation: true,
+        minMatchCharLength: 2
+      });
+
+      renderFilters(data.concepts);
+      renderList();
+
+      // auto-select the highest-mention concept
+      const top = [...data.concepts].sort((a,b) => b.mentions.length - a.mentions.length)[0];
+      if (top) selectConcept(top.id);
+    })
+    .catch(err => {
+      console.warn('[Concept Index] Failed to load concept_index.json:', err);
+      elList.innerHTML = '<div class="concept-none">Concept index unavailable.</div>';
+    });
 })();
 </script>
 
