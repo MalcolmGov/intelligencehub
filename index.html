@@ -12,35 +12,53 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --brand-blue: #0A6FD8;
-  --brand-blue-dark: #004A99;
-  --brand-blue-deep: #001B3D;
-  --neon-cyan: #00E5FF;
-  --neon-green: #00E676;
-  --neon-purple: #9575F6;
-  --neon-pink: #FF2D78;
-  --bg-primary: #020A18;
-  --bg-secondary: #061225;
-  --bg-card: rgba(8, 20, 42, 0.88);
-  --bg-card-hover: rgba(0, 102, 204, 0.12);
-  --text-primary: #EAF2FF;
-  --text-secondary: #92ADC9;
-  --text-muted: #526B8A;
-  --border-glow: rgba(0, 229, 255, 0.13);
-  --gradient-neon: linear-gradient(135deg, #00E5FF, #0A6FD8, #9575F6);
-  --gradient-card: linear-gradient(145deg, rgba(0,229,255,0.04), rgba(10,111,216,0.07));
-  --font-display: 'Orbitron', sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  /* === Antigravity palette (Tailwind slate + 400-tones) === */
+  --bg-primary: #0F172A;          /* slate-900 */
+  --bg-secondary: #1E293B;        /* slate-800 */
+  --bg-card: rgba(30, 41, 59, 0.7);
+  --bg-card-hover: rgba(96, 165, 250, 0.08);
+  --text-primary: #F8FAFC;        /* slate-50 */
+  --text-secondary: #94A3B8;      /* slate-400 */
+  --text-muted: #64748B;          /* slate-500 */
+
+  /* Brand / accent colours */
+  --brand-blue: #60A5FA;          /* blue-400 */
+  --brand-blue-dark: #3B82F6;     /* blue-500 */
+  --brand-blue-deep: #1E40AF;     /* blue-800 */
+
+  /* Legacy aliases mapped to the new palette so existing references still resolve */
+  --neon-cyan:   #60A5FA;         /* was #00E5FF */
+  --neon-green:  #34D399;         /* was #00E676 — emerald-400 */
+  --neon-purple: #A78BFA;         /* was #9575F6 — violet-400 */
+  --neon-pink:   #F472B6;         /* was #FF2D78 — pink-400 */
+
+  /* Antigravity-specific accents (new) */
+  --accent-blue:   #60A5FA;
+  --accent-green:  #34D399;
+  --accent-purple: #A78BFA;
+  --accent-rose:   #F472B6;
+
+  --border-glow: rgba(148, 163, 184, 0.14);
+  --gradient-neon: linear-gradient(135deg, #60A5FA, #34D399, #A78BFA);
+  --gradient-card: linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Fira Code', monospace;
   --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-  --card-radius: 18px;
+  --card-radius: 14px;
 }
 
 html { scroll-behavior: smooth; }
 
 body {
   font-family: var(--font-body);
-  background: var(--bg-primary);
+  background-color: var(--bg-primary);
+  /* Antigravity-style soft radial wash — calm, not noisy */
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(96, 165, 250, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(167, 139, 250, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
   color: var(--text-primary);
   overflow-x: hidden;
   line-height: 1.7;
@@ -48,13 +66,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ========== 3D NEURAL NETWORK BACKGROUND ========== */
+/* ========== 3D NEURAL NETWORK BACKGROUND (toned down) ========== */
 #neural-canvas {
   position: fixed;
   top: 0; left: 0;
   width: 100%; height: 100%;
   z-index: 0;
   pointer-events: none;
+  opacity: 0.35;          /* was implicitly 1 — now a quiet backdrop, not the headline */
 }
 
 .grid-overlay {
@@ -2222,6 +2241,111 @@ body.brief-active .nav-right { opacity: 1; }
 .ws-activity-content { flex: 1; }
 .ws-activity-text { color: rgba(255,255,255,0.88); font-size: 0.9rem; line-height: 1.5; }
 .ws-activity-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: rgba(255,255,255,0.45); margin-top: 4px; letter-spacing: 1.2px; }
+
+/* ========================================================== */
+/* Antigravity helpers — palette-aligned visual primitives    */
+/* (ag-* prefix; designed to drop in without breaking exists) */
+/* ========================================================== */
+
+.ag-section-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--accent-purple);
+  padding: 5px 14px;
+  background: rgba(167, 139, 250, 0.10);
+  border: 1px solid rgba(167, 139, 250, 0.22);
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+.ag-section-tag.blue   { color: var(--accent-blue);   background: rgba(96,165,250,0.10);  border-color: rgba(96,165,250,0.22); }
+.ag-section-tag.green  { color: var(--accent-green);  background: rgba(52,211,153,0.10);  border-color: rgba(52,211,153,0.22); }
+.ag-section-tag.rose   { color: var(--accent-rose);   background: rgba(244,114,182,0.10); border-color: rgba(244,114,182,0.22); }
+
+/* Soft radial glow backdrop behind a visual (image, orb, etc.) */
+.ag-glow-backdrop {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 120%; height: 120%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+  opacity: 0.45;
+  pointer-events: none;
+}
+.ag-glow-backdrop.blue    { background: radial-gradient(circle, rgba(96,165,250,0.6) 0%, transparent 70%); }
+.ag-glow-backdrop.emerald { background: radial-gradient(circle, rgba(52,211,153,0.4) 0%, rgba(96,165,250,0.4) 50%, transparent 70%); }
+.ag-glow-backdrop.purple  { background: radial-gradient(circle, rgba(167,139,250,0.5) 0%, rgba(96,165,250,0.3) 60%, transparent 80%); }
+
+/* Visual wrapper with gentle floating animation */
+.ag-visual-wrapper {
+  position: relative;
+  border-radius: 16px;
+  padding: 8px;
+  animation: agFloat 7s ease-in-out infinite;
+}
+.ag-visual-wrapper img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 24px 48px rgba(0,0,0,0.45);
+  transition: transform .35s ease;
+}
+.ag-visual-wrapper:hover img { transform: scale(1.02); }
+@keyframes agFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+/* Two-column visual + text split (Antigravity hero style) */
+.ag-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  padding: 60px 0;
+}
+@media (max-width: 900px) {
+  .ag-split { grid-template-columns: 1fr; text-align: center; }
+}
+
+/* Gradient text — for headline statements */
+.ag-gradient-text {
+  background: linear-gradient(to right, #fff, var(--text-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Section spacer — used to drop a 3D image visual into existing sections */
+.ag-feature-strip {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  margin: 24px auto 56px;
+  max-width: 1240px;
+  padding: 0 24px;
+}
+.ag-feature-strip.reverse { direction: rtl; }
+.ag-feature-strip.reverse > * { direction: ltr; }
+.ag-feature-strip .copy { display: flex; flex-direction: column; gap: 12px; }
+.ag-feature-strip .copy h3 {
+  font-size: 1.6rem; font-weight: 700; letter-spacing: -0.4px;
+}
+.ag-feature-strip .copy p {
+  color: var(--text-secondary); font-size: 0.98rem; line-height: 1.6; max-width: 520px;
+}
+@media (max-width: 900px) {
+  .ag-feature-strip { grid-template-columns: 1fr; }
+  .ag-feature-strip.reverse { direction: ltr; }
+}
 </style>
 </head>
 <body>
@@ -2431,12 +2555,38 @@ body.brief-active .nav-right { opacity: 1; }
   </div>
 </div>
 
+<!-- AG: Hero feature strip — bridges hero into dashboard -->
+<div class="ag-feature-strip reveal" style="margin-top: 60px;">
+  <div class="copy">
+    <span class="ag-section-tag">Executive Overview</span>
+    <h3 class="ag-gradient-text" style="font-size: 1.9rem;">Fintech Intelligence Command Centre</h3>
+    <p>Centralised orchestration for AI-driven digital transformation, automation initiatives and next-generation financial services — one operating picture for every team that needs it.</p>
+  </div>
+  <div class="ag-visual-wrapper">
+    <div class="ag-glow-backdrop blue"></div>
+    <img src="./images/hub_hero_3d.png" alt="Fintech Command Centre" loading="lazy">
+  </div>
+</div>
+
 <!-- Dashboard Section -->
 <section id="dashboard">
   <div class="section-header reveal">
     <div class="section-tag">// SYSTEM OVERVIEW</div>
     <h2 class="section-title">Command Dashboard</h2>
     <p class="section-desc">Real-time overview of AI & Automation initiatives across the enterprise</p>
+  </div>
+
+  <!-- AG: Holographic metrics orb feature strip -->
+  <div class="ag-feature-strip reveal">
+    <div class="copy">
+      <span class="ag-section-tag green">System Health</span>
+      <h3 class="ag-gradient-text">Real-time Metrics Orb</h3>
+      <p>Live monitoring of transaction throughput, anomaly detection and predictive scaling across the network. Every signal flows into the orb; every alert routes from it.</p>
+    </div>
+    <div class="ag-visual-wrapper">
+      <div class="ag-glow-backdrop emerald"></div>
+      <img src="./images/hub_dashboard_3d.png" alt="Holographic Metrics Orb" loading="lazy">
+    </div>
   </div>
 
   <div class="dashboard-grid">
@@ -2500,6 +2650,19 @@ body.brief-active .nav-right { opacity: 1; }
     <p class="section-desc">Strategic AI initiatives driving transformation across the enterprise</p>
   </div>
 
+  <!-- AG: Portfolio feature strip -->
+  <div class="ag-feature-strip reverse reveal">
+    <div class="copy">
+      <span class="ag-section-tag blue">Initiatives</span>
+      <h3 class="ag-gradient-text">Transformation Portfolio</h3>
+      <p>Tracking the progress of core engineering and AI initiatives — fraud, decisioning, copilots, platform — through pilot, validation and production.</p>
+    </div>
+    <div class="ag-visual-wrapper">
+      <div class="ag-glow-backdrop blue"></div>
+      <img src="./images/hub_projects_3d.png" alt="Transformation Portfolio Visualisation" loading="lazy">
+    </div>
+  </div>
+
   <div class="projects-grid">
     <div class="glow-card project-card reveal"><div class="holo-shimmer"></div><div class="project-header"><span class="project-domain">Engineering &amp; DevOps</span><span class="project-status status-active"><span class="status-dot"></span> Active</span></div><div class="project-body"><h3 class="project-title">GenAI Code Assistant</h3><p class="project-desc">AI-powered code generation, review, and optimisation engine integrated into the CI/CD pipeline. Accelerating developer productivity across all engineering teams.</p><div class="project-tech"><span class="tech-tag">LLM</span><span class="tech-tag">Python</span><span class="tech-tag">GitHub Actions</span><span class="tech-tag">RAG</span></div></div><div class="project-footer"><div class="project-progress"><div class="progress-label"><span>Progress</span><span>72%</span></div><div class="progress-bar"><div class="progress-fill" data-width="72"></div></div></div><a href="#" class="project-link">View &rarr;</a></div></div>
 
@@ -2531,6 +2694,19 @@ body.brief-active .nav-right { opacity: 1; }
     <div class="section-tag">// USE CASE LIBRARY</div>
     <h2 class="section-title">AI Use Cases</h2>
     <p class="section-desc">Searchable catalogue of AI opportunities across all 8 transformation domains</p>
+  </div>
+
+  <!-- AG: Cognitive architecture feature strip -->
+  <div class="ag-feature-strip reveal">
+    <div class="copy">
+      <span class="ag-section-tag">Intelligence Models</span>
+      <h3 class="ag-gradient-text">Cognitive Architecture</h3>
+      <p>Mapping neural pathways across the service ecosystem — credit, fraud, conversational banking, operations — enabling predictive experiences and assistive decisions.</p>
+    </div>
+    <div class="ag-visual-wrapper">
+      <div class="ag-glow-backdrop purple"></div>
+      <img src="./images/hub_usecases_3d.png" alt="Cognitive Architecture" loading="lazy">
+    </div>
   </div>
 
   <div class="usecase-filter reveal">
@@ -2634,6 +2810,19 @@ body.brief-active .nav-right { opacity: 1; }
     <div class="section-tag">// TRANSFORMATION ROADMAP</div>
     <h2 class="section-title">Strategic Roadmap</h2>
     <p class="section-desc">Phased delivery plan for AI & Automation capability build-out</p>
+  </div>
+
+  <!-- AG: R&D / Edge AI feature strip -->
+  <div class="ag-feature-strip reverse reveal">
+    <div class="copy">
+      <span class="ag-section-tag rose">R&amp;D Lab</span>
+      <h3 class="ag-gradient-text">Hardware &amp; Edge AI</h3>
+      <p>Beyond cloud — bringing intelligence to the edge. Prototyping next-generation devices, offline inference and resilient mesh networks for ubiquitous access.</p>
+    </div>
+    <div class="ag-visual-wrapper">
+      <div class="ag-glow-backdrop emerald"></div>
+      <img src="./images/hub_innovation_3d.png" alt="Hardware and Edge AI" loading="lazy">
+    </div>
   </div>
 
   <div class="roadmap-container">
