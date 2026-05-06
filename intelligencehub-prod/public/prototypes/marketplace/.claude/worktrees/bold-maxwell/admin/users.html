@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users - Market by MoMo Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #F3F4F6; color: #111827; }
+
+        .container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            color: white;
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            background: #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .admin-badge {
+            display: inline-block;
+            background: #EF4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .user-profile {
+            background: #1A1A2E;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .user-info { flex: 1; }
+        .user-info p:first-child { font-weight: 600; font-size: 13px; }
+        .user-info p:last-child { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
+
+        .nav-section { margin-bottom: 32px; }
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #D1D5DB;
+            transition: all 0.2s;
+        }
+        .nav-item:hover { background: #1A1A2E; color: #FFCC00; }
+        .nav-item.active { background: #FFCC00; color: #111827; font-weight: 600; }
+
+        .sidebar-bottom {
+            border-top: 1px solid #1A1A2E;
+            padding-top: 16px;
+            margin-top: auto;
+        }
+        .system-status {
+            background: #1A1A2E;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 32px;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-label { font-size: 13px; color: #6B7280; margin-bottom: 8px; }
+        .stat-value { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; }
+
+        /* Loyalty Distribution */
+        .loyalty-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .loyalty-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .loyalty-grid {
+            display: grid;
+            grid-template-columns: 1fr 200px;
+            gap: 40px;
+            align-items: center;
+        }
+        .loyalty-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .loyalty-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 6px;
+        }
+        .loyalty-label { font-weight: 600; color: #111827; }
+        .loyalty-count { color: #6B7280; font-size: 13px; }
+
+        /* Filters */
+        .filters {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #F9FAFB;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #6B7280;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        tr:hover { background: #F9FAFB; }
+
+        .user-name {
+            font-weight: 600;
+            color: #111827;
+        }
+        .tier-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .tier-regular { background: #E5E7EB; color: #374151; }
+        .tier-silver { background: #F0F9FF; color: #1E40AF; }
+        .tier-gold { background: #FFFBEB; color: #B45309; }
+        .tier-vip { background: #F5F3FF; color: #6D28D9; }
+
+        .action-button {
+            background: none;
+            border: none;
+            color: #3B82F6;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 8px;
+            transition: all 0.2s;
+        }
+        .action-button:hover { color: #1E40AF; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .modal.active { display: flex; }
+
+        .modal-panel {
+            background: white;
+            width: 450px;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 32px;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6B7280;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .modal-section {
+            margin-bottom: 24px;
+        }
+        .modal-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6B7280;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .user-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .user-avatar-large {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #FFCC00, #FFD700);
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .user-tier-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 13px;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #6B7280; }
+        .info-value { font-weight: 600; color: #111827; }
+
+        .address-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .address-item {
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .order-item {
+            padding: 12px;
+            background: #F9FAFB;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        .order-id { font-weight: 600; color: #3B82F6; }
+        .order-date { color: #6B7280; font-size: 11px; margin-top: 2px; }
+
+        .modal-button {
+            background: #FFCC00;
+            color: #111827;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            margin-right: 8px;
+            margin-top: 12px;
+            transition: all 0.2s;
+        }
+        .modal-button:hover { background: #FFD700; }
+        .modal-button.secondary {
+            background: #E5E7EB;
+            color: #111827;
+        }
+        .modal-button.secondary:hover { background: #D1D5DB; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .loyalty-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; height: auto; margin-bottom: 20px; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .stats-row { grid-template-columns: 1fr; }
+            .modal-panel { width: 100%; }
+            table { font-size: 12px; }
+            th, td { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle">MB</div>
+                <div>
+                    <div>Market by MoMo</div>
+                    <span class="admin-badge">ADMIN</span>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">MG</div>
+                <div class="user-info">
+                    <p>Malcolm Govender</p>
+                    <p>Super Admin</p>
+                </div>
+            </div>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Overview</div>
+                <div class="nav-item">📊 Dashboard</div>
+                <div class="nav-item">📈 Analytics</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Marketplace</div>
+                <div class="nav-item">📦 All Orders</div>
+                <div class="nav-item active">👥 Customers</div>
+                <div class="nav-item">🏪 Sellers</div>
+                <div class="nav-item">🗂 Products</div>
+                <div class="nav-item">🏷 Categories</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <div class="nav-item">💳 Transactions</div>
+                <div class="nav-item">💸 Payouts</div>
+                <div class="nav-item">📊 Reports</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">System</div>
+                <div class="nav-item">🔔 Notifications</div>
+                <div class="nav-item">🛡 Fraud & Risk</div>
+                <div class="nav-item">⚙️ Settings</div>
+                <div class="nav-item">👤 Admin Users</div>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="system-status">
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-dot"></span>
+                        <strong>System Status: All OK</strong>
+                    </div>
+                    <div style="font-size: 11px; color: #9CA3AF;">Version 2.4.1</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 class="page-title">Customer Management</h1>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value">10.4M</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">New Today</div>
+                    <div class="stat-value">312</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active (30D)</div>
+                    <div class="stat-value">2.1M</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Order Value</div>
+                    <div class="stat-value">UGX 185K</div>
+                </div>
+            </div>
+
+            <!-- Loyalty Distribution -->
+            <div class="loyalty-section">
+                <div class="loyalty-title">💎 Loyalty Tier Distribution</div>
+                <div class="loyalty-grid">
+                    <div class="loyalty-list">
+                        <div class="loyalty-item">
+                            <div>
+                                <div class="loyalty-label">Regular</div>
+                                <div class="loyalty-count">7.8M members</div>
+                            </div>
+                            <div style="text-align: right; color: #6B7280;">75%</div>
+                        </div>
+                        <div class="loyalty-item">
+                            <div>
+                                <div class="loyalty-label">Silver</div>
+                                <div class="loyalty-count">1.8M members</div>
+                            </div>
+                            <div style="text-align: right; color: #6B7280;">17%</div>
+                        </div>
+                        <div class="loyalty-item">
+                            <div>
+                                <div class="loyalty-label">Gold</div>
+                                <div class="loyalty-count">0.6M members</div>
+                            </div>
+                            <div style="text-align: right; color: #6B7280;">6%</div>
+                        </div>
+                        <div class="loyalty-item">
+                            <div>
+                                <div class="loyalty-label">VIP</div>
+                                <div class="loyalty-count">0.2M members</div>
+                            </div>
+                            <div style="text-align: right; color: #6B7280;">2%</div>
+                        </div>
+                    </div>
+
+                    <svg viewBox="0 0 200 200" height="200">
+                        <defs>
+                            <linearGradient id="tier-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#E5E7EB;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#D1D5DB;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Background circle -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#F3F4F6" stroke-width="25"/>
+
+                        <!-- Regular: 75% (270 degrees) -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#E5E7EB" stroke-width="25" stroke-dasharray="471.24 628.32" stroke-dashoffset="0" transform="rotate(-90 100 100)"/>
+
+                        <!-- Silver: 17% (61 degrees) -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#BFDBFE" stroke-width="25" stroke-dasharray="107 628.32" stroke-dashoffset="-471" transform="rotate(-90 100 100)"/>
+
+                        <!-- Gold: 6% (22 degrees) -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#FECACA" stroke-width="25" stroke-dasharray="38 628.32" stroke-dashoffset="-578" transform="rotate(-90 100 100)"/>
+
+                        <!-- VIP: 2% (7 degrees) -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#C4B5FD" stroke-width="25" stroke-dasharray="13 628.32" stroke-dashoffset="-616" transform="rotate(-90 100 100)"/>
+
+                        <!-- Center circle -->
+                        <circle cx="100" cy="100" r="55" fill="white"/>
+
+                        <!-- Center text -->
+                        <text x="100" y="105" font-size="16" font-weight="700" fill="#111827" text-anchor="middle" font-family="Outfit">10.4M</text>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <input type="text" class="filter-input" placeholder="Search by name, email, or phone...">
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox"></th>
+                            <th>User</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Location</th>
+                            <th>Joined</th>
+                            <th>Orders</th>
+                            <th>Spent</th>
+                            <th>Tier</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr onclick="openModal('user1')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">Sarah Nakato</span></td>
+                            <td>+256 772 456 789</td>
+                            <td>sarah@email.com</td>
+                            <td>Kampala</td>
+                            <td>12 Jan 2024</td>
+                            <td>24</td>
+                            <td>UGX 4.6M</td>
+                            <td><span class="tier-badge tier-gold">⭐ Gold</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user2')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">James Mutua</span></td>
+                            <td>+256 701 234 567</td>
+                            <td>james@email.com</td>
+                            <td>Nairobi</td>
+                            <td>5 Feb 2024</td>
+                            <td>18</td>
+                            <td>UGX 3.2M</td>
+                            <td><span class="tier-badge tier-silver">Silver</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user3')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">Amina Hassan</span></td>
+                            <td>+256 772 123 456</td>
+                            <td>amina@email.com</td>
+                            <td>Kampala</td>
+                            <td>20 Feb 2024</td>
+                            <td>8</td>
+                            <td>UGX 1.4M</td>
+                            <td><span class="tier-badge tier-regular">Regular</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user4')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">David Okongo</span></td>
+                            <td>+256 701 876 543</td>
+                            <td>david@email.com</td>
+                            <td>Mbarara</td>
+                            <td>1 Mar 2024</td>
+                            <td>42</td>
+                            <td>UGX 8.9M</td>
+                            <td><span class="tier-badge tier-vip">💎 VIP</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user5')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">Grace Nanjei</span></td>
+                            <td>+256 772 987 654</td>
+                            <td>grace@email.com</td>
+                            <td>Jinja</td>
+                            <td>15 Mar 2024</td>
+                            <td>5</td>
+                            <td>UGX 890K</td>
+                            <td><span class="tier-badge tier-regular">Regular</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user6')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">Peter Mwangi</span></td>
+                            <td>+256 701 543 210</td>
+                            <td>peter@email.com</td>
+                            <td>Kisumu</td>
+                            <td>20 Mar 2024</td>
+                            <td>31</td>
+                            <td>UGX 5.7M</td>
+                            <td><span class="tier-badge tier-gold">⭐ Gold</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user7')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">Rose Kyambadde</span></td>
+                            <td>+256 772 654 321</td>
+                            <td>rose@email.com</td>
+                            <td>Kampala</td>
+                            <td>2 Apr 2024</td>
+                            <td>12</td>
+                            <td>UGX 2.1M</td>
+                            <td><span class="tier-badge tier-silver">Silver</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user8')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">Michael Kiyimba</span></td>
+                            <td>+256 701 765 432</td>
+                            <td>michael@email.com</td>
+                            <td>Kampala</td>
+                            <td>8 Apr 2024</td>
+                            <td>3</td>
+                            <td>UGX 450K</td>
+                            <td><span class="tier-badge tier-regular">Regular</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user9')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">Lucy Achieng</span></td>
+                            <td>+256 772 321 098</td>
+                            <td>lucy@email.com</td>
+                            <td>Kisumu</td>
+                            <td>10 Apr 2024</td>
+                            <td>28</td>
+                            <td>UGX 6.8M</td>
+                            <td><span class="tier-badge tier-gold">⭐ Gold</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                        <tr onclick="openModal('user10')">
+                            <td><input type="checkbox"></td>
+                            <td><span class="user-name">Henry Walimu</span></td>
+                            <td>+256 701 098 765</td>
+                            <td>henry@email.com</td>
+                            <td>Dar es Salaam</td>
+                            <td>13 Apr 2024</td>
+                            <td>6</td>
+                            <td>UGX 1.2M</td>
+                            <td><span class="tier-badge tier-regular">Regular</span></td>
+                            <td><button class="action-button">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-panel">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+
+            <div class="modal-title">Customer Profile</div>
+
+            <!-- User Header -->
+            <div class="modal-section">
+                <div class="user-header">
+                    <div class="user-avatar-large">SN</div>
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 700;" id="modalUserName">Sarah Nakato</div>
+                    <span class="tier-badge tier-gold user-tier-badge" id="modalUserTier">⭐ Gold</span>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="modal-section">
+                <div class="modal-section-title">Contact Information</div>
+                <div class="info-row">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value" id="modalPhone">+256 772 456 789</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value" id="modalEmail">sarah@email.com</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Joined</span>
+                    <span class="info-value">12 Jan 2024</span>
+                </div>
+            </div>
+
+            <!-- Delivery Addresses -->
+            <div class="modal-section">
+                <div class="modal-section-title">Delivery Addresses</div>
+                <div class="address-list">
+                    <div class="address-item">
+                        <strong style="color: #111827;">Home - Kampala</strong>
+                        <div style="color: #6B7280; margin-top: 4px; font-size: 11px;">Kampala Central District</div>
+                    </div>
+                    <div class="address-item">
+                        <strong style="color: #111827;">Work - Kampala</strong>
+                        <div style="color: #6B7280; margin-top: 4px; font-size: 11px;">Kampala Business District</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase History -->
+            <div class="modal-section">
+                <div class="modal-section-title">Recent Orders (Last 5)</div>
+                <div class="order-item">
+                    <div class="order-id">#ORD-9921</div>
+                    <div style="color: #6B7280; margin-top: 2px;">UGX 890,000</div>
+                    <div class="order-date">2 hours ago</div>
+                </div>
+                <div class="order-item">
+                    <div class="order-id">#ORD-9918</div>
+                    <div style="color: #6B7280; margin-top: 2px;">UGX 340,000</div>
+                    <div class="order-date">3 days ago</div>
+                </div>
+                <div class="order-item">
+                    <div class="order-id">#ORD-9915</div>
+                    <div style="color: #6B7280; margin-top: 2px;">UGX 1,250,000</div>
+                    <div class="order-date">1 week ago</div>
+                </div>
+                <div class="order-item">
+                    <div class="order-id">#ORD-9912</div>
+                    <div style="color: #6B7280; margin-top: 2px;">UGX 280,000</div>
+                    <div class="order-date">2 weeks ago</div>
+                </div>
+                <div class="order-item">
+                    <div class="order-id">#ORD-9909</div>
+                    <div style="color: #6B7280; margin-top: 2px;">UGX 650,000</div>
+                    <div class="order-date">3 weeks ago</div>
+                </div>
+            </div>
+
+            <!-- Account Stats -->
+            <div class="modal-section">
+                <div class="modal-section-title">Account Statistics</div>
+                <div class="info-row">
+                    <span class="info-label">Total Orders</span>
+                    <span class="info-value">24</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Total Spent</span>
+                    <span class="info-value">UGX 4.6M</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Avg Order Value</span>
+                    <span class="info-value">UGX 192K</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Wishlist Items</span>
+                    <span class="info-value">7</span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-section">
+                <button class="modal-button" onclick="alert('Notification sent')">Send Notification</button>
+                <button class="modal-button secondary" onclick="alert('Orders displayed')">View Orders</button>
+                <button class="modal-button secondary" onclick="alert('Password reset')">Reset Password</button>
+                <button class="modal-button secondary" onclick="alert('Account suspended')" style="background: #FEE2E2; color: #991B1B;">Suspend Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userData = {
+            user1: { name: 'Sarah Nakato', phone: '+256 772 456 789', email: 'sarah@email.com', tier: '⭐ Gold' },
+            user2: { name: 'James Mutua', phone: '+256 701 234 567', email: 'james@email.com', tier: 'Silver' },
+            user3: { name: 'Amina Hassan', phone: '+256 772 123 456', email: 'amina@email.com', tier: 'Regular' },
+            user4: { name: 'David Okongo', phone: '+256 701 876 543', email: 'david@email.com', tier: '💎 VIP' },
+            user5: { name: 'Grace Nanjei', phone: '+256 772 987 654', email: 'grace@email.com', tier: 'Regular' },
+            user6: { name: 'Peter Mwangi', phone: '+256 701 543 210', email: 'peter@email.com', tier: '⭐ Gold' },
+            user7: { name: 'Rose Kyambadde', phone: '+256 772 654 321', email: 'rose@email.com', tier: 'Silver' },
+            user8: { name: 'Michael Kiyimba', phone: '+256 701 765 432', email: 'michael@email.com', tier: 'Regular' },
+            user9: { name: 'Lucy Achieng', phone: '+256 772 321 098', email: 'lucy@email.com', tier: '⭐ Gold' },
+            user10: { name: 'Henry Walimu', phone: '+256 701 098 765', email: 'henry@email.com', tier: 'Regular' }
+        };
+
+        function openModal(userId) {
+            const user = userData[userId];
+            document.getElementById('modalUserName').textContent = user.name;
+            document.getElementById('modalPhone').textContent = user.phone;
+            document.getElementById('modalEmail').textContent = user.email;
+            document.getElementById('modalUserTier').textContent = user.tier;
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').classList.remove('active');
+        }
+
+        document.getElementById('userModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>

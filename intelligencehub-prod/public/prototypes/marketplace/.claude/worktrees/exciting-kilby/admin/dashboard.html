@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Market by MoMo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #F3F4F6; color: #111827; }
+
+        .container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            color: white;
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            background: #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .admin-badge {
+            display: inline-block;
+            background: #EF4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .user-profile {
+            background: #1A1A2E;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            background: #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #111827;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .user-info { flex: 1; }
+        .user-info p:first-child { font-weight: 600; font-size: 13px; }
+        .user-info p:last-child { font-size: 12px; color: #9CA3AF; margin-top: 2px; }
+
+        .nav-section { margin-bottom: 32px; }
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #D1D5DB;
+            transition: all 0.2s;
+        }
+        .nav-item:hover { background: #1A1A2E; color: #FFCC00; }
+        .nav-item.active { background: #FFCC00; color: #111827; font-weight: 600; }
+
+        .sidebar-bottom {
+            border-top: 1px solid #1A1A2E;
+            padding-top: 16px;
+            margin-top: auto;
+        }
+        .system-status {
+            background: #1A1A2E;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 32px;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .greeting {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .date { font-size: 14px; color: #6B7280; }
+        .quick-action {
+            background: #FFCC00;
+            color: #111827;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .quick-action:hover { background: #FFD700; }
+        .status-pill {
+            background: #10B981;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .kpi-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .kpi-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .kpi-label {
+            font-size: 13px;
+            color: #6B7280;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .kpi-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .kpi-change {
+            font-size: 12px;
+            color: #10B981;
+            font-weight: 600;
+        }
+        .kpi-change.negative { color: #EF4444; }
+
+        /* Charts Row */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .chart-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .chart-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .period-tab {
+            background: #E5E7EB;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .period-tab.active {
+            background: #FFCC00;
+            color: #111827;
+        }
+
+        /* Right sidebar area */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Middle row cards */
+        .middle-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .card-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-section h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .seller-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 13px;
+        }
+        .seller-item:last-child { border-bottom: none; }
+        .seller-name { font-weight: 600; }
+        .seller-gmv { color: #10B981; font-weight: 600; }
+
+        .category-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .category-bar:last-child { border-bottom: none; }
+        .bar-fill {
+            flex: 1;
+            height: 24px;
+            background: linear-gradient(90deg, #FFCC00, #FFD700);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            color: #111827;
+        }
+        .category-count {
+            font-size: 12px;
+            color: #6B7280;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* Map placeholder */
+        .map-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #E5E7EB, #F3F4F6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6B7280;
+            font-size: 14px;
+        }
+
+        /* Feed */
+        .feed-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            grid-column: span 1;
+        }
+
+        .feed-item {
+            padding: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #FFCC00;
+            background: #F9FAFB;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .feed-item:last-child { margin-bottom: 0; }
+        .feed-time {
+            color: #6B7280;
+            font-size: 11px;
+            margin-top: 6px;
+        }
+
+        .feed-scroll {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        /* Health section */
+        .health-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #E5E7EB;
+            font-size: 13px;
+        }
+        .health-item:last-child { border-bottom: none; }
+        .health-status {
+            color: #10B981;
+            font-weight: 600;
+        }
+
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Charts SVG */
+        svg { display: block; width: 100%; height: auto; }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .charts-row { grid-template-columns: 1fr; }
+            .middle-row { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; height: auto; margin-bottom: 20px; }
+            .main-content { margin-left: 0; padding: 20px; }
+            .top-bar { flex-direction: column; gap: 16px; }
+            .kpi-grid { grid-template-columns: 1fr; }
+            .charts-row { grid-template-columns: 1fr; }
+            .middle-row { grid-template-columns: 1fr; }
+            .bottom-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle">MB</div>
+                <div>
+                    <div>Market by MoMo</div>
+                    <span class="admin-badge">ADMIN</span>
+                </div>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">MG</div>
+                <div class="user-info">
+                    <p>Malcolm Govender</p>
+                    <p>Super Admin</p>
+                </div>
+            </div>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Overview</div>
+                <div class="nav-item active">📊 Dashboard</div>
+                <div class="nav-item">📈 Analytics</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Marketplace</div>
+                <div class="nav-item">📦 All Orders</div>
+                <div class="nav-item">👥 Customers</div>
+                <div class="nav-item">🏪 Sellers</div>
+                <div class="nav-item">🗂 Products</div>
+                <div class="nav-item">🏷 Categories</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <div class="nav-item">💳 Transactions</div>
+                <div class="nav-item">💸 Payouts</div>
+                <div class="nav-item">📊 Reports</div>
+            </nav>
+
+            <nav class="nav-section">
+                <div class="nav-section-title">System</div>
+                <div class="nav-item">🔔 Notifications</div>
+                <div class="nav-item">🛡 Fraud & Risk</div>
+                <div class="nav-item">⚙️ Settings</div>
+                <div class="nav-item">👤 Admin Users</div>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="system-status">
+                    <div style="margin-bottom: 8px;">
+                        <span class="status-dot"></span>
+                        <strong>System Status: All OK</strong>
+                    </div>
+                    <div style="font-size: 11px; color: #9CA3AF;">Version 2.4.1</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="greeting">Good morning, Malcolm 👋</div>
+                <div class="top-bar-right">
+                    <div class="date" id="current-date"></div>
+                    <button class="quick-action">View Site →</button>
+                    <button class="quick-action">Send Notification</button>
+                    <div class="status-pill">🟢 All Systems OK</div>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon">💰</div>
+                    <div class="kpi-label">Platform GMV (Today)</div>
+                    <div class="kpi-value">UGX 48.2M</div>
+                    <div class="kpi-change">↑ +34%</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon">📦</div>
+                    <div class="kpi-label">Total Orders (Today)</div>
+                    <div class="kpi-value">1,847</div>
+                    <div class="kpi-change">↑ +22%</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon">👥</div>
+                    <div class="kpi-label">New Users (Today)</div>
+                    <div class="kpi-value">312</div>
+                    <div class="kpi-change">↑ +41%</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon">🏪</div>
+                    <div class="kpi-label">Active Sellers</div>
+                    <div class="kpi-value">52,847</div>
+                    <div class="kpi-change">↑ +8%</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon">💸</div>
+                    <div class="kpi-label">Commission Earned</div>
+                    <div class="kpi-value">UGX 4.8M</div>
+                    <div class="kpi-change">↑ +34%</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon">📱</div>
+                    <div class="kpi-label">MoMo Pay Volume</div>
+                    <div class="kpi-value">UGX 36.9M</div>
+                    <div class="kpi-change">↑ +28%</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-title">Revenue & GMV Trend</div>
+                    <div class="period-selector">
+                        <button class="period-tab">7D</button>
+                        <button class="period-tab active">14D</button>
+                        <button class="period-tab">30D</button>
+                        <button class="period-tab">90D</button>
+                    </div>
+                    <svg viewBox="0 0 600 250" height="250">
+                        <!-- Grid -->
+                        <line x1="50" y1="20" x2="50" y2="200" stroke="#E5E7EB" stroke-width="1"/>
+                        <line x1="50" y1="200" x2="580" y2="200" stroke="#E5E7EB" stroke-width="1"/>
+                        <!-- Horizontal gridlines -->
+                        <line x1="50" y1="50" x2="580" y2="50" stroke="#F3F4F6" stroke-width="1" stroke-dasharray="4"/>
+                        <line x1="50" y1="100" x2="580" y2="100" stroke="#F3F4F6" stroke-width="1" stroke-dasharray="4"/>
+                        <line x1="50" y1="150" x2="580" y2="150" stroke="#F3F4F6" stroke-width="1" stroke-dasharray="4"/>
+
+                        <!-- Y-axis labels -->
+                        <text x="40" y="205" font-size="11" fill="#6B7280">0M</text>
+                        <text x="25" y="155" font-size="11" fill="#6B7280">25M</text>
+                        <text x="25" y="105" font-size="11" fill="#6B7280">50M</text>
+                        <text x="25" y="55" font-size="11" fill="#6B7280">75M</text>
+
+                        <!-- GMV Area (Yellow) -->
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#FFCC00;stop-opacity:0.3" />
+                                <stop offset="100%" style="stop-color:#FFCC00;stop-opacity:0" />
+                            </linearGradient>
+                        </defs>
+                        <polygon points="50,140 90,100 130,120 170,80 210,90 250,60 290,70 330,50 370,65 410,45 450,55 490,40 530,50 570,35 570,200 50,200" fill="url(#grad1)" stroke="#FFCC00" stroke-width="2"/>
+
+                        <!-- Commission line (Blue) -->
+                        <polyline points="50,170 90,155 130,160 170,145 210,150 250,140 290,145 330,135 370,142 410,130 450,140 490,125 530,135 570,120" fill="none" stroke="#3B82F6" stroke-width="2"/>
+
+                        <!-- X-axis labels (days) -->
+                        <text x="50" y="220" font-size="11" fill="#6B7280" text-anchor="middle">Day 1</text>
+                        <text x="290" y="220" font-size="11" fill="#6B7280" text-anchor="middle">Day 7</text>
+                        <text x="570" y="220" font-size="11" fill="#6B7280" text-anchor="middle">Day 14</text>
+
+                        <!-- Legend -->
+                        <rect x="60" y="10" width="12" height="12" fill="#FFCC00" stroke="#999" stroke-width="1"/>
+                        <text x="80" y="20" font-size="11" fill="#111827" font-weight="600">GMV</text>
+
+                        <rect x="150" y="10" width="12" height="12" fill="#3B82F6" stroke="#999" stroke-width="1"/>
+                        <text x="170" y="20" font-size="11" fill="#111827" font-weight="600">Commission</text>
+                    </svg>
+                </div>
+
+                <div class="right-column">
+                    <div class="chart-card">
+                        <div class="chart-title">Payment Methods</div>
+                        <svg viewBox="0 0 250 180" height="180">
+                            <!-- Donut Chart -->
+                            <defs>
+                                <linearGradient id="momo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FFCC00;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#FFB700;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- Background circle -->
+                            <circle cx="80" cy="80" r="60" fill="none" stroke="#E5E7EB" stroke-width="20"/>
+
+                            <!-- MoMo: 68% (245 degrees) -->
+                            <circle cx="80" cy="80" r="60" fill="none" stroke="url(#momo-grad)" stroke-width="20" stroke-dasharray="277 408" stroke-dashoffset="0" transform="rotate(-90 80 80)"/>
+
+                            <!-- Card: 21% (76 degrees) -->
+                            <circle cx="80" cy="80" r="60" fill="none" stroke="#3B82F6" stroke-width="20" stroke-dasharray="85 408" stroke-dashoffset="-277" transform="rotate(-90 80 80)"/>
+
+                            <!-- BNPL: 11% (40 degrees) -->
+                            <circle cx="80" cy="80" r="60" fill="none" stroke="#8B5CF6" stroke-width="20" stroke-dasharray="44 408" stroke-dashoffset="-362" transform="rotate(-90 80 80)"/>
+
+                            <!-- Center circle -->
+                            <circle cx="80" cy="80" r="40" fill="white"/>
+
+                            <!-- Center text -->
+                            <text x="80" y="85" font-size="14" font-weight="700" fill="#111827" text-anchor="middle" font-family="Outfit">68%</text>
+
+                            <!-- Legend -->
+                            <rect x="160" y="20" width="12" height="12" fill="#FFCC00" stroke="#999" stroke-width="1"/>
+                            <text x="180" y="28" font-size="11" fill="#111827" font-weight="600">MoMo 68%</text>
+
+                            <rect x="160" y="50" width="12" height="12" fill="#3B82F6" stroke="#999" stroke-width="1"/>
+                            <text x="180" y="58" font-size="11" fill="#111827" font-weight="600">Card 21%</text>
+
+                            <rect x="160" y="80" width="12" height="12" fill="#8B5CF6" stroke="#999" stroke-width="1"/>
+                            <text x="180" y="88" font-size="11" fill="#111827" font-weight="600">BNPL 11%</text>
+                        </svg>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-title">Order Status</div>
+                        <svg viewBox="0 0 300 80" height="80">
+                            <!-- Delivered -->
+                            <rect x="10" y="10" width="60" height="20" fill="#10B981" rx="4"/>
+                            <text x="40" y="28" font-size="12" fill="white" text-anchor="middle" font-weight="600">Delivered</text>
+                            <text x="40" y="48" font-size="11" fill="#111827" text-anchor="middle" font-weight="600">724 (39%)</text>
+
+                            <!-- Processing -->
+                            <rect x="80" y="10" width="60" height="20" fill="#3B82F6" rx="4"/>
+                            <text x="110" y="28" font-size="12" fill="white" text-anchor="middle" font-weight="600">Processing</text>
+                            <text x="110" y="48" font-size="11" fill="#111827" text-anchor="middle" font-weight="600">698 (37%)</text>
+
+                            <!-- Shipped -->
+                            <rect x="150" y="10" width="60" height="20" fill="#14B8A6" rx="4"/>
+                            <text x="180" y="28" font-size="12" fill="white" text-anchor="middle" font-weight="600">Shipped</text>
+                            <text x="180" y="48" font-size="11" fill="#111827" text-anchor="middle" font-weight="600">428 (22%)</text>
+
+                            <!-- Cancelled -->
+                            <rect x="220" y="10" width="60" height="20" fill="#EF4444" rx="4"/>
+                            <text x="250" y="28" font-size="12" fill="white" text-anchor="middle" font-weight="600">Cancelled</text>
+                            <text x="250" y="48" font-size="11" fill="#111827" text-anchor="middle" font-weight="600">98 (5%)</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Row: 3 cards -->
+            <div class="middle-row">
+                <div class="card-section">
+                    <h3>🏆 Top Sellers Today</h3>
+                    <div class="seller-item">
+                        <span class="seller-name">1. TechHub Uganda</span>
+                        <span class="seller-gmv">UGX 890K</span>
+                    </div>
+                    <div class="seller-item">
+                        <span class="seller-name">2. FashionKampala</span>
+                        <span class="seller-gmv">UGX 680K</span>
+                    </div>
+                    <div class="seller-item">
+                        <span class="seller-name">3. GrocerFresh UG</span>
+                        <span class="seller-gmv">UGX 520K</span>
+                    </div>
+                    <div class="seller-item">
+                        <span class="seller-name">4. HomeDecor Africa</span>
+                        <span class="seller-gmv">UGX 340K</span>
+                    </div>
+                    <div class="seller-item">
+                        <span class="seller-name">5. SportZone UG</span>
+                        <span class="seller-gmv">UGX 280K</span>
+                    </div>
+                </div>
+
+                <div class="card-section">
+                    <h3>📊 Top Categories</h3>
+                    <div class="category-bar">
+                        <span style="min-width: 80px;">Electronics</span>
+                        <div class="bar-fill" style="flex-basis: 100%;">450 orders</div>
+                        <span class="category-count">24%</span>
+                    </div>
+                    <div class="category-bar">
+                        <span style="min-width: 80px;">Fashion</span>
+                        <div class="bar-fill" style="flex-basis: 62%;">280 orders</div>
+                        <span class="category-count">15%</span>
+                    </div>
+                    <div class="category-bar">
+                        <span style="min-width: 80px;">Supermarket</span>
+                        <div class="bar-fill" style="flex-basis: 58%;">260 orders</div>
+                        <span class="category-count">14%</span>
+                    </div>
+                    <div class="category-bar">
+                        <span style="min-width: 80px;">Home</span>
+                        <div class="bar-fill" style="flex-basis: 40%;">180 orders</div>
+                        <span class="category-count">10%</span>
+                    </div>
+                    <div class="category-bar">
+                        <span style="min-width: 80px;">Others</span>
+                        <div class="bar-fill" style="flex-basis: 37%;">677 orders</div>
+                        <span class="category-count">37%</span>
+                    </div>
+                </div>
+
+                <div class="card-section">
+                    <h3>🗺 Geographic Distribution</h3>
+                    <div class="map-placeholder">
+                        <svg width="100%" height="100%" viewBox="0 0 200 150" style="max-height: 180px;">
+                            <!-- Simple Uganda outline -->
+                            <path d="M 50 30 L 80 25 L 90 40 L 85 60 L 100 70 L 95 90 L 70 100 L 50 85 L 40 70 L 45 50 Z" fill="#E5E7EB" stroke="#999" stroke-width="1"/>
+
+                            <!-- District heat dots -->
+                            <circle cx="60" cy="50" r="6" fill="#FFCC00" opacity="0.8"/>
+                            <text x="60" y="53" font-size="10" text-anchor="middle" font-weight="600" fill="#111827">12K</text>
+
+                            <circle cx="75" cy="70" r="5" fill="#FFD700" opacity="0.8"/>
+                            <text x="75" y="73" font-size="9" text-anchor="middle" font-weight="600" fill="#111827">8K</text>
+
+                            <circle cx="50" cy="80" r="4" fill="#FFE680" opacity="0.8"/>
+                            <text x="50" y="82" font-size="8" text-anchor="middle" font-weight="600" fill="#111827">4K</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Feed + Health -->
+            <div class="bottom-row">
+                <div class="feed-card">
+                    <h3 class="chart-title">🔴 Live Activity Feed</h3>
+                    <div class="feed-scroll">
+                        <div class="feed-item">
+                            🟢 New order #ORD-9921 — UGX 890,000 — MoMo Payment
+                            <div class="feed-time">Just now</div>
+                        </div>
+                        <div class="feed-item">
+                            🔵 New seller registered — TechHub Mbarara
+                            <div class="feed-time">2 min ago</div>
+                        </div>
+                        <div class="feed-item">
+                            🟡 Promotion 'Flash Sale' started — TechMart
+                            <div class="feed-time">5 min ago</div>
+                        </div>
+                        <div class="feed-item">
+                            🔴 Order #ORD-9902 cancelled — Refund UGX 185,000
+                            <div class="feed-time">8 min ago</div>
+                        </div>
+                        <div class="feed-item">
+                            🟢 Seller payout processed — UGX 2,450,000 to TechHub
+                            <div class="feed-time">12 min ago</div>
+                        </div>
+                        <div class="feed-item">
+                            🔵 Dispute raised on order #ORD-9895 by buyer
+                            <div class="feed-time">18 min ago</div>
+                        </div>
+                        <div class="feed-item">
+                            🟡 Low inventory alert — Samsung Galaxy A54 (12 units left)
+                            <div class="feed-time">25 min ago</div>
+                        </div>
+                        <div class="feed-item">
+                            🟢 Customer refund approved — UGX 340,000
+                            <div class="feed-time">32 min ago</div>
+                        </div>
+                        <div class="feed-item">
+                            🔵 New category request from seller — 'Pet Supplies'
+                            <div class="feed-time">45 min ago</div>
+                        </div>
+                        <div class="feed-item">
+                            🟢 Daily backup completed successfully
+                            <div class="feed-time">1 hour ago</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feed-card">
+                    <h3 class="chart-title">⚙️ System Health</h3>
+                    <div class="health-item">
+                        <span>API Response Time</span>
+                        <span class="health-status">142ms ✅</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Database</span>
+                        <span class="health-status">Healthy ✅</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Payment Gateway</span>
+                        <span class="health-status">Online ✅</span>
+                    </div>
+                    <div class="health-item">
+                        <span>WhatsApp Bot</span>
+                        <span class="health-status">Active ✅</span>
+                    </div>
+                    <div class="health-item">
+                        <span>SMS Gateway</span>
+                        <span class="health-status">Active ✅</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Email Service</span>
+                        <span class="health-status">Online ✅</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Last Backup</span>
+                        <span class="health-status">2 hours ago ✅</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Uptime (30D)</span>
+                        <span class="health-status">99.98% ✅</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Set current date
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date().toLocaleDateString('en-US', options);
+        document.getElementById('current-date').textContent = today;
+    </script>
+</body>
+</html>

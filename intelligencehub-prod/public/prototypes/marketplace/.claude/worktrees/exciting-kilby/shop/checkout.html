@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Market by MoMo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #1A1A2E;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: #FFFFFF;
+            border-bottom: 1px solid #E0E0E0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-search {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #F8F9FA;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .search-bar {
+            background: #F8F9FA;
+            border: 1px solid #E0E0E0;
+            border-radius: 24px;
+            padding: 12px 20px;
+            width: 300px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .header-actions a {
+            color: #1A1A2E;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+        }
+
+        /* Step Indicators */
+        .step-indicators {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 48px;
+            justify-content: space-between;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            width: 50%;
+            height: 2px;
+            background: #E0E0E0;
+            z-index: 0;
+        }
+
+        .step.active:not(:last-child)::after {
+            background: #FFCC00;
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #F8F9FA;
+            border: 2px solid #E0E0E0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .step.active .step-circle {
+            background: #FFCC00;
+            border-color: #FFCC00;
+            color: #1A1A2E;
+        }
+
+        .step.completed .step-circle {
+            background: #00B074;
+            border-color: #00B074;
+            color: #FFFFFF;
+        }
+
+        .step-label {
+            margin-left: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .step.active .step-label {
+            color: #FFCC00;
+        }
+
+        /* Content Sections */
+        .checkout-content {
+            background: #FFFFFF;
+            border-radius: 8px;
+            border: 1px solid #E0E0E0;
+            padding: 40px;
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        /* Delivery Step */
+        .address-card {
+            border: 2px solid #FFCC00;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .address-card.inactive {
+            border-color: #E0E0E0;
+        }
+
+        .address-radio {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            accent-color: #FFCC00;
+            cursor: pointer;
+        }
+
+        .address-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .address-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .address-default {
+            display: inline-block;
+            background: #F8F9FA;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .add-address-btn {
+            color: #FFCC00;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: block;
+        }
+
+        .delivery-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .delivery-option {
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .delivery-option:hover {
+            border-color: #FFCC00;
+        }
+
+        .delivery-option.selected {
+            border-color: #FFCC00;
+            background: #FFFDF0;
+        }
+
+        .delivery-radio {
+            accent-color: #FFCC00;
+            cursor: pointer;
+        }
+
+        .delivery-info {
+            flex: 1;
+        }
+
+        .delivery-label {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .delivery-time {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .delivery-price {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: #FFCC00;
+        }
+
+        /* Payment Step */
+        .payment-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .payment-tab {
+            padding: 16px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .payment-tab:hover {
+            color: #1A1A2E;
+        }
+
+        .payment-tab.active {
+            color: #FFCC00;
+            border-bottom-color: #FFCC00;
+        }
+
+        .payment-panel {
+            display: none;
+        }
+
+        .payment-panel.active {
+            display: block;
+        }
+
+        /* MoMo Panel */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FFCC00;
+            background: #FFFDF0;
+        }
+
+        .form-help {
+            font-size: 13px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Card Panel */
+        .card-visualization {
+            background: linear-gradient(135deg, #1A1A2E 0%, #2D3561 100%);
+            border-radius: 12px;
+            padding: 24px;
+            color: #FFFFFF;
+            margin-bottom: 24px;
+            aspect-ratio: 16/10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: 'Courier', monospace;
+        }
+
+        .card-chip {
+            width: 50px;
+            height: 40px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-radius: 4px;
+        }
+
+        .card-number {
+            font-size: 24px;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .card-holder {
+            font-size: 14px;
+        }
+
+        .card-expiry {
+            font-size: 14px;
+        }
+
+        /* BNPL Panel */
+        .bnpl-container {
+            background: #F8F9FA;
+            border: 1px solid #7C3AED;
+            border-radius: 8px;
+            padding: 24px;
+        }
+
+        .bnpl-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #7C3AED;
+            margin-bottom: 20px;
+        }
+
+        .payment-schedule {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .payment-schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #FFFFFF;
+            border-radius: 6px;
+            border: 1px solid #E0E0E0;
+        }
+
+        .schedule-date {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .schedule-amount {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: #7C3AED;
+        }
+
+        .bnpl-features {
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            color: #666;
+            padding: 16px;
+            background: #FFFFFF;
+            border-radius: 6px;
+        }
+
+        /* Action Buttons */
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .btn-back {
+            flex: 1;
+            padding: 14px;
+            background: transparent;
+            color: #1A1A2E;
+            border: 2px solid #1A1A2E;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #F8F9FA;
+        }
+
+        .btn-next {
+            flex: 1;
+            padding: 14px;
+            background: #FFCC00;
+            color: #1A1A2E;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-next:hover {
+            background: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+        }
+
+        .btn-place-order {
+            width: 100%;
+            padding: 16px;
+            background: #FFCC00;
+            color: #1A1A2E;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-place-order:hover {
+            background: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+        }
+
+        /* Review Step */
+        .review-box {
+            background: #F8F9FA;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .review-label {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .review-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .checkout-content {
+                padding: 20px;
+            }
+
+            .step-indicators {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .step {
+                flex-direction: column;
+            }
+
+            .step:not(:last-child)::after {
+                display: none;
+            }
+
+            .step-label {
+                margin-left: 0;
+                margin-top: 8px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .payment-tabs {
+                flex-wrap: wrap;
+            }
+
+            .payment-tab {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-top">
+            <div class="logo">🛍 Market by MoMo</div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="page-title">Secure Checkout</div>
+
+        <!-- Step Indicators -->
+        <div class="step-indicators">
+            <div class="step active completed" id="step-0">
+                <div class="step-circle">✓</div>
+                <span class="step-label">Cart</span>
+            </div>
+            <div class="step active" id="step-1">
+                <div class="step-circle">2</div>
+                <span class="step-label">Delivery</span>
+            </div>
+            <div class="step" id="step-2">
+                <div class="step-circle">3</div>
+                <span class="step-label">Payment</span>
+            </div>
+            <div class="step" id="step-3">
+                <div class="step-circle">4</div>
+                <span class="step-label">Review</span>
+            </div>
+            <div class="step" id="step-4">
+                <div class="step-circle">5</div>
+                <span class="step-label">Confirm</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Delivery -->
+        <div class="checkout-content">
+            <div class="step-content active" id="content-1">
+                <div class="section-title">📍 Delivery Address</div>
+
+                <div class="address-card">
+                    <input type="radio" class="address-radio" name="address" checked>
+                    <div class="address-name">John Kamau</div>
+                    <div class="address-text">Plot 45, Kampala Road<br>Kampala, 256<br>Uganda</div>
+                    <span class="address-default">Default Address</span>
+                </div>
+
+                <div class="address-card inactive">
+                    <input type="radio" class="address-radio" name="address">
+                    <div class="address-name">Jane Doe</div>
+                    <div class="address-text">123 Main Street<br>Kampala, 256<br>Uganda</div>
+                </div>
+
+                <a href="#add" class="add-address-btn">+ Add new address</a>
+
+                <div style="margin-top: 40px;">
+                    <div class="section-title">🚚 Delivery Options</div>
+                    <div class="delivery-options">
+                        <label class="delivery-option selected">
+                            <input type="radio" class="delivery-radio" name="delivery" checked>
+                            <div class="delivery-info">
+                                <div class="delivery-label">Standard Delivery</div>
+                                <div class="delivery-time">2-3 business days</div>
+                            </div>
+                            <div class="delivery-price">FREE</div>
+                        </label>
+
+                        <label class="delivery-option">
+                            <input type="radio" class="delivery-radio" name="delivery">
+                            <div class="delivery-info">
+                                <div class="delivery-label">Express Delivery</div>
+                                <div class="delivery-time">Next business day</div>
+                            </div>
+                            <div class="delivery-price">UGX 5,000</div>
+                        </label>
+
+                        <label class="delivery-option">
+                            <input type="radio" class="delivery-radio" name="delivery">
+                            <div class="delivery-info">
+                                <div class="delivery-label">Same Day Delivery</div>
+                                <div class="delivery-time">Kampala only</div>
+                            </div>
+                            <div class="delivery-price">UGX 12,000</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-back" onclick="goBack()">← Back to Cart</button>
+                    <button class="btn-next" onclick="nextStep(2)">Continue to Payment →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Payment -->
+        <div class="checkout-content">
+            <div class="step-content" id="content-2">
+                <div class="section-title">💳 Payment Method</div>
+
+                <div class="payment-tabs">
+                    <button class="payment-tab active" onclick="switchPayment('momo')">🟡 Pay with MoMo</button>
+                    <button class="payment-tab" onclick="switchPayment('card')">💳 Pay with Card</button>
+                    <button class="payment-tab" onclick="switchPayment('bnpl')">🟣 Pay Later</button>
+                </div>
+
+                <!-- MoMo Panel -->
+                <div class="payment-panel active" id="panel-momo">
+                    <div class="logo-box">
+                        <div class="logo-icon">🟡</div>
+                        <div class="logo-text">MTN Mobile Money</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" placeholder="+256 ___________" value="+256 ">
+                        <div class="form-help">A prompt will be sent to your phone to confirm payment</div>
+                    </div>
+
+                    <div style="background: #F8F9FA; padding: 16px; border-radius: 6px; margin-bottom: 24px;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 12px;">💳 Amount to Pay</div>
+                        <div style="font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 700; color: #FFCC00;">UGX 856,440</div>
+                    </div>
+
+                    <button class="btn-next" style="width: 100%;" onclick="submitPayment()">Pay UGX 856,440 with MoMo →</button>
+                </div>
+
+                <!-- Card Panel -->
+                <div class="payment-panel" id="panel-card">
+                    <div class="card-visualization">
+                        <div class="card-chip"></div>
+                        <div class="card-number">•••• •••• •••• 4242</div>
+                        <div class="card-details">
+                            <div class="card-holder">CARDHOLDER</div>
+                            <div class="card-expiry">MM/YY</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Card Number</label>
+                        <input type="text" class="form-input" placeholder="1234 5678 9012 3456">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="text" class="form-input" placeholder="MM/YY">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CVV</label>
+                            <input type="text" class="form-input" placeholder="•••">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Cardholder Name</label>
+                        <input type="text" class="form-input" placeholder="John Kamau">
+                    </div>
+
+                    <button class="btn-next" style="width: 100%;" onclick="submitPayment()">Pay with Card →</button>
+                </div>
+
+                <!-- BNPL Panel -->
+                <div class="payment-panel" id="panel-bnpl">
+                    <div class="bnpl-container">
+                        <div class="bnpl-title">Split into 3 Payments (0% Interest)</div>
+
+                        <div class="payment-schedule">
+                            <div class="payment-schedule-item">
+                                <div class="schedule-date">Today</div>
+                                <div class="schedule-amount">UGX 285,480</div>
+                            </div>
+                            <div class="payment-schedule-item">
+                                <div class="schedule-date">In 30 days</div>
+                                <div class="schedule-amount">UGX 285,480</div>
+                            </div>
+                            <div class="payment-schedule-item">
+                                <div class="schedule-date">In 60 days</div>
+                                <div class="schedule-amount">UGX 285,480</div>
+                            </div>
+                        </div>
+
+                        <div class="bnpl-features">
+                            <div>✓ 0% interest</div>
+                            <div>✓ No hidden fees</div>
+                            <div>✓ Flexible terms</div>
+                        </div>
+
+                        <button class="btn-next" style="width: 100%; margin-top: 24px;" onclick="submitPayment()">Apply for Pay Later →</button>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 24px;">
+                    <button class="btn-back" onclick="prevStep(1)">← Back</button>
+                    <button class="btn-next" onclick="nextStep(3)">Continue to Review →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Review -->
+        <div class="checkout-content">
+            <div class="step-content" id="content-3">
+                <div class="section-title">✓ Review Order</div>
+
+                <div class="review-box">
+                    <span class="review-label">📦 Items (3)</span>
+                    <div class="review-content">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <div>Samsung Galaxy A54 (1×)</div>
+                            <div>UGX 890,000</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <div>Saachi Electric Kettle (1×)</div>
+                            <div>UGX 45,000</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>Grace Foam Duvet Set (1×)</div>
+                            <div>UGX 16,600</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-box">
+                    <span class="review-label">📍 Delivery Address</span>
+                    <div class="review-content">
+                        John Kamau<br>
+                        Plot 45, Kampala Road<br>
+                        Kampala, Uganda<br>
+                        <span style="margin-top: 8px; display: block;">Standard Delivery (2-3 days) - FREE</span>
+                    </div>
+                </div>
+
+                <div class="review-box">
+                    <span class="review-label">💳 Payment Method</span>
+                    <div class="review-content">
+                        🟡 MTN Mobile Money<br>
+                        <span style="margin-top: 8px; display: block;">Phone: +256 ___________</span>
+                    </div>
+                </div>
+
+                <div class="review-box" style="background: #FFFDF0; border: 2px solid #FFCC00;">
+                    <span class="review-label">💰 Order Total</span>
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; color: #FFCC00;">UGX 856,440</div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-back" onclick="prevStep(2)">← Back</button>
+                    <button class="btn-next" onclick="nextStep(4)">Place Order →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Confirm -->
+        <div class="checkout-content">
+            <div class="step-content" id="content-4">
+                <div class="section-title" style="text-align: center;">Order Confirmed! 🎉</div>
+                <div style="text-align: center; margin-top: 32px;">
+                    <div style="font-size: 16px; color: #666; margin-bottom: 16px;">Your order has been successfully placed.</div>
+                    <div style="font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: #FFCC00; margin-bottom: 32px;">Order #MBM-2024-789123</div>
+                    <button class="btn-next" onclick="goToSuccess()" style="width: 100%;">View Order Confirmation →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function nextStep(step) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`content-${step}`).classList.add('active');
+
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            for (let i = 0; i < step; i++) {
+                document.getElementById(`step-${i}`).classList.add('active');
+            }
+            if (step > 1) {
+                document.getElementById(`step-${step-1}`).classList.add('completed');
+                document.getElementById(`step-${step-1}`).classList.remove('active');
+            }
+
+            currentStep = step;
+            window.scrollTo(0, 0);
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        function goBack() {
+            window.location.href = 'cart.html';
+        }
+
+        function goToSuccess() {
+            window.location.href = 'order-success.html';
+        }
+
+        function switchPayment(method) {
+            document.querySelectorAll('.payment-panel').forEach(el => el.classList.remove('active'));
+            document.getElementById(`panel-${method}`).classList.add('active');
+
+            document.querySelectorAll('.payment-tab').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function submitPayment() {
+            alert('Payment processing...');
+            setTimeout(() => {
+                nextStep(3);
+            }, 1000);
+        }
+
+        // Delivery option selection
+        document.querySelectorAll('.delivery-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.delivery-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Address selection
+        document.querySelectorAll('.address-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.address-card').forEach(c => c.classList.remove('inactive'));
+                const others = Array.from(document.querySelectorAll('.address-card')).filter(c => c !== this);
+                others.forEach(o => o.classList.add('inactive'));
+            });
+        });
+    </script>
+</body>
+</html>

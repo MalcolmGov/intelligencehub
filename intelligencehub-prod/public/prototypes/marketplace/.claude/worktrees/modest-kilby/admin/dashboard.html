@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Market by MoMo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    :root{
+      --blue:#1B4F8A;--blue-d:#0E3A6B;--blue-l:#E8F1FA;--blue-gl:rgba(27,79,138,0.12);
+      --yellow:#FFCC00;--yellow-d:#D4A700;--yellow-gl:rgba(255,204,0,0.12);
+      --green:#00B074;--green-gl:rgba(0,176,116,0.12);
+      --red:#E53E3E;--red-gl:rgba(229,62,62,0.12);
+      --orange:#F6882A;--orange-gl:rgba(246,136,42,0.12);
+      --purple:#7C5CFC;--purple-gl:rgba(124,92,252,0.12);
+      --fh:'Plus Jakarta Sans',sans-serif;--fb:'Inter',sans-serif;
+      --ease:cubic-bezier(.4,0,.2,1);
+      --r-sm:6px;--r-md:10px;--r-lg:14px;--r-xl:20px;--r-full:9999px;
+      --sidebar-w:260px;
+    }
+    :root,[data-theme="light"]{
+      --bg:#F4F6FF;--bg-1:#FFFFFF;--bg-2:#EEF2FF;--bg-3:#E4EBFF;
+      --border:rgba(0,0,0,0.08);--border-hi:rgba(27,79,138,0.30);
+      --t1:#0A1628;--t2:#4B5675;--t3:#8B98B8;
+      --sh:0 2px 12px rgba(0,0,0,0.07);--sh-lg:0 8px 32px rgba(27,79,138,0.12);
+      --sidebar-bg:#0A1628;--sidebar-t:#CBD5E1;--sidebar-border:rgba(255,255,255,0.06);
+    }
+    [data-theme="dark"]{
+      --bg:#07070F;--bg-1:#0E0E1A;--bg-2:#141424;--bg-3:#1C1C30;
+      --border:rgba(255,255,255,0.07);--border-hi:rgba(27,79,138,0.55);
+      --t1:#FFFFFF;--t2:#A8A8C0;--t3:#64648A;
+      --sh:0 4px 24px rgba(0,0,0,0.5);--sh-lg:0 12px 40px rgba(0,0,0,0.6);
+      --sidebar-bg:#07070F;--sidebar-t:#94A3B8;--sidebar-border:rgba(255,255,255,0.05);
+    }
+    body{font-family:var(--fb);background:var(--bg);color:var(--t1);-webkit-font-smoothing:antialiased;display:flex;min-height:100vh;transition:background .3s var(--ease),color .3s var(--ease)}
+
+    /* ── SIDEBAR ── */
+    .sidebar{width:var(--sidebar-w);background:var(--sidebar-bg);color:#fff;position:fixed;left:0;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;border-right:1px solid var(--sidebar-border);z-index:200;transition:transform .3s var(--ease)}
+    .sidebar-head{padding:20px 16px;border-bottom:1px solid var(--sidebar-border)}
+    .sb-brand{display:flex;align-items:center;gap:10px;text-decoration:none;margin-bottom:16px}
+    .sb-brand-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--blue-d),var(--blue));border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sb-brand-icon svg{width:18px;height:18px;fill:white}
+    .sb-brand-name{font-family:var(--fh);font-weight:900;font-size:.9rem;color:#fff}
+    .sb-brand-name span{color:var(--yellow)}
+    .admin-pill{background:var(--red);color:#fff;padding:2px 8px;border-radius:var(--r-full);font-size:.62rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-block;margin-top:2px}
+    .admin-profile{background:rgba(255,255,255,0.05);border:1px solid var(--sidebar-border);border-radius:var(--r-lg);padding:12px;display:flex;align-items:center;gap:10px}
+    .admin-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--red),#C0392B);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:.82rem;color:#fff;flex-shrink:0}
+    .admin-info{flex:1;min-width:0}
+    .admin-name{font-family:var(--fh);font-weight:700;font-size:.82rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .admin-role{font-size:.68rem;color:var(--red);font-weight:600;margin-top:1px}
+    .online-dot{width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--sidebar-bg);flex-shrink:0}
+
+    .sb-nav{padding:12px 0;flex:1}
+    .sb-section{padding:0 10px;margin-bottom:6px}
+    .sb-section-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--sidebar-t);padding:0 8px;margin-bottom:4px;opacity:.5}
+    .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-md);color:var(--sidebar-t);font-size:.81rem;font-weight:500;cursor:pointer;transition:all .2s;text-decoration:none;position:relative;margin-bottom:1px}
+    .sb-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+    .sb-item.active{background:var(--blue);color:#fff;font-weight:600}
+    .sb-item svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
+    .sb-count{margin-left:auto;background:rgba(255,255,255,0.12);color:#fff;border-radius:var(--r-full);font-size:.62rem;font-weight:700;padding:1px 6px;min-width:18px;text-align:center}
+    .sb-count.red{background:var(--red)}
+    .sb-count.yellow{background:var(--yellow);color:#0A1628}
+
+    .sb-footer{padding:12px 10px;border-top:1px solid var(--sidebar-border)}
+    .sb-footer-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-md);color:var(--sidebar-t);font-size:.81rem;cursor:pointer;border:none;background:none;width:100%;transition:all .2s}
+    .sb-footer-item:hover{color:var(--red);background:rgba(229,62,62,0.08)}
+    .sb-footer-item svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+    /* ── MAIN ── */
+    .main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column}
+
+    /* ── TOP NAV ── */
+    .topnav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 28px;height:62px;display:flex;align-items:center;justify-content:space-between;transition:background .3s var(--ease)}
+    [data-theme="dark"] .topnav{background:rgba(14,14,26,0.92)}
+    .topnav-left{display:flex;align-items:center;gap:12px}
+    .hamburger{display:none;padding:7px;border:none;background:transparent;cursor:pointer;border-radius:var(--r-sm);color:var(--t2)}
+    .hamburger svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+    .breadcrumb{font-size:.78rem;color:var(--t3)}
+    .breadcrumb span{color:var(--t1);font-weight:600}
+    .live-badge{display:flex;align-items:center;gap:6px;background:var(--green-gl);color:var(--green);padding:4px 10px;border-radius:var(--r-full);font-size:.68rem;font-weight:700;border:1px solid rgba(0,176,116,0.2)}
+    .live-pulse{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 1.5s ease infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+    .topnav-right{display:flex;align-items:center;gap:8px}
+    .tnav-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;background:var(--bg-1);border:1.5px solid var(--border);border-radius:var(--r-full);color:var(--t2);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:var(--fh)}
+    .tnav-btn:hover{border-color:var(--border-hi);color:var(--t1)}
+    .tnav-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+    .tnav-btn.danger{border-color:rgba(229,62,62,0.3);color:var(--red)}
+    .tnav-btn.danger:hover{background:var(--red-gl)}
+    .theme-toggle{width:34px;height:34px;border-radius:var(--r-full);border:1.5px solid var(--border);background:var(--bg-2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .theme-toggle:hover{border-color:var(--border-hi)}
+    .theme-toggle svg{width:14px;height:14px;stroke:var(--t2);fill:none;stroke-width:2}
+    .notif-wrap{position:relative}
+    .notif-dot{position:absolute;top:3px;right:3px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--bg-1)}
+
+    /* ── PAGE ── */
+    .page{padding:28px;flex:1}
+    .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+    .page-title{font-family:var(--fh);font-weight:900;font-size:1.5rem;color:var(--t1);letter-spacing:-.02em}
+    .page-sub{font-size:.78rem;color:var(--t3);margin-top:3px}
+    .header-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--r-full);font-family:var(--fh);font-weight:700;font-size:.78rem;cursor:pointer;border:none;transition:all .2s;text-decoration:none;white-space:nowrap}
+    .btn-primary{background:var(--blue);color:#fff;box-shadow:0 4px 14px rgba(27,79,138,.3)}
+    .btn-primary:hover{background:var(--blue-d);transform:translateY(-1px)}
+    .btn-secondary{background:var(--bg-1);color:var(--t1);border:1.5px solid var(--border)}
+    .btn-secondary:hover{border-color:var(--border-hi);color:var(--blue)}
+    .btn-danger{background:var(--red-gl);color:var(--red);border:1.5px solid rgba(229,62,62,.2)}
+    .btn-danger:hover{background:var(--red);color:#fff}
+    .btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+    /* ── KPI CARDS ── */
+    .kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}
+    .kpi-card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-xl);padding:20px;transition:all .25s var(--ease);position:relative;overflow:hidden}
+    .kpi-card:hover{border-color:var(--border-hi);box-shadow:var(--sh-lg);transform:translateY(-2px)}
+    .kpi-card.featured{background:linear-gradient(135deg,#0E3A6B,#1B4F8A);border-color:transparent}
+    .kpi-card.featured .kpi-label,.kpi-card.featured .kpi-sub{color:rgba(255,255,255,.65)}
+    .kpi-card.featured .kpi-value{color:#fff}
+    .kpi-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+    .kpi-icon{width:38px;height:38px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .kpi-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+    .kpi-icon.blue{background:var(--blue-gl);color:var(--blue)}
+    .kpi-icon.yellow{background:var(--yellow-gl);color:#A07000}
+    .kpi-icon.green{background:var(--green-gl);color:var(--green)}
+    .kpi-icon.red{background:var(--red-gl);color:var(--red)}
+    .kpi-icon.purple{background:var(--purple-gl);color:var(--purple)}
+    .kpi-icon.white{background:rgba(255,255,255,.15);color:#fff}
+    .kpi-change{font-family:var(--fh);font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:var(--r-full)}
+    .kpi-change.up{background:var(--green-gl);color:var(--green)}
+    .kpi-change.down{background:var(--red-gl);color:var(--red)}
+    .kpi-card.featured .kpi-change.up{background:rgba(0,176,116,.25);color:#4ECCA3}
+    .kpi-label{font-size:.72rem;color:var(--t3);font-weight:500;margin-bottom:3px}
+    .kpi-value{font-family:var(--fh);font-weight:900;font-size:1.4rem;color:var(--t1);letter-spacing:-.02em;margin-bottom:2px}
+    .kpi-sub{font-size:.68rem;color:var(--t3)}
+
+    /* ── CHARTS ── */
+    .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px}
+    .chart-card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-xl);padding:22px}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+    .card-title{font-family:var(--fh);font-weight:800;font-size:.95rem;color:var(--t1)}
+    .card-sub{font-size:.7rem;color:var(--t3);margin-top:2px}
+    .period-tabs{display:flex;gap:3px;background:var(--bg-2);border-radius:var(--r-full);padding:3px}
+    .ptab{padding:4px 11px;border-radius:var(--r-full);font-size:.7rem;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--t3);font-family:var(--fh);transition:all .2s}
+    .ptab.active{background:var(--bg-1);color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+    .chart-wrap{position:relative;height:210px}
+    .chart-wrap-sm{position:relative;height:180px}
+
+    /* ── SECTION CARD ── */
+    .section-card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:20px}
+    .section-head{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .search-box{position:relative;flex:1;max-width:260px}
+    .search-box input{width:100%;padding:7px 10px 7px 32px;background:var(--bg-2);border:1.5px solid var(--border);border-radius:var(--r-full);font-size:.78rem;color:var(--t1);outline:none;font-family:var(--fb);transition:all .2s}
+    .search-box input:focus{border-color:var(--blue);background:var(--bg-1)}
+    .search-box input::placeholder{color:var(--t3)}
+    .search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--t3)}
+    .search-icon svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+    .filter-sel{padding:7px 10px;background:var(--bg-2);border:1.5px solid var(--border);border-radius:var(--r-full);font-size:.76rem;color:var(--t1);outline:none;font-family:var(--fb);cursor:pointer}
+    .table-wrap{overflow-x:auto}
+    table{width:100%;border-collapse:collapse}
+    th{padding:11px 14px;text-align:left;font-size:.68rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);background:var(--bg-2);white-space:nowrap}
+    td{padding:13px 14px;font-size:.8rem;color:var(--t2);border-bottom:1px solid var(--border);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tbody tr:hover{background:var(--bg-2)}
+    .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:var(--r-full);font-size:.66rem;font-weight:700;white-space:nowrap}
+    .badge::before{content:'';width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .badge-verified{background:var(--green-gl);color:var(--green)}
+    .badge-pending{background:var(--orange-gl);color:var(--orange)}
+    .badge-suspended{background:var(--red-gl);color:var(--red)}
+    .badge-active{background:var(--blue-gl);color:var(--blue)}
+    .badge-inactive{background:var(--border);color:var(--t3)}
+    .badge-flagged{background:var(--red-gl);color:var(--red)}
+    .user-cell{display:flex;align-items:center;gap:8px}
+    .user-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+    .user-av.blue{background:var(--blue-gl);color:var(--blue)}
+    .user-av.green{background:var(--green-gl);color:var(--green)}
+    .user-av.purple{background:var(--purple-gl);color:var(--purple)}
+    .user-av.orange{background:var(--orange-gl);color:var(--orange)}
+    .user-av.red{background:var(--red-gl);color:var(--red)}
+    .user-name{font-weight:600;color:var(--t1);font-size:.8rem}
+    .user-email{font-size:.68rem;color:var(--t3)}
+    .stars{color:var(--yellow-d);font-size:.78rem;letter-spacing:.05em}
+    .table-actions{display:flex;gap:6px}
+    .tbl-btn{padding:4px 10px;border-radius:var(--r-sm);font-size:.68rem;font-weight:700;cursor:pointer;border:1.5px solid;font-family:var(--fh);transition:all .2s}
+    .tbl-btn.approve{border-color:rgba(0,176,116,.3);color:var(--green);background:var(--green-gl)}
+    .tbl-btn.approve:hover{background:var(--green);color:#fff;border-color:var(--green)}
+    .tbl-btn.suspend{border-color:rgba(229,62,62,.3);color:var(--red);background:var(--red-gl)}
+    .tbl-btn.suspend:hover{background:var(--red);color:#fff;border-color:var(--red)}
+    .tbl-btn.view{border-color:var(--border);color:var(--t2);background:transparent}
+    .tbl-btn.view:hover{border-color:var(--border-hi);color:var(--blue)}
+    .tbl-btn.reject{border-color:rgba(229,62,62,.3);color:var(--red);background:var(--red-gl)}
+    .tbl-btn.reject:hover{background:var(--red);color:#fff}
+    .pagination{padding:14px 22px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:.75rem;color:var(--t3)}
+    .page-nums{display:flex;gap:3px}
+    .pg-btn{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;border:1.5px solid var(--border);cursor:pointer;font-size:.75rem;font-weight:600;background:transparent;color:var(--t2);transition:all .2s}
+    .pg-btn:hover{border-color:var(--border-hi);color:var(--blue)}
+    .pg-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
+    /* ── MIDDLE ROW ── */
+    .mid-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
+
+    /* ── ACTIVITY FEED ── */
+    .feed-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+    .feed-item:last-child{border-bottom:none}
+    .feed-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+    .feed-icon svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+    .feed-icon.order{background:var(--blue-gl);color:var(--blue)}
+    .feed-icon.signup{background:var(--green-gl);color:var(--green)}
+    .feed-icon.product{background:var(--purple-gl);color:var(--purple)}
+    .feed-icon.flag{background:var(--red-gl);color:var(--red)}
+    .feed-icon.payout{background:var(--yellow-gl);color:#A07000}
+    .feed-text{flex:1;min-width:0}
+    .feed-msg{font-size:.8rem;color:var(--t1);line-height:1.4;margin-bottom:2px}
+    .feed-msg strong{color:var(--t1);font-weight:600}
+    .feed-time{font-size:.68rem;color:var(--t3)}
+
+    /* ── HEALTH GAUGES ── */
+    .health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px}
+    .health-item{background:var(--bg-2);border-radius:var(--r-lg);padding:14px}
+    .health-label{font-size:.72rem;color:var(--t3);margin-bottom:8px;font-weight:500}
+    .health-val{font-family:var(--fh);font-weight:800;font-size:1.3rem;color:var(--t1);margin-bottom:6px}
+    .health-bar{height:6px;background:var(--bg-3);border-radius:var(--r-full);overflow:hidden}
+    .health-fill{height:100%;border-radius:var(--r-full);transition:width .8s var(--ease)}
+    .health-fill.good{background:var(--green)}
+    .health-fill.warn{background:var(--orange)}
+    .health-fill.bad{background:var(--red)}
+    .health-change{font-size:.68rem;margin-top:4px}
+    .health-change.good{color:var(--green)}
+    .health-change.bad{color:var(--red)}
+
+    /* ── GEO CHART ── */
+    .geo-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+    .geo-item:last-child{border-bottom:none}
+    .geo-rank{font-family:var(--fh);font-weight:800;font-size:.78rem;color:var(--t3);width:18px;flex-shrink:0}
+    .geo-info{flex:1;min-width:0}
+    .geo-city{font-weight:600;font-size:.8rem;color:var(--t1);margin-bottom:3px}
+    .geo-bar-wrap{height:4px;background:var(--bg-3);border-radius:var(--r-full);overflow:hidden}
+    .geo-bar{height:100%;border-radius:var(--r-full);background:linear-gradient(90deg,var(--blue-d),var(--blue))}
+    .geo-count{font-family:var(--fh);font-weight:700;font-size:.8rem;color:var(--t1);flex-shrink:0}
+
+    /* ── FINANCIAL SUMMARY ── */
+    .fin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:16px}
+    .fin-item{background:var(--bg-2);border-radius:var(--r-lg);padding:14px;text-align:center}
+    .fin-val{font-family:var(--fh);font-weight:900;font-size:1.2rem;color:var(--t1);margin-bottom:2px}
+    .fin-label{font-size:.7rem;color:var(--t3)}
+
+    /* ── PRODUCT MODERATION ── */
+    .mod-item{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--border)}
+    .mod-item:last-child{border-bottom:none}
+    .mod-thumb{width:44px;height:44px;border-radius:var(--r-md);background:var(--bg-3);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+    .mod-info{flex:1;min-width:0}
+    .mod-name{font-weight:600;font-size:.82rem;color:var(--t1);margin-bottom:2px}
+    .mod-seller{font-size:.7rem;color:var(--t3)}
+    .mod-reason{font-size:.7rem;color:var(--red);margin-top:2px;font-weight:500}
+    .mod-actions{display:flex;gap:6px;flex-shrink:0}
+
+    /* ── OVERLAY + TOAST ── */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190;backdrop-filter:blur(2px)}
+    .overlay.show{display:block}
+    .toast-container{position:fixed;bottom:20px;right:20px;z-index:1000;display:flex;flex-direction:column;gap:8px}
+    .toast{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-lg);font-size:.8rem;color:var(--t1);transform:translateX(120%);transition:transform .35s var(--ease);min-width:260px}
+    .toast.show{transform:translateX(0)}
+    .toast-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .toast-icon.success{background:var(--green-gl);color:var(--green)}
+    .toast-icon.error{background:var(--red-gl);color:var(--red)}
+    .toast-icon.warn{background:var(--orange-gl);color:var(--orange)}
+    .toast-icon svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2.5}
+    .toast-msg{flex:1;font-weight:500}
+    .toast-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:.9rem;padding:0}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:1400px){.kpi-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)};.mid-row{grid-template-columns:1fr 1fr}}
+    @media(max-width:1000px){.charts-row{grid-template-columns:1fr};.mid-row{grid-template-columns:1fr}}
+    @media(max-width:768px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.open{transform:translateX(0)}
+      .main{margin-left:0}
+      .hamburger{display:flex}
+      .page{padding:16px}
+      .kpi-grid{grid-template-columns:1fr 1fr}
+      .topnav{padding:0 14px}
+      .fin-grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:480px){.kpi-grid{grid-template-columns:1fr};.fin-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <a href="../index.html" class="sb-brand">
+        <div class="sb-brand-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </div>
+        <div>
+          <div class="sb-brand-name">Market<span>MoMo</span></div>
+          <span class="admin-pill">Admin</span>
+        </div>
+      </a>
+      <div class="admin-profile">
+        <div class="admin-avatar">SA</div>
+        <div class="admin-info">
+          <div class="admin-name">Super Admin</div>
+          <div class="admin-role">Platform Administrator</div>
+        </div>
+        <div class="online-dot"></div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="sb-section">
+        <div class="sb-section-label">Overview</div>
+        <a href="dashboard.html" class="sb-item active">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </a>
+        <a href="reports.html" class="sb-item">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Reports
+        </a>
+      </div>
+      <div class="sb-section">
+        <div class="sb-section-label">People</div>
+        <a href="users.html" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Users
+          <span class="sb-count">12,480</span>
+        </a>
+        <a href="sellers.html" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><line x1="12" y1="12" x2="12.01" y2="12"/></svg>
+          Sellers
+          <span class="sb-count yellow">14</span>
+        </a>
+      </div>
+      <div class="sb-section">
+        <div class="sb-section-label">Commerce</div>
+        <a href="orders.html" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Orders
+          <span class="sb-count red">47</span>
+        </a>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Products
+          <span class="sb-count red">6</span>
+        </a>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Categories
+        </a>
+      </div>
+      <div class="sb-section">
+        <div class="sb-section-label">Finance</div>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Finance
+        </a>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+          Payouts
+        </a>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Disputes
+        </a>
+      </div>
+      <div class="sb-section">
+        <div class="sb-section-label">System</div>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+          Settings
+        </a>
+        <a href="#" class="sb-item">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Security
+        </a>
+      </div>
+    </nav>
+
+    <div class="sb-footer">
+      <button class="sb-footer-item" onclick="toast('Logged out','warn')">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <header class="topnav">
+      <div class="topnav-left">
+        <button class="hamburger" onclick="toggleSidebar()">
+          <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <span class="breadcrumb">Admin / <span>Dashboard</span></span>
+        <div class="live-badge"><span class="live-pulse"></span>Live</div>
+      </div>
+      <div class="topnav-right">
+        <button class="tnav-btn notif-wrap" onclick="toast('7 pending actions need review','warn')">
+          <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Alerts
+          <span class="sb-count red" style="margin-left:2px">7</span>
+          <span class="notif-dot"></span>
+        </button>
+        <a href="reports.html" class="tnav-btn">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Reports
+        </a>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title">Platform Overview</div>
+          <div class="page-sub">Market by MoMo · April 15, 2026 · All data live</div>
+        </div>
+        <div class="header-actions">
+          <a href="reports.html" class="btn btn-secondary">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            View Reports
+          </a>
+          <button class="btn btn-primary" onclick="toast('System diagnostics running…','success')">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            System Health
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card featured">
+          <div class="kpi-top">
+            <div class="kpi-icon white">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <span class="kpi-change up">+22.1%</span>
+          </div>
+          <div class="kpi-label">Total GMV (MTD)</div>
+          <div class="kpi-value">R 2.4M</div>
+          <div class="kpi-sub">R 1.97M last month</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon blue">
+              <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <span class="kpi-change up">+8.4%</span>
+          </div>
+          <div class="kpi-label">Active Users</div>
+          <div class="kpi-value">12,480</div>
+          <div class="kpi-sub">+342 this week</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon green">
+              <svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+            </div>
+            <span class="kpi-change up">+5.2%</span>
+          </div>
+          <div class="kpi-label">Active Sellers</div>
+          <div class="kpi-value">847</div>
+          <div class="kpi-sub">14 pending verification</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon yellow">
+              <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            </div>
+            <span class="kpi-change up">+15.7%</span>
+          </div>
+          <div class="kpi-label">Total Orders (MTD)</div>
+          <div class="kpi-value">8,924</div>
+          <div class="kpi-sub">47 pending dispatch</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-icon purple">
+              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <span class="kpi-change up">+18.3%</span>
+          </div>
+          <div class="kpi-label">Commission Earned</div>
+          <div class="kpi-value">R 192K</div>
+          <div class="kpi-sub">8% avg commission rate</div>
+        </div>
+      </div>
+
+      <!-- Revenue & User Growth Charts -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Platform Revenue vs Seller Payouts</div>
+              <div class="card-sub">Monthly comparison — commission vs payouts</div>
+            </div>
+            <div class="period-tabs">
+              <button class="ptab" onclick="switchRevPeriod('3m',this)">3M</button>
+              <button class="ptab active" onclick="switchRevPeriod('6m',this)">6M</button>
+              <button class="ptab" onclick="switchRevPeriod('1y',this)">1Y</button>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="revChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">New Users & Sellers</div>
+              <div class="card-sub">Monthly registrations</div>
+            </div>
+          </div>
+          <div class="chart-wrap-sm"><canvas id="userGrowthChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Mid row: Activity Feed, Geo, Health -->
+      <div class="mid-row">
+        <!-- Activity Feed -->
+        <div class="section-card" style="margin-bottom:0">
+          <div class="section-head">
+            <div>
+              <div class="card-title">Live Activity Feed</div>
+              <div class="card-sub">Real-time platform events</div>
+            </div>
+            <div class="live-badge"><span class="live-pulse"></span>Live</div>
+          </div>
+          <div style="padding:4px 20px 8px" id="activityFeed"></div>
+        </div>
+
+        <!-- Geographic Distribution -->
+        <div class="section-card" style="margin-bottom:0">
+          <div class="section-head">
+            <div>
+              <div class="card-title">Top Regions</div>
+              <div class="card-sub">Order volume by city</div>
+            </div>
+          </div>
+          <div style="padding:4px 20px 12px" id="geoList"></div>
+          <div style="padding:0 16px 16px">
+            <div class="chart-wrap-sm"><canvas id="geoChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Platform Health -->
+        <div class="section-card" style="margin-bottom:0">
+          <div class="section-head">
+            <div>
+              <div class="card-title">Platform Health</div>
+              <div class="card-sub">Key performance indicators</div>
+            </div>
+          </div>
+          <div class="health-grid">
+            <div class="health-item">
+              <div class="health-label">Fulfillment Rate</div>
+              <div class="health-val">94.7%</div>
+              <div class="health-bar"><div class="health-fill good" style="width:94.7%"></div></div>
+              <div class="health-change good">+1.2% vs last month</div>
+            </div>
+            <div class="health-item">
+              <div class="health-label">Avg Delivery Time</div>
+              <div class="health-val">2.4 days</div>
+              <div class="health-bar"><div class="health-fill good" style="width:75%"></div></div>
+              <div class="health-change good">-0.3 days improved</div>
+            </div>
+            <div class="health-item">
+              <div class="health-label">Dispute Rate</div>
+              <div class="health-val">1.8%</div>
+              <div class="health-bar"><div class="health-fill warn" style="width:18%"></div></div>
+              <div class="health-change bad">+0.2% vs last month</div>
+            </div>
+            <div class="health-item">
+              <div class="health-label">Return Rate</div>
+              <div class="health-val">4.2%</div>
+              <div class="health-bar"><div class="health-fill warn" style="width:42%"></div></div>
+              <div class="health-change good">-0.5% improved</div>
+            </div>
+          </div>
+          <!-- Financial Summary -->
+          <div class="section-head" style="padding:14px 22px">
+            <div class="card-title">Financial Summary</div>
+          </div>
+          <div class="fin-grid">
+            <div class="fin-item">
+              <div class="fin-val" style="color:var(--green)">R 192K</div>
+              <div class="fin-label">Commission Earned</div>
+            </div>
+            <div class="fin-item">
+              <div class="fin-val" style="color:var(--orange)">R 84K</div>
+              <div class="fin-label">Pending Payouts</div>
+            </div>
+            <div class="fin-item">
+              <div class="fin-val" style="color:var(--red)">R 12K</div>
+              <div class="fin-label">Refunds Processed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seller Management Table -->
+      <div class="section-card" style="margin-top:20px">
+        <div class="section-head">
+          <div>
+            <div class="card-title">Seller Management</div>
+            <div class="card-sub">847 active sellers · 14 pending verification</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="text" placeholder="Search sellers…" oninput="filterSellers(this.value)">
+            </div>
+            <select class="filter-sel" onchange="filterSellerStatus(this.value)">
+              <option value="">All Status</option>
+              <option value="Verified">Verified</option>
+              <option value="Pending">Pending</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Seller</th>
+                <th>Store</th>
+                <th>Status</th>
+                <th>Total Sales</th>
+                <th>Rating</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sellersBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span>Showing 1–8 of 847 sellers</span>
+          <div class="page-nums">
+            <button class="pg-btn active">1</button>
+            <button class="pg-btn">2</button>
+            <button class="pg-btn">3</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Moderation -->
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <div class="card-title">Product Moderation</div>
+            <div class="card-sub">Flagged products requiring review</div>
+          </div>
+          <span class="badge badge-flagged">6 flagged</span>
+        </div>
+        <div id="moderationList"></div>
+      </div>
+
+      <!-- User Management Table -->
+      <div class="section-card">
+        <div class="section-head">
+          <div>
+            <div class="card-title">User Management</div>
+            <div class="card-sub">12,480 registered users</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <div class="search-box">
+              <span class="search-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <input type="text" placeholder="Search users…">
+            </div>
+            <select class="filter-sel">
+              <option>All Roles</option>
+              <option>Buyer</option>
+              <option>Seller</option>
+              <option>Admin</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Orders</th>
+                <th>Total Spend</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span>Showing 1–8 of 12,480 users</span>
+          <div class="page-nums">
+            <button class="pg-btn active">1</button>
+            <button class="pg-btn">2</button>
+            <button class="pg-btn">3</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // ── THEME ──
+    function toggleTheme(){
+      const html=document.documentElement;
+      const dark=html.getAttribute('data-theme')==='dark';
+      html.setAttribute('data-theme',dark?'light':'dark');
+      document.querySelector('.icon-moon').style.display=dark?'':'none';
+      document.querySelector('.icon-sun').style.display=dark?'none':'';
+      updateChartsTheme();
+    }
+    function isDark(){return document.documentElement.getAttribute('data-theme')==='dark'}
+
+    // ── SIDEBAR ──
+    function toggleSidebar(){
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('show');
+    }
+
+    // ── TOAST ──
+    function toast(msg,type='success'){
+      const c=document.getElementById('toastContainer');
+      const t=document.createElement('div');t.className='toast';
+      const icons={success:'<polyline points="20 6 9 17 4 12"/>',error:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',warn:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'};
+      t.innerHTML=`<div class="toast-icon ${type}"><svg viewBox="0 0 24 24">${icons[type]||icons.success}</svg></div><span class="toast-msg">${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
+      c.appendChild(t);setTimeout(()=>t.classList.add('show'),10);
+      setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),350)},3500);
+    }
+
+    // ── MOCK DATA ──
+    const sellers=[
+      {name:'Thabo Khumalo',store:'TechKing Gadgets',avatar:'TK',avatarColor:'blue',status:'Verified',sales:'R 284,920',rating:4.8,joined:'Jan 2024'},
+      {name:'Amara Osei',store:'Afro Fashion Hub',avatar:'AO',avatarColor:'green',status:'Verified',sales:'R 192,400',rating:4.7,joined:'Mar 2024'},
+      {name:'Zanele Mokoena',store:'Beauty Palace ZA',avatar:'ZM',avatarColor:'purple',status:'Pending',sales:'R 12,800',rating:4.5,joined:'Apr 2026'},
+      {name:'Carlos Mensah',store:'Sport Life Store',avatar:'CM',avatarColor:'orange',status:'Verified',sales:'R 88,200',rating:4.6,joined:'Jun 2024'},
+      {name:'Priya Naidoo',store:'Home & Living Co',avatar:'PN',avatarColor:'blue',status:'Suspended',sales:'R 34,600',rating:3.2,joined:'Aug 2024'},
+      {name:'Kwame Asante',store:'GamingZone Africa',avatar:'KA',avatarColor:'green',status:'Verified',sales:'R 156,800',rating:4.9,joined:'Feb 2024'},
+      {name:'Fatima Khalid',store:'Organic Kitchen',avatar:'FK',avatarColor:'orange',status:'Pending',sales:'R 4,200',rating:4.4,joined:'Apr 2026'},
+      {name:'Liam van Wyk',store:'Pet Paradise',avatar:'LV',avatarColor:'purple',status:'Verified',sales:'R 62,100',rating:4.5,joined:'Sep 2024'},
+    ];
+
+    const statusBadge={Verified:'badge-verified',Pending:'badge-pending',Suspended:'badge-suspended'};
+    const sellerActions={
+      Verified:'<button class="tbl-btn view" onclick="toast(\'Seller profile opened\',\'success\')">View</button><button class="tbl-btn suspend" onclick="toast(\'Seller suspended\',\'warn\')">Suspend</button>',
+      Pending:'<button class="tbl-btn approve" onclick="toast(\'Seller approved!\',\'success\')">Approve</button><button class="tbl-btn reject" onclick="toast(\'Seller rejected\',\'error\')">Reject</button>',
+      Suspended:'<button class="tbl-btn approve" onclick="toast(\'Seller reinstated\',\'success\')">Reinstate</button><button class="tbl-btn view" onclick="toast(\'Viewing seller\',\'success\')">View</button>',
+    };
+
+    function renderSellers(data){
+      document.getElementById('sellersBody').innerHTML=data.map(s=>`
+        <tr>
+          <td><div class="user-cell"><div class="user-av ${s.avatarColor}">${s.avatar}</div><div><div class="user-name">${s.name}</div></div></div></td>
+          <td style="font-weight:600;color:var(--t1)">${s.store}</td>
+          <td><span class="badge ${statusBadge[s.status]}">${s.status}</span></td>
+          <td style="font-family:var(--fh);font-weight:700;color:var(--t1)">${s.sales}</td>
+          <td><span class="stars">${'★'.repeat(Math.round(s.rating))}</span> <span style="font-size:.75rem;color:var(--t3)">${s.rating}</span></td>
+          <td style="color:var(--t3)">${s.joined}</td>
+          <td><div class="table-actions">${sellerActions[s.status]}</div></td>
+        </tr>`).join('');
+    }
+
+    function filterSellers(q){renderSellers(sellers.filter(s=>s.name.toLowerCase().includes(q.toLowerCase())||s.store.toLowerCase().includes(q.toLowerCase())))}
+    function filterSellerStatus(v){renderSellers(v?sellers.filter(s=>s.status===v):sellers)}
+    renderSellers(sellers);
+
+    // ── USERS ──
+    const users=[
+      {name:'Sipho Ndlovu',email:'sipho@gmail.com',avatar:'SN',avatarColor:'blue',role:'Buyer',status:'Active',orders:24,spend:'R 12,400',joined:'Feb 2024'},
+      {name:'Nomsa Dlamini',email:'nomsa@outlook.com',avatar:'ND',avatarColor:'green',role:'Buyer',status:'Active',orders:12,spend:'R 5,800',joined:'Mar 2024'},
+      {name:'Ethan Botha',email:'ethan@gmail.com',avatar:'EB',avatarColor:'purple',role:'Seller',status:'Active',orders:0,spend:'R 0',joined:'Jan 2024'},
+      {name:'Zara Petersen',email:'zara@gmail.com',avatar:'ZP',avatarColor:'orange',role:'Buyer',status:'Inactive',orders:3,spend:'R 1,200',joined:'Apr 2025'},
+      {name:'John Dlamini',email:'jdlamini@gmail.com',avatar:'JD',avatarColor:'red',role:'Buyer',status:'Banned',orders:8,spend:'R 3,400',joined:'Nov 2024'},
+      {name:'Grace Okonkwo',email:'grace@gmail.com',avatar:'GO',avatarColor:'blue',role:'Buyer',status:'Active',orders:31,spend:'R 18,900',joined:'Oct 2023'},
+      {name:'Sam Lee',email:'samlee@outlook.com',avatar:'SL',avatarColor:'green',role:'Admin',status:'Active',orders:0,spend:'R 0',joined:'Jan 2023'},
+      {name:'Aisha Bello',email:'aisha@gmail.com',avatar:'AB',avatarColor:'purple',role:'Buyer',status:'Active',orders:7,spend:'R 3,100',joined:'Aug 2024'},
+    ];
+    const userStatusBadge={Active:'badge-active',Inactive:'badge-inactive',Banned:'badge-suspended'};
+    document.getElementById('usersBody').innerHTML=users.map(u=>`
+      <tr>
+        <td><div class="user-cell"><div class="user-av ${u.avatarColor}">${u.avatar}</div><div><div class="user-name">${u.name}</div><div class="user-email">${u.email}</div></div></div></td>
+        <td><span class="badge ${u.role==='Admin'?'badge-flagged':u.role==='Seller'?'badge-verified':'badge-active'}">${u.role}</span></td>
+        <td><span class="badge ${userStatusBadge[u.status]}">${u.status}</span></td>
+        <td style="font-weight:600">${u.orders}</td>
+        <td style="font-family:var(--fh);font-weight:700;color:var(--t1)">${u.spend}</td>
+        <td style="color:var(--t3)">${u.joined}</td>
+        <td><div class="table-actions"><button class="tbl-btn view" onclick="toast('Viewing ${u.name}','success')">View</button>${u.status!=='Banned'?'<button class="tbl-btn suspend" onclick="toast(\'User action taken\',\'warn\')">Ban</button>':''}</div></td>
+      </tr>`).join('');
+
+    // ── MODERATION ──
+    const flaggedProducts=[
+      {emoji:'👟',name:'Fake Jordan 1 Retro',seller:'QuickSell Store',reason:'Counterfeit goods suspected'},
+      {emoji:'💊',name:'Weight Loss Pills',seller:'Health Trends ZA',reason:'Unverified health claims'},
+      {emoji:'🔫',name:'Airsoft Replica',seller:'Adventure Gear',reason:'Restricted item category'},
+      {emoji:'📦',name:'Bulk SIM Cards (100)',seller:'TechPlus Africa',reason:'Bulk resale restriction'},
+    ];
+    document.getElementById('moderationList').innerHTML=flaggedProducts.map(p=>`
+      <div class="mod-item">
+        <div class="mod-thumb">${p.emoji}</div>
+        <div class="mod-info">
+          <div class="mod-name">${p.name}</div>
+          <div class="mod-seller">By ${p.seller}</div>
+          <div class="mod-reason">⚠ ${p.reason}</div>
+        </div>
+        <div class="mod-actions">
+          <button class="tbl-btn approve" onclick="toast('Product approved','success')">Approve</button>
+          <button class="tbl-btn reject" onclick="toast('Product removed','error')">Remove</button>
+          <button class="tbl-btn view" onclick="toast('Viewing product','success')">Details</button>
+        </div>
+      </div>`).join('');
+
+    // ── ACTIVITY FEED ──
+    const activities=[
+      {type:'order',icon:'<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>',msg:'<strong>Sipho Ndlovu</strong> placed order #MKT-7821 for R 8,499',time:'2 min ago'},
+      {type:'signup',icon:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',msg:'<strong>Zanele Mokoena</strong> registered as a new seller',time:'5 min ago'},
+      {type:'product',icon:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>',msg:'<strong>TechKing Gadgets</strong> listed 3 new products',time:'12 min ago'},
+      {type:'flag',icon:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',msg:'Product "Fake Jordan 1" flagged for review',time:'18 min ago'},
+      {type:'payout',icon:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',msg:'<strong>R 14,200</strong> payout processed for Afro Fashion Hub',time:'24 min ago'},
+      {type:'order',icon:'<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>',msg:'<strong>Ethan Botha</strong> placed order #MKT-7820 for R 3,200',time:'31 min ago'},
+      {type:'signup',icon:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',msg:'<strong>Fatima Khalid</strong> completed seller onboarding',time:'45 min ago'},
+    ];
+    document.getElementById('activityFeed').innerHTML=activities.map(a=>`
+      <div class="feed-item">
+        <div class="feed-icon ${a.type}"><svg viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none">${a.icon}</svg></div>
+        <div class="feed-text">
+          <div class="feed-msg">${a.msg}</div>
+          <div class="feed-time">${a.time}</div>
+        </div>
+      </div>`).join('');
+
+    // ── GEO DATA ──
+    const geoData=[
+      {city:'Johannesburg, GP',count:'2,841',pct:100},
+      {city:'Cape Town, WC',count:'1,920',pct:67},
+      {city:'Durban, KZN',count:'1,480',pct:52},
+      {city:'Pretoria, GP',count:'980',pct:34},
+      {city:'Port Elizabeth, EC',count:'640',pct:22},
+    ];
+    document.getElementById('geoList').innerHTML=geoData.map((g,i)=>`
+      <div class="geo-item">
+        <span class="geo-rank">0${i+1}</span>
+        <div class="geo-info">
+          <div class="geo-city">${g.city}</div>
+          <div class="geo-bar-wrap"><div class="geo-bar" style="width:${g.pct}%"></div></div>
+        </div>
+        <span class="geo-count">${g.count}</span>
+      </div>`).join('');
+
+    // ── CHARTS ──
+    let revChart,growthChart,geoChart;
+
+    function getColors(){
+      const dark=isDark();
+      return{grid:dark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',text:dark?'#64648A':'#8B98B8'};
+    }
+
+    function initRevChart(){
+      const ctx=document.getElementById('revChart').getContext('2d');
+      const c=getColors();
+      const grad=ctx.createLinearGradient(0,0,0,210);
+      grad.addColorStop(0,'rgba(27,79,138,.25)');grad.addColorStop(1,'rgba(27,79,138,0)');
+      const grad2=ctx.createLinearGradient(0,0,0,210);
+      grad2.addColorStop(0,'rgba(0,176,116,.2)');grad2.addColorStop(1,'rgba(0,176,116,0)');
+      revChart=new Chart(ctx,{
+        type:'line',
+        data:{
+          labels:['Nov','Dec','Jan','Feb','Mar','Apr'],
+          datasets:[
+            {label:'Commission Revenue',data:[120,148,162,178,192,208],borderColor:'#1B4F8A',backgroundColor:grad,tension:.4,fill:true,pointBackgroundColor:'#1B4F8A',pointRadius:4,pointHoverRadius:6},
+            {label:'Seller Payouts',data:[980,1240,1380,1520,1660,1820],borderColor:'#00B074',backgroundColor:grad2,tension:.4,fill:true,pointBackgroundColor:'#00B074',pointRadius:4,pointHoverRadius:6,yAxisID:'y2'},
+          ]
+        },
+        options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{color:c.text,font:{family:'Inter',size:11},usePointStyle:true}},tooltip:{callbacks:{label:ctx=>`R ${ctx.parsed.y}K`}}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{family:'Inter',size:11}}},y:{grid:{color:c.grid},ticks:{color:c.text,font:{family:'Inter',size:11},callback:v=>`R${v}K`},title:{display:true,text:'Commission (R K)',color:c.text,font:{size:10}}},y2:{position:'right',grid:{display:false},ticks:{color:c.text,font:{family:'Inter',size:11},callback:v=>`R${v}K`},title:{display:true,text:'Payouts (R K)',color:c.text,font:{size:10}}}}}
+      });
+    }
+
+    function initGrowthChart(){
+      const ctx=document.getElementById('userGrowthChart').getContext('2d');
+      const c=getColors();
+      growthChart=new Chart(ctx,{
+        type:'bar',
+        data:{
+          labels:['Nov','Dec','Jan','Feb','Mar','Apr'],
+          datasets:[
+            {label:'New Users',data:[820,1240,980,1100,1380,1420],backgroundColor:'rgba(27,79,138,0.7)',borderRadius:6},
+            {label:'New Sellers',data:[42,68,55,72,88,94],backgroundColor:'rgba(255,204,0,0.8)',borderRadius:6},
+          ]
+        },
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:c.text,font:{family:'Inter',size:11},usePointStyle:true}}},scales:{x:{grid:{display:false},ticks:{color:c.text,font:{family:'Inter',size:11}}},y:{grid:{color:c.grid},ticks:{color:c.text,font:{family:'Inter',size:11}}}}}
+      });
+    }
+
+    function initGeoChart(){
+      const ctx=document.getElementById('geoChart').getContext('2d');
+      const c=getColors();
+      geoChart=new Chart(ctx,{
+        type:'bar',
+        data:{labels:geoData.map(g=>g.city.split(',')[0]),datasets:[{label:'Orders',data:[2841,1920,1480,980,640],backgroundColor:['#1B4F8A','#0E3A6B','#2D6BB8','#4A8FD4','#A0C4EA'],borderRadius:6,borderSkipped:false}]},
+        options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:c.grid},ticks:{color:c.text,font:{family:'Inter',size:10}}},y:{grid:{display:false},ticks:{color:c.text,font:{family:'Inter',size:10}}}}}
+      });
+    }
+
+    function switchRevPeriod(p,btn){
+      document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
+      const datasets={
+        '3m':{labels:['Feb','Mar','Apr'],commission:[178,192,208],payouts:[1520,1660,1820]},
+        '6m':{labels:['Nov','Dec','Jan','Feb','Mar','Apr'],commission:[120,148,162,178,192,208],payouts:[980,1240,1380,1520,1660,1820]},
+        '1y':{labels:['May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr'],commission:[85,92,108,115,128,134,120,148,162,178,192,208],payouts:[680,740,880,920,1040,1080,980,1240,1380,1520,1660,1820]}
+      };
+      const d=datasets[p];
+      revChart.data.labels=d.labels;
+      revChart.data.datasets[0].data=d.commission;
+      revChart.data.datasets[1].data=d.payouts;
+      revChart.update();
+    }
+
+    function updateChartsTheme(){
+      [revChart,growthChart,geoChart].forEach(c=>{
+        if(!c)return;
+        const col=getColors();
+        Object.values(c.config.options.scales||{}).forEach(s=>{if(s.grid)s.grid.color=col.grid;if(s.ticks)s.ticks.color=col.text;});
+        if(c.config.options.plugins?.legend?.labels)c.config.options.plugins.legend.labels.color=col.text;
+        c.update();
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded',()=>{
+      initRevChart();initGrowthChart();initGeoChart();
+    });
+  </script>
+</body>
+</html>

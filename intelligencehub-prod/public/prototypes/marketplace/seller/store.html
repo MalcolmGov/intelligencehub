@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechVibe Store — MarketByMoMo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Tokens ─────────────────────────────────────── */
+    :root {
+      --navy: #1B4F8A;
+      --navy-dark: #133970;
+      --navy-light: #2a6ab5;
+      --yellow: #FFCC00;
+      --yellow-dark: #e6b800;
+      --white: #ffffff;
+      --success: #22c55e;
+      --danger: #ef4444;
+
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface-2: #f0f4f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-2: #475569;
+      --text-3: #94a3b8;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.05);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,.10);
+      --radius: 14px;
+      --radius-sm: 8px;
+    }
+    [data-theme="dark"] {
+      --bg: #0b1220;
+      --surface: #141f33;
+      --surface-2: #1a2844;
+      --border: #253555;
+      --text: #f1f5f9;
+      --text-2: #94a3b8;
+      --text-3: #475569;
+      --shadow: 0 1px 3px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,.4);
+    }
+
+    /* ─── Reset ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; border: none; background: none; }
+    ul { list-style: none; }
+
+    /* ─── Topbar ─────────────────────────────────────── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--navy);
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 24px; height: 56px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .topbar-logo {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 1.15rem;
+      color: var(--yellow); letter-spacing: -.3px;
+      white-space: nowrap;
+    }
+    .topbar-logo span { color: var(--white); }
+    .topbar-search {
+      flex: 1; max-width: 520px;
+      display: flex; align-items: center;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 50px; overflow: hidden;
+      padding: 0 4px 0 16px;
+    }
+    .topbar-search input {
+      flex: 1; background: none; border: none; outline: none;
+      color: #fff; font-size: .9rem; padding: 8px 0;
+    }
+    .topbar-search input::placeholder { color: rgba(255,255,255,.5); }
+    .topbar-search button {
+      background: var(--yellow); color: var(--navy);
+      border-radius: 50px; padding: 6px 14px;
+      font-size: .82rem; font-weight: 700;
+      transition: background .2s;
+    }
+    .topbar-search button:hover { background: var(--yellow-dark); }
+    .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    .theme-toggle {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.12); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; transition: background .2s;
+    }
+    .theme-toggle:hover { background: rgba(255,255,255,.22); }
+    .topbar-cart {
+      position: relative;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,.12); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; transition: background .2s;
+    }
+    .topbar-cart:hover { background: rgba(255,255,255,.22); }
+    .cart-badge {
+      position: absolute; top: -3px; right: -3px;
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--yellow); color: var(--navy);
+      font-size: .65rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── Hero Banner ────────────────────────────────── */
+    .hero-banner {
+      position: relative; height: 260px; overflow: hidden;
+      background: linear-gradient(135deg, #1B4F8A 0%, #0d3060 50%, #133970 100%);
+    }
+    .hero-cover {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg,
+        #1B4F8A 0%, #0d2d5e 30%,
+        #1a3a6e 60%, #0a2040 100%);
+    }
+    .hero-cover::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(255,204,0,.12) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,.06) 0%, transparent 35%),
+        radial-gradient(circle at 60% 80%, rgba(27,79,138,.5) 0%, transparent 40%);
+    }
+    .hero-cover::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 120px;
+      background: linear-gradient(to bottom, transparent, rgba(0,0,0,.55));
+    }
+    .hero-geo {
+      position: absolute; inset: 0;
+      background-image:
+        repeating-linear-gradient(45deg, rgba(255,255,255,.025) 0, rgba(255,255,255,.025) 1px, transparent 0, transparent 50%);
+      background-size: 30px 30px;
+    }
+    .hero-content {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 0 24px 20px;
+      display: flex; align-items: flex-end; gap: 20px;
+    }
+    .store-logo-wrap {
+      position: relative; flex-shrink: 0;
+      transform: translateY(40px);
+    }
+    .store-logo {
+      width: 96px; height: 96px; border-radius: 20px;
+      background: linear-gradient(135deg, #FFCC00 0%, #f59e0b 100%);
+      border: 4px solid var(--surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem; font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; color: var(--navy);
+      box-shadow: 0 4px 16px rgba(0,0,0,.35);
+      overflow: hidden;
+    }
+    .store-logo-online {
+      position: absolute; bottom: 6px; right: 6px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--success); border: 2px solid var(--surface);
+    }
+    .hero-meta { flex: 1; padding-bottom: 4px; }
+    .hero-store-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.55rem; font-weight: 800;
+      color: #fff; display: flex; align-items: center; gap: 8px;
+      text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    }
+    .verified-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--yellow); color: var(--navy);
+      font-size: .7rem; font-weight: 700;
+      padding: 3px 8px; border-radius: 20px;
+      letter-spacing: .3px;
+    }
+    .hero-sub {
+      font-size: .875rem; color: rgba(255,255,255,.75);
+      margin-top: 2px;
+    }
+    .hero-sub span { color: rgba(255,255,255,.95); font-weight: 600; }
+    .hero-actions { display: flex; align-items: center; gap: 10px; padding-bottom: 4px; }
+    .btn-follow {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--yellow); color: var(--navy);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700; font-size: .9rem;
+      padding: 9px 22px; border-radius: 50px;
+      transition: transform .15s, background .2s, box-shadow .2s;
+      box-shadow: 0 2px 10px rgba(255,204,0,.35);
+    }
+    .btn-follow:hover { background: var(--yellow-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,204,0,.45); }
+    .btn-follow.following {
+      background: rgba(255,255,255,.15); color: #fff;
+      border: 1.5px solid rgba(255,255,255,.35);
+      box-shadow: none;
+    }
+    .btn-follow.following:hover { background: rgba(255,255,255,.22); }
+    .btn-follow.pop { animation: pop .3s ease; }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1); }
+    }
+    .btn-contact {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,.15); color: #fff;
+      border: 1.5px solid rgba(255,255,255,.35);
+      font-weight: 600; font-size: .88rem;
+      padding: 8px 18px; border-radius: 50px;
+      backdrop-filter: blur(4px);
+      transition: background .2s, transform .15s;
+    }
+    .btn-contact:hover { background: rgba(255,255,255,.25); transform: translateY(-1px); }
+
+    /* ─── Stats Bar ──────────────────────────────────── */
+    .stats-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    .stats-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center;
+      padding: 12px 0 12px 116px; /* offset for logo overlap */
+      gap: 0;
+    }
+    .stat-item {
+      flex: 1; text-align: center;
+      padding: 10px 16px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-value {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.25rem; font-weight: 800;
+      color: var(--navy);
+    }
+    [data-theme="dark"] .stat-value { color: var(--yellow); }
+    .stat-label { font-size: .75rem; color: var(--text-2); margin-top: 2px; }
+    .stars { color: var(--yellow); font-size: .95rem; }
+
+    /* ─── Main Layout ────────────────────────────────── */
+    .main-wrap { max-width: 1280px; margin: 0 auto; padding: 24px 24px 60px; }
+    .layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; }
+
+    /* ─── Tab Nav ────────────────────────────────────── */
+    .tab-nav {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex; overflow-x: auto;
+      scrollbar-width: none;
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 14px 22px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600; font-size: .9rem;
+      color: var(--text-2);
+      border-bottom: 2.5px solid transparent;
+      transition: color .2s, border-color .2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--navy); }
+    .tab-btn.active {
+      color: var(--navy); border-bottom-color: var(--navy);
+    }
+    [data-theme="dark"] .tab-btn.active {
+      color: var(--yellow); border-bottom-color: var(--yellow);
+    }
+
+    /* ─── Tab Panels ─────────────────────────────────── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ─── Filter Bar ─────────────────────────────────── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; margin-bottom: 18px;
+    }
+    .filter-pill {
+      padding: 7px 16px; border-radius: 50px;
+      border: 1.5px solid var(--border);
+      font-size: .82rem; font-weight: 600;
+      color: var(--text-2); background: var(--surface);
+      transition: all .18s;
+    }
+    .filter-pill:hover { border-color: var(--navy); color: var(--navy); }
+    .filter-pill.active {
+      background: var(--navy); color: #fff; border-color: var(--navy);
+    }
+    [data-theme="dark"] .filter-pill.active {
+      background: var(--yellow); color: var(--navy); border-color: var(--yellow);
+    }
+    .sort-select {
+      margin-left: auto; padding: 7px 12px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text);
+      font-size: .82rem; font-family: inherit; outline: none;
+      cursor: pointer;
+    }
+
+    /* ─── Product Grid ───────────────────────────────── */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+    .product-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+      position: relative;
+    }
+    .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .card-badge {
+      position: absolute; top: 10px; left: 10px; z-index: 2;
+      font-size: .7rem; font-weight: 700;
+      padding: 3px 8px; border-radius: 20px;
+      letter-spacing: .3px;
+    }
+    .badge-sale { background: var(--danger); color: #fff; }
+    .badge-new  { background: var(--success); color: #fff; }
+    .badge-hot  { background: #f97316; color: #fff; }
+    .card-wishlist {
+      position: absolute; top: 10px; right: 10px; z-index: 2;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,.9); color: #94a3b8;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; transition: color .2s, transform .2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    }
+    .card-wishlist:hover { color: #ef4444; transform: scale(1.1); }
+    .card-wishlist.liked { color: #ef4444; }
+    .card-img {
+      height: 180px; overflow: hidden;
+      background: var(--surface-2);
+    }
+    .card-img-inner {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+      transition: transform .3s;
+    }
+    .product-card:hover .card-img-inner { transform: scale(1.08); }
+    .card-body { padding: 12px 14px 14px; }
+    .card-category { font-size: .72rem; color: var(--navy); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    [data-theme="dark"] .card-category { color: var(--yellow); }
+    .card-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700; font-size: .9rem;
+      color: var(--text); line-height: 1.35;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-rating { display: flex; align-items: center; gap: 5px; margin-top: 6px; }
+    .card-stars { color: var(--yellow); font-size: .78rem; }
+    .card-rating-count { font-size: .75rem; color: var(--text-3); }
+    .card-price { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .price-now {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1.05rem; font-weight: 800; color: var(--navy);
+    }
+    [data-theme="dark"] .price-now { color: var(--yellow); }
+    .price-old { font-size: .8rem; color: var(--text-3); text-decoration: line-through; }
+    .price-discount { font-size: .72rem; font-weight: 700; color: var(--danger); }
+    .card-footer { padding: 0 14px 12px; }
+    .btn-add-cart {
+      width: 100%;
+      background: var(--navy); color: #fff;
+      border-radius: var(--radius-sm); padding: 9px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700; font-size: .84rem;
+      transition: background .2s, transform .15s;
+    }
+    .btn-add-cart:hover { background: var(--navy-dark); transform: translateY(-1px); }
+
+    /* ─── About Tab ──────────────────────────────────── */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .about-card {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .about-card.full { grid-column: 1 / -1; }
+    .section-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 1rem; font-weight: 800;
+      color: var(--text); margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; color: #fff; flex-shrink: 0;
+    }
+    [data-theme="dark"] .section-title-icon { background: linear-gradient(135deg, var(--yellow-dark), var(--yellow)); }
+    .about-text { font-size: .875rem; color: var(--text-2); line-height: 1.7; }
+    .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .team-member { text-align: center; }
+    .team-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      margin: 0 auto 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; color: #fff;
+    }
+    .team-name { font-size: .82rem; font-weight: 600; color: var(--text); }
+    .team-role { font-size: .75rem; color: var(--text-3); margin-top: 2px; }
+    .map-placeholder {
+      height: 160px; border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--surface-2) 0%, var(--border) 100%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px; color: var(--text-2); font-size: .875rem;
+      border: 2px dashed var(--border);
+    }
+    .map-placeholder span { font-size: 2rem; }
+    .info-list { display: flex; flex-direction: column; gap: 10px; }
+    .info-row { display: flex; align-items: flex-start; gap: 10px; font-size: .875rem; }
+    .info-icon { font-size: 1rem; margin-top: 1px; flex-shrink: 0; }
+    .info-label { color: var(--text-3); font-size: .78rem; }
+    .info-val { color: var(--text); font-weight: 500; }
+
+    /* ─── Reviews Tab ────────────────────────────────── */
+    .reviews-summary {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      padding: 22px; margin-bottom: 20px;
+      display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center;
+    }
+    .big-rating { text-align: center; }
+    .big-score {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 4rem; font-weight: 800; line-height: 1;
+      color: var(--navy);
+    }
+    [data-theme="dark"] .big-score { color: var(--yellow); }
+    .big-stars { font-size: 1.4rem; color: var(--yellow); margin: 4px 0; }
+    .big-count { font-size: .8rem; color: var(--text-2); }
+    .rating-bars { display: flex; flex-direction: column; gap: 7px; }
+    .rating-row { display: flex; align-items: center; gap: 10px; }
+    .rating-label { font-size: .8rem; color: var(--text-2); min-width: 30px; }
+    .rating-bar-wrap { flex: 1; height: 8px; background: var(--surface-2); border-radius: 20px; overflow: hidden; }
+    .rating-bar-fill { height: 100%; border-radius: 20px; background: var(--yellow); transition: width .8s ease; }
+    .rating-bar-pct { font-size: .75rem; color: var(--text-3); min-width: 28px; text-align: right; }
+    .review-list { display: flex; flex-direction: column; gap: 14px; }
+    .review-card {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      padding: 18px 20px;
+    }
+    .review-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .reviewer-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: #fff; flex-shrink: 0;
+    }
+    .reviewer-name { font-weight: 600; font-size: .9rem; color: var(--text); }
+    .reviewer-date { font-size: .75rem; color: var(--text-3); margin-top: 2px; }
+    .review-stars { margin-left: auto; color: var(--yellow); font-size: .9rem; }
+    .review-product { font-size: .78rem; color: var(--navy); font-weight: 600; margin-bottom: 6px; }
+    [data-theme="dark"] .review-product { color: var(--yellow); }
+    .review-text { font-size: .875rem; color: var(--text-2); line-height: 1.65; }
+    .review-helpful { font-size: .78rem; color: var(--text-3); margin-top: 10px; }
+    .review-helpful button { color: var(--navy); font-weight: 600; margin-left: 4px; }
+    [data-theme="dark"] .review-helpful button { color: var(--yellow); }
+    .review-images { display: flex; gap: 8px; margin-top: 10px; }
+    .review-thumb {
+      width: 56px; height: 56px; border-radius: var(--radius-sm);
+      background: var(--surface-2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    /* ─── Policies Tab ───────────────────────────────── */
+    .policies-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .policy-card {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .policy-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(27,79,138,.1), rgba(27,79,138,.18));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 12px;
+    }
+    [data-theme="dark"] .policy-icon { background: linear-gradient(135deg, rgba(255,204,0,.12), rgba(255,204,0,.2)); }
+    .policy-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700; font-size: .95rem; color: var(--text); margin-bottom: 8px;
+    }
+    .policy-text { font-size: .84rem; color: var(--text-2); line-height: 1.7; }
+    .policy-list { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+    .policy-item { display: flex; align-items: flex-start; gap: 8px; font-size: .83rem; color: var(--text-2); }
+    .policy-check { color: var(--success); flex-shrink: 0; }
+
+    /* ─── Sidebar ────────────────────────────────────── */
+    .sidebar { display: flex; flex-direction: column; gap: 16px; }
+    .sidebar-card {
+      background: var(--surface); border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700; font-size: .88rem; color: var(--text);
+    }
+    .sidebar-body { padding: 14px 18px; }
+    .cat-list { display: flex; flex-direction: column; gap: 1px; }
+    .cat-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 10px; border-radius: var(--radius-sm);
+      font-size: .875rem; color: var(--text-2);
+      transition: background .15s, color .15s;
+      cursor: pointer;
+    }
+    .cat-item:hover { background: var(--surface-2); color: var(--navy); }
+    .cat-item.active { background: var(--navy); color: #fff; font-weight: 600; }
+    [data-theme="dark"] .cat-item.active { background: var(--yellow); color: var(--navy); }
+    .cat-count {
+      font-size: .72rem; padding: 2px 7px; border-radius: 20px;
+      background: var(--surface-2); color: var(--text-3); font-weight: 600;
+    }
+    .cat-item.active .cat-count { background: rgba(255,255,255,.2); color: rgba(255,255,255,.9); }
+    [data-theme="dark"] .cat-item.active .cat-count { background: rgba(27,79,138,.25); color: var(--navy); }
+
+    .top-seller-item {
+      display: flex; align-items: center; gap: 10px; padding: 8px 0;
+      border-bottom: 1px solid var(--border); cursor: pointer;
+    }
+    .top-seller-item:last-child { border-bottom: none; }
+    .ts-img {
+      width: 46px; height: 46px; border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .ts-info { flex: 1; min-width: 0; }
+    .ts-name { font-size: .82rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ts-price { font-size: .8rem; color: var(--navy); font-weight: 700; margin-top: 2px; }
+    [data-theme="dark"] .ts-price { color: var(--yellow); }
+
+    .badge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .store-badge {
+      background: var(--surface-2); border-radius: var(--radius-sm);
+      border: 1px solid var(--border); padding: 12px 10px;
+      text-align: center;
+    }
+    .badge-icon { font-size: 1.6rem; margin-bottom: 5px; }
+    .badge-name { font-size: .72rem; font-weight: 700; color: var(--text); }
+    .badge-sub { font-size: .65rem; color: var(--text-3); margin-top: 2px; }
+
+    .contact-cta {
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      border-radius: var(--radius);
+      padding: 20px 18px; text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .cta-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 1rem; color: #fff; margin-bottom: 4px;
+    }
+    .cta-sub { font-size: .8rem; color: rgba(255,255,255,.7); margin-bottom: 14px; }
+    .btn-cta {
+      display: block; width: 100%;
+      background: var(--yellow); color: var(--navy);
+      border-radius: 50px; padding: 10px 18px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: .88rem;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 2px 10px rgba(255,204,0,.35);
+    }
+    .btn-cta:hover { background: var(--yellow-dark); transform: translateY(-1px); }
+    .cta-note { font-size: .73rem; color: rgba(255,255,255,.55); margin-top: 8px; }
+
+    /* ─── Toast ──────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--navy); color: #fff;
+      padding: 12px 22px; border-radius: 50px;
+      font-size: .875rem; font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+      z-index: 9999; pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ─── Responsive ─────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { grid-row: 1; display: grid; grid-template-columns: repeat(2, 1fr); }
+      .contact-cta { grid-column: 1 / -1; }
+    }
+    @media (max-width: 768px) {
+      .topbar { padding: 0 16px; }
+      .topbar-search { display: none; }
+      .hero-banner { height: 200px; }
+      .hero-content { padding: 0 16px 16px; gap: 14px; }
+      .store-logo { width: 76px; height: 76px; font-size: 1.9rem; }
+      .store-logo-wrap { transform: translateY(32px); }
+      .stats-inner { padding: 10px 0 10px 90px; gap: 0; flex-wrap: wrap; }
+      .stat-item { min-width: 100px; padding: 8px 10px; }
+      .hero-store-name { font-size: 1.2rem; }
+      .about-grid, .policies-grid { grid-template-columns: 1fr; }
+      .about-card.full { grid-column: 1; }
+      .reviews-summary { grid-template-columns: 1fr; }
+      .big-rating { display: flex; align-items: center; gap: 16px; justify-content: center; }
+      .sidebar { grid-template-columns: 1fr; }
+      .main-wrap { padding: 16px 16px 48px; }
+      .hero-actions { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+    @media (max-width: 480px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .hero-meta { display: none; }
+      .hero-content { justify-content: flex-end; }
+      .hero-actions { display: none; }
+      .filter-bar { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════ TOPBAR ══ -->
+<header class="topbar">
+  <div class="topbar-logo">Market<span>byMoMo</span></div>
+  <div class="topbar-search">
+    <input type="text" placeholder="Search TechVibe Store…" />
+    <button>Search</button>
+  </div>
+  <div class="topbar-actions">
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode">🌙</button>
+    <button class="topbar-cart">
+      🛒
+      <span class="cart-badge">3</span>
+    </button>
+  </div>
+</header>
+
+<!-- ════════════════════════════════ HERO ══ -->
+<section class="hero-banner">
+  <div class="hero-cover"></div>
+  <div class="hero-geo"></div>
+  <div class="hero-content">
+    <div class="store-logo-wrap">
+      <div class="store-logo">TV</div>
+      <div class="store-logo-online"></div>
+    </div>
+    <div class="hero-meta">
+      <div class="hero-store-name">
+        TechVibe Store
+        <span class="verified-badge">✓ Verified</span>
+      </div>
+      <div class="hero-sub">
+        <span>12,840</span> followers &nbsp;·&nbsp; Electronics &amp; Gadgets &nbsp;·&nbsp; Johannesburg, ZA
+      </div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn-follow" id="followBtn">
+        <span id="followIcon">＋</span>
+        <span id="followText">Follow Store</span>
+      </button>
+      <button class="btn-contact" id="contactBtn">💬 Message</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ STATS BAR ══ -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-value">348</div>
+      <div class="stat-label">Products</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">14.2K</div>
+      <div class="stat-label">Sales</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value"><span class="stars">★</span> 4.9</div>
+      <div class="stat-label">Rating</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">&lt; 1h</div>
+      <div class="stat-label">Response Time</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">2019</div>
+      <div class="stat-label">Member Since</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ MAIN ══ -->
+<div class="main-wrap">
+  <div class="layout">
+
+    <!-- ── Content Column ── -->
+    <div>
+
+      <!-- Tab Navigation -->
+      <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="products">🛍️ Products</button>
+        <button class="tab-btn" data-tab="about">ℹ️ About</button>
+        <button class="tab-btn" data-tab="reviews">⭐ Reviews (1.2K)</button>
+        <button class="tab-btn" data-tab="policies">📋 Policies</button>
+      </nav>
+
+      <!-- ── PRODUCTS TAB ── -->
+      <div class="tab-panel active" id="panel-products">
+        <div class="filter-bar">
+          <button class="filter-pill active" data-cat="all">All</button>
+          <button class="filter-pill" data-cat="phones">Phones</button>
+          <button class="filter-pill" data-cat="audio">Audio</button>
+          <button class="filter-pill" data-cat="accessories">Accessories</button>
+          <button class="filter-pill" data-cat="wearables">Wearables</button>
+          <button class="filter-pill" data-cat="computing">Computing</button>
+          <select class="sort-select">
+            <option>Sort: Featured</option>
+            <option>Price: Low to High</option>
+            <option>Price: High to Low</option>
+            <option>Top Rated</option>
+            <option>Newest</option>
+          </select>
+        </div>
+        <div class="product-grid" id="productGrid">
+          <!-- Products injected by JS -->
+        </div>
+      </div>
+
+      <!-- ── ABOUT TAB ── -->
+      <div class="tab-panel" id="panel-about">
+        <div class="about-grid">
+          <div class="about-card full">
+            <div class="section-title">
+              <div class="section-title-icon">🏪</div>
+              About TechVibe Store
+            </div>
+            <p class="about-text">
+              TechVibe Store is South Africa's leading online destination for cutting-edge consumer electronics. Founded in 2019 in Johannesburg, we've grown from a small local retailer to serving over 14,000 satisfied customers across the country.
+            </p>
+            <p class="about-text" style="margin-top:10px;">
+              Our mission is simple: bring the latest tech to every South African at fair, transparent prices — backed by genuine warranties, fast shipping, and real human support. Every product is hand-selected by our team of tech enthusiasts who test before we list.
+            </p>
+            <p class="about-text" style="margin-top:10px;">
+              We're proud to be a <strong>Top Rated Seller</strong> and <strong>Fast Shipper</strong> on MarketByMoMo. Your satisfaction is our obsession.
+            </p>
+          </div>
+          <div class="about-card">
+            <div class="section-title">
+              <div class="section-title-icon">👥</div>
+              Our Team
+            </div>
+            <div class="team-grid">
+              <div class="team-member">
+                <div class="team-avatar">👨‍💼</div>
+                <div class="team-name">Sipho M.</div>
+                <div class="team-role">Founder & CEO</div>
+              </div>
+              <div class="team-member">
+                <div class="team-avatar">👩‍💻</div>
+                <div class="team-name">Amara N.</div>
+                <div class="team-role">Tech Curator</div>
+              </div>
+              <div class="team-member">
+                <div class="team-avatar">👨‍🔧</div>
+                <div class="team-name">Liam T.</div>
+                <div class="team-role">Support Lead</div>
+              </div>
+            </div>
+          </div>
+          <div class="about-card">
+            <div class="section-title">
+              <div class="section-title-icon">📍</div>
+              Location &amp; Contact
+            </div>
+            <div class="info-list">
+              <div class="info-row">
+                <span class="info-icon">📍</span>
+                <div>
+                  <div class="info-label">Address</div>
+                  <div class="info-val">14 Tech Park Drive, Sandton, Johannesburg, 2196</div>
+                </div>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">📦</span>
+                <div>
+                  <div class="info-label">Dispatch from</div>
+                  <div class="info-val">Johannesburg Warehouse</div>
+                </div>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">🕒</span>
+                <div>
+                  <div class="info-label">Business Hours</div>
+                  <div class="info-val">Mon–Fri 8am–6pm · Sat 9am–2pm</div>
+                </div>
+              </div>
+              <div class="info-row">
+                <span class="info-icon">📧</span>
+                <div>
+                  <div class="info-label">Email</div>
+                  <div class="info-val">hello@techvibe.co.za</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="about-card full">
+            <div class="section-title">
+              <div class="section-title-icon">🗺️</div>
+              Store Location
+            </div>
+            <div class="map-placeholder">
+              <span>🗺️</span>
+              <div>Map — Sandton, Johannesburg</div>
+              <div style="font-size:.75rem;color:var(--text-3)">14 Tech Park Drive · 26°06′S 28°03′E</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── REVIEWS TAB ── -->
+      <div class="tab-panel" id="panel-reviews">
+        <div class="reviews-summary">
+          <div class="big-rating">
+            <div class="big-score">4.9</div>
+            <div class="big-stars">★★★★★</div>
+            <div class="big-count">1,248 reviews</div>
+          </div>
+          <div class="rating-bars">
+            <div class="rating-row">
+              <span class="rating-label">5 ★</span>
+              <div class="rating-bar-wrap"><div class="rating-bar-fill" style="width:82%"></div></div>
+              <span class="rating-bar-pct">82%</span>
+            </div>
+            <div class="rating-row">
+              <span class="rating-label">4 ★</span>
+              <div class="rating-bar-wrap"><div class="rating-bar-fill" style="width:12%"></div></div>
+              <span class="rating-bar-pct">12%</span>
+            </div>
+            <div class="rating-row">
+              <span class="rating-label">3 ★</span>
+              <div class="rating-bar-wrap"><div class="rating-bar-fill" style="width:4%"></div></div>
+              <span class="rating-bar-pct">4%</span>
+            </div>
+            <div class="rating-row">
+              <span class="rating-label">2 ★</span>
+              <div class="rating-bar-wrap"><div class="rating-bar-fill" style="width:1%"></div></div>
+              <span class="rating-bar-pct">1%</span>
+            </div>
+            <div class="rating-row">
+              <span class="rating-label">1 ★</span>
+              <div class="rating-bar-wrap"><div class="rating-bar-fill" style="width:1%"></div></div>
+              <span class="rating-bar-pct">1%</span>
+            </div>
+          </div>
+        </div>
+        <div class="review-list" id="reviewList">
+          <!-- Reviews injected by JS -->
+        </div>
+      </div>
+
+      <!-- ── POLICIES TAB ── -->
+      <div class="tab-panel" id="panel-policies">
+        <div class="policies-grid">
+          <div class="policy-card">
+            <div class="policy-icon">🚚</div>
+            <div class="policy-title">Shipping Policy</div>
+            <p class="policy-text">We dispatch within 1 business day. Delivery timelines:</p>
+            <ul class="policy-list">
+              <li class="policy-item"><span class="policy-check">✓</span> Gauteng: 1–2 business days</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Cape Town / Durban: 2–3 business days</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Other SA regions: 3–5 business days</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Free shipping on orders over R500</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Express overnight delivery available</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Real-time tracking via SMS &amp; email</li>
+            </ul>
+          </div>
+          <div class="policy-card">
+            <div class="policy-icon">↩️</div>
+            <div class="policy-title">Return &amp; Refund Policy</div>
+            <p class="policy-text">We stand behind every product. Hassle-free returns:</p>
+            <ul class="policy-list">
+              <li class="policy-item"><span class="policy-check">✓</span> 30-day return window on all items</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Full refund for defective products</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Exchange available within 14 days</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Return shipping covered for faulty items</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Refund processed within 3–5 business days</li>
+            </ul>
+          </div>
+          <div class="policy-card">
+            <div class="policy-icon">💳</div>
+            <div class="policy-title">Payment Policy</div>
+            <p class="policy-text">We accept all major payment methods securely:</p>
+            <ul class="policy-list">
+              <li class="policy-item"><span class="policy-check">✓</span> Credit &amp; Debit Cards (Visa, Mastercard)</li>
+              <li class="policy-item"><span class="policy-check">✓</span> EFT / Instant EFT</li>
+              <li class="policy-item"><span class="policy-check">✓</span> MoMo Wallet &amp; Pay Later</li>
+              <li class="policy-item"><span class="policy-check">✓</span> PayFlex (buy now, pay over 4 weeks)</li>
+              <li class="policy-item"><span class="policy-check">✓</span> 256-bit SSL encrypted checkout</li>
+            </ul>
+          </div>
+          <div class="policy-card">
+            <div class="policy-icon">🛡️</div>
+            <div class="policy-title">Warranty &amp; Authenticity</div>
+            <p class="policy-text">Every product sold is 100% authentic and carries:</p>
+            <ul class="policy-list">
+              <li class="policy-item"><span class="policy-check">✓</span> Manufacturer warranty (12–24 months)</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Official SA warranty with local support</li>
+              <li class="policy-item"><span class="policy-check">✓</span> Anti-counterfeit serial verification</li>
+              <li class="policy-item"><span class="policy-check">✓</span> TechVibe authenticity seal on all items</li>
+              <li class="policy-item"><span class="policy-check">✓</span> MarketByMoMo Buyer Protection enabled</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content column -->
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+
+      <div class="contact-cta">
+        <div class="cta-title">Need Help?</div>
+        <div class="cta-sub">Our team replies in under 1 hour</div>
+        <button class="btn-cta" id="sideContactBtn">💬 Contact Seller</button>
+        <div class="cta-note">Avg. reply time: 32 minutes</div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-header">Store Badges</div>
+        <div class="sidebar-body">
+          <div class="badge-grid">
+            <div class="store-badge">
+              <div class="badge-icon">🏆</div>
+              <div class="badge-name">Top Rated</div>
+              <div class="badge-sub">2024 &amp; 2025</div>
+            </div>
+            <div class="store-badge">
+              <div class="badge-icon">⚡</div>
+              <div class="badge-name">Fast Shipper</div>
+              <div class="badge-sub">Same-day dispatch</div>
+            </div>
+            <div class="store-badge">
+              <div class="badge-icon">✅</div>
+              <div class="badge-name">Verified Seller</div>
+              <div class="badge-sub">ID &amp; business verified</div>
+            </div>
+            <div class="store-badge">
+              <div class="badge-icon">💎</div>
+              <div class="badge-name">Premium Store</div>
+              <div class="badge-sub">Since 2022</div>
+            </div>
+            <div class="store-badge">
+              <div class="badge-icon">🔒</div>
+              <div class="badge-name">Secure Pay</div>
+              <div class="badge-sub">All methods safe</div>
+            </div>
+            <div class="store-badge">
+              <div class="badge-icon">🌟</div>
+              <div class="badge-name">5-Star Service</div>
+              <div class="badge-sub">3 years running</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-header">Browse Categories</div>
+        <div class="sidebar-body" style="padding:8px 10px;">
+          <ul class="cat-list">
+            <li class="cat-item active" data-sc="all">All Products <span class="cat-count">348</span></li>
+            <li class="cat-item" data-sc="phones">📱 Smartphones <span class="cat-count">89</span></li>
+            <li class="cat-item" data-sc="audio">🎧 Audio <span class="cat-count">64</span></li>
+            <li class="cat-item" data-sc="accessories">🔌 Accessories <span class="cat-count">112</span></li>
+            <li class="cat-item" data-sc="wearables">⌚ Wearables <span class="cat-count">43</span></li>
+            <li class="cat-item" data-sc="computing">💻 Computing <span class="cat-count">40</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-header">Top Sellers</div>
+        <div class="sidebar-body" style="padding:8px 18px;">
+          <div id="topSellers"></div>
+        </div>
+      </div>
+
+    </aside>
+  </div><!-- end layout -->
+</div><!-- end main-wrap -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ─── Data ───────────────────────────────────────── */
+  const products = [
+    { id:1, name:'Samsung Galaxy S24 Ultra', cat:'phones', price:21999, oldPrice:24999, discount:12, rating:4.9, reviews:342, emoji:'📱', badge:'hot', badgeLabel:'Hot' },
+    { id:2, name:'Sony WH-1000XM5 Headphones', cat:'audio', price:7499, oldPrice:8999, discount:17, rating:4.9, reviews:218, emoji:'🎧', badge:'sale', badgeLabel:'Sale' },
+    { id:3, name:'Apple AirPods Pro (3rd Gen)', cat:'audio', price:4999, oldPrice:null, discount:0, rating:4.8, reviews:189, emoji:'🎵', badge:'new', badgeLabel:'New' },
+    { id:4, name:'USB-C 140W GaN Charger', cat:'accessories', price:699, oldPrice:999, discount:30, rating:4.7, reviews:97, emoji:'🔌', badge:'sale', badgeLabel:'Sale' },
+    { id:5, name:'Apple Watch Series 10', cat:'wearables', price:12999, oldPrice:14999, discount:13, rating:4.9, reviews:156, emoji:'⌚', badge:null, badgeLabel:null },
+    { id:6, name:'Samsung Galaxy Buds3 Pro', cat:'audio', price:3299, oldPrice:3999, discount:17, rating:4.8, reviews:88, emoji:'🎶', badge:'sale', badgeLabel:'Sale' },
+    { id:7, name:'MacBook Air M3 13"', cat:'computing', price:24999, oldPrice:26999, discount:7, rating:5.0, reviews:64, emoji:'💻', badge:'hot', badgeLabel:'Hot' },
+    { id:8, name:'Wireless Charging Pad 30W', cat:'accessories', price:499, oldPrice:699, discount:29, rating:4.6, reviews:143, emoji:'⚡', badge:'sale', badgeLabel:'Sale' },
+    { id:9, name:'Xiaomi 14 Ultra', cat:'phones', price:17999, oldPrice:null, discount:0, rating:4.8, reviews:77, emoji:'📲', badge:'new', badgeLabel:'New' },
+    { id:10, name:'Garmin Forerunner 965', cat:'wearables', price:11499, oldPrice:12999, discount:12, rating:4.9, reviews:55, emoji:'🏃', badge:null, badgeLabel:null },
+    { id:11, name:'Anker MagSafe Battery Pack', cat:'accessories', price:1299, oldPrice:null, discount:0, rating:4.7, reviews:112, emoji:'🔋', badge:'new', badgeLabel:'New' },
+    { id:12, name:'iPad Pro M4 11"', cat:'computing', price:19999, oldPrice:21999, discount:9, rating:4.9, reviews:91, emoji:'📟', badge:'hot', badgeLabel:'Hot' },
+  ];
+
+  const reviews = [
+    { name:'Thabo K.', avatar:'👨🏿', color:'#1B4F8A', date:'3 days ago', stars:5, product:'Samsung Galaxy S24 Ultra', text:'Absolutely blown away by the service. Package arrived next day in perfect condition, sealed box with all accessories. The phone itself is incredible — camera is out of this world. Will definitely order again.', helpful:24, images:['📦','📱','✨'] },
+    { name:'Sarah M.', avatar:'👩🏽', color:'#7c3aed', date:'1 week ago', stars:5, product:'Sony WH-1000XM5', text:'TechVibe is the real deal. I was a bit nervous ordering expensive headphones online, but they came with full warranty card, receipt, everything. Sound quality is just incredible. Fast dispatch and great communication throughout.', helpful:18, images:['🎧','📦'] },
+    { name:'James O.', avatar:'👨🏻', color:'#059669', date:'2 weeks ago', stars:4, product:'Apple Watch Series 10', text:'Great experience overall. Watch is 100% genuine, works perfectly. Took 2 days to arrive (Cape Town) which was actually faster than expected. Only minor thing — the box had a small dent but the product was fine. Would recommend TechVibe without hesitation.', helpful:11, images:[] },
+    { name:'Nomsa D.', avatar:'👩🏿', color:'#dc2626', date:'3 weeks ago', stars:5, product:'MacBook Air M3', text:'This store is next level. I have bought 4 laptops from TechVibe over the years and never once had a bad experience. They even followed up after delivery to make sure everything was fine. Customer service is genuinely the best on this platform.', helpful:35, images:['💻','🌟'] },
+    { name:'Ryan P.', avatar:'👨🏼', color:'#d97706', date:'1 month ago', stars:5, product:'USB-C GaN Charger', text:'Exactly what I needed. Charges my MacBook, iPad, and phone simultaneously. Genuine product, not a cheap knockoff. Price was the best I found anywhere. Quick delivery to Pretoria.', helpful:9, images:[] },
+  ];
+
+  /* ─── Render Products ────────────────────────────── */
+  function renderProducts(cat = 'all') {
+    const grid = document.getElementById('productGrid');
+    const list = cat === 'all' ? products : products.filter(p => p.cat === cat);
+    grid.innerHTML = list.map(p => `
+      <div class="product-card" data-cat="${p.cat}">
+        ${p.badge ? `<span class="card-badge badge-${p.badge}">${p.badgeLabel}</span>` : ''}
+        <button class="card-wishlist" onclick="toggleWishlist(this)">♡</button>
+        <div class="card-img">
+          <div class="card-img-inner">${p.emoji}</div>
+        </div>
+        <div class="card-body">
+          <div class="card-category">${p.cat}</div>
+          <div class="card-name">${p.name}</div>
+          <div class="card-rating">
+            <span class="card-stars">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5-Math.round(p.rating))}</span>
+            <span class="card-rating-count">(${p.reviews})</span>
+          </div>
+          <div class="card-price">
+            <span class="price-now">R${p.price.toLocaleString()}</span>
+            ${p.oldPrice ? `<span class="price-old">R${p.oldPrice.toLocaleString()}</span>` : ''}
+            ${p.discount ? `<span class="price-discount">−${p.discount}%</span>` : ''}
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn-add-cart" onclick="addToCart('${p.name}')">Add to Cart</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ─── Render Reviews ─────────────────────────────── */
+  function renderReviews() {
+    document.getElementById('reviewList').innerHTML = reviews.map(r => `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="reviewer-avatar" style="background:${r.color}">${r.avatar}</div>
+          <div>
+            <div class="reviewer-name">${r.name}</div>
+            <div class="reviewer-date">${r.date}</div>
+          </div>
+          <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+        </div>
+        <div class="review-product">Purchased: ${r.product}</div>
+        <p class="review-text">${r.text}</p>
+        ${r.images.length ? `<div class="review-images">${r.images.map(img => `<div class="review-thumb">${img}</div>`).join('')}</div>` : ''}
+        <div class="review-helpful">Helpful? <button onclick="markHelpful(this, ${r.helpful})">${r.helpful} people found this helpful</button></div>
+      </div>
+    `).join('');
+  }
+
+  /* ─── Render Top Sellers ─────────────────────────── */
+  function renderTopSellers() {
+    const top = [...products].sort((a,b) => b.reviews - a.reviews).slice(0, 4);
+    document.getElementById('topSellers').innerHTML = top.map(p => `
+      <div class="top-seller-item">
+        <div class="ts-img">${p.emoji}</div>
+        <div class="ts-info">
+          <div class="ts-name">${p.name}</div>
+          <div class="ts-price">R${p.price.toLocaleString()}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ─── Toast ──────────────────────────────────────── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  /* ─── Interactions ───────────────────────────────── */
+  function toggleWishlist(btn) {
+    btn.classList.toggle('liked');
+    btn.textContent = btn.classList.contains('liked') ? '♥' : '♡';
+    showToast(btn.classList.contains('liked') ? '♥ Added to wishlist' : 'Removed from wishlist');
+  }
+
+  function addToCart(name) {
+    const badge = document.querySelector('.cart-badge');
+    const n = parseInt(badge.textContent) + 1;
+    badge.textContent = n;
+    badge.style.transform = 'scale(1.4)';
+    setTimeout(() => badge.style.transform = '', 200);
+    showToast(`🛒 "${name.substring(0,28)}…" added to cart`);
+  }
+
+  function markHelpful(btn, count) {
+    btn.textContent = `${count+1} people found this helpful`;
+    btn.disabled = true;
+    btn.style.opacity = '.5';
+    showToast('Thanks for your feedback!');
+  }
+
+  /* ─── Tab Switching ──────────────────────────────── */
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ─── Filter Pills ───────────────────────────────── */
+  document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      renderProducts(pill.dataset.cat);
+      // sync sidebar categories
+      document.querySelectorAll('.cat-item').forEach(c => {
+        c.classList.toggle('active', c.dataset.sc === pill.dataset.cat);
+      });
+    });
+  });
+
+  /* ─── Sidebar Categories ─────────────────────────── */
+  document.querySelectorAll('.cat-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('active'));
+      item.classList.add('active');
+      const cat = item.dataset.sc;
+      renderProducts(cat);
+      // sync filter pills
+      document.querySelectorAll('.filter-pill').forEach(p => {
+        p.classList.toggle('active', p.dataset.cat === cat);
+      });
+      // switch to products tab
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelector('[data-tab="products"]').classList.add('active');
+      document.getElementById('panel-products').classList.add('active');
+    });
+  });
+
+  /* ─── Follow Button ──────────────────────────────── */
+  let following = false;
+  document.getElementById('followBtn').addEventListener('click', function() {
+    following = !following;
+    this.classList.toggle('following', following);
+    this.classList.add('pop');
+    document.getElementById('followIcon').textContent = following ? '✓' : '＋';
+    document.getElementById('followText').textContent = following ? 'Following' : 'Follow Store';
+    setTimeout(() => this.classList.remove('pop'), 300);
+    showToast(following ? '✓ Now following TechVibe Store!' : 'Unfollowed TechVibe Store');
+  });
+
+  /* ─── Contact Buttons ────────────────────────────── */
+  ['contactBtn','sideContactBtn'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', () => {
+      showToast('💬 Opening chat with TechVibe Store…');
+    });
+  });
+
+  /* ─── Dark Mode ──────────────────────────────────── */
+  const html = document.documentElement;
+  const themeBtn = document.getElementById('themeToggle');
+  function updateThemeIcon() {
+    themeBtn.textContent = html.dataset.theme === 'dark' ? '☀️' : '🌙';
+  }
+  themeBtn.addEventListener('click', () => {
+    html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('mbm-theme', html.dataset.theme);
+    updateThemeIcon();
+  });
+  // restore saved preference
+  const saved = localStorage.getItem('mbm-theme');
+  if (saved) { html.dataset.theme = saved; updateThemeIcon(); }
+
+  /* ─── Init ───────────────────────────────────────── */
+  renderProducts();
+  renderReviews();
+  renderTopSellers();
+</script>
+</body>
+</html>

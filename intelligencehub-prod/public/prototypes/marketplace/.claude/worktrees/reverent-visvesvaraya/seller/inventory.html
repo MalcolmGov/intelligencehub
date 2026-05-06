@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - Market by MoMo Seller Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background: #1A1A2E;
+            color: #FFFFFF;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 30px 0;
+            border-right: 1px solid rgba(255, 204, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFCC00;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: #9E9E9E;
+        }
+
+        .store-info {
+            padding: 20px;
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 8px;
+            margin: 20px;
+            margin-bottom: 30px;
+        }
+
+        .store-avatar {
+            width: 50px;
+            height: 50px;
+            background: #FFCC00;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #1A1A2E;
+            font-size: 20px;
+        }
+
+        .store-name {
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .store-email {
+            font-size: 11px;
+            color: #9E9E9E;
+            text-align: center;
+        }
+
+        .nav-items {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 8px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 204, 0, 0.1);
+            border-left-color: #FFCC00;
+        }
+
+        .nav-link.active {
+            color: #FFCC00;
+            border-left-color: #FFCC00;
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+            font-size: 12px;
+            color: #9E9E9E;
+            text-align: center;
+        }
+
+        .sidebar-footer-links {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .sidebar-footer-links a {
+            color: #FFCC00;
+            text-decoration: none;
+            font-size: 11px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 40px;
+        }
+
+        .page-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A1A2E;
+            margin-bottom: 30px;
+        }
+
+        .page-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #FFCC00;
+            color: #1A1A2E;
+        }
+
+        .btn-primary:hover {
+            background: #FFD633;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: #F0F0F0;
+            color: #1A1A2E;
+        }
+
+        .btn-secondary:hover {
+            background: #E0E0E0;
+        }
+
+        .search-bar {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #FFCC00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #FFFFFF;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #E0E0E0;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #9E9E9E;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1A1A2E;
+        }
+
+        /* Low Stock Alert */
+        .alert {
+            background: rgba(255, 149, 0, 0.1);
+            border: 1px solid #FF9500;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .alert-icon {
+            font-size: 20px;
+        }
+
+        .alert-text {
+            font-size: 13px;
+            color: #1A1A2E;
+        }
+
+        .alert-link {
+            color: #FF9500;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .alert-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Table */
+        .table-container {
+            background: #FFFFFF;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #E0E0E0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #F8F9FA;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            color: #1A1A2E;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #E0E0E0;
+            font-size: 13px;
+            color: #1A1A2E;
+        }
+
+        tr:hover {
+            background: #F8F9FA;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .product-cell {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .product-image {
+            width: 40px;
+            height: 40px;
+            background: #F0F0F0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .product-name {
+            font-weight: 600;
+        }
+
+        .product-sku {
+            font-size: 11px;
+            color: #9E9E9E;
+        }
+
+        .stock-bar {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .stock-fill {
+            flex: 1;
+            height: 6px;
+            background: #E0E0E0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stock-fill-bar {
+            height: 100%;
+            background: #00B074;
+            border-radius: 3px;
+        }
+
+        .stock-fill-bar.low {
+            background: #FF9500;
+        }
+
+        .stock-fill-bar.empty {
+            background: #FF3B30;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .status-active {
+            background: rgba(0, 176, 116, 0.1);
+            color: #00B074;
+        }
+
+        .status-draft {
+            background: rgba(158, 158, 158, 0.1);
+            color: #9E9E9E;
+        }
+
+        .status-low {
+            background: rgba(255, 149, 0, 0.1);
+            color: #FF9500;
+        }
+
+        .status-empty {
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #E0E0E0;
+            background: #FFFFFF;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #1A1A2E;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            border-color: #FFCC00;
+            color: #FFCC00;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            right: -500px;
+            top: 0;
+            width: 500px;
+            height: 100vh;
+            background: #FFFFFF;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            z-index: 1000;
+            transition: right 0.3s ease;
+        }
+
+        .modal.active {
+            right: 0;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #E0E0E0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1A1A2E;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9E9E9E;
+        }
+
+        .modal-content {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-family: 'Outfit', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A2E;
+            margin-bottom: 8px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #FFCC00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .upload-zone {
+            border: 2px dashed #FFCC00;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-size: 13px;
+            color: #1A1A2E;
+            font-weight: 500;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            padding-top: 24px;
+            border-top: 1px solid #E0E0E0;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-primary {
+            background: #FFCC00;
+            color: #1A1A2E;
+        }
+
+        .modal-btn-primary:hover {
+            background: #FFD633;
+        }
+
+        .modal-btn-secondary {
+            background: #F0F0F0;
+            color: #1A1A2E;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #E0E0E0;
+        }
+
+        @media (max-width: 1024px) {
+            .modal {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .page-controls {
+                flex-direction: column;
+            }
+
+            .search-bar {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">Market by MoMo</div>
+            <div class="sidebar-subtitle">Seller Center</div>
+        </div>
+
+        <div class="store-info">
+            <div class="store-avatar">TU</div>
+            <div class="store-name">TechHub Uganda</div>
+            <div class="store-email">techhubu@gmail.com</div>
+        </div>
+
+        <ul class="nav-items">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="orders.html" class="nav-link">
+                    <span>📦</span>
+                    <span>Orders</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="inventory.html" class="nav-link active">
+                    <span>📋</span>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="storefront.html" class="nav-link">
+                    <span>🏪</span>
+                    <span>My Storefront</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="promotions.html" class="nav-link">
+                    <span>🎁</span>
+                    <span>Promotions</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span>💰</span>
+                    <span>Payouts</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span>📈</span>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span>⭐</span>
+                    <span>Reviews</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <span>⚙️</span>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-links">
+                <a href="#">View My Store →</a>
+            </div>
+            <div style="margin-bottom: 15px;">Help & Support</div>
+            <div>Logged in as: techhubu@gmail.com</div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1 class="page-title">Inventory</h1>
+
+        <!-- Page Controls -->
+        <div class="page-controls">
+            <button class="btn btn-primary" onclick="openAddProduct()">+ Add New Product</button>
+            <button class="btn btn-secondary">📥 Import CSV</button>
+            <input type="text" class="search-bar" placeholder="Search products...">
+            <select class="btn btn-secondary" style="padding: 0 16px;">
+                <option>All Categories</option>
+                <option>Electronics</option>
+                <option>Fashion</option>
+                <option>Home</option>
+            </select>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-label">Total Products</div>
+                <div class="stat-value">84</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">In Stock</div>
+                <div class="stat-value">71</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Low Stock</div>
+                <div class="stat-value" style="color: #FF9500;">9</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Out of Stock</div>
+                <div class="stat-value" style="color: #FF3B30;">4</div>
+            </div>
+        </div>
+
+        <!-- Low Stock Alert -->
+        <div class="alert">
+            <div class="alert-icon">⚠️</div>
+            <div>
+                <div class="alert-text"><strong>9 products running low</strong> — restock soon</div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"><input type="checkbox" class="checkbox"></th>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">📱</div>
+                                <div class="product-info">
+                                    <div class="product-name">Samsung Galaxy A54</div>
+                                    <div class="product-sku">SKU-001</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Electronics</td>
+                        <td>UGX 890,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar" style="width: 94%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">47</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn" onclick="openEditProduct(event)">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">🎧</div>
+                                <div class="product-info">
+                                    <div class="product-name">JBL Bluetooth Speaker</div>
+                                    <div class="product-sku">SKU-002</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Electronics</td>
+                        <td>UGX 185,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar" style="width: 46%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">23</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">💻</div>
+                                <div class="product-info">
+                                    <div class="product-name">HP Pavilion Laptop</div>
+                                    <div class="product-sku">SKU-003</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Electronics</td>
+                        <td>UGX 1,850,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar low" style="width: 6%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">3</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-low">⚠️ Low Stock</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">📺</div>
+                                <div class="product-info">
+                                    <div class="product-name">Samsung 43" TV</div>
+                                    <div class="product-sku">SKU-004</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Electronics</td>
+                        <td>UGX 1,290,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar empty" style="width: 0%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">0</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-empty">❌ Out of Stock</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">👕</div>
+                                <div class="product-info">
+                                    <div class="product-name">Nike Joggers</div>
+                                    <div class="product-sku">SKU-005</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Fashion</td>
+                        <td>UGX 125,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar" style="width: 60%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">38</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">🛋️</div>
+                                <div class="product-info">
+                                    <div class="product-name">Modern Office Chair</div>
+                                    <div class="product-sku">SKU-006</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Home</td>
+                        <td>UGX 450,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar" style="width: 80%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">12</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">⌚</div>
+                                <div class="product-info">
+                                    <div class="product-name">Apple Watch Series 8</div>
+                                    <div class="product-sku">SKU-007</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Electronics</td>
+                        <td>UGX 1,200,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar low" style="width: 12%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">5</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-low">⚠️ Low Stock</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">🎮</div>
+                                <div class="product-info">
+                                    <div class="product-name">PlayStation 5 Console</div>
+                                    <div class="product-sku">SKU-008</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Electronics</td>
+                        <td>UGX 2,100,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar" style="width: 35%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">7</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-draft">Draft</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">🎧</div>
+                                <div class="product-info">
+                                    <div class="product-name">Sony WH-1000XM4 Headphones</div>
+                                    <div class="product-sku">SKU-009</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Electronics</td>
+                        <td>UGX 850,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar" style="width: 70%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">14</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="checkbox" class="checkbox"></td>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">💾</div>
+                                <div class="product-info">
+                                    <div class="product-name">USB-C External SSD 1TB</div>
+                                    <div class="product-sku">SKU-010</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>Electronics</td>
+                        <td>UGX 320,000</td>
+                        <td>
+                            <div class="stock-bar">
+                                <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                                    <div class="stock-fill">
+                                        <div class="stock-fill-bar" style="width: 40%;"></div>
+                                    </div>
+                                    <span style="min-width: 30px;">8</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn">Edit</button>
+                                <button class="action-btn">View</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeProduct()"></div>
+
+    <!-- Add/Edit Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">Add New Product</div>
+            <button class="modal-close" onclick="closeProduct()">✕</button>
+        </div>
+
+        <div class="modal-content">
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-input" placeholder="e.g., Samsung Galaxy A54">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-select">
+                    <option>Select category</option>
+                    <option>Electronics</option>
+                    <option>Fashion</option>
+                    <option>Home</option>
+                    <option>Food & Beverages</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea class="form-textarea" placeholder="Describe your product..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Product Images</label>
+                <div class="upload-zone">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">Click to upload or drag & drop</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label">Regular Price</label>
+                    <input type="text" class="form-input" placeholder="UGX 0">
+                </div>
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label class="form-label">Sale Price</label>
+                    <input type="text" class="form-input" placeholder="UGX 0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Quantity in Stock</label>
+                <input type="number" class="form-input" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">SKU</label>
+                <input type="text" class="form-input" placeholder="e.g., SKU-001">
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="closeProduct()">Cancel</button>
+                <button class="modal-btn modal-btn-primary">Save & Publish</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openAddProduct() {
+            document.getElementById('modalTitle').textContent = 'Add New Product';
+            document.getElementById('productModal').classList.add('active');
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function openEditProduct(event) {
+            event.stopPropagation();
+            document.getElementById('modalTitle').textContent = 'Edit Product';
+            document.getElementById('productModal').classList.add('active');
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeProduct() {
+            document.getElementById('productModal').classList.remove('active');
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

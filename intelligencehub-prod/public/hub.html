@@ -2703,7 +2703,7 @@ body.brief-active .nav-right { opacity: 1; }
     justify-content: center;
     z-index: 10000;
     opacity: 0;
-    pointer-events: none;
+    pointer-events: auto;
     animation: ux-fade-in 0.4s ease-out forwards;
   }
 
@@ -3438,6 +3438,10 @@ body.brief-active .nav-right { opacity: 1; }
 </style>
 </head>
 <body>
+
+<!-- Background canvas layers for 3D neural network and matrix rain -->
+<canvas id="neural-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.25;" aria-hidden="true"></canvas>
+<canvas id="matrix-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.07;" aria-hidden="true"></canvas>
 
 <!-- Shared SVG defs — gradient for progress rings etc. -->
 <svg width="0" height="0" style="position:absolute;pointer-events:none;" aria-hidden="true">
@@ -9623,14 +9627,19 @@ function filterModels(filter) {
   </p>
 </footer>
 
+<!-- Three.js for 3D neural network visualization -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <!-- JavaScript -->
 <script>
 // ========== 1. THREE.JS 3D NEURAL NETWORK ==========
 // Defer init so HTML parse & paint complete first
 (function() { setTimeout(function() {
+  const neuralCanvas = document.getElementById('neural-canvas');
+  if (!neuralCanvas) return;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-  const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('neural-canvas'), alpha: true, antialias: true });
+  const renderer = new THREE.WebGLRenderer({ canvas: neuralCanvas, alpha: true, antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -9774,6 +9783,7 @@ function filterModels(filter) {
 // ========== 2. DATA MATRIX RAIN ==========
 (function() {
   const c = document.getElementById('matrix-canvas');
+  if (!c) return;
   const ctx = c.getContext('2d');
   c.width = window.innerWidth;
   c.height = window.innerHeight;
@@ -20671,6 +20681,7 @@ html[data-theme="dark"] .spark-scenario.scenario-aggressive .spark-scenario-labe
 
 <script>
 /* ===== UX Feature A: Welcome Modal + Banner ===== */
+document.addEventListener('DOMContentLoaded', function() {
 
   // Welcome Modal Logic
   const welcomeModal = document.getElementById('ux-welcome-modal');
@@ -21055,6 +21066,7 @@ html[data-theme="dark"] .spark-scenario.scenario-aggressive .spark-scenario-labe
     }
   })();
 
+}); // end DOMContentLoaded — UX Feature A
 </script>
 
 

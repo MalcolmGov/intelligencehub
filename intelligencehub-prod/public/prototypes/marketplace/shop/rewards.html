@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MoMo Rewards — Loyalty Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Tokens ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1B4F8A;
+      --navy-dark: #143d6b;
+      --navy-light: #2563b0;
+      --yellow: #FFCC00;
+      --yellow-dark: #e6b800;
+      --yellow-light: #ffe566;
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface2: #f0f3f8;
+      --border: #dde3ed;
+      --text: #0f1b2d;
+      --text-muted: #5a6a82;
+      --text-inv: #ffffff;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 2px 16px rgba(27,79,138,.1);
+      --shadow-lg: 0 8px 40px rgba(27,79,138,.18);
+      --font-head: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --transition: .2s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0b1422;
+      --surface: #111f33;
+      --surface2: #162440;
+      --border: #1e3050;
+      --text: #e8edf5;
+      --text-muted: #7a90b0;
+      --shadow: 0 2px 16px rgba(0,0,0,.4);
+      --shadow-lg: 0 8px 40px rgba(0,0,0,.5);
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+
+    /* ── Scrollbar ────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Layout ───────────────────────────────────────────────── */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Top Bar ──────────────────────────────────────────────── */
+    .topbar {
+      background: var(--navy);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,.25);
+    }
+    .topbar-brand {
+      font-family: var(--font-head);
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--yellow);
+      text-decoration: none;
+      letter-spacing: -.5px;
+    }
+    .topbar-brand span { color: #fff; }
+    .topbar-actions { display: flex; gap: 12px; align-items: center; }
+    .btn-theme {
+      background: rgba(255,255,255,.12);
+      border: none;
+      border-radius: 8px;
+      width: 36px; height: 36px;
+      cursor: pointer;
+      color: #fff;
+      font-size: 1rem;
+      display: grid; place-items: center;
+      transition: background var(--transition);
+    }
+    .btn-theme:hover { background: rgba(255,255,255,.22); }
+    .topbar-pts {
+      background: var(--yellow);
+      color: var(--navy);
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: .85rem;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, #3d7fc4 100%);
+      padding: 56px 20px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-label {
+      display: inline-block;
+      background: rgba(255,204,0,.18);
+      color: var(--yellow);
+      font-family: var(--font-head);
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,204,0,.3);
+      margin-bottom: 18px;
+    }
+    .hero-name {
+      color: #fff;
+      font-family: var(--font-head);
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+      opacity: .85;
+    }
+    .hero-points {
+      font-family: var(--font-head);
+      font-size: clamp(3.5rem, 10vw, 6rem);
+      font-weight: 800;
+      color: var(--yellow);
+      line-height: 1;
+      letter-spacing: -3px;
+      margin-bottom: 8px;
+      text-shadow: 0 4px 24px rgba(255,204,0,.35);
+    }
+    .hero-pts-label {
+      color: rgba(255,255,255,.75);
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 28px;
+    }
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: .95rem;
+      margin-bottom: 28px;
+    }
+    .tier-badge.bronze { background: linear-gradient(135deg,#cd7f32,#a0522d); color: #fff; }
+    .tier-badge.silver { background: linear-gradient(135deg,#c0c0c0,#808080); color: #fff; }
+    .tier-badge.gold { background: linear-gradient(135deg,#ffd700,#ffa500); color: #333; }
+    .tier-badge.platinum { background: linear-gradient(135deg,#e5e4e2,#a0b2c4); color: #1a1a2e; }
+    .tier-badge .tier-icon { font-size: 1.2rem; }
+
+    .progress-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      color: rgba(255,255,255,.7);
+      font-size: .8rem;
+      margin-bottom: 8px;
+    }
+    .progress-bar-track {
+      background: rgba(255,255,255,.15);
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, var(--yellow), #ff9900);
+      border-radius: 999px;
+      height: 100%;
+      width: 0;
+      transition: width 1.4s cubic-bezier(.25,.8,.25,1);
+      position: relative;
+    }
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 50%;
+      transform: translate(50%,-50%);
+      width: 16px; height: 16px;
+      background: #fff;
+      border: 3px solid var(--yellow);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px rgba(255,204,0,.35);
+    }
+    .progress-note {
+      color: rgba(255,255,255,.6);
+      font-size: .8rem;
+      margin-top: 10px;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-stat { color: rgba(255,255,255,.8); text-align: center; }
+    .hero-stat-val { display: block; font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; color: #fff; }
+    .hero-stat-key { font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ── Section Titles ───────────────────────────────────────── */
+    .section { padding: 64px 0; }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(1.4rem, 3vw, 1.85rem);
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .section-sub {
+      color: var(--text-muted);
+      font-size: .95rem;
+      margin-bottom: 36px;
+    }
+    .section-header { margin-bottom: 36px; }
+
+    /* ── Card ─────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: box-shadow var(--transition);
+    }
+    .card:hover { box-shadow: var(--shadow-lg); }
+
+    /* ── How It Works ─────────────────────────────────────────── */
+    .earn-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .earn-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      text-align: center;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .earn-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .earn-icon {
+      width: 60px; height: 60px;
+      border-radius: 18px;
+      display: grid; place-items: center;
+      font-size: 1.6rem;
+      margin: 0 auto 16px;
+    }
+    .earn-icon.blue { background: rgba(27,79,138,.12); }
+    .earn-icon.yellow { background: rgba(255,204,0,.18); }
+    .earn-icon.green { background: rgba(34,197,94,.12); }
+    .earn-icon.purple { background: rgba(139,92,246,.12); }
+    .earn-icon.orange { background: rgba(249,115,22,.12); }
+    .earn-pts {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    [data-theme="dark"] .earn-pts { color: var(--yellow); }
+    .earn-label { font-weight: 600; font-size: .9rem; margin: 4px 0; }
+    .earn-desc { color: var(--text-muted); font-size: .8rem; line-height: 1.5; }
+
+    /* ── Daily Check-in ───────────────────────────────────────── */
+    .checkin-wrap {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      border-radius: var(--radius);
+      padding: 36px;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .checkin-wrap::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M20 0L0 20L20 40L40 20Z'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    .checkin-header { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
+    .checkin-title { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; }
+    .checkin-streak { background: rgba(255,204,0,.15); border: 1px solid rgba(255,204,0,.35); border-radius: 12px; padding: 8px 16px; text-align: center; }
+    .streak-val { font-family: var(--font-head); font-size: 2rem; font-weight: 800; color: var(--yellow); line-height: 1; }
+    .streak-label { font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; opacity: .75; }
+    .days-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 10px; position: relative; z-index: 1; margin-bottom: 28px; }
+    .day-item {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: default;
+      transition: transform var(--transition);
+    }
+    .day-item.checked {
+      background: rgba(255,204,0,.22);
+      border-color: var(--yellow);
+    }
+    .day-item.today-item {
+      background: rgba(255,204,0,.35);
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(255,204,0,.3);
+      animation: pulse-day 2s ease-in-out infinite;
+    }
+    @keyframes pulse-day {
+      0%,100% { box-shadow: 0 0 0 3px rgba(255,204,0,.3); }
+      50% { box-shadow: 0 0 0 6px rgba(255,204,0,.15); }
+    }
+    .day-name { font-size: .68rem; text-transform: uppercase; letter-spacing: .5px; opacity: .65; margin-bottom: 6px; }
+    .day-icon { font-size: 1.3rem; margin-bottom: 4px; }
+    .day-pts { font-family: var(--font-head); font-size: .75rem; font-weight: 700; color: var(--yellow); }
+    .checkin-btn {
+      position: relative; z-index: 1;
+      display: block;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      background: var(--yellow);
+      color: var(--navy);
+      font-family: var(--font-head);
+      font-size: 1rem;
+      font-weight: 800;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 32px;
+      cursor: pointer;
+      transition: all var(--transition);
+      letter-spacing: .3px;
+    }
+    .checkin-btn:hover { background: var(--yellow-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,204,0,.4); }
+    .checkin-btn:active { transform: translateY(0); }
+    .checkin-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .checkin-btn .btn-text { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+    /* ── Rewards Catalog ──────────────────────────────────────── */
+    .rewards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .reward-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition);
+      cursor: pointer;
+    }
+    .reward-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .reward-thumb {
+      height: 120px;
+      display: grid;
+      place-items: center;
+      font-size: 3rem;
+    }
+    .reward-thumb.color-blue { background: linear-gradient(135deg,#dbeafe,#bfdbfe); }
+    .reward-thumb.color-green { background: linear-gradient(135deg,#dcfce7,#bbf7d0); }
+    .reward-thumb.color-yellow { background: linear-gradient(135deg,#fefce8,#fef08a); }
+    .reward-thumb.color-purple { background: linear-gradient(135deg,#f3e8ff,#e9d5ff); }
+    .reward-thumb.color-orange { background: linear-gradient(135deg,#ffedd5,#fed7aa); }
+    .reward-thumb.color-pink { background: linear-gradient(135deg,#fce7f3,#fbcfe8); }
+    [data-theme="dark"] .reward-thumb.color-blue { background: linear-gradient(135deg,#1e3a5f,#1e40af44); }
+    [data-theme="dark"] .reward-thumb.color-green { background: linear-gradient(135deg,#14532d,#16653544); }
+    [data-theme="dark"] .reward-thumb.color-yellow { background: linear-gradient(135deg,#451a03,#78350f44); }
+    [data-theme="dark"] .reward-thumb.color-purple { background: linear-gradient(135deg,#2e1065,#4c1d9544); }
+    [data-theme="dark"] .reward-thumb.color-orange { background: linear-gradient(135deg,#431407,#7c2d1244); }
+    [data-theme="dark"] .reward-thumb.color-pink { background: linear-gradient(135deg,#500724,#83182c44); }
+    .reward-body { padding: 16px; }
+    .reward-name { font-family: var(--font-head); font-weight: 700; font-size: .95rem; margin-bottom: 4px; }
+    .reward-desc { color: var(--text-muted); font-size: .78rem; margin-bottom: 12px; line-height: 1.5; }
+    .reward-footer { display: flex; align-items: center; justify-content: space-between; }
+    .reward-pts-cost {
+      display: flex; align-items: center; gap: 5px;
+      font-family: var(--font-head); font-weight: 700; font-size: .9rem;
+      color: var(--navy);
+    }
+    [data-theme="dark"] .reward-pts-cost { color: var(--yellow); }
+    .reward-pts-cost .star { color: var(--yellow); font-size: 1rem; }
+    .btn-redeem {
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-family: var(--font-head);
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-redeem:hover { background: var(--navy-dark); }
+    .btn-redeem.insufficient { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+    .reward-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      background: var(--navy);
+      color: var(--yellow);
+      font-size: .65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .reward-card { position: relative; }
+
+    /* ── Points History ───────────────────────────────────────── */
+    .history-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+    thead th {
+      background: var(--surface2);
+      padding: 12px 16px;
+      text-align: left;
+      font-family: var(--font-head);
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+    .tx-source { display: flex; align-items: center; gap: 10px; }
+    .tx-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tx-dot.earn { background: var(--success); }
+    .tx-dot.spend { background: var(--danger); }
+    .tx-pts.earn { color: var(--success); font-weight: 700; }
+    .tx-pts.spend { color: var(--danger); font-weight: 700; }
+    .tx-balance { font-family: var(--font-head); font-weight: 600; }
+    .tx-date { color: var(--text-muted); font-size: .8rem; }
+
+    /* ── Referral ─────────────────────────────────────────────── */
+    .referral-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 700px) { .referral-grid { grid-template-columns: 1fr; } }
+    .referral-left { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+    .referral-right { display: grid; gap: 16px; }
+    .ref-label { color: var(--text-muted); font-size: .8rem; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; }
+    .ref-code-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+    }
+    .ref-code {
+      font-family: var(--font-head);
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: var(--navy);
+      flex: 1;
+    }
+    [data-theme="dark"] .ref-code { color: var(--yellow); }
+    .btn-copy {
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-weight: 600;
+      font-size: .8rem;
+      cursor: pointer;
+      transition: background var(--transition);
+      white-space: nowrap;
+    }
+    .btn-copy:hover { background: var(--navy-dark); }
+    .share-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-share {
+      flex: 1;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: opacity var(--transition);
+    }
+    .btn-share:hover { opacity: .85; }
+    .btn-share.whatsapp { background: #25D366; color: #fff; }
+    .btn-share.twitter { background: #1DA1F2; color: #fff; }
+    .btn-share.link { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .ref-stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 20px; display: flex; align-items: center; gap: 16px; }
+    .ref-stat-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0; }
+    .ref-stat-icon.purple { background: rgba(139,92,246,.12); }
+    .ref-stat-icon.green { background: rgba(34,197,94,.12); }
+    .ref-stat-icon.yellow { background: rgba(255,204,0,.18); }
+    .ref-stat-val { font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; line-height: 1; }
+    .ref-stat-key { color: var(--text-muted); font-size: .78rem; margin-top: 3px; }
+
+    /* ── Tier Benefits ────────────────────────────────────────── */
+    .tier-table-wrap { overflow-x: auto; }
+    .tier-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .85rem;
+    }
+    .tier-table th, .tier-table td {
+      padding: 14px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .tier-table th:first-child,
+    .tier-table td:first-child { text-align: left; font-weight: 500; }
+    .tier-table thead th { font-family: var(--font-head); font-size: .8rem; font-weight: 700; background: var(--surface2); }
+    .tier-table thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    .tier-table thead th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+    .tier-table .tier-head-bronze { color: #a0522d; }
+    .tier-table .tier-head-silver { color: #808080; }
+    .tier-table .tier-head-gold { color: #d97706; }
+    .tier-table .tier-head-platinum { color: #4b5e72; }
+    [data-theme="dark"] .tier-table .tier-head-platinum { color: #94a3b8; }
+    .check { color: var(--success); font-size: 1rem; }
+    .cross { color: var(--border); font-size: 1rem; }
+    .tier-table tbody tr:hover td { background: var(--surface2); }
+    .tier-table td.highlight { background: rgba(255,204,0,.08); font-weight: 600; }
+
+    /* ── Achievements ─────────────────────────────────────────── */
+    .badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+    .badge-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px 16px;
+      text-align: center;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .badge-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .badge-card.locked { opacity: .45; filter: grayscale(.7); }
+    .badge-icon-wrap {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-size: 1.6rem;
+      margin: 0 auto 12px;
+      border: 2px solid var(--border);
+    }
+    .badge-card:not(.locked) .badge-icon-wrap {
+      border-color: var(--yellow);
+      background: rgba(255,204,0,.1);
+      box-shadow: 0 0 0 4px rgba(255,204,0,.2);
+    }
+    .badge-name { font-family: var(--font-head); font-size: .82rem; font-weight: 700; margin-bottom: 4px; }
+    .badge-desc { color: var(--text-muted); font-size: .72rem; line-height: 1.4; }
+    .badge-earned { color: var(--success); font-size: .7rem; font-weight: 600; margin-top: 6px; }
+    .badge-locked-lbl { color: var(--text-muted); font-size: .7rem; margin-top: 6px; }
+
+    /* ── Leaderboard ──────────────────────────────────────────── */
+    .leaderboard-list { display: grid; gap: 10px; }
+    .lb-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 18px;
+      transition: background var(--transition);
+    }
+    .lb-item:hover { background: var(--surface2); }
+    .lb-item.top-3 { border-color: rgba(255,204,0,.5); background: rgba(255,204,0,.04); }
+    .lb-rank {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: grid; place-items: center;
+      font-family: var(--font-head);
+      font-weight: 800;
+      font-size: .85rem;
+      flex-shrink: 0;
+    }
+    .rank-1 { background: linear-gradient(135deg,#ffd700,#ff9900); color: #333; }
+    .rank-2 { background: linear-gradient(135deg,#c0c0c0,#999); color: #fff; }
+    .rank-3 { background: linear-gradient(135deg,#cd7f32,#a0522d); color: #fff; }
+    .rank-other { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+    .lb-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      display: grid; place-items: center;
+      font-family: var(--font-head);
+      font-weight: 700;
+      font-size: .9rem;
+      color: var(--yellow);
+      flex-shrink: 0;
+    }
+    .lb-name { font-family: var(--font-head); font-weight: 600; font-size: .9rem; flex: 1; }
+    .lb-pts-val { font-family: var(--font-head); font-weight: 700; font-size: .95rem; color: var(--navy); }
+    [data-theme="dark"] .lb-pts-val { color: var(--yellow); }
+    .lb-pts-label { color: var(--text-muted); font-size: .72rem; }
+    .lb-you { background: rgba(27,79,138,.08); border-color: var(--navy); }
+    [data-theme="dark"] .lb-you { background: rgba(255,204,0,.06); border-color: rgba(255,204,0,.4); }
+    .you-tag { background: var(--navy); color: var(--yellow); font-size: .65rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+    [data-theme="dark"] .you-tag { background: var(--yellow); color: var(--navy); }
+
+    /* ── Notification Toast ───────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: var(--shadow-lg);
+      z-index: 9999;
+      font-weight: 600;
+      font-size: .9rem;
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      white-space: nowrap;
+      max-width: 90vw;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Confetti ─────────────────────────────────────────────── */
+    #confetti-canvas {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+    }
+
+    /* ── Misc ─────────────────────────────────────────────────── */
+    .tag {
+      display: inline-block;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .tag.new { background: rgba(239,68,68,.1); color: #ef4444; }
+    .tag.popular { background: rgba(245,158,11,.12); color: #d97706; }
+    .tag.limited { background: rgba(139,92,246,.1); color: #8b5cf6; }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0;
+    }
+
+    /* ── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .days-grid { grid-template-columns: repeat(4,1fr); }
+      .days-grid .day-item:nth-child(n+5) { display: none; }
+      .earn-grid { grid-template-columns: repeat(2,1fr); }
+      .hero-stats { gap: 20px; }
+      .rewards-grid { grid-template-columns: repeat(2,1fr); }
+      .badges-grid { grid-template-columns: repeat(3,1fr); }
+    }
+    @media (max-width: 480px) {
+      .hero { padding: 40px 16px 48px; }
+      .earn-grid { grid-template-columns: 1fr 1fr; }
+      .rewards-grid { grid-template-columns: 1fr; }
+      .badges-grid { grid-template-columns: repeat(2,1fr); }
+      .section { padding: 40px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Confetti Canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Toast -->
+<div id="toast">
+  <span id="toast-icon">🎉</span>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<!-- ── Top Bar ──────────────────────────────────────────────────── -->
+<nav class="topbar">
+  <a href="../index.html" class="topbar-brand">Mo<span>Mo</span> Market</a>
+  <div class="topbar-actions">
+    <span class="topbar-pts" id="nav-pts">2,450 pts</span>
+    <button class="btn-theme" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</nav>
+
+<!-- ── Hero ────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-label">✦ Loyalty &amp; Rewards Center</div>
+    <div class="hero-name">Welcome back, Sarah K.!</div>
+    <div class="hero-points" id="pointsCounter">0</div>
+    <div class="hero-pts-label">Total MoMo Points</div>
+
+    <div class="tier-badge gold" id="tierBadge">
+      <span class="tier-icon">🥇</span>
+      <span>Gold Member</span>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-labels">
+        <span>Gold · 2,450 pts</span>
+        <span>Platinum · 5,000 pts</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <div class="progress-note">2,550 more points to unlock Platinum tier</div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-val">23</span>
+        <span class="hero-stat-key">Orders</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-val">7</span>
+        <span class="hero-stat-key">Day Streak</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-val">4</span>
+        <span class="hero-stat-key">Rewards Redeemed</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-val">12</span>
+        <span class="hero-stat-key">Referrals</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ─────────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">How to Earn Points</h2>
+      <p class="section-sub">Every action gets you closer to amazing rewards</p>
+    </div>
+    <div class="earn-grid">
+      <div class="earn-card">
+        <div class="earn-icon blue">🛒</div>
+        <div class="earn-pts">1 pt</div>
+        <div class="earn-label">Per UGX 1,000 Spent</div>
+        <div class="earn-desc">Earn points on every purchase. Gold &amp; Platinum members get 1.5x–2x multipliers.</div>
+      </div>
+      <div class="earn-card">
+        <div class="earn-icon yellow">⭐</div>
+        <div class="earn-pts">+50 pts</div>
+        <div class="earn-label">Write a Review</div>
+        <div class="earn-desc">Share your experience on any product you've purchased. Max 5 reviews/month.</div>
+      </div>
+      <div class="earn-card">
+        <div class="earn-icon green">👥</div>
+        <div class="earn-pts">+200 pts</div>
+        <div class="earn-label">Refer a Friend</div>
+        <div class="earn-desc">Both you and your friend earn 200 points when they complete their first order.</div>
+      </div>
+      <div class="earn-card">
+        <div class="earn-icon purple">📅</div>
+        <div class="earn-pts">+10–100 pts</div>
+        <div class="earn-label">Daily Check-in</div>
+        <div class="earn-desc">Check in every day to build streaks. Longer streaks unlock bigger daily bonuses.</div>
+      </div>
+      <div class="earn-card">
+        <div class="earn-icon orange">🎂</div>
+        <div class="earn-pts">+500 pts</div>
+        <div class="earn-label">Birthday Bonus</div>
+        <div class="earn-desc">We celebrate your birthday with a special 500-point gift, automatically added.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Daily Check-in ─────────────────────────────────────────── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="checkin-wrap">
+      <div class="checkin-header">
+        <div>
+          <h2 style="font-family:var(--font-head);font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:6px">Daily Check-in</h2>
+          <p style="color:rgba(255,255,255,.7);font-size:.875rem">Check in every day to keep your streak alive and earn more points!</p>
+        </div>
+        <div class="checkin-streak">
+          <div class="streak-val" id="streakCount">7</div>
+          <div class="streak-label">Day Streak 🔥</div>
+        </div>
+      </div>
+
+      <div class="days-grid" id="daysGrid">
+        <!-- Generated by JS -->
+      </div>
+
+      <button class="checkin-btn" id="checkinBtn" onclick="doCheckin()">
+        <span class="btn-text">
+          <span>✅</span>
+          <span>Check In for Today (+50 pts)</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── Rewards Catalog ────────────────────────────────────────── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Redeem Rewards</h2>
+      <p class="section-sub">Use your points to unlock exclusive discounts and perks</p>
+    </div>
+    <div class="rewards-grid" id="rewardsGrid">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ── Points History ─────────────────────────────────────────── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Points History</h2>
+      <p class="section-sub">A detailed record of how you've earned and spent points</p>
+    </div>
+    <div class="card">
+      <div class="history-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>Points</th>
+              <th>Balance</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <!-- Generated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Referral ──────────────────────────────────────────────── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Refer &amp; Earn</h2>
+      <p class="section-sub">Share your code and earn 200 points for every friend who joins</p>
+    </div>
+    <div class="referral-grid">
+      <div class="referral-left">
+        <p class="ref-label">Your Referral Code</p>
+        <div class="ref-code-box">
+          <span class="ref-code">SARAH200</span>
+          <button class="btn-copy" onclick="copyCode('SARAH200')">Copy</button>
+        </div>
+        <p class="ref-label" style="margin-bottom:12px">Share via</p>
+        <div class="share-btns">
+          <button class="btn-share whatsapp" onclick="shareWhatsApp()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.557 4.126 1.527 5.858L0 24l6.327-1.507C8.07 23.455 10.002 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.852 0-3.587-.502-5.083-1.375l-.365-.216-3.752.893.934-3.673-.239-.379C2.502 15.587 2 13.852 2 12 2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+            WhatsApp
+          </button>
+          <button class="btn-share twitter" onclick="shareTwitter()">
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+            Twitter
+          </button>
+          <button class="btn-share link" onclick="copyLink()">
+            🔗 Copy Link
+          </button>
+        </div>
+      </div>
+      <div class="referral-right">
+        <div class="ref-stat-card">
+          <div class="ref-stat-icon purple">👥</div>
+          <div>
+            <div class="ref-stat-val">12</div>
+            <div class="ref-stat-key">Friends Referred</div>
+          </div>
+        </div>
+        <div class="ref-stat-card">
+          <div class="ref-stat-icon green">✅</div>
+          <div>
+            <div class="ref-stat-val">9</div>
+            <div class="ref-stat-key">Conversions (made first order)</div>
+          </div>
+        </div>
+        <div class="ref-stat-card">
+          <div class="ref-stat-icon yellow">⭐</div>
+          <div>
+            <div class="ref-stat-val">1,800</div>
+            <div class="ref-stat-key">Total Referral Points Earned</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Tier Benefits ─────────────────────────────────────────── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Tier Benefits</h2>
+      <p class="section-sub">Unlock more perks as you rise through the tiers</p>
+    </div>
+    <div class="card tier-table-wrap">
+      <table class="tier-table">
+        <thead>
+          <tr>
+            <th>Benefit</th>
+            <th class="tier-head-bronze">🥉 Bronze<br><small style="font-weight:500;font-size:.72rem;opacity:.8">0–499 pts</small></th>
+            <th class="tier-head-silver">🥈 Silver<br><small style="font-weight:500;font-size:.72rem;opacity:.8">500–1,999 pts</small></th>
+            <th class="tier-head-gold">🥇 Gold<br><small style="font-weight:500;font-size:.72rem;opacity:.8">2,000–4,999 pts</small></th>
+            <th class="tier-head-platinum">💎 Platinum<br><small style="font-weight:500;font-size:.72rem;opacity:.8">5,000+ pts</small></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Points Multiplier</td>
+            <td>1×</td>
+            <td>1.25×</td>
+            <td class="highlight">1.5×</td>
+            <td>2×</td>
+          </tr>
+          <tr>
+            <td>Free Shipping Threshold</td>
+            <td>UGX 150k</td>
+            <td>UGX 100k</td>
+            <td class="highlight">UGX 50k</td>
+            <td>Always Free</td>
+          </tr>
+          <tr>
+            <td>Birthday Bonus</td>
+            <td>100 pts</td>
+            <td>250 pts</td>
+            <td class="highlight">500 pts</td>
+            <td>1,000 pts</td>
+          </tr>
+          <tr>
+            <td>Early Access to Sales</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="highlight check">✓</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td>Priority Customer Support</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="highlight check">✓</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td>Exclusive Products Access</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="highlight cross">✗</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td>Dedicated Account Manager</td>
+            <td class="cross">✗</td>
+            <td class="cross">✗</td>
+            <td class="highlight cross">✗</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td>Flash Sale Early Notifications</td>
+            <td class="cross">✗</td>
+            <td class="check">✓</td>
+            <td class="highlight check">✓</td>
+            <td class="check">✓</td>
+          </tr>
+          <tr>
+            <td>Review Points Bonus</td>
+            <td>50 pts</td>
+            <td>75 pts</td>
+            <td class="highlight">100 pts</td>
+            <td>150 pts</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── Achievements ──────────────────────────────────────────── -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Achievements &amp; Badges</h2>
+      <p class="section-sub">Collect badges to show off your MoMo Market journey</p>
+    </div>
+    <div class="badges-grid" id="badgesGrid">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ── Leaderboard ───────────────────────────────────────────── -->
+<section class="section" style="padding-top:0;padding-bottom:80px">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Monthly Leaderboard</h2>
+      <p class="section-sub">Top point earners for April 2026 — compete for exclusive Platinum rewards</p>
+    </div>
+    <div class="leaderboard-list" id="leaderboard">
+      <!-- Generated by JS -->
+    </div>
+  </div>
+</section>
+
+
+<script>
+/* ─── State ────────────────────────────────────────────────── */
+let userPoints = 2450;
+let streakDays = 7;
+let checkedInToday = false;
+
+/* ─── Theme Toggle ─────────────────────────────────────────── */
+const themeToggle = document.getElementById('themeToggle');
+function getTheme() { return document.documentElement.getAttribute('data-theme'); }
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  themeToggle.textContent = t === 'dark' ? '☀️' : '🌙';
+  localStorage.setItem('momo-theme', t);
+}
+(function() {
+  const saved = localStorage.getItem('momo-theme');
+  setTheme(saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+})();
+themeToggle.addEventListener('click', () => setTheme(getTheme() === 'dark' ? 'light' : 'dark'));
+
+/* ─── Animated Counter ─────────────────────────────────────── */
+function animateCounter(el, target, duration = 1800) {
+  let start = null;
+  const from = 0;
+  function step(ts) {
+    if (!start) start = ts;
+    const progress = Math.min((ts - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(from + (target - from) * ease).toLocaleString();
+    if (progress < 1) requestAnimationFrame(step);
+    else el.textContent = target.toLocaleString();
+  }
+  requestAnimationFrame(step);
+}
+animateCounter(document.getElementById('pointsCounter'), userPoints);
+
+/* ─── Progress Bar ─────────────────────────────────────────── */
+setTimeout(() => {
+  // Gold tier: 2000–4999. User at 2450. Progress = (2450-2000)/(5000-2000) = 450/3000 = 15%
+  document.getElementById('progressFill').style.width = '15%';
+}, 200);
+
+/* ─── Update Nav Points ────────────────────────────────────── */
+function updateNavPoints() {
+  document.getElementById('nav-pts').textContent = userPoints.toLocaleString() + ' pts';
+}
+
+/* ─── Daily Check-in Calendar ──────────────────────────────── */
+const dayData = [
+  { name: 'Mon', pts: 10, icon: '☀️' },
+  { name: 'Tue', pts: 15, icon: '⭐' },
+  { name: 'Wed', pts: 20, icon: '🌟' },
+  { name: 'Thu', pts: 25, icon: '💫' },
+  { name: 'Fri', pts: 30, icon: '🔥' },
+  { name: 'Sat', pts: 40, icon: '💎' },
+  { name: 'Sun', pts: 50, icon: '👑' },
+];
+function renderDays() {
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = dayData.map((d, i) => {
+    const checked = i < streakDays - (checkedInToday ? 0 : 1);
+    const isToday = i === streakDays - (checkedInToday ? 0 : 1);
+    let cls = 'day-item';
+    if (checked) cls += ' checked';
+    if (isToday && !checkedInToday) cls += ' today-item';
+    return `<div class="${cls}">
+      <div class="day-name">${d.name}</div>
+      <div class="day-icon">${checked || (isToday && checkedInToday) ? '✅' : d.icon}</div>
+      <div class="day-pts">+${d.pts}</div>
+    </div>`;
+  }).join('');
+}
+renderDays();
+
+function doCheckin() {
+  if (checkedInToday) return;
+  const pts = dayData[streakDays - 1]?.pts || 10;
+  checkedInToday = true;
+  userPoints += pts;
+  updateNavPoints();
+  animateCounter(document.getElementById('pointsCounter'), userPoints, 600);
+  document.getElementById('streakCount').textContent = streakDays;
+  const btn = document.getElementById('checkinBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="btn-text">✅ Checked In! Come back tomorrow</span>';
+  renderDays();
+  showToast('🔥', `+${pts} pts earned! ${streakDays}-day streak!`);
+  launchConfetti();
+}
+
+/* ─── Rewards Catalog ──────────────────────────────────────── */
+const rewards = [
+  { icon: '🎟️', color: 'color-blue', name: '10% Off Coupon', desc: 'Get 10% off your entire next order. Valid for 7 days after redemption.', pts: 500, tag: 'popular', tagLabel: 'Popular' },
+  { icon: '🚚', color: 'color-green', name: 'Free Shipping', desc: 'Free delivery on your next order, regardless of order value.', pts: 300, tag: 'popular', tagLabel: 'Popular' },
+  { icon: '🎁', color: 'color-yellow', name: 'Mystery Box', desc: 'A surprise selection of premium products curated just for you.', pts: 1200, tag: 'new', tagLabel: 'New' },
+  { icon: '⚡', color: 'color-purple', name: 'Early Access Pass', desc: 'Get 24-hour early access to flash sales and new product launches.', pts: 800, tag: null },
+  { icon: '💵', color: 'color-orange', name: 'UGX 5,000 Credit', desc: 'Add UGX 5,000 directly to your store wallet for any purchase.', pts: 1000, tag: null },
+  { icon: '🏷️', color: 'color-pink', name: '20% Off Coupon', desc: 'Our biggest discount coupon — 20% off one item in your cart.', pts: 1500, tag: 'limited', tagLabel: 'Limited' },
+  { icon: '👑', color: 'color-blue', name: 'VIP Upgrade (1 Month)', desc: 'Temporary Platinum tier upgrade with all exclusive benefits.', pts: 3000, tag: 'limited', tagLabel: 'Limited' },
+  { icon: '🎂', color: 'color-green', name: 'Birthday Bundle', desc: 'Special birthday gift package with selected premium items.', pts: 2000, tag: 'new', tagLabel: 'New' },
+];
+
+function renderRewards() {
+  const grid = document.getElementById('rewardsGrid');
+  grid.innerHTML = rewards.map((r, i) => {
+    const canAfford = userPoints >= r.pts;
+    return `<div class="reward-card">
+      ${r.tag ? `<div class="reward-badge">${r.tagLabel}</div>` : ''}
+      <div class="reward-thumb ${r.color}">${r.icon}</div>
+      <div class="reward-body">
+        <div class="reward-name">${r.name}</div>
+        <div class="reward-desc">${r.desc}</div>
+        <div class="reward-footer">
+          <div class="reward-pts-cost">
+            <span class="star">★</span>
+            ${r.pts.toLocaleString()} pts
+          </div>
+          <button class="btn-redeem${canAfford ? '' : ' insufficient'}"
+            onclick="redeemReward(${i})" ${canAfford ? '' : 'title="Not enough points"'}>
+            ${canAfford ? 'Redeem' : 'Need more'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderRewards();
+
+function redeemReward(idx) {
+  const r = rewards[idx];
+  if (userPoints < r.pts) {
+    showToast('⚠️', `You need ${(r.pts - userPoints).toLocaleString()} more points`);
+    return;
+  }
+  userPoints -= r.pts;
+  updateNavPoints();
+  animateCounter(document.getElementById('pointsCounter'), userPoints, 600);
+  renderRewards();
+  showToast('🎉', `"${r.name}" redeemed! Check your email.`);
+  launchConfetti();
+}
+
+/* ─── Points History ───────────────────────────────────────── */
+const history = [
+  { type: 'earn', source: '🛒 Order #8823 — Electronics', pts: +230, date: 'Apr 14, 2026', balance: 2450 },
+  { type: 'earn', source: '📅 Daily Check-in (7-day streak)', pts: +50, date: 'Apr 14, 2026', balance: 2220 },
+  { type: 'spend', source: '🎟️ Redeemed: 10% Off Coupon', pts: -500, date: 'Apr 13, 2026', balance: 2170 },
+  { type: 'earn', source: '👥 Referral Bonus — James M.', pts: +200, date: 'Apr 12, 2026', balance: 2670 },
+  { type: 'earn', source: '⭐ Review on "Wireless Earbuds"', pts: +100, date: 'Apr 11, 2026', balance: 2470 },
+  { type: 'earn', source: '🛒 Order #8791 — Fashion', pts: +180, date: 'Apr 10, 2026', balance: 2370 },
+  { type: 'earn', source: '📅 Daily Check-in', pts: +25, date: 'Apr 10, 2026', balance: 2190 },
+  { type: 'spend', source: '🚚 Redeemed: Free Shipping', pts: -300, date: 'Apr 8, 2026', balance: 2165 },
+  { type: 'earn', source: '🛒 Order #8742 — Home & Kitchen', pts: +320, date: 'Apr 7, 2026', balance: 2465 },
+  { type: 'earn', source: '👥 Referral Bonus — Amina T.', pts: +200, date: 'Apr 5, 2026', balance: 2145 },
+];
+
+function renderHistory() {
+  const body = document.getElementById('historyBody');
+  body.innerHTML = history.map(h => `
+    <tr>
+      <td>
+        <div class="tx-source">
+          <div class="tx-dot ${h.type}"></div>
+          <span>${h.source}</span>
+        </div>
+      </td>
+      <td class="tx-pts ${h.type}">${h.pts > 0 ? '+' : ''}${h.pts.toLocaleString()}</td>
+      <td class="tx-balance">${h.balance.toLocaleString()}</td>
+      <td class="tx-date">${h.date}</td>
+    </tr>`).join('');
+}
+renderHistory();
+
+/* ─── Achievements ─────────────────────────────────────────── */
+const badges = [
+  { icon: '🛒', name: 'First Purchase', desc: 'Completed your very first order', earned: true, date: 'Jan 2026' },
+  { icon: '🔟', name: '10 Orders', desc: 'Placed 10 orders on MoMo Market', earned: true, date: 'Feb 2026' },
+  { icon: '🏆', name: '25 Orders', desc: 'A loyal shopper — 25 orders!', earned: false, progress: '23/25' },
+  { icon: '⭐', name: 'Review Writer', desc: 'Written your first product review', earned: true, date: 'Feb 2026' },
+  { icon: '📝', name: 'Power Reviewer', desc: 'Written 10 or more reviews', earned: false, progress: '7/10' },
+  { icon: '👑', name: 'Referral King', desc: 'Referred 10 or more friends', earned: true, date: 'Mar 2026' },
+  { icon: '🔥', name: '7-Day Streak', desc: 'Checked in 7 days in a row', earned: true, date: 'Apr 2026' },
+  { icon: '💫', name: '30-Day Streak', desc: 'Maintain a 30-day check-in streak', earned: false, progress: '7/30' },
+  { icon: '🥇', name: 'Gold Member', desc: 'Reached Gold tier status', earned: true, date: 'Mar 2026' },
+  { icon: '💎', name: 'Platinum Elite', desc: 'Reached the coveted Platinum tier', earned: false, progress: '2,450/5,000 pts' },
+  { icon: '🎂', name: 'Birthday Special', desc: 'Received your birthday bonus points', earned: false, progress: 'Awaiting Apr 22' },
+  { icon: '🌍', name: 'Big Spender', desc: 'Spent over UGX 1,000,000 total', earned: false, progress: 'UGX 780k / 1M' },
+];
+
+function renderBadges() {
+  const grid = document.getElementById('badgesGrid');
+  grid.innerHTML = badges.map(b => `
+    <div class="badge-card ${b.earned ? '' : 'locked'}">
+      <div class="badge-icon-wrap">${b.icon}</div>
+      <div class="badge-name">${b.name}</div>
+      <div class="badge-desc">${b.desc}</div>
+      ${b.earned
+        ? `<div class="badge-earned">✓ Earned ${b.date}</div>`
+        : `<div class="badge-locked-lbl">🔒 ${b.progress}</div>`}
+    </div>`).join('');
+}
+renderBadges();
+
+/* ─── Leaderboard ──────────────────────────────────────────── */
+const leaders = [
+  { name: 'Kwame O.', pts: 9840, you: false },
+  { name: 'Fatima H.', pts: 8210, you: false },
+  { name: 'David N.', pts: 7650, you: false },
+  { name: 'Amara S.', pts: 6920, you: false },
+  { name: 'John B.', pts: 5440, you: false },
+  { name: 'Sarah K.', pts: 2450, you: true },
+  { name: 'Lydia M.', pts: 2180, you: false },
+  { name: 'Peter A.', pts: 1950, you: false },
+  { name: 'Nadia R.', pts: 1720, you: false },
+  { name: 'Marcus T.', pts: 1540, you: false },
+];
+
+function renderLeaderboard() {
+  const list = document.getElementById('leaderboard');
+  list.innerHTML = leaders.map((l, i) => {
+    const rank = i + 1;
+    const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+    const topCls = rank <= 3 ? 'top-3' : '';
+    const youCls = l.you ? 'lb-you' : '';
+    const initials = l.name.split(' ').map(w => w[0]).join('');
+    return `<div class="lb-item ${topCls} ${youCls}">
+      <div class="lb-rank ${rankClass}">${rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : rank}</div>
+      <div class="lb-avatar">${initials}</div>
+      <div class="lb-name">${l.name} ${l.you ? '<span class="you-tag">You</span>' : ''}</div>
+      <div>
+        <div class="lb-pts-val">${l.pts.toLocaleString()}</div>
+        <div class="lb-pts-label">points this month</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderLeaderboard();
+
+/* ─── Referral Actions ─────────────────────────────────────── */
+function copyCode(code) {
+  navigator.clipboard.writeText(code).catch(() => {});
+  showToast('📋', 'Referral code copied!');
+}
+function copyLink() {
+  navigator.clipboard.writeText('https://momomarket.ug/ref/SARAH200').catch(() => {});
+  showToast('🔗', 'Referral link copied!');
+}
+function shareWhatsApp() {
+  const msg = 'Hey! Join MoMo Market using my referral code SARAH200 and we both get 200 bonus points! 🎁';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+function shareTwitter() {
+  const msg = 'Shopping on @MoMoMarket is amazing! Use my referral code SARAH200 and get bonus rewards 🎉 #MoMoMarket';
+  window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(msg), '_blank');
+}
+
+/* ─── Toast ────────────────────────────────────────────────── */
+let toastTimeout;
+function showToast(icon, msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+/* ─── Confetti ─────────────────────────────────────────────── */
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let animating = false;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const confettiColors = ['#FFCC00','#1B4F8A','#ff6b6b','#4ecdc4','#45b7d1','#96ceb4','#ff9ff3','#54a0ff'];
+
+function launchConfetti() {
+  particles = [];
+  for (let i = 0; i < 140; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: -10 - Math.random() * 200,
+      w: 8 + Math.random() * 8,
+      h: 4 + Math.random() * 6,
+      color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+      vx: (Math.random() - .5) * 3,
+      vy: 2 + Math.random() * 4,
+      vr: (Math.random() - .5) * .3,
+      r: Math.random() * Math.PI * 2,
+      opacity: 1,
+    });
+  }
+  if (!animating) animateConfetti();
+}
+
+function animateConfetti() {
+  animating = true;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.opacity > 0.05);
+  if (!particles.length) { animating = false; return; }
+  particles.forEach(p => {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.r += p.vr;
+    p.vy += .05; // gravity
+    if (p.y > canvas.height * .7) p.opacity -= .02;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.r);
+    ctx.globalAlpha = p.opacity;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    ctx.restore();
+  });
+  requestAnimationFrame(animateConfetti);
+}
+</script>
+</body>
+</html>

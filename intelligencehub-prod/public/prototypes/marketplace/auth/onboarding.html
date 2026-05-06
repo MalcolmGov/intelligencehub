@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Market by MoMo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #FFFFFF;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .carousel {
+            position: relative;
+            height: 100vh;
+            max-height: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        /* SLIDE 1: DELIVERY LOCATION */
+        .slide-1-content {
+            width: 100%;
+        }
+
+        .slide-heading {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #0D0D0D;
+            margin-bottom: 24px;
+        }
+
+        .map-illustration {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 204, 0, 0.1);
+            border: 2px solid #FFCC00;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin: 0 auto 32px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A2E;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            background: #FFFFFF;
+            border-color: #FFCC00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #999999;
+        }
+
+        /* SLIDE 2: SHOPPING INTERESTS */
+        .slide-2-content {
+            width: 100%;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .category-tile {
+            padding: 16px;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            background: #F8F9FA;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1A1A2E;
+        }
+
+        .category-tile:hover {
+            border-color: #FFCC00;
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .category-tile.selected {
+            border-color: #FFCC00;
+            background: #FFFAEB;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        .category-emoji {
+            font-size: 24px;
+        }
+
+        /* SLIDE 3: PAYMENT SETUP */
+        .slide-3-content {
+            width: 100%;
+        }
+
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .payment-card {
+            padding: 16px;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            background: #F8F9FA;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .payment-card:hover {
+            border-color: #FFCC00;
+            background: rgba(255, 204, 0, 0.05);
+        }
+
+        .payment-card.selected {
+            border-color: #FFCC00;
+            background: #FFFAEB;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        .payment-card-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #E0E0E0;
+            border-radius: 50%;
+            margin-top: 2px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-card.selected .payment-card-radio {
+            border-color: #FFCC00;
+            background: #FFCC00;
+        }
+
+        .payment-card-radio::after {
+            content: '✓';
+            color: #1A1A2E;
+            font-weight: 700;
+            font-size: 12px;
+            display: none;
+        }
+
+        .payment-card.selected .payment-card-radio::after {
+            display: block;
+        }
+
+        .payment-card-content {
+            flex: 1;
+        }
+
+        .payment-card-title {
+            font-weight: 600;
+            color: #1A1A2E;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .payment-card-desc {
+            font-size: 12px;
+            color: #666666;
+        }
+
+        .payment-details {
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .payment-details.show {
+            display: block;
+        }
+
+        /* SLIDE 4: WELCOME */
+        .slide-4-content {
+            width: 100%;
+        }
+
+        .confetti {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .success-icon-lg {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #FFCC00 0%, #FFD700 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            margin: 0 auto 24px;
+            animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 30px rgba(255, 204, 0, 0.2);
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .slide-4-heading {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: #0D0D0D;
+            margin-bottom: 8px;
+        }
+
+        .slide-4-subheading {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 32px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 32px;
+            width: 100%;
+        }
+
+        .product-card {
+            background: #F8F9FA;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .product-card-name {
+            font-size: 11px;
+            color: #666666;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* BUTTONS */
+        .button-group {
+            width: 100%;
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        .btn {
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1A1A2E;
+            color: #FFFFFF;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #0D0D0D;
+            box-shadow: 0 10px 30px rgba(13, 13, 13, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* PROGRESS DOTS */
+        .progress-dots {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #E0E0E0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #FFCC00;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .dot:hover {
+            background: #FFCC00;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .slide {
+                padding: 40px 20px;
+            }
+
+            .container {
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .carousel {
+                max-height: 100vh;
+                height: 100vh;
+            }
+
+            .slide-heading {
+                font-size: 24px;
+            }
+
+            .slide-4-heading {
+                font-size: 20px;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+
+            .payment-options {
+                gap: 10px;
+            }
+
+            .payment-card {
+                padding: 12px;
+            }
+
+            .payment-card-title {
+                font-size: 13px;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="carousel" id="carousel">
+            <!-- SLIDE 1: DELIVERY LOCATION -->
+            <div class="slide active" id="slide1">
+                <div class="slide-1-content">
+                    <h2 class="slide-heading">Where do we deliver?</h2>
+
+                    <div class="map-illustration">🗺️</div>
+
+                    <form id="slide1Form">
+                        <div class="form-group">
+                            <label>City / District</label>
+                            <select id="city" required>
+                                <option value="">Select your city</option>
+                                <option value="kampala">Kampala</option>
+                                <option value="entebbe">Entebbe</option>
+                                <option value="jinja">Jinja</option>
+                                <option value="gulu">Gulu</option>
+                                <option value="mbarara">Mbarara</option>
+                                <option value="masaka">Masaka</option>
+                                <option value="fort-portal">Fort Portal</option>
+                                <option value="soroti">Soroti</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Area / Neighborhood</label>
+                            <input type="text" id="area" placeholder="e.g., Nakasero, Kololo" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Continue →</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: SHOPPING INTERESTS -->
+            <div class="slide" id="slide2">
+                <div class="slide-2-content">
+                    <h2 class="slide-heading">What do you love?</h2>
+
+                    <div class="category-grid" id="categoryGrid">
+                        <div class="category-tile" data-category="electronics">
+                            <div class="category-emoji">📱</div>
+                            <div>Electronics</div>
+                        </div>
+                        <div class="category-tile" data-category="fashion">
+                            <div class="category-emoji">👗</div>
+                            <div>Fashion</div>
+                        </div>
+                        <div class="category-tile" data-category="supermarket">
+                            <div class="category-emoji">🛒</div>
+                            <div>Supermarket</div>
+                        </div>
+                        <div class="category-tile" data-category="home">
+                            <div class="category-emoji">🏠</div>
+                            <div>Home</div>
+                        </div>
+                        <div class="category-tile" data-category="sports">
+                            <div class="category-emoji">🏃</div>
+                            <div>Sports</div>
+                        </div>
+                        <div class="category-tile" data-category="health">
+                            <div class="category-emoji">💊</div>
+                            <div>Health</div>
+                        </div>
+                        <div class="category-tile" data-category="books">
+                            <div class="category-emoji">📚</div>
+                            <div>Books</div>
+                        </div>
+                        <div class="category-tile" data-category="beauty">
+                            <div class="category-emoji">💄</div>
+                            <div>Beauty</div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="slide2Btn" disabled>Continue →</button>
+                </div>
+            </div>
+
+            <!-- SLIDE 3: PAYMENT SETUP -->
+            <div class="slide" id="slide3">
+                <div class="slide-3-content">
+                    <h2 class="slide-heading">How do you pay?</h2>
+
+                    <div class="payment-options" id="paymentOptions">
+                        <div class="payment-card" data-payment="momo">
+                            <div class="payment-card-radio"></div>
+                            <div class="payment-card-content">
+                                <div class="payment-card-title">🟡 MoMo Wallet</div>
+                                <div class="payment-card-desc">Pay instantly with your MoMo balance</div>
+                            </div>
+                        </div>
+
+                        <div class="payment-card" data-payment="card">
+                            <div class="payment-card-radio"></div>
+                            <div class="payment-card-content">
+                                <div class="payment-card-title">💳 Debit/Credit Card</div>
+                                <div class="payment-card-desc">Visa & Mastercard accepted</div>
+                            </div>
+                        </div>
+
+                        <div class="payment-card" data-payment="bnpl">
+                            <div class="payment-card-radio"></div>
+                            <div class="payment-card-content">
+                                <div class="payment-card-title">🟣 Pay Later (BNPL)</div>
+                                <div class="payment-card-desc">Buy now, pay in 3 instalments</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="payment-details" id="momoDetails">
+                        <div class="form-group">
+                            <label>MoMo Number</label>
+                            <input type="tel" id="momoNumber" placeholder="07XX XXX XXX" required>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="slide3Btn" disabled>Continue →</button>
+                </div>
+            </div>
+
+            <!-- SLIDE 4: WELCOME -->
+            <div class="slide" id="slide4">
+                <div class="slide-4-content">
+                    <div class="success-icon-lg">🎉</div>
+                    <h2 class="slide-4-heading">Welcome to Market!</h2>
+                    <p class="slide-4-subheading">Your personalized shop is ready</p>
+
+                    <div class="products-grid">
+                        <div class="product-card">
+                            <div>👗</div>
+                            <div class="product-card-name">Fashion</div>
+                        </div>
+                        <div class="product-card">
+                            <div>📱</div>
+                            <div class="product-card-name">Electronics</div>
+                        </div>
+                        <div class="product-card">
+                            <div>🏠</div>
+                            <div class="product-card-name">Home & Living</div>
+                        </div>
+                        <div class="product-card">
+                            <div>💄</div>
+                            <div class="product-card-name">Beauty</div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="startBtn">Start Shopping →</button>
+                </div>
+            </div>
+
+            <!-- PROGRESS DOTS -->
+            <div class="progress-dots" id="progressDots">
+                <div class="dot active" data-slide="1"></div>
+                <div class="dot" data-slide="2"></div>
+                <div class="dot" data-slide="3"></div>
+                <div class="dot" data-slide="4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const maxSlides = 4;
+        let selectedCategories = new Set();
+        let selectedPayment = null;
+
+        // SLIDE 1 - DELIVERY LOCATION
+        document.getElementById('slide1Form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const city = document.getElementById('city').value;
+            const area = document.getElementById('area').value;
+
+            if (!city || !area) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            goToSlide(2);
+        });
+
+        // SLIDE 2 - SHOPPING INTERESTS
+        const categoryTiles = document.querySelectorAll('.category-tile');
+        const slide2Btn = document.getElementById('slide2Btn');
+
+        categoryTiles.forEach(tile => {
+            tile.addEventListener('click', () => {
+                const category = tile.dataset.category;
+
+                if (selectedCategories.has(category)) {
+                    selectedCategories.delete(category);
+                    tile.classList.remove('selected');
+                } else {
+                    selectedCategories.add(category);
+                    tile.classList.add('selected');
+                }
+
+                slide2Btn.disabled = selectedCategories.size === 0;
+            });
+        });
+
+        slide2Btn.addEventListener('click', () => {
+            goToSlide(3);
+        });
+
+        // SLIDE 3 - PAYMENT SETUP
+        const paymentCards = document.querySelectorAll('.payment-card');
+        const slide3Btn = document.getElementById('slide3Btn');
+        const momoDetails = document.getElementById('momoDetails');
+
+        paymentCards.forEach(card => {
+            card.addEventListener('click', () => {
+                paymentCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedPayment = card.dataset.payment;
+                slide3Btn.disabled = false;
+
+                // Show MoMo input if MoMo selected
+                if (selectedPayment === 'momo') {
+                    momoDetails.classList.add('show');
+                } else {
+                    momoDetails.classList.remove('show');
+                }
+            });
+        });
+
+        slide3Btn.addEventListener('click', () => {
+            if (selectedPayment === 'momo') {
+                const momoNumber = document.getElementById('momoNumber').value;
+                if (!momoNumber) {
+                    alert('Please enter your MoMo number');
+                    return;
+                }
+            }
+            goToSlide(4);
+        });
+
+        // SLIDE 4 - START SHOPPING
+        document.getElementById('startBtn').addEventListener('click', () => {
+            window.location.href = '../index.html';
+        });
+
+        // NAVIGATION
+        function goToSlide(slide) {
+            const fromSlide = document.getElementById('slide' + currentSlide);
+            const toSlide = document.getElementById('slide' + slide);
+
+            if (slide > currentSlide) {
+                fromSlide.classList.remove('active');
+                fromSlide.classList.add('prev');
+                toSlide.classList.remove('prev');
+                toSlide.classList.add('active');
+            } else {
+                fromSlide.classList.remove('active');
+                fromSlide.classList.remove('prev');
+                toSlide.classList.remove('prev');
+                toSlide.classList.add('active');
+            }
+
+            // Update progress dots
+            document.querySelectorAll('.progress-dots .dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index + 1 === slide);
+            });
+
+            currentSlide = slide;
+        }
+
+        // PROGRESS DOTS CLICK
+        document.querySelectorAll('.progress-dots .dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                const slide = parseInt(dot.dataset.slide);
+                if (slide < currentSlide) {
+                    goToSlide(slide);
+                }
+            });
+        });
+
+        // CONFETTI ANIMATION
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.top = '-10px';
+            confetti.innerHTML = '🎉';
+            confetti.style.opacity = '1';
+            confetti.style.fontSize = (Math.random() * 20 + 20) + 'px';
+
+            const carousel = document.getElementById('carousel');
+            carousel.appendChild(confetti);
+
+            let top = -10;
+            const speed = Math.random() * 2 + 2;
+            const duration = Math.random() * 2 + 3;
+            const startTime = Date.now();
+
+            function animate() {
+                const elapsed = (Date.now() - startTime) / 1000;
+                if (elapsed > duration) {
+                    confetti.remove();
+                    return;
+                }
+
+                const progress = elapsed / duration;
+                confetti.style.top = (progress * 100) + 'vh';
+                confetti.style.opacity = 1 - progress;
+                confetti.style.transform = 'rotate(' + (elapsed * 300) + 'deg)';
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
+
+        // Trigger confetti when reaching slide 4
+        const originalGoToSlide = goToSlide;
+        window.goToSlide = function(slide) {
+            originalGoToSlide(slide);
+            if (slide === 4) {
+                for (let i = 0; i < 12; i++) {
+                    setTimeout(() => createConfetti(), i * 50);
+                }
+            }
+        };
+    </script>
+</body>
+</html>

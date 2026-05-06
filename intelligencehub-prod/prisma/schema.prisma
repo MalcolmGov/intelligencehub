@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── AUTH (NextAuth v5) ───────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  opco          String?
+  role          String    @default("STAFF")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts  Account[]
+  sessions  Session[]
+  ideas     SparkIdea[]
+  votes     SparkVote[]
+  comments  SparkComment[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+// ─── SPARK ────────────────────────────────────────────
+model SparkIdea {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  impact      String?
+  authorId    String
+  opco        String
+  type        String   @default("OPPORTUNITY")   // OPPORTUNITY | PROBLEM | IMPROVEMENT
+  category    String
+  status      String   @default("SUBMITTED")     // SUBMITTED | UNDER_REVIEW | SHORTLISTED | PILOT | IN_PRODUCTION | REJECTED
+  tags        String   @default("")              // comma-separated
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author   User           @relation(fields: [authorId], references: [id])
+  votes    SparkVote[]
+  comments SparkComment[]
+
+  @@index([opco])
+  @@index([status])
+}
+
+model SparkVote {
+  id        String   @id @default(cuid())
+  ideaId    String
+  userId    String
+  createdAt DateTime @default(now())
+  idea      SparkIdea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([ideaId, userId])
+}
+
+model SparkComment {
+  id        String    @id @default(cuid())
+  ideaId    String
+  userId    String
+  body      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  idea      SparkIdea @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── PROJECTS ─────────────────────────────────────────
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  stage       String   @default("PILOT")    // PILOT | VALIDATION | PRODUCTION | PAUSED
+  opco        String?
+  type        String
+  icon        String?
+  health      Int      @default(75)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── DOCUMENTS ────────────────────────────────────────
+model Document {
+  id        String   @id @default(cuid())
+  title     String
+  category  String
+  summary   String?
+  tldr      String?
+  filePath  String?
+  url       String?
+  version   String?
+  tags      String   @default("")   // comma-separated
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
