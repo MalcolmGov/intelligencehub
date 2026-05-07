@@ -1,4 +1,11 @@
 import { Sidebar } from '@/components/shell/sidebar'
+import dynamic from 'next/dynamic'
+
+// ZaraVoice uses browser APIs — SSR must be off
+const ZaraVoice = dynamic(
+  () => import('@/components/zara/zara-voice').then(m => m.ZaraVoice),
+  { ssr: false }
+)
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,6 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {children}
       </div>
+      <ZaraVoice />
     </div>
   )
 }
