@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { GalaxyCanvas } from '@/components/shell/galaxy-canvas'
 
 export const metadata: Metadata = {
   title: 'IntelligenceHub | AI & Automation Command Centre',
@@ -10,7 +11,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="dark">
       <body className="bg-bg-primary text-text-primary antialiased">
-        {children}
+        <GalaxyCanvas />
+        <div className="galaxy-grid" aria-hidden="true" />
+        <div className="relative" style={{ zIndex: 1 }}>
+          {children}
+        </div>
       </body>
     </html>
   )

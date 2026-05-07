@@ -6,7 +6,13 @@ export default auth((req) => {
   const { pathname } = req.nextUrl
   const isLoginPage = pathname.startsWith('/login')
   const isApiAuth   = pathname.startsWith('/api/auth')
-  const isPublic    = isLoginPage || isApiAuth
+
+  // Root always serves the HTML landing page — rewrite keeps URL as "/"
+  if (pathname === '/') {
+    return NextResponse.rewrite(new URL('/hub.html', req.nextUrl.origin))
+  }
+
+  const isPublic = isLoginPage || isApiAuth
 
   // Unauthenticated users on protected routes → login
   if (!isLoggedIn && !isPublic) {
@@ -24,6 +30,6 @@ export default auth((req) => {
 })
 
 export const config = {
-  // Exclude static assets, public files, and the hub HTML prototype from middleware
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|images|prototypes|docs|screenshots|hub\\.html|$).*)'],
+  // Exclude static assets and public files; root "/" is handled above via rewrite
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|images|prototypes|docs|screenshots|hub\\.html).*)'],
 }

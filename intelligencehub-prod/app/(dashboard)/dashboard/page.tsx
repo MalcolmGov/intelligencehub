@@ -4,7 +4,7 @@ import { Topbar } from '@/components/shell/topbar'
 import { db } from '@/lib/db'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { TrendingUp, Zap, GitBranch, Users, Activity, ArrowUpRight } from 'lucide-react'
+import { TrendingUp, Zap, GitBranch, Activity, ArrowUpRight, Brain, Cpu, Globe2 } from 'lucide-react'
 import Link from 'next/link'
 
 async function getStats() {
@@ -37,10 +37,13 @@ async function getTopProjects() {
 
 const STAGE_COLORS: Record<string, 'green' | 'blue' | 'purple' | 'amber'> = {
   PRODUCTION: 'green',
-  PILOT:       'blue',
-  VALIDATION:  'purple',
-  PAUSED:      'amber',
+  PILOT:      'blue',
+  VALIDATION: 'purple',
+  PAUSED:     'amber',
 }
+
+const HEALTH_COLOR = (h: number) =>
+  h >= 80 ? '#4ade80' : h >= 60 ? '#3B82F6' : h >= 40 ? '#F59E0B' : '#f87171'
 
 export default async function DashboardPage() {
   const [stats, recentIdeas, topProjects] = await Promise.all([
@@ -48,10 +51,38 @@ export default async function DashboardPage() {
   ])
 
   const KPI = [
-    { label: 'Spark Ideas',    value: stats.totalIdeas,    icon: Zap,        color: 'text-accent-cyan'   },
-    { label: 'Total Votes',    value: stats.totalVotes,    icon: TrendingUp,  color: 'text-brand-blue'   },
-    { label: 'Live Projects',  value: stats.totalProjects, icon: GitBranch,   color: 'text-accent-green' },
-    { label: 'In Pilot',       value: stats.pilotProjects, icon: Activity,    color: 'text-accent-amber' },
+    {
+      label: 'Spark Ideas',
+      value: stats.totalIdeas,
+      icon: Zap,
+      iconColor: 'text-accent-cyan',
+      cardClass: 'kpi-card-cyan',
+      sub: 'Community submissions',
+    },
+    {
+      label: 'Total Votes',
+      value: stats.totalVotes,
+      icon: TrendingUp,
+      iconColor: 'text-brand-blue',
+      cardClass: 'kpi-card-blue',
+      sub: 'Across all ideas',
+    },
+    {
+      label: 'Live Projects',
+      value: stats.totalProjects,
+      icon: GitBranch,
+      iconColor: 'text-accent-green',
+      cardClass: 'kpi-card-green',
+      sub: 'In active development',
+    },
+    {
+      label: 'In Pilot',
+      value: stats.pilotProjects,
+      icon: Activity,
+      iconColor: 'text-accent-amber',
+      cardClass: 'kpi-card-amber',
+      sub: 'Pilot stage projects',
+    },
   ]
 
   return (
@@ -60,26 +91,54 @@ export default async function DashboardPage() {
       <main className="flex-1 p-6 space-y-6 fade-up">
 
         {/* Hero */}
-        <div className="glass rounded-card p-6 bg-gradient-to-br from-brand-blue/5 to-transparent">
-          <p className="text-xs text-text-muted font-mono uppercase tracking-wider mb-1">AI & Automation Division</p>
-          <h2 className="text-2xl font-semibold text-text-primary mb-1">Intelligence Command Centre</h2>
-          <p className="text-text-secondary text-sm max-w-lg">
-            Real-time visibility across strategy, innovation, and engineering — driving transformation across {stats.totalProjects > 0 ? 'all active' : 'pan-African'} markets.
-          </p>
+        <div className="glass rounded-card p-6 relative overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, rgba(57,210,255,0.06) 0%, rgba(59,130,246,0.04) 50%, transparent 100%)', borderColor: 'rgba(57,210,255,0.12)' }}>
+          {/* Decorative orb */}
+          <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full opacity-10 pointer-events-none"
+            style={{ background: 'radial-gradient(circle, #39D2FF, transparent 70%)' }} />
+          <div className="relative">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan pulse-dot" />
+              <p className="text-xs text-text-muted font-mono uppercase tracking-wider">AI & Automation Division · Live</p>
+            </div>
+            <h2 className="text-2xl font-semibold text-text-primary mb-1">Intelligence Command Centre</h2>
+            <p className="text-text-secondary text-sm max-w-lg">
+              Real-time visibility across strategy, innovation, and engineering — driving transformation across{' '}
+              <span className="text-accent-cyan font-medium">pan-African</span> markets.
+            </p>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-1.5 text-xs text-text-muted">
+                <Brain size={12} className="text-accent-cyan" />
+                <span>AI-Powered</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-text-muted">
+                <Cpu size={12} className="text-brand-blue" />
+                <span>Real-time Data</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-text-muted">
+                <Globe2 size={12} className="text-accent-green" />
+                <span>Pan-African Reach</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* KPI row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {KPI.map(({ label, value, icon: Icon, color }) => (
-            <Card key={label} className="flex items-center gap-4">
-              <div className={`p-2.5 rounded-xl bg-white/5 ${color}`}>
+          {KPI.map(({ label, value, icon: Icon, iconColor, cardClass, sub }) => (
+            <div
+              key={label}
+              className={`glass rounded-card p-4 flex items-center gap-4 border transition-transform hover:-translate-y-0.5 ${cardClass}`}
+            >
+              <div className={`p-2.5 rounded-xl bg-white/5 ${iconColor} shrink-0`}>
                 <Icon size={18} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-text-primary tabular-nums">{value}</p>
-                <p className="text-xs text-text-secondary">{label}</p>
+              <div className="min-w-0">
+                <p className="text-2xl font-bold text-text-primary tabular-nums leading-none">{value}</p>
+                <p className="text-xs font-medium text-text-primary mt-0.5 truncate">{label}</p>
+                <p className="text-[10px] text-text-muted truncate">{sub}</p>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
 
@@ -92,12 +151,16 @@ export default async function DashboardPage() {
                 View all <ArrowUpRight size={11} />
               </Link>
             </CardHeader>
-            <div className="space-y-3">
+            <div className="space-y-1">
               {recentIdeas.length === 0 && (
                 <p className="text-text-muted text-sm text-center py-6">No ideas submitted yet — be the first!</p>
               )}
               {recentIdeas.map(idea => (
-                <div key={idea.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
+                <Link
+                  key={idea.id}
+                  href={`/spark?idea=${idea.id}`}
+                  className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group block"
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-text-primary truncate group-hover:text-brand-blue transition-colors">
                       {idea.title}
@@ -106,11 +169,11 @@ export default async function DashboardPage() {
                       {idea.author.name} · {idea.author.opco}
                     </p>
                   </div>
-                  <div className="flex items-center gap-1 shrink-0 text-xs text-text-muted">
-                    <Zap size={11} />
+                  <div className="flex items-center gap-1 shrink-0 text-xs text-text-muted bg-white/5 px-2 py-0.5 rounded-lg">
+                    <Zap size={10} className="text-accent-cyan" />
                     {idea._count.votes}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </Card>
@@ -123,7 +186,7 @@ export default async function DashboardPage() {
                 View all <ArrowUpRight size={11} />
               </Link>
             </CardHeader>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {topProjects.length === 0 && (
                 <p className="text-text-muted text-sm text-center py-6">No projects tracked yet.</p>
               )}
@@ -135,13 +198,19 @@ export default async function DashboardPage() {
                       <Badge variant={STAGE_COLORS[project.stage] ?? 'slate'}>
                         {project.stage}
                       </Badge>
-                      <span className="text-xs font-mono text-text-secondary">{project.health}%</span>
+                      <span className="text-xs font-mono tabular-nums" style={{ color: HEALTH_COLOR(project.health) }}>
+                        {project.health}%
+                      </span>
                     </div>
                   </div>
                   <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-brand-blue transition-all"
-                      style={{ width: `${project.health}%` }}
+                      className="h-full rounded-full transition-all duration-700"
+                      style={{
+                        width: `${project.health}%`,
+                        background: `linear-gradient(90deg, ${HEALTH_COLOR(project.health)}, ${HEALTH_COLOR(project.health)}88)`,
+                        boxShadow: `0 0 6px ${HEALTH_COLOR(project.health)}66`,
+                      }}
                     />
                   </div>
                 </div>

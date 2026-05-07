@@ -19,14 +19,19 @@ const config: Config = {
           blue:      '#3B82F6',
           blueDark:  '#2563EB',
           blueDeep:  '#1E40AF',
+          yellow:    '#FFD700',
         },
         accent: {
           blue:   '#3B82F6',
-          cyan:   '#FACC15',
-          green:  '#60A5FA',
-          purple: '#2563EB',
-          amber:  '#FACC15',
-          rose:   '#F59E0B',
+          cyan:   '#39D2FF',
+          green:  '#4ade80',
+          purple: '#a78bfa',
+          amber:  '#F59E0B',
+          rose:   '#f87171',
+        },
+        neon: {
+          green: '#4ade80',
+          blue:  '#39D2FF',
         },
         text: {
           primary:   '#F1F5F9',
@@ -35,7 +40,9 @@ const config: Config = {
         },
         border: {
           subtle: 'rgba(148,163,184,0.08)',
+          medium: 'rgba(148,163,184,0.15)',
           active: 'rgba(59,130,246,0.3)',
+          glow:   'rgba(59,130,246,0.25)',
         },
       },
       fontFamily: {
@@ -45,10 +52,13 @@ const config: Config = {
       },
       borderRadius: {
         card: '14px',
+        xl2:  '18px',
       },
       backgroundImage: {
-        'gradient-neon': 'linear-gradient(135deg, #FACC15, #3B82F6, #1E40AF)',
-        'gradient-card': 'linear-gradient(145deg, rgba(17,24,39,0.8) 0%, rgba(10,15,30,0.9) 100%)',
+        'gradient-neon':  'linear-gradient(135deg, #39D2FF, #3B82F6, #1E40AF)',
+        'gradient-brand': 'linear-gradient(90deg, #39D2FF, #3B82F6)',
+        'gradient-gold':  'linear-gradient(90deg, #FFD700, #F59E0B)',
+        'gradient-card':  'linear-gradient(145deg, rgba(17,24,39,0.8) 0%, rgba(10,15,30,0.9) 100%)',
       },
     },
   },
