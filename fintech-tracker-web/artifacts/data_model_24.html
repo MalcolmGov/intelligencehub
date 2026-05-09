@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UC24 — AI Customer Intelligence Layer | Data Model</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card-2: #162032;
+    --border: rgba(255,255,255,.07);
+    --border-accent: rgba(129,140,248,.25);
+    --indigo: #818cf8;
+    --violet: #a78bfa;
+    --teal: #2dd4bf;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --green: #4ade80;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --dim: #64748b;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Back button */
+  .back-btn {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(129,140,248,.12);
+    border: 1px solid rgba(129,140,248,.3);
+    border-radius: 8px;
+    color: var(--indigo);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all .2s;
+    backdrop-filter: blur(8px);
+  }
+  .back-btn:hover { background: rgba(129,140,248,.22); transform: translateX(-2px); }
+  .back-btn svg { width: 14px; height: 14px; }
+
+  /* Layout */
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* Header */
+  .header {
+    padding: 60px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+  }
+  .header-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+  .badge-amber { background: rgba(251,191,36,.12); color: var(--amber); border: 1px solid rgba(251,191,36,.25); }
+  .badge-new {
+    background: linear-gradient(135deg, rgba(129,140,248,.18), rgba(167,139,250,.18));
+    border: 1px solid rgba(167,139,250,.35);
+    color: var(--violet);
+  }
+  .badge-uc { background: rgba(45,212,191,.1); color: var(--teal); border: 1px solid rgba(45,212,191,.25); }
+
+  .header-title {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--indigo), var(--violet));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .header-subtitle { color: var(--muted); font-size: 16px; max-width: 700px; }
+
+  .header-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .owner-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--indigo), var(--violet));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .owner-name { font-weight: 600; color: var(--text); font-size: 13px; }
+  .owner-role { color: var(--muted); font-size: 12px; }
+
+  .meta-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .meta-pill {
+    padding: 4px 10px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .meta-pill span { color: var(--text); font-weight: 500; }
+
+  /* Section nav */
+  .section-nav {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .nav-pill {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s;
+    border: 1px solid transparent;
+  }
+  .nav-pill:hover { color: var(--indigo); border-color: rgba(129,140,248,.25); background: rgba(129,140,248,.08); }
+
+  /* Section headings */
+  .section { margin-bottom: 48px; }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title .icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .icon-indigo { background: rgba(129,140,248,.15); }
+  .icon-teal { background: rgba(45,212,191,.12); }
+  .icon-violet { background: rgba(167,139,250,.12); }
+  .icon-amber { background: rgba(251,191,36,.1); }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--indigo);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--indigo);
+    flex-shrink: 0;
+  }
+  .card-title .dot-teal { background: var(--teal); }
+  .card-title .dot-violet { background: var(--violet); }
+  .card-title .dot-amber { background: var(--amber); }
+
+  /* ERD Diagram */
+  .erd-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 24px;
+    overflow-x: auto;
+  }
+  .erd-svg { width: 100%; min-width: 900px; }
+
+  /* Schema tables */
+  .schema-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  .schema-table th {
+    background: rgba(255,255,255,.04);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .schema-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--text);
+  }
+  .schema-table tr:last-child td { border-bottom: none; }
+  .schema-table tr:hover td { background: rgba(255,255,255,.02); }
+
+  .field-name { font-family: var(--mono); color: var(--indigo); font-size: 12px; }
+  .field-type { font-family: var(--mono); color: var(--teal); font-size: 11px; }
+  .nullable-yes { color: var(--dim); font-size: 11px; }
+  .nullable-no { color: var(--amber); font-size: 11px; font-weight: 600; }
+
+  .popia-pii { background: rgba(248,113,113,.12); color: #fca5a5; border: 1px solid rgba(248,113,113,.2); border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .popia-sensitive { background: rgba(251,191,36,.1); color: #fde68a; border: 1px solid rgba(251,191,36,.2); border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+  .popia-nonpii { background: rgba(74,222,128,.08); color: #86efac; border: 1px solid rgba(74,222,128,.18); border-radius: 4px; padding: 2px 7px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+
+  /* JSON payloads */
+  .json-block {
+    background: #0a111e;
+    border: 1px solid rgba(129,140,248,.15);
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #cbd5e1;
+  }
+  .json-block .jk { color: #93c5fd; } /* key */
+  .json-block .js { color: #86efac; } /* string value */
+  .json-block .jn { color: #fda4af; } /* number */
+  .json-block .jb { color: #c4b5fd; } /* boolean */
+  .json-block .jnull { color: var(--dim); }
+  .json-block .jc { color: var(--dim); font-style: italic; } /* comment */
+
+  /* Data lineage */
+  .lineage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .lineage-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .lineage-source {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .source-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .lineage-fields { display: flex; flex-direction: column; gap: 4px; }
+  .lineage-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .lineage-field:last-child { border-bottom: none; }
+  .lineage-field .arrow { color: var(--dim); font-size: 10px; }
+  .lineage-field .target { font-family: var(--mono); color: var(--indigo); font-size: 11px; }
+
+  /* Grid helpers */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  /* Scroll anchor offset */
+  [id] { scroll-margin-top: 80px; }
+
+  /* POPIA notice */
+  .popia-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(251,191,36,.06);
+    border: 1px solid rgba(251,191,36,.2);
+    border-left: 3px solid var(--amber);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 12.5px;
+    color: #fde68a;
+  }
+  .popia-notice svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 0;
+    text-align: center;
+    color: var(--dim);
+    font-size: 12px;
+  }
+
+  /* Sub entity label */
+  .entity-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: rgba(129,140,248,.1);
+    border: 1px solid rgba(129,140,248,.2);
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--indigo);
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+
+  .section-desc { color: var(--muted); font-size: 13px; margin-bottom: 20px; max-width: 800px; }
+</style>
+</head>
+<body>
+
+<!-- Back Button -->
+<a class="back-btn" href="../">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="15 18 9 12 15 6"/>
+  </svg>
+  Back
+</a>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-meta">
+      <span class="badge badge-uc">UC24</span>
+      <span class="badge badge-amber">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+        Not Started — Planning Phase
+      </span>
+      <span class="badge badge-new">
+        <svg width="9" height="9" viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="4.5,1 6,3.5 9,4 6.5,6.5 7,9 4.5,8 2,9 2.5,6.5 0,4 3,3.5"/></svg>
+        New — Gap Identified by Malcolm
+      </span>
+    </div>
+    <h1 class="header-title">AI Customer Intelligence Layer</h1>
+    <p class="header-subtitle">
+      Unified Customer Data Model — canonical schema for UC24's golden customer record,
+      powering entity resolution, AI-driven insights, POPIA-compliant consent management,
+      and cross-system intelligence aggregation.
+    </p>
+    <div class="header-bottom">
+      <div class="owner-chip">
+        <div class="avatar">MG</div>
+        <div>
+          <div class="owner-name">Malcolm Govender</div>
+          <div class="owner-role">Head of AI &amp; Engineering</div>
+        </div>
+      </div>
+      <div class="meta-pills">
+        <div class="meta-pill">Version <span>0.1 — Draft</span></div>
+        <div class="meta-pill">Date <span>09 May 2026</span></div>
+        <div class="meta-pill">Domain <span>Customer Intelligence</span></div>
+        <div class="meta-pill">Integrations <span>UC16, UC18, Core Banking</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAV -->
+  <nav class="section-nav" aria-label="Section navigation">
+    <a class="nav-pill" href="#erd">Entity Relationship Diagram</a>
+    <a class="nav-pill" href="#core">Core Entity</a>
+    <a class="nav-pill" href="#identity">Identity Cluster</a>
+    <a class="nav-pill" href="#personal">Personal Profile</a>
+    <a class="nav-pill" href="#popia">POPIA Consent Ledger</a>
+    <a class="nav-pill" href="#financial">Financial Profile</a>
+    <a class="nav-pill" href="#interactions">Interaction History</a>
+    <a class="nav-pill" href="#ai">AI Intelligence Outputs</a>
+    <a class="nav-pill" href="#audit">Audit Trail</a>
+    <a class="nav-pill" href="#lineage">Data Lineage</a>
+  </nav>
+
+  <!-- ERD SECTION -->
+  <section class="section" id="erd">
+    <h2 class="section-title">
+      <span class="icon icon-indigo">&#9741;</span>
+      Entity Relationship Diagram
+    </h2>
+    <p class="section-desc">Visual representation of the UnifiedCustomerProfile and its sub-entities. All relationships radiate from the golden record.</p>
+    <div class="erd-container">
+      <svg class="erd-svg" viewBox="0 0 960 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Entity relationship diagram for UC24 UnifiedCustomerProfile">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(129,140,248,0.5)"/>
+          </marker>
+          <marker id="arr-teal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(45,212,191,0.5)"/>
+          </marker>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Central entity -->
+        <rect x="345" y="220" width="270" height="180" rx="12" fill="#162032" stroke="rgba(129,140,248,0.5)" stroke-width="1.5"/>
+        <rect x="345" y="220" width="270" height="36" rx="12" fill="rgba(129,140,248,0.15)"/>
+        <rect x="345" y="244" width="270" height="12" rx="0" fill="rgba(129,140,248,0.15)"/>
+        <text x="480" y="243" text-anchor="middle" fill="#818cf8" font-size="12" font-weight="700" font-family="Segoe UI,system-ui,sans-serif">UnifiedCustomerProfile</text>
+        <text x="480" y="259" text-anchor="middle" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">CORE ENTITY — GOLDEN RECORD</text>
+        <text x="360" y="280" fill="#94a3b8" font-size="10" font-family="Cascadia Code,monospace">customerId: UUID</text>
+        <text x="360" y="296" fill="#94a3b8" font-size="10" font-family="Cascadia Code,monospace">goldenRecordId: UUID</text>
+        <text x="360" y="312" fill="#94a3b8" font-size="10" font-family="Cascadia Code,monospace">schemaVersion: string</text>
+        <text x="360" y="328" fill="#94a3b8" font-size="10" font-family="Cascadia Code,monospace">createdAt: DateTime</text>
+        <text x="360" y="344" fill="#94a3b8" font-size="10" font-family="Cascadia Code,monospace">updatedAt: DateTime</text>
+        <text x="360" y="365" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">+ 7 sub-entity clusters</text>
+        <text x="360" y="380" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">+ POPIA compliant lifecycle</text>
+
+        <!-- Identity cluster - top left -->
+        <rect x="30" y="30" width="190" height="110" rx="10" fill="#162032" stroke="rgba(45,212,191,0.35)" stroke-width="1"/>
+        <rect x="30" y="30" width="190" height="28" rx="10" fill="rgba(45,212,191,0.1)"/>
+        <rect x="30" y="48" width="190" height="10" rx="0" fill="rgba(45,212,191,0.1)"/>
+        <text x="125" y="49" text-anchor="middle" fill="#2dd4bf" font-size="11" font-weight="700" font-family="Segoe UI,system-ui,sans-serif">Identity Cluster</text>
+        <text x="44" y="74" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">identifiers[]</text>
+        <text x="44" y="89" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">entityResolution</text>
+        <text x="44" y="104" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">confidence: 0–1</text>
+        <text x="44" y="119" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">algorithm: hybrid</text>
+        <line x1="220" y1="85" x2="345" y2="285" stroke="rgba(45,212,191,0.3)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-teal)"/>
+
+        <!-- Personal profile - top center-left -->
+        <rect x="250" y="30" width="190" height="110" rx="10" fill="#162032" stroke="rgba(167,139,250,0.35)" stroke-width="1"/>
+        <rect x="250" y="30" width="190" height="28" rx="10" fill="rgba(167,139,250,0.1)"/>
+        <rect x="250" y="48" width="190" height="10" rx="0" fill="rgba(167,139,250,0.1)"/>
+        <text x="345" y="49" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="700" font-family="Segoe UI,system-ui,sans-serif">Personal Profile</text>
+        <text x="264" y="74" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">name: {first,last,aliases}</text>
+        <text x="264" y="89" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">contact: {emails,phones}</text>
+        <text x="264" y="104" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">demographics</text>
+        <text x="264" y="119" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">segment: retail|premium</text>
+        <line x1="345" y1="140" x2="420" y2="220" stroke="rgba(167,139,250,0.3)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- POPIA - top right -->
+        <rect x="520" y="30" width="195" height="110" rx="10" fill="#162032" stroke="rgba(251,191,36,0.35)" stroke-width="1"/>
+        <rect x="520" y="30" width="195" height="28" rx="10" fill="rgba(251,191,36,0.08)"/>
+        <rect x="520" y="48" width="195" height="10" rx="0" fill="rgba(251,191,36,0.08)"/>
+        <text x="617" y="49" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="700" font-family="Segoe UI,system-ui,sans-serif">POPIA Consent Ledger</text>
+        <text x="534" y="74" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">consents[]</text>
+        <text x="534" y="89" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">erasureRequests[]</text>
+        <text x="534" y="104" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">dataRetentionPolicy</text>
+        <text x="534" y="119" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">legalBasis: string</text>
+        <line x1="560" y1="140" x2="530" y2="220" stroke="rgba(251,191,36,0.3)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Financial profile - far right top -->
+        <rect x="735" y="30" width="195" height="110" rx="10" fill="#162032" stroke="rgba(129,140,248,0.35)" stroke-width="1"/>
+        <rect x="735" y="30" width="195" height="28" rx="10" fill="rgba(129,140,248,0.1)"/>
+        <rect x="735" y="48" width="195" height="10" rx="0" fill="rgba(129,140,248,0.1)"/>
+        <text x="832" y="49" text-anchor="middle" fill="#818cf8" font-size="11" font-weight="700" font-family="Segoe UI,system-ui,sans-serif">Financial Profile</text>
+        <text x="749" y="74" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">accounts[]</text>
+        <text x="749" y="89" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">riskProfile (UC16)</text>
+        <text x="749" y="104" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">lifetimeValue</text>
+        <text x="749" y="119" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">creditScore: number</text>
+        <line x1="770" y1="140" x2="615" y2="220" stroke="rgba(129,140,248,0.3)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Interaction history - bottom left -->
+        <rect x="30" y="460" width="195" height="110" rx="10" fill="#162032" stroke="rgba(45,212,191,0.35)" stroke-width="1"/>
+        <rect x="30" y="460" width="195" height="28" rx="10" fill="rgba(45,212,191,0.1)"/>
+        <rect x="30" y="478" width="195" height="10" rx="0" fill="rgba(45,212,191,0.1)"/>
+        <text x="127" y="479" text-anchor="middle" fill="#2dd4bf" font-size="11" font-weight="700" font-family="Segoe UI,system-ui,sans-serif">Interaction History</text>
+        <text x="44" y="504" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">interactions[]</text>
+        <text x="44" y="519" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">voiceInteractions[] (UC18)</text>
+        <text x="44" y="534" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">channel: voice|web|mobile</text>
+        <text x="44" y="549" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">sentiment: float</text>
+        <line x1="225" y1="490" x2="345" y2="400" stroke="rgba(45,212,191,0.3)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-teal)"/>
+
+        <!-- AI Intelligence - bottom center -->
+        <rect x="275" y="460" width="195" height="110" rx="10" fill="#162032" stroke="rgba(167,139,250,0.35)" stroke-width="1"/>
+        <rect x="275" y="460" width="195" height="28" rx="10" fill="rgba(167,139,250,0.1)"/>
+        <rect x="275" y="478" width="195" height="10" rx="0" fill="rgba(167,139,250,0.1)"/>
+        <text x="372" y="479" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="700" font-family="Segoe UI,system-ui,sans-serif">AI Intelligence</text>
+        <text x="289" y="504" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">nextBestActions[]</text>
+        <text x="289" y="519" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">churnProbability</text>
+        <text x="289" y="534" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">productAffinityScores[]</text>
+        <text x="289" y="549" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">confidence: 0–1</text>
+        <line x1="372" y1="460" x2="450" y2="400" stroke="rgba(167,139,250,0.3)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Audit trail - bottom right -->
+        <rect x="510" y="460" width="195" height="110" rx="10" fill="#162032" stroke="rgba(248,113,113,0.3)" stroke-width="1"/>
+        <rect x="510" y="460" width="195" height="28" rx="10" fill="rgba(248,113,113,0.08)"/>
+        <rect x="510" y="478" width="195" height="10" rx="0" fill="rgba(248,113,113,0.08)"/>
+        <text x="607" y="479" text-anchor="middle" fill="#fca5a5" font-size="11" font-weight="700" font-family="Segoe UI,system-ui,sans-serif">Audit Trail</text>
+        <text x="524" y="504" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">dataAccessLog[]</text>
+        <text x="524" y="519" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">mutations[]</text>
+        <text x="524" y="534" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">before / after snapshot</text>
+        <text x="524" y="549" fill="#94a3b8" font-size="9.5" font-family="Cascadia Code,monospace">mutatedBy: string</text>
+        <line x1="607" y1="460" x2="540" y2="400" stroke="rgba(248,113,113,0.3)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+        <!-- Cardinality labels -->
+        <text x="232" y="175" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">1..*</text>
+        <text x="368" y="178" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">1..1</text>
+        <text x="530" y="165" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">1..*</text>
+        <text x="720" y="175" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">1..*</text>
+        <text x="238" y="452" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">0..*</text>
+        <text x="406" y="452" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">0..*</text>
+        <text x="565" y="452" fill="#64748b" font-size="9" font-family="Segoe UI,system-ui,sans-serif">1..*</text>
+
+        <!-- Legend -->
+        <rect x="730" y="440" width="200" height="110" rx="8" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+        <text x="743" y="458" fill="#64748b" font-size="10" font-weight="600" font-family="Segoe UI,system-ui,sans-serif">LEGEND</text>
+        <line x1="743" y1="470" x2="770" y2="470" stroke="rgba(129,140,248,0.5)" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="776" y="474" fill="#94a3b8" font-size="9" font-family="Segoe UI,system-ui,sans-serif">Has-One / Has-Many</text>
+        <rect x="743" y="482" width="10" height="10" rx="2" fill="rgba(45,212,191,0.1)" stroke="rgba(45,212,191,0.35)" stroke-width="1"/>
+        <text x="759" y="491" fill="#2dd4bf" font-size="9" font-family="Segoe UI,system-ui,sans-serif">Interaction / Identity</text>
+        <rect x="743" y="498" width="10" height="10" rx="2" fill="rgba(167,139,250,0.1)" stroke="rgba(167,139,250,0.35)" stroke-width="1"/>
+        <text x="759" y="507" fill="#a78bfa" font-size="9" font-family="Segoe UI,system-ui,sans-serif">Profile / AI Outputs</text>
+        <rect x="743" y="514" width="10" height="10" rx="2" fill="rgba(251,191,36,0.08)" stroke="rgba(251,191,36,0.35)" stroke-width="1"/>
+        <text x="759" y="523" fill="#fbbf24" font-size="9" font-family="Segoe UI,system-ui,sans-serif">Compliance (POPIA)</text>
+        <rect x="743" y="530" width="10" height="10" rx="2" fill="rgba(248,113,113,0.08)" stroke="rgba(248,113,113,0.3)" stroke-width="1"/>
+        <text x="759" y="539" fill="#fca5a5" font-size="9" font-family="Segoe UI,system-ui,sans-serif">Audit &amp; Governance</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- CORE ENTITY -->
+  <section class="section" id="core">
+    <h2 class="section-title">
+      <span class="icon icon-indigo">&#9632;</span>
+      Core Entity — UnifiedCustomerProfile
+    </h2>
+    <p class="section-desc">The root document representing the golden record for a resolved customer identity across all source systems.</p>
+    <div class="card">
+      <table class="schema-table">
+        <thead>
+          <tr>
+            <th>Field Name</th>
+            <th>Type</th>
+            <th>Nullable</th>
+            <th>Description</th>
+            <th>POPIA Class</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="field-name">customerId</span></td>
+            <td><span class="field-type">UUID</span></td>
+            <td><span class="nullable-no">NO</span></td>
+            <td>Primary key — system-generated unique identifier for this unified profile</td>
+            <td><span class="popia-nonpii">Non-PII</span></td>
+          </tr>
+          <tr>
+            <td><span class="field-name">goldenRecordId</span></td>
+            <td><span class="field-type">UUID</span></td>
+            <td><span class="nullable-no">NO</span></td>
+            <td>Stable external-facing identifier assigned after entity resolution. Persists across merges.</td>
+            <td><span class="popia-nonpii">Non-PII</span></td>
+          </tr>
+          <tr>
+            <td><span class="field-name">createdAt</span></td>
+            <td><span class="field-type">DateTime (ISO 8601)</span></td>
+            <td><span class="nullable-no">NO</span></td>
+            <td>Timestamp of profile creation in UTC</td>
+            <td><span class="popia-nonpii">Non-PII</span></td>
+          </tr>
+          <tr>
+            <td><span class="field-name">updatedAt</span></td>
+            <td><span class="field-type">DateTime (ISO 8601)</span></td>
+            <td><span class="nullable-no">NO</span></td>
+            <td>Timestamp of last write to any sub-entity. Updated on every mutation.</td>
+            <td><span class="popia-nonpii">Non-PII</span></td>
+          </tr>
+          <tr>
+            <td><span class="field-name">schemaVersion</span></td>
+            <td><span class="field-type">string</span></td>
+            <td><span class="nullable-no">NO</span></td>
+            <td>Semantic version of the data model schema (e.g. "2.1.0"). Used for migration compatibility.</td>
+            <td><span class="popia-nonpii">Non-PII</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Sample JSON — Core Entity</div>
+      <div class="json-block">
+<span class="jc">// UnifiedCustomerProfile — root document</span>
+{
+  <span class="jk">"customerId"</span>: <span class="js">"cust_01HXYZ9BKM3VQ8W5RFJN4E7D"</span>,
+  <span class="jk">"goldenRecordId"</span>: <span class="js">"grec_01HXAB4CPN8TL2V7QJDZ5F3M"</span>,
+  <span class="jk">"createdAt"</span>: <span class="js">"2024-03-15T08:22:11.000Z"</span>,
+  <span class="jk">"updatedAt"</span>: <span class="js">"2026-05-09T14:07:33.000Z"</span>,
+  <span class="jk">"schemaVersion"</span>: <span class="js">"2.1.0"</span>,
+  <span class="jc">// ... sub-entities nested below (see each section)</span>
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- IDENTITY CLUSTER -->
+  <section class="section" id="identity">
+    <h2 class="section-title">
+      <span class="icon icon-teal">&#9675;</span>
+      Identity Cluster
+    </h2>
+    <p class="section-desc">Multi-source identifier collection and probabilistic/deterministic entity resolution metadata.</p>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-teal"></span>identifiers[] — Sub-Entity Schema</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">type</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td>Identifier type: national_id | passport | phone | email | account_number | device_id</td><td><span class="popia-pii">PII</span></td></tr>
+          <tr><td><span class="field-name">value</span></td><td><span class="field-type">string (encrypted)</span></td><td><span class="nullable-no">NO</span></td><td>The identifier value. Always stored AES-256 encrypted at rest.</td><td><span class="popia-sensitive">Sensitive</span></td></tr>
+          <tr><td><span class="field-name">verified</span></td><td><span class="field-type">boolean</span></td><td><span class="nullable-no">NO</span></td><td>Whether the identifier has been formally verified (OTP, document check, etc.)</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">source</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td>Origin system that provided this identifier (e.g. "core_banking", "kyc_service", "mobile_app")</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">createdAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td>When this identifier was first recorded in the system</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-teal"></span>entityResolution — Sub-Entity Schema</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">confidence</span></td><td><span class="field-type">float (0–1)</span></td><td><span class="nullable-no">NO</span></td><td>Match confidence score from entity resolution engine. &gt;0.9 = deterministic match.</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">matchedSources</span></td><td><span class="field-type">string[]</span></td><td><span class="nullable-no">NO</span></td><td>List of source systems contributing to this golden record (e.g. ["core_banking","crm","kyc"])</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">lastResolved</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td>Timestamp of last entity resolution run</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">algorithm</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td>Resolution method used: deterministic | probabilistic | hybrid</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-teal"></span>Sample JSON — Identity Cluster</div>
+      <div class="json-block">
+<span class="jk">"identifiers"</span>: [
+  {
+    <span class="jk">"type"</span>: <span class="js">"national_id"</span>,
+    <span class="jk">"value"</span>: <span class="js">"ENC::v2::8f3aK9...=="</span>, <span class="jc">// AES-256 encrypted</span>
+    <span class="jk">"verified"</span>: <span class="jb">true</span>,
+    <span class="jk">"source"</span>: <span class="js">"kyc_service"</span>,
+    <span class="jk">"createdAt"</span>: <span class="js">"2024-03-15T08:22:11.000Z"</span>
+  },
+  {
+    <span class="jk">"type"</span>: <span class="js">"phone"</span>,
+    <span class="jk">"value"</span>: <span class="js">"ENC::v2::7dR2M1...=="</span>,
+    <span class="jk">"verified"</span>: <span class="jb">true</span>,
+    <span class="jk">"source"</span>: <span class="js">"mobile_app"</span>,
+    <span class="jk">"createdAt"</span>: <span class="js">"2024-03-16T11:05:44.000Z"</span>
+  }
+],
+<span class="jk">"entityResolution"</span>: {
+  <span class="jk">"confidence"</span>: <span class="jn">0.97</span>,
+  <span class="jk">"matchedSources"</span>: [<span class="js">"core_banking"</span>, <span class="js">"kyc_service"</span>, <span class="js">"crm"</span>],
+  <span class="jk">"lastResolved"</span>: <span class="js">"2026-05-09T00:00:00.000Z"</span>,
+  <span class="jk">"algorithm"</span>: <span class="js">"hybrid"</span>
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- PERSONAL PROFILE -->
+  <section class="section" id="personal">
+    <h2 class="section-title">
+      <span class="icon icon-violet">&#9733;</span>
+      Personal Profile
+    </h2>
+    <p class="section-desc">Customer name, contact information, demographics, and segmentation data.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot dot-violet"></span>name — Schema</div>
+        <table class="schema-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>POPIA</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">first</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-pii">PII</span></td></tr>
+            <tr><td><span class="field-name">last</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-pii">PII</span></td></tr>
+            <tr><td><span class="field-name">preferred</span></td><td><span class="field-type">string</span></td><td><span class="nullable-yes">YES</span></td><td><span class="popia-pii">PII</span></td></tr>
+            <tr><td><span class="field-name">aliases[]</span></td><td><span class="field-type">string[]</span></td><td><span class="nullable-yes">YES</span></td><td><span class="popia-pii">PII</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-violet"></span>demographics — Schema</div>
+        <table class="schema-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>POPIA</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">dateOfBirth</span></td><td><span class="field-type">Date (encrypted)</span></td><td><span class="nullable-yes">YES</span></td><td><span class="popia-sensitive">Sensitive</span></td></tr>
+            <tr><td><span class="field-name">nationality</span></td><td><span class="field-type">string (ISO 3166)</span></td><td><span class="nullable-yes">YES</span></td><td><span class="popia-pii">PII</span></td></tr>
+            <tr><td><span class="field-name">language</span></td><td><span class="field-type">string (BCP-47)</span></td><td><span class="nullable-yes">YES</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">segment</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-violet"></span>contact — Schema</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">emails[]</span></td><td><span class="field-type">string[]</span></td><td><span class="nullable-yes">YES</span></td><td>List of email addresses. First item is primary. All encrypted at rest.</td><td><span class="popia-pii">PII</span></td></tr>
+          <tr><td><span class="field-name">phones[]</span></td><td><span class="field-type">string[] (E.164)</span></td><td><span class="nullable-yes">YES</span></td><td>Phone numbers in E.164 format. Encrypted at rest.</td><td><span class="popia-pii">PII</span></td></tr>
+          <tr><td><span class="field-name">addresses[]</span></td><td><span class="field-type">Address[]</span></td><td><span class="nullable-yes">YES</span></td><td>Physical address objects: {street, city, province, postalCode, country, type: "home"|"postal"|"work"}</td><td><span class="popia-pii">PII</span></td></tr>
+          <tr><td><span class="field-name">preferredChannel</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-yes">YES</span></td><td>Customer's preferred contact channel: sms | email | push | in_app | branch</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-violet"></span>Sample JSON — Personal Profile</div>
+      <div class="json-block">
+<span class="jk">"personalProfile"</span>: {
+  <span class="jk">"name"</span>: {
+    <span class="jk">"first"</span>: <span class="js">"Sipho"</span>,
+    <span class="jk">"last"</span>: <span class="js">"Dlamini"</span>,
+    <span class="jk">"preferred"</span>: <span class="js">"Si"</span>,
+    <span class="jk">"aliases"</span>: [<span class="js">"S. Dlamini"</span>]
+  },
+  <span class="jk">"contact"</span>: {
+    <span class="jk">"emails"</span>: [<span class="js">"sipho.dlamini@example.co.za"</span>],
+    <span class="jk">"phones"</span>: [<span class="js">"+27821234567"</span>],
+    <span class="jk">"addresses"</span>: [{
+      <span class="jk">"street"</span>: <span class="js">"14 Sandton Drive"</span>,
+      <span class="jk">"city"</span>: <span class="js">"Sandton"</span>,
+      <span class="jk">"province"</span>: <span class="js">"Gauteng"</span>,
+      <span class="jk">"postalCode"</span>: <span class="js">"2196"</span>,
+      <span class="jk">"country"</span>: <span class="js">"ZA"</span>,
+      <span class="jk">"type"</span>: <span class="js">"home"</span>
+    }],
+    <span class="jk">"preferredChannel"</span>: <span class="js">"push"</span>
+  },
+  <span class="jk">"demographics"</span>: {
+    <span class="jk">"dateOfBirth"</span>: <span class="js">"ENC::v2::9eQ1N3...=="</span>,
+    <span class="jk">"nationality"</span>: <span class="js">"ZA"</span>,
+    <span class="jk">"language"</span>: <span class="js">"zu"</span>,
+    <span class="jk">"segment"</span>: <span class="js">"premium"</span>
+  }
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- POPIA CONSENT -->
+  <section class="section" id="popia">
+    <h2 class="section-title">
+      <span class="icon icon-amber">&#9888;</span>
+      POPIA Consent Ledger
+    </h2>
+    <div class="popia-notice">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 22 2 22"/><line x1="12" y1="10" x2="12" y2="14"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      <span><strong>POPIA Compliance Critical.</strong> This entity cluster implements South Africa's Protection of Personal Information Act (POPIA) requirements. All consent records are immutable and append-only. Withdrawal of consent does not delete records — it creates a withdrawnAt entry. Erasure requests trigger workflows across all affectedSystems.</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-amber"></span>consents[] — Schema</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">purpose</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td>Specific processing purpose (e.g. "marketing_email", "credit_risk_profiling", "ai_personalisation")</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">granted</span></td><td><span class="field-type">boolean</span></td><td><span class="nullable-no">NO</span></td><td>Current consent state. Must be re-evaluated if expiresAt has passed.</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">grantedAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td>Timestamp of original consent grant</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">expiresAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-yes">YES</span></td><td>Optional consent expiry. Null = indefinite. System must re-prompt on expiry.</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">channel</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td>Channel through which consent was captured: web | mobile | branch | ivr | email</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">ipAddress</span></td><td><span class="field-type">string (hashed)</span></td><td><span class="nullable-yes">YES</span></td><td>SHA-256 hashed IP address for digital consent records</td><td><span class="popia-pii">PII</span></td></tr>
+          <tr><td><span class="field-name">version</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td>Version of the consent notice/wording presented to customer at time of grant</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">withdrawnAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-yes">YES</span></td><td>Timestamp of consent withdrawal. Null if consent still active. Record is never deleted.</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot dot-amber"></span>erasureRequests[] — Schema</div>
+        <table class="schema-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>POPIA</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">requestId</span></td><td><span class="field-type">UUID</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">requestedAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">status</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">completedAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-yes">YES</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">affectedSystems[]</span></td><td><span class="field-type">string[]</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-amber"></span>dataRetentionPolicy — Schema</div>
+        <table class="schema-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>POPIA</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">category</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">retentionDays</span></td><td><span class="field-type">integer</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">legalBasis</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-amber"></span>Sample JSON — POPIA Consent Ledger</div>
+      <div class="json-block">
+<span class="jk">"popiaConsent"</span>: {
+  <span class="jk">"consents"</span>: [
+    {
+      <span class="jk">"purpose"</span>: <span class="js">"ai_personalisation"</span>,
+      <span class="jk">"granted"</span>: <span class="jb">true</span>,
+      <span class="jk">"grantedAt"</span>: <span class="js">"2025-01-10T09:15:00.000Z"</span>,
+      <span class="jk">"expiresAt"</span>: <span class="js">"2027-01-10T00:00:00.000Z"</span>,
+      <span class="jk">"channel"</span>: <span class="js">"mobile"</span>,
+      <span class="jk">"ipAddress"</span>: <span class="js">"sha256::a3f8b2..."</span>,
+      <span class="jk">"version"</span>: <span class="js">"consent_notice_v4.2"</span>,
+      <span class="jk">"withdrawnAt"</span>: <span class="jnull">null</span>
+    },
+    {
+      <span class="jk">"purpose"</span>: <span class="js">"marketing_email"</span>,
+      <span class="jk">"granted"</span>: <span class="jb">false</span>,
+      <span class="jk">"grantedAt"</span>: <span class="js">"2024-06-01T00:00:00.000Z"</span>,
+      <span class="jk">"expiresAt"</span>: <span class="jnull">null</span>,
+      <span class="jk">"channel"</span>: <span class="js">"web"</span>,
+      <span class="jk">"ipAddress"</span>: <span class="js">"sha256::d9c4e1..."</span>,
+      <span class="jk">"version"</span>: <span class="js">"consent_notice_v3.0"</span>,
+      <span class="jk">"withdrawnAt"</span>: <span class="js">"2025-11-22T14:30:00.000Z"</span>
+    }
+  ],
+  <span class="jk">"erasureRequests"</span>: [],
+  <span class="jk">"dataRetentionPolicy"</span>: {
+    <span class="jk">"category"</span>: <span class="js">"financial_records"</span>,
+    <span class="jk">"retentionDays"</span>: <span class="jn">2555</span>, <span class="jc">// 7 years — FICA requirement</span>
+    <span class="jk">"legalBasis"</span>: <span class="js">"FICA_s29_legal_obligation"</span>
+  }
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- FINANCIAL PROFILE -->
+  <section class="section" id="financial">
+    <h2 class="section-title">
+      <span class="icon icon-indigo">&#9670;</span>
+      Financial Profile
+    </h2>
+    <p class="section-desc">Accounts, risk scores (including UC16 PayGuard fraud signals), AML risk, and predicted lifetime value.</p>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>accounts[] — Schema</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">accountId</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td>Institution-scoped account identifier</td><td><span class="popia-pii">PII</span></td></tr>
+          <tr><td><span class="field-name">type</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td>cheque | savings | credit | investment | loan | wallet</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">institution</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td>Holding institution name or code (e.g. "ABSA", "FNB", "NEDBANK")</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">status</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td>active | dormant | closed | suspended</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">openedAt</span></td><td><span class="field-type">Date</span></td><td><span class="nullable-yes">YES</span></td><td>Account opening date</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>riskProfile — Schema (includes UC16 PayGuard signals)</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">creditScore</span></td><td><span class="field-type">integer</span></td><td><span class="nullable-yes">YES</span></td><td>Credit bureau score. Range 0–999 (TransUnion / Experian ZA)</td><td><span class="popia-sensitive">Sensitive</span></td></tr>
+          <tr><td><span class="field-name">fraudRiskScore</span></td><td><span class="field-type">float (0–1)</span></td><td><span class="nullable-yes">YES</span></td><td>Real-time fraud risk score sourced from UC16 PayGuard. Updated per transaction window.</td><td><span class="popia-sensitive">Sensitive</span></td></tr>
+          <tr><td><span class="field-name">amlRisk</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-yes">YES</span></td><td>Anti-money laundering risk tier: low | medium | high | prohibited</td><td><span class="popia-sensitive">Sensitive</span></td></tr>
+          <tr><td><span class="field-name">lastUpdated</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td>When risk scores were last refreshed from source systems</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Sample JSON — Financial Profile</div>
+      <div class="json-block">
+<span class="jk">"financialProfile"</span>: {
+  <span class="jk">"accounts"</span>: [
+    {
+      <span class="jk">"accountId"</span>: <span class="js">"4089***1234"</span>, <span class="jc">// masked for display</span>
+      <span class="jk">"type"</span>: <span class="js">"cheque"</span>,
+      <span class="jk">"institution"</span>: <span class="js">"ABSA"</span>,
+      <span class="jk">"status"</span>: <span class="js">"active"</span>,
+      <span class="jk">"openedAt"</span>: <span class="js">"2019-06-14"</span>
+    }
+  ],
+  <span class="jk">"riskProfile"</span>: {
+    <span class="jk">"creditScore"</span>: <span class="jn">742</span>,
+    <span class="jk">"fraudRiskScore"</span>: <span class="jn">0.04</span>, <span class="jc">// UC16 PayGuard signal</span>
+    <span class="jk">"amlRisk"</span>: <span class="js">"low"</span>,
+    <span class="jk">"lastUpdated"</span>: <span class="js">"2026-05-09T00:01:00.000Z"</span>
+  },
+  <span class="jk">"lifetimeValue"</span>: {
+    <span class="jk">"current"</span>: <span class="jn">48200.00</span>, <span class="jc">// ZAR</span>
+    <span class="jk">"predicted12m"</span>: <span class="jn">61500.00</span>,
+    <span class="jk">"segment"</span>: <span class="js">"high_value"</span>
+  }
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTION HISTORY -->
+  <section class="section" id="interactions">
+    <h2 class="section-title">
+      <span class="icon icon-teal">&#9679;</span>
+      Interaction History
+    </h2>
+    <p class="section-desc">All customer touchpoints across channels, including voice interactions sourced from UC18 ARIA.</p>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-teal"></span>interactions[] — Schema</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">interactionId</span></td><td><span class="field-type">UUID</span></td><td><span class="nullable-no">NO</span></td><td>Unique identifier for this interaction event</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">channel</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td>voice | web | mobile | branch | email | chat</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">timestamp</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td>UTC timestamp of interaction start</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">duration</span></td><td><span class="field-type">integer (seconds)</span></td><td><span class="nullable-yes">YES</span></td><td>Interaction duration in seconds</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">sentiment</span></td><td><span class="field-type">float (-1 to 1)</span></td><td><span class="nullable-yes">YES</span></td><td>ML-derived sentiment score. -1=very negative, 0=neutral, 1=very positive</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">outcome</span></td><td><span class="field-type">string</span></td><td><span class="nullable-yes">YES</span></td><td>Interaction outcome (e.g. "resolved", "escalated", "abandoned", "sale_completed")</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">agentId</span></td><td><span class="field-type">string</span></td><td><span class="nullable-yes">YES</span></td><td>Human agent or AI agent identifier. Null for self-service.</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">ucSource</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td>Originating use case system: UC18 (ARIA voice) | UC16 (PayGuard) | core</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-teal"></span>voiceInteractions[] — UC18 ARIA Schema</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">interactionId</span></td><td><span class="field-type">UUID</span></td><td><span class="nullable-no">NO</span></td><td>Matches parent interactions[] record</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">transcriptSummary</span></td><td><span class="field-type">string</span></td><td><span class="nullable-yes">YES</span></td><td>AI-generated summary of call transcript. Full transcript stored in UC18 with pointer.</td><td><span class="popia-pii">PII</span></td></tr>
+          <tr><td><span class="field-name">intent</span></td><td><span class="field-type">string</span></td><td><span class="nullable-yes">YES</span></td><td>Primary intent classified by ARIA NLU (e.g. "balance_inquiry", "dispute_transaction")</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">resolution</span></td><td><span class="field-type">string</span></td><td><span class="nullable-yes">YES</span></td><td>How the call was resolved</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">satisfaction</span></td><td><span class="field-type">integer (1–5)</span></td><td><span class="nullable-yes">YES</span></td><td>Post-call CSAT score captured by ARIA</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-teal"></span>Sample JSON — Interaction History</div>
+      <div class="json-block">
+<span class="jk">"interactionHistory"</span>: {
+  <span class="jk">"interactions"</span>: [
+    {
+      <span class="jk">"interactionId"</span>: <span class="js">"int_01HZ2P8KQL5RV9N3WFEJ7D4B"</span>,
+      <span class="jk">"channel"</span>: <span class="js">"voice"</span>,
+      <span class="jk">"timestamp"</span>: <span class="js">"2026-05-08T10:34:21.000Z"</span>,
+      <span class="jk">"duration"</span>: <span class="jn">247</span>,
+      <span class="jk">"sentiment"</span>: <span class="jn">0.62</span>,
+      <span class="jk">"outcome"</span>: <span class="js">"resolved"</span>,
+      <span class="jk">"agentId"</span>: <span class="js">"ARIA_v3.1"</span>,
+      <span class="jk">"ucSource"</span>: <span class="js">"UC18"</span>
+    }
+  ],
+  <span class="jk">"voiceInteractions"</span>: [
+    {
+      <span class="jk">"interactionId"</span>: <span class="js">"int_01HZ2P8KQL5RV9N3WFEJ7D4B"</span>,
+      <span class="jk">"transcriptSummary"</span>: <span class="js">"Customer called to query a debit order dispute. ARIA resolved by confirming merchant and providing dispute reference."</span>,
+      <span class="jk">"intent"</span>: <span class="js">"dispute_transaction"</span>,
+      <span class="jk">"resolution"</span>: <span class="js">"dispute_logged"</span>,
+      <span class="jk">"satisfaction"</span>: <span class="jn">4</span>
+    }
+  ]
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- AI INTELLIGENCE -->
+  <section class="section" id="ai">
+    <h2 class="section-title">
+      <span class="icon icon-violet">&#10024;</span>
+      AI Intelligence Outputs
+    </h2>
+    <p class="section-desc">Model-generated outputs: next-best actions, churn prediction, and product affinity scoring. All outputs carry expiry timestamps and presented/accepted tracking for feedback loops.</p>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-violet"></span>nextBestActions[] — Schema</div>
+      <table class="schema-table">
+        <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th><th>POPIA</th></tr></thead>
+        <tbody>
+          <tr><td><span class="field-name">actionId</span></td><td><span class="field-type">UUID</span></td><td><span class="nullable-no">NO</span></td><td>Unique action identifier for tracking presentation and acceptance</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">type</span></td><td><span class="field-type">enum</span></td><td><span class="nullable-no">NO</span></td><td>product | retention | service | upsell</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">confidence</span></td><td><span class="field-type">float (0–1)</span></td><td><span class="nullable-no">NO</span></td><td>Model confidence in this action being appropriate. &gt;0.75 = eligible for auto-present.</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">reasoning</span></td><td><span class="field-type">string</span></td><td><span class="nullable-yes">YES</span></td><td>Human-readable explanation of why this action was recommended (XAI explainability)</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">expiresAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td>Action validity window. Expired actions must be recomputed.</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">presented</span></td><td><span class="field-type">boolean</span></td><td><span class="nullable-no">NO</span></td><td>Whether this action has been surfaced to the customer or agent</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          <tr><td><span class="field-name">accepted</span></td><td><span class="field-type">boolean</span></td><td><span class="nullable-yes">YES</span></td><td>Customer/agent response. Null until presented. Used to train reinforcement feedback loop.</td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot dot-violet"></span>churnProbability — Schema</div>
+        <table class="schema-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>POPIA</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">score</span></td><td><span class="field-type">float (0–1)</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">factors[]</span></td><td><span class="field-type">string[]</span></td><td><span class="nullable-yes">YES</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">computedAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot dot-violet"></span>productAffinityScores[] — Schema</div>
+        <table class="schema-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>POPIA</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">productCode</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">score</span></td><td><span class="field-type">float (0–1)</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">computedAt</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot dot-violet"></span>Sample JSON — AI Intelligence Outputs</div>
+      <div class="json-block">
+<span class="jk">"aiIntelligence"</span>: {
+  <span class="jk">"nextBestActions"</span>: [
+    {
+      <span class="jk">"actionId"</span>: <span class="js">"nba_01HZ9R4PLQ2WN7K5VCFM3J8E"</span>,
+      <span class="jk">"type"</span>: <span class="js">"upsell"</span>,
+      <span class="jk">"confidence"</span>: <span class="jn">0.88</span>,
+      <span class="jk">"reasoning"</span>: <span class="js">"Customer has held a cheque account for 6+ years, credit score 742, and no investment products. High affinity for unit trust products based on cohort analysis."</span>,
+      <span class="jk">"expiresAt"</span>: <span class="js">"2026-05-16T00:00:00.000Z"</span>,
+      <span class="jk">"presented"</span>: <span class="jb">false</span>,
+      <span class="jk">"accepted"</span>: <span class="jnull">null</span>
+    }
+  ],
+  <span class="jk">"churnProbability"</span>: {
+    <span class="jk">"score"</span>: <span class="jn">0.11</span>,
+    <span class="jk">"factors"</span>: [<span class="js">"declining_transaction_frequency"</span>, <span class="js">"competitor_inquiry_detected"</span>],
+    <span class="jk">"computedAt"</span>: <span class="js">"2026-05-09T00:00:00.000Z"</span>
+  },
+  <span class="jk">"productAffinityScores"</span>: [
+    { <span class="jk">"productCode"</span>: <span class="js">"UNIT_TRUST_GRW"</span>, <span class="jk">"score"</span>: <span class="jn">0.84</span>, <span class="jk">"computedAt"</span>: <span class="js">"2026-05-09T00:00:00.000Z"</span> },
+    { <span class="jk">"productCode"</span>: <span class="js">"HOME_LOAN_VAR"</span>, <span class="jk">"score"</span>: <span class="jn">0.61</span>, <span class="jk">"computedAt"</span>: <span class="js">"2026-05-09T00:00:00.000Z"</span> }
+  ]
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIT TRAIL -->
+  <section class="section" id="audit">
+    <h2 class="section-title">
+      <span class="icon icon-indigo">&#9632;</span>
+      Audit Trail
+    </h2>
+    <p class="section-desc">Immutable access and mutation logs for regulatory compliance, data governance, and forensic investigation.</p>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>dataAccessLog[] — Schema</div>
+        <table class="schema-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>POPIA</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">accessedBy</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">purpose</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">timestamp</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">fieldsAccessed[]</span></td><td><span class="field-type">string[]</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>mutations[] — Schema</div>
+        <table class="schema-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>POPIA</th></tr></thead>
+          <tbody>
+            <tr><td><span class="field-name">mutatedBy</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">timestamp</span></td><td><span class="field-type">DateTime</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+            <tr><td><span class="field-name">before</span></td><td><span class="field-type">JSON (encrypted)</span></td><td><span class="nullable-yes">YES</span></td><td><span class="popia-sensitive">Sensitive</span></td></tr>
+            <tr><td><span class="field-name">after</span></td><td><span class="field-type">JSON (encrypted)</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-sensitive">Sensitive</span></td></tr>
+            <tr><td><span class="field-name">reason</span></td><td><span class="field-type">string</span></td><td><span class="nullable-no">NO</span></td><td><span class="popia-nonpii">Non-PII</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Sample JSON — Audit Trail</div>
+      <div class="json-block">
+<span class="jk">"auditTrail"</span>: {
+  <span class="jk">"dataAccessLog"</span>: [
+    {
+      <span class="jk">"accessedBy"</span>: <span class="js">"svc_uc24_intelligence_engine"</span>,
+      <span class="jk">"purpose"</span>: <span class="js">"nba_computation"</span>,
+      <span class="jk">"timestamp"</span>: <span class="js">"2026-05-09T00:00:01.000Z"</span>,
+      <span class="jk">"fieldsAccessed"</span>: [<span class="js">"financialProfile.lifetimeValue"</span>, <span class="js">"interactionHistory.interactions"</span>, <span class="js">"aiIntelligence.churnProbability"</span>]
+    }
+  ],
+  <span class="jk">"mutations"</span>: [
+    {
+      <span class="jk">"mutatedBy"</span>: <span class="js">"svc_uc18_aria"</span>,
+      <span class="jk">"timestamp"</span>: <span class="js">"2026-05-08T10:34:28.000Z"</span>,
+      <span class="jk">"before"</span>: <span class="js">"ENC::v2::..."</span>,
+      <span class="jk">"after"</span>: <span class="js">"ENC::v2::..."</span>,
+      <span class="jk">"reason"</span>: <span class="js">"voice_interaction_appended"</span>
+    }
+  ]
+}
+      </div>
+    </div>
+  </section>
+
+  <!-- DATA LINEAGE -->
+  <section class="section" id="lineage">
+    <h2 class="section-title">
+      <span class="icon icon-teal">&#10147;</span>
+      Data Lineage Map
+    </h2>
+    <p class="section-desc">Source systems and the specific fields they populate in the UnifiedCustomerProfile. All flows are event-driven via the Intelligence Hub integration bus.</p>
+
+    <div class="lineage-grid">
+
+      <div class="lineage-card">
+        <div class="lineage-source" style="color: #818cf8;">
+          <span class="source-dot" style="background:#818cf8;"></span>
+          Core Banking System
+        </div>
+        <div class="lineage-fields">
+          <div class="lineage-field">Account data <span class="arrow">&#8594;</span><span class="target">financialProfile.accounts[]</span></div>
+          <div class="lineage-field">Customer ID <span class="arrow">&#8594;</span><span class="target">identifiers[type=account_number]</span></div>
+          <div class="lineage-field">Name &amp; DOB <span class="arrow">&#8594;</span><span class="target">personalProfile.name, demographics</span></div>
+          <div class="lineage-field">Address <span class="arrow">&#8594;</span><span class="target">personalProfile.contact.addresses[]</span></div>
+          <div class="lineage-field">Account status <span class="arrow">&#8594;</span><span class="target">financialProfile.accounts[].status</span></div>
+        </div>
+      </div>
+
+      <div class="lineage-card">
+        <div class="lineage-source" style="color: #f87171;">
+          <span class="source-dot" style="background:#f87171;"></span>
+          UC16 — PayGuard
+        </div>
+        <div class="lineage-fields">
+          <div class="lineage-field">Fraud risk score <span class="arrow">&#8594;</span><span class="target">financialProfile.riskProfile.fraudRiskScore</span></div>
+          <div class="lineage-field">Transaction events <span class="arrow">&#8594;</span><span class="target">interactionHistory.interactions[]</span></div>
+          <div class="lineage-field">AML signals <span class="arrow">&#8594;</span><span class="target">financialProfile.riskProfile.amlRisk</span></div>
+          <div class="lineage-field">Device fingerprint <span class="arrow">&#8594;</span><span class="target">identifiers[type=device_id]</span></div>
+        </div>
+      </div>
+
+      <div class="lineage-card">
+        <div class="lineage-source" style="color: #2dd4bf;">
+          <span class="source-dot" style="background:#2dd4bf;"></span>
+          UC18 — ARIA Voice AI
+        </div>
+        <div class="lineage-fields">
+          <div class="lineage-field">Call transcript summary <span class="arrow">&#8594;</span><span class="target">voiceInteractions[].transcriptSummary</span></div>
+          <div class="lineage-field">Intent classification <span class="arrow">&#8594;</span><span class="target">voiceInteractions[].intent</span></div>
+          <div class="lineage-field">CSAT score <span class="arrow">&#8594;</span><span class="target">voiceInteractions[].satisfaction</span></div>
+          <div class="lineage-field">Sentiment score <span class="arrow">&#8594;</span><span class="target">interactions[].sentiment</span></div>
+          <div class="lineage-field">Resolution outcome <span class="arrow">&#8594;</span><span class="target">interactions[].outcome</span></div>
+        </div>
+      </div>
+
+      <div class="lineage-card">
+        <div class="lineage-source" style="color: #fbbf24;">
+          <span class="source-dot" style="background:#fbbf24;"></span>
+          KYC Service
+        </div>
+        <div class="lineage-fields">
+          <div class="lineage-field">National ID <span class="arrow">&#8594;</span><span class="target">identifiers[type=national_id]</span></div>
+          <div class="lineage-field">Passport <span class="arrow">&#8594;</span><span class="target">identifiers[type=passport]</span></div>
+          <div class="lineage-field">Verification status <span class="arrow">&#8594;</span><span class="target">identifiers[].verified</span></div>
+          <div class="lineage-field">Nationality <span class="arrow">&#8594;</span><span class="target">personalProfile.demographics.nationality</span></div>
+        </div>
+      </div>
+
+      <div class="lineage-card">
+        <div class="lineage-source" style="color: #a78bfa;">
+          <span class="source-dot" style="background:#a78bfa;"></span>
+          CRM System
+        </div>
+        <div class="lineage-fields">
+          <div class="lineage-field">Email address <span class="arrow">&#8594;</span><span class="target">personalProfile.contact.emails[]</span></div>
+          <div class="lineage-field">Phone number <span class="arrow">&#8594;</span><span class="target">personalProfile.contact.phones[]</span></div>
+          <div class="lineage-field">Preferred channel <span class="arrow">&#8594;</span><span class="target">personalProfile.contact.preferredChannel</span></div>
+          <div class="lineage-field">Segment <span class="arrow">&#8594;</span><span class="target">personalProfile.demographics.segment</span></div>
+          <div class="lineage-field">Interaction history <span class="arrow">&#8594;</span><span class="target">interactions[channel=email|web]</span></div>
+        </div>
+      </div>
+
+      <div class="lineage-card">
+        <div class="lineage-source" style="color: #4ade80;">
+          <span class="source-dot" style="background:#4ade80;"></span>
+          Credit Bureau (TransUnion / Experian)
+        </div>
+        <div class="lineage-fields">
+          <div class="lineage-field">Credit score <span class="arrow">&#8594;</span><span class="target">financialProfile.riskProfile.creditScore</span></div>
+          <div class="lineage-field">Score refresh date <span class="arrow">&#8594;</span><span class="target">financialProfile.riskProfile.lastUpdated</span></div>
+        </div>
+      </div>
+
+      <div class="lineage-card">
+        <div class="lineage-source" style="color: #f472b6;">
+          <span class="source-dot" style="background:#f472b6;"></span>
+          UC24 AI Engine (Internal)
+        </div>
+        <div class="lineage-fields">
+          <div class="lineage-field">NBA computation <span class="arrow">&#8594;</span><span class="target">aiIntelligence.nextBestActions[]</span></div>
+          <div class="lineage-field">Churn model <span class="arrow">&#8594;</span><span class="target">aiIntelligence.churnProbability</span></div>
+          <div class="lineage-field">Affinity model <span class="arrow">&#8594;</span><span class="target">aiIntelligence.productAffinityScores[]</span></div>
+          <div class="lineage-field">LTV prediction <span class="arrow">&#8594;</span><span class="target">financialProfile.lifetimeValue.predicted12m</span></div>
+          <div class="lineage-field">Entity resolution <span class="arrow">&#8594;</span><span class="target">identityCluster.entityResolution</span></div>
+        </div>
+      </div>
+
+      <div class="lineage-card">
+        <div class="lineage-source" style="color: #94a3b8;">
+          <span class="source-dot" style="background:#94a3b8;"></span>
+          Consent Management Platform
+        </div>
+        <div class="lineage-fields">
+          <div class="lineage-field">Consent events <span class="arrow">&#8594;</span><span class="target">popiaConsent.consents[]</span></div>
+          <div class="lineage-field">Erasure requests <span class="arrow">&#8594;</span><span class="target">popiaConsent.erasureRequests[]</span></div>
+          <div class="lineage-field">Retention policy <span class="arrow">&#8594;</span><span class="target">popiaConsent.dataRetentionPolicy</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>
+      UC24 — AI Customer Intelligence Layer &nbsp;|&nbsp; Data Model v0.1 Draft &nbsp;|&nbsp;
+      Malcolm Govender — Head of AI &amp; Engineering &nbsp;|&nbsp; Intelligence Hub &copy; 2026
+    </div>
+    <div style="margin-top:6px; color: #475569;">
+      POPIA Classification: PII fields encrypted AES-256 at rest, TLS 1.3 in transit. Access governed by attribute-based access control (ABAC).
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

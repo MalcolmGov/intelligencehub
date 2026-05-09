@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC24 - AI Customer Intelligence Layer - Architecture Specification</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0f172a; --surface: #1e293b; --surface2: #263348;
+            --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+            --text: #e2e8f0; --text-muted: #94a3b8; --text-dim: #64748b;
+            --indigo: #818cf8; --violet: #a78bfa; --teal: #2dd4bf;
+            --amber: #fbbf24; --amber-soft: rgba(251,191,36,0.12);
+            --red: #f87171; --red-soft: rgba(248,113,113,0.15);
+            --green: #4ade80; --green-soft: rgba(74,222,128,0.12);
+            --indigo-soft: rgba(129,140,248,0.12); --violet-soft: rgba(167,139,250,0.12);
+            --teal-soft: rgba(45,212,191,0.12);
+        }
+        body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 14px; padding: 32px 24px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        .back-btn { position: fixed; top: 20px; left: 24px; background: var(--indigo-soft); border: 1px solid rgba(129,140,248,0.3); color: var(--indigo); border-radius: 6px; padding: 8px 16px; font-size: 13px; font-weight: 600; z-index: 100; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+        .back-btn:hover { background: rgba(129,140,248,0.2); }
+        .print-btn { position: fixed; top: 20px; right: 24px; background: var(--indigo); color: #fff; border: none; border-radius: 6px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; z-index: 100; }
+        .print-btn:hover { background: var(--violet); }
+        .doc-header { margin-bottom: 36px; padding-bottom: 28px; border-bottom: 1px solid var(--border2); margin-top: 20px; }
+        .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+        .header-badge-new { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--indigo), var(--violet)); color: #fff; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 12px; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--amber-soft); border: 1px solid rgba(251,191,36,0.4); color: var(--amber); padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); }
+        .doc-title { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #e2e8f0 0%, var(--indigo) 60%, var(--violet) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.2; margin-bottom: 8px; }
+        .doc-subtitle { font-size: 15px; color: var(--text-muted); margin-bottom: 20px; }
+        .header-meta { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 20px; }
+        .meta-item { display: flex; flex-direction: column; gap: 3px; }
+        .meta-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); }
+        .meta-value { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .meta-value.highlight { color: var(--teal); }
+        .meta-value.indigo { color: var(--indigo); }
+        .owner-card { display: flex; align-items: center; gap: 12px; background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; padding: 14px 20px; min-width: 260px; }
+        .owner-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--indigo), var(--violet)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0; }
+        .owner-name { font-size: 13px; font-weight: 700; color: var(--text); }
+        .owner-role { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; text-align: center; }
+        .stat-value { font-size: 26px; font-weight: 800; color: var(--teal); display: block; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.7px; font-weight: 600; }
+        .section { margin-bottom: 36px; }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .section-title::before { content: ''; display: block; width: 4px; height: 20px; border-radius: 2px; background: linear-gradient(180deg, var(--indigo), var(--violet)); flex-shrink: 0; }
+        .section-num { font-size: 11px; font-weight: 700; color: var(--indigo); background: var(--indigo-soft); padding: 2px 8px; border-radius: 4px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 16px; }
+        .card-title { font-size: 14px; font-weight: 700; color: var(--indigo); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .card-icon { width: 28px; height: 28px; border-radius: 7px; background: var(--indigo-soft); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .card p { color: var(--text-muted); font-size: 13px; line-height: 1.7; margin-bottom: 10px; }
+        .card p:last-child { margin-bottom: 0; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+        .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; letter-spacing: 0.3px; }
+        .tag-indigo { background: var(--indigo-soft); color: var(--indigo); border: 1px solid rgba(129,140,248,0.25); }
+        .tag-teal   { background: var(--teal-soft);   color: var(--teal);   border: 1px solid rgba(45,212,191,0.25); }
+        .tag-violet { background: var(--violet-soft); color: var(--violet); border: 1px solid rgba(167,139,250,0.25); }
+        .tag-amber  { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.25); }
+        .tag-green  { background: var(--green-soft);  color: var(--green);  border: 1px solid rgba(74,222,128,0.25); }
+        .tag-red    { background: var(--red-soft);    color: var(--red);    border: 1px solid rgba(248,113,113,0.25); }
+        .arch-diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+        .arch-layers { display: flex; flex-direction: column; gap: 10px; }
+        .arch-layer { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 8px; border: 1px solid var(--border2); }
+        .arch-layer.layer-1 { background: rgba(45,212,191,0.08);  border-color: rgba(45,212,191,0.2); }
+        .arch-layer.layer-2 { background: rgba(129,140,248,0.08); border-color: rgba(129,140,248,0.2); }
+        .arch-layer.layer-3 { background: rgba(167,139,250,0.10); border-color: rgba(167,139,250,0.2); }
+        .arch-layer.layer-4 { background: rgba(251,191,36,0.07);  border-color: rgba(251,191,36,0.2); }
+        .arch-layer.layer-5 { background: rgba(74,222,128,0.07);  border-color: rgba(74,222,128,0.2); }
+        .arch-layer.layer-6 { background: rgba(129,140,248,0.12); border-color: rgba(129,140,248,0.3); }
+        .layer-num { font-size: 10px; font-weight: 800; width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .layer-1 .layer-num { background: rgba(45,212,191,0.2);  color: var(--teal); }
+        .layer-2 .layer-num { background: rgba(129,140,248,0.2); color: var(--indigo); }
+        .layer-3 .layer-num { background: rgba(167,139,250,0.2); color: var(--violet); }
+        .layer-4 .layer-num { background: rgba(251,191,36,0.2);  color: var(--amber); }
+        .layer-5 .layer-num { background: rgba(74,222,128,0.2);  color: var(--green); }
+        .layer-6 .layer-num { background: rgba(129,140,248,0.25); color: var(--indigo); }
+        .layer-name { font-size: 13px; font-weight: 700; flex-shrink: 0; min-width: 170px; }
+        .layer-1 .layer-name { color: var(--teal); }
+        .layer-2 .layer-name { color: var(--indigo); }
+        .layer-3 .layer-name { color: var(--violet); }
+        .layer-4 .layer-name { color: var(--amber); }
+        .layer-5 .layer-name { color: var(--green); }
+        .layer-6 .layer-name { color: var(--indigo); }
+        .layer-desc { font-size: 12px; color: var(--text-muted); flex: 1; }
+        .layer-arrow { text-align: center; color: var(--text-dim); font-size: 16px; padding: 2px 0; }
+        .flow-diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; overflow-x: auto; }
+        .flow-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); margin-bottom: 20px; }
+        .flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .flow-node { padding: 8px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; white-space: nowrap; border: 1px solid transparent; }
+        .flow-node.source  { background: rgba(45,212,191,0.10);  border-color: rgba(45,212,191,0.3);  color: var(--teal); }
+        .flow-node.process { background: rgba(129,140,248,0.10); border-color: rgba(129,140,248,0.3); color: var(--indigo); }
+        .flow-node.store   { background: rgba(167,139,250,0.10); border-color: rgba(167,139,250,0.3); color: var(--violet); }
+        .flow-node.output  { background: rgba(74,222,128,0.10);  border-color: rgba(74,222,128,0.3);  color: var(--green); }
+        .flow-node.cache   { background: rgba(251,191,36,0.10);  border-color: rgba(251,191,36,0.3);  color: var(--amber); }
+        .flow-node.ext     { background: rgba(248,113,113,0.10); border-color: rgba(248,113,113,0.3); color: var(--red); }
+        .flow-arrow { color: var(--text-dim); font-size: 14px; }
+        .flow-label { font-size: 10px; color: var(--text-dim); font-weight: 600; letter-spacing: 0.5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 10px 14px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); border-bottom: 1px solid var(--border2); background: rgba(255,255,255,0.02); }
+        td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-muted); vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        td.mono { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; color: var(--teal); }
+        td.bold { font-weight: 700; color: var(--text); }
+        .code-block { background: #0a1628; border: 1px solid var(--border2); border-radius: 8px; padding: 16px 18px; font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; color: var(--text-muted); overflow-x: auto; line-height: 1.7; margin-top: 10px; }
+        .code-block .kw  { color: var(--violet); }
+        .code-block .str { color: var(--teal); }
+        .code-block .num { color: var(--amber); }
+        .code-block .cm  { color: var(--text-dim); }
+        .code-block .key { color: var(--indigo); }
+        .api-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+        .api-header { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+        .method-badge { font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 5px; letter-spacing: 0.5px; }
+        .method-get    { background: rgba(74,222,128,0.15);  color: var(--green); }
+        .method-post   { background: rgba(129,140,248,0.15); color: var(--indigo); }
+        .method-delete { background: rgba(248,113,113,0.15); color: var(--red); }
+        .api-path { font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; color: var(--text); font-weight: 600; }
+        .api-body { padding: 14px 18px; }
+        .api-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+        .api-meta-row { display: flex; gap: 16px; flex-wrap: wrap; }
+        .api-meta { font-size: 11px; color: var(--text-dim); }
+        .api-meta span { color: var(--teal); font-weight: 600; }
+        .compliance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
+        .compliance-card { background: var(--surface2); border: 1px solid var(--border2); border-radius: 10px; padding: 16px; text-align: center; }
+        .compliance-icon { font-size: 20px; margin-bottom: 8px; }
+        .compliance-name { font-size: 14px; font-weight: 800; color: var(--indigo); margin-bottom: 4px; }
+        .compliance-desc { font-size: 11px; color: var(--text-dim); line-height: 1.5; }
+        .deploy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .deploy-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+        .deploy-service { font-size: 12px; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
+        .deploy-detail { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+        .schema-block { background: #0a1628; border: 1px solid rgba(129,140,248,0.2); border-radius: 10px; padding: 20px 22px; font-family: 'SF Mono','Fira Code',monospace; font-size: 12px; line-height: 1.9; color: var(--text-muted); overflow-x: auto; margin-top: 12px; }
+        .schema-key { color: var(--indigo); } .schema-type { color: var(--violet); } .schema-comment { color: var(--text-dim); } .schema-value { color: var(--teal); }
+        .sec-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+        .sec-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+        .sec-bullet { width: 18px; height: 18px; border-radius: 5px; background: var(--indigo-soft); border: 1px solid rgba(129,140,248,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; margin-top: 2px; color: var(--indigo); font-weight: 700; }
+        .doc-footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        .footer-text { font-size: 12px; color: var(--text-dim); }
+        .footer-badge { font-size: 11px; font-weight: 700; color: var(--indigo); background: var(--indigo-soft); border: 1px solid rgba(129,140,248,0.2); padding: 4px 12px; border-radius: 20px; }
+        @media print { .print-btn, .back-btn { display: none; } body { padding: 16px; } }
+    </style>
+</head>
+<body>
+
+<a class="back-btn" href="../">&#8592; Back</a>
+<button class="print-btn" onclick="window.print()">Print / Export PDF</button>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="header-top">
+      <div>
+        <div class="header-badge-new">&#10022; New &mdash; Gap Identified by Malcolm</div>
+        <h1 class="doc-title">UC24 &mdash; AI Customer Intelligence Layer</h1>
+        <p class="doc-subtitle">Unified Customer Profile Platform &middot; SA Fintech &middot; Architecture Specification</p>
+        <div class="status-badge"><span class="status-dot"></span>Not Started &mdash; Planning Phase</div>
+      </div>
+      <div class="owner-card">
+        <div class="owner-avatar">MG</div>
+        <div>
+          <div class="owner-name">Malcolm Govender</div>
+          <div class="owner-role">Head of AI &amp; Engineering</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-label">Document ID</span><span class="meta-value">ARCH-UC24-CIL-v0.1</span></div>
+      <div class="meta-item"><span class="meta-label">Use Case</span><span class="meta-value">UC24 &mdash; Customer Intelligence</span></div>
+      <div class="meta-item"><span class="meta-label">Est. LOC</span><span class="meta-value highlight">6,500</span></div>
+      <div class="meta-item"><span class="meta-label">Source Files</span><span class="meta-value highlight">28</span></div>
+      <div class="meta-item"><span class="meta-label">Integrations</span><span class="meta-value highlight">8</span></div>
+      <div class="meta-item"><span class="meta-label">Stack</span><span class="meta-value indigo">Python &middot; TypeScript</span></div>
+      <div class="meta-item"><span class="meta-label">Created</span><span class="meta-value">May 2026</span></div>
+      <div class="meta-item"><span class="meta-label">Phase</span><span class="meta-value">Planning</span></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><span class="stat-value">6,500</span><span class="stat-label">Est. Source LOC</span></div>
+    <div class="stat-card"><span class="stat-value">28</span><span class="stat-label">Source Files</span></div>
+    <div class="stat-card"><span class="stat-value">8</span><span class="stat-label">Integrations</span></div>
+    <div class="stat-card"><span class="stat-value">&lt;200ms</span><span class="stat-label">API p99 Target</span></div>
+    <div class="stat-card"><span class="stat-value">5</span><span class="stat-label">Compliance Frameworks</span></div>
+    <div class="stat-card"><span class="stat-value">7</span><span class="stat-label">AI/ML Components</span></div>
+  </div>
+
+  <!-- SECTION 1: SYSTEM OVERVIEW -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">01</span>System Overview</div>
+    <div class="card">
+      <p>The AI Customer Intelligence Layer (UC24) is a unified customer profile platform purpose-built for South African fintech. It aggregates signals from all customer touchpoints &mdash; banking core, telephony, support desk, web analytics, and transaction ledger &mdash; into a single, authoritative golden record, enriched continuously by AI inference. The platform resolves identity across fragmented data sources, maintains a POPIA-compliant consent ledger, and exposes actionable intelligence via REST and GraphQL APIs consumed by downstream products including ARIA (UC18) and PayGuard (UC16).</p>
+      <p>The architecture is composed of six ordered layers, each with a discrete responsibility and clean interface contract. Data flows unidirectionally from ingestion to intelligence, with a bidirectional integration bus enabling real-time feedback loops between sibling use cases.</p>
+      <div class="tag-row">
+        <span class="tag tag-teal">Event-Sourced</span>
+        <span class="tag tag-indigo">POPIA Compliant</span>
+        <span class="tag tag-violet">AI-Enriched</span>
+        <span class="tag tag-amber">Real-Time Kafka</span>
+        <span class="tag tag-green">Golden Record</span>
+        <span class="tag tag-indigo">REST + GraphQL</span>
+      </div>
+    </div>
+    <div class="arch-diagram">
+      <div class="flow-title">Layered Architecture &mdash; UC24 Customer Intelligence</div>
+      <div class="arch-layers">
+        <div class="arch-layer layer-1"><div class="layer-num">01</div><div class="layer-name">Data Ingestion</div><div class="layer-desc">Kafka streams from banking core, telephony, support desk, web analytics, transaction ledger &mdash; normalised to unified event schema</div></div>
+        <div class="layer-arrow">&#8595;</div>
+        <div class="arch-layer layer-2"><div class="layer-num">02</div><div class="layer-name">Entity Resolution</div><div class="layer-desc">Probabilistic + deterministic identity matching across name, ID, phone, email, device fingerprint &mdash; confidence scoring 0&ndash;1, deduplication, golden record election</div></div>
+        <div class="layer-arrow">&#8595;</div>
+        <div class="arch-layer layer-3"><div class="layer-num">03</div><div class="layer-name">Profile Store</div><div class="layer-desc">Event-sourced immutable customer profile &mdash; PostgreSQL primary store, Redis cache, POPIA consent ledger, full audit trail, right-to-erasure support</div></div>
+        <div class="layer-arrow">&#8595;</div>
+        <div class="arch-layer layer-4"><div class="layer-num">04</div><div class="layer-name">AI Intelligence Engine</div><div class="layer-desc">LightGBM + LLM next-best-action model, churn prediction, product affinity scoring, customer lifetime value estimation, Pinecone embedding store</div></div>
+        <div class="layer-arrow">&#8595;</div>
+        <div class="arch-layer layer-5"><div class="layer-num">05</div><div class="layer-name">Customer 360 API Layer</div><div class="layer-desc">FastAPI REST + GraphQL, &lt;200ms p99, mTLS, RBAC, rate-limiting, audit-logged &mdash; primary consumer interface for all downstream systems</div></div>
+        <div class="layer-arrow">&#8595;</div>
+        <div class="arch-layer layer-6"><div class="layer-num">06</div><div class="layer-name">Integration Bus</div><div class="layer-desc">Bi-directional adapters &mdash; UC18 ARIA (voice &#8594; profile), UC16 PayGuard (fraud signals &#8594; risk profile), banking core, support desk, web analytics pipeline</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: CORE COMPONENTS -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">02</span>Core Components</div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">&#128373;</div>Entity Resolution Engine</div>
+      <p>The Entity Resolution Engine (ERE) is the identity backbone of the platform. It applies both deterministic and probabilistic matching strategies to identify that records across disparate source systems refer to the same individual. Deterministic rules match on exact government-issued ID numbers (RSA ID, passport), verified email addresses, and confirmed mobile numbers. Probabilistic scoring uses a weighted Jaro-Winkler similarity model over name, date of birth, and device fingerprint to handle data quality variance common in legacy banking core exports.</p>
+      <p>Each identity candidate pair is assigned a confidence score between 0.0 and 1.0. Pairs above threshold 0.85 are automatically merged; pairs in the 0.60&ndash;0.85 range are flagged for human review via an audit queue. The golden record selection algorithm applies a recency-weighted source priority: banking core &gt; KYC provider &gt; telephony &gt; support desk. Deduplication runs continuously as a Kafka Streams topology, ensuring new events trigger immediate re-evaluation of identity clusters.</p>
+      <div class="tag-row">
+        <span class="tag tag-indigo">Jaro-Winkler</span><span class="tag tag-teal">Confidence 0&ndash;1</span><span class="tag tag-violet">Golden Record</span><span class="tag tag-amber">Kafka Streams</span><span class="tag tag-green">Deduplication</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">&#128176;</div>Unified Profile Store</div>
+      <p>The Unified Profile Store is event-sourced: every change to a customer profile is appended as an immutable event, enabling complete audit replay at any point in time. The current profile state is a materialised view derived from the event stream. PostgreSQL serves as the primary durable store; Redis caches hot profiles with a TTL-based invalidation strategy keyed on profile version.</p>
+      <p>The POPIA Consent Ledger is an embedded, append-only sub-store that records every consent grant and withdrawal, the purpose of processing, data categories covered, and the timestamp. The right-to-erasure orchestrator propagates deletion requests across all integrated systems, verifies acknowledgement receipts, and logs the erasure event chain into the audit trail.</p>
+      <div class="schema-block">
+<span class="schema-comment">// Unified Customer Profile Schema</span>
+{
+  <span class="schema-key">"customerId"</span>:      <span class="schema-type">UUID</span>,            <span class="schema-comment">// Golden record identifier</span>
+  <span class="schema-key">"identifiers"</span>: [
+    { <span class="schema-key">"type"</span>: <span class="schema-value">"RSA_ID"</span>, <span class="schema-key">"value"</span>: <span class="schema-value">"..."</span>, <span class="schema-key">"verified"</span>: <span class="schema-value">true</span> },
+    { <span class="schema-key">"type"</span>: <span class="schema-value">"PHONE"</span>,  <span class="schema-key">"value"</span>: <span class="schema-value">"..."</span>, <span class="schema-key">"verified"</span>: <span class="schema-value">true</span> },
+    { <span class="schema-key">"type"</span>: <span class="schema-value">"EMAIL"</span>,  <span class="schema-key">"value"</span>: <span class="schema-value">"..."</span>, <span class="schema-key">"verified"</span>: <span class="schema-value">false</span> }
+  ],
+  <span class="schema-key">"consentHistory"</span>: [
+    { <span class="schema-key">"purpose"</span>: <span class="schema-value">"marketing"</span>, <span class="schema-key">"granted"</span>: <span class="schema-value">true</span>, <span class="schema-key">"timestamp"</span>: <span class="schema-type">ISO8601</span> }
+  ],
+  <span class="schema-key">"interactions"</span>: [
+    { <span class="schema-key">"source"</span>: <span class="schema-value">"ARIA_VOICE"</span>, <span class="schema-key">"eventType"</span>: <span class="schema-value">"CALL_COMPLETED"</span>, <span class="schema-key">"ts"</span>: <span class="schema-type">ISO8601</span> }
+  ],
+  <span class="schema-key">"riskProfile"</span>: {
+    <span class="schema-key">"fraudScore"</span>: <span class="schema-type">float</span>,    <span class="schema-comment">// Sourced from PayGuard UC16</span>
+    <span class="schema-key">"ficaStatus"</span>: <span class="schema-type">enum</span>,
+    <span class="schema-key">"pepFlag"</span>:    <span class="schema-type">boolean</span>
+  },
+  <span class="schema-key">"nextBestActions"</span>: [
+    { <span class="schema-key">"action"</span>: <span class="schema-value">"OFFER_SAVINGS_ACCOUNT"</span>, <span class="schema-key">"score"</span>: <span class="schema-value">0.87</span> }
+  ]
+}
+      </div>
+      <div class="tag-row">
+        <span class="tag tag-teal">Event-Sourced</span><span class="tag tag-indigo">Immutable Audit Log</span><span class="tag tag-violet">POPIA Consent Ledger</span><span class="tag tag-amber">Right-to-Erasure</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">&#128268;</div>Behavioural Signal Ingestion</div>
+      <p>All customer-generating systems publish structured events to Apache Kafka topics partitioned by customerId. A normaliser service (Python/FastAPI) consumes from each source topic, applies schema validation, enriches with a sourceSystemId and ingestionTimestamp, and produces a normalised event onto the unified <code style="color:var(--teal);font-size:11px;">customer.events.v1</code> topic. The banking core connector handles T24/Finacle CDC exports; the telephony adapter processes ARIA call completion webhooks; the support desk adapter consumes Zendesk event hooks; web analytics events are streamed from a server-side tracking pixel.</p>
+      <p>The transaction ledger ingestion path applies PCI-DSS field masking at the normaliser boundary &mdash; PANs are truncated to last 4 digits before entering the profile store. Dead-letter queues capture events that fail schema validation, with alerting and replay tooling surfaced via CloudWatch dashboards.</p>
+      <div class="tag-row">
+        <span class="tag tag-amber">Kafka Streams</span><span class="tag tag-indigo">CDC Banking Core</span><span class="tag tag-teal">ARIA Webhooks</span><span class="tag tag-violet">PCI-DSS Masking</span><span class="tag tag-green">Dead-Letter Queue</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">&#129504;</div>AI Intelligence Engine</div>
+      <p>The AI Intelligence Engine runs four concurrent inference pipelines. The <strong style="color:var(--text);">Next-Best-Action (NBA) model</strong> combines a LightGBM ranker over structured features (recency, frequency, monetary, product holdings, channel preference) with a GPT-4o LLM layer that generates natural-language action descriptions and personalised rationale surfaced in agent UIs. Features are computed via a real-time feature store backed by Redis.</p>
+      <p>The <strong style="color:var(--text);">Churn Prediction</strong> model is a gradient-boosted binary classifier retrained weekly on 90-day lookback windows, scoring each customer daily. <strong style="color:var(--text);">Product Affinity Scoring</strong> uses a matrix factorisation model (ALS) over co-occurrence data to rank product categories. <strong style="color:var(--text);">Customer Lifetime Value (CLV)</strong> estimation applies a BG/NBD + Gamma-Gamma pipeline. All model outputs and confidence intervals are stored back into the profile store as inference artefacts with model version provenance.</p>
+      <p>Customer embedding vectors (1536-dim) generated from interaction history via OpenAI embeddings are stored in Pinecone and used for similarity search &mdash; powering segment discovery and next-best-action cold-start resolution.</p>
+      <div class="tag-row">
+        <span class="tag tag-violet">LightGBM</span><span class="tag tag-indigo">GPT-4o</span><span class="tag tag-teal">Churn Prediction</span><span class="tag tag-amber">CLV Estimation</span><span class="tag tag-green">Pinecone Embeddings</span><span class="tag tag-violet">ALS Matrix Factorisation</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">&#128274;</div>POPIA Compliance Module</div>
+      <p>The POPIA Compliance Module enforces the Protection of Personal Information Act (Act 4 of 2013) as a first-class platform concern. Consent is captured at the point of customer interaction via a consent API that records the lawful basis, purpose category, data subjects involved, and retention period. Consent state is propagated in real-time to all downstream integrated systems via a <code style="color:var(--teal);font-size:11px;">consent.events</code> Kafka topic.</p>
+      <p>The Right-to-Erasure Orchestrator implements a two-phase deletion protocol: Phase 1 pseudonymises the profile in the primary store and suspends all inference pipelines for the subject; Phase 2 dispatches erasure requests to all eight integrated systems, collects cryptographic acknowledgements, and seals the erasure record. The sealed record is retained (without PII) as proof-of-compliance for the FSCA-required 5-year audit window.</p>
+      <div class="tag-row">
+        <span class="tag tag-red">POPIA Act 4/2013</span><span class="tag tag-amber">Consent Ledger</span><span class="tag tag-indigo">Right-to-Erasure</span><span class="tag tag-violet">Pseudonymisation</span><span class="tag tag-teal">5-Year Audit Window</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">&#128257;</div>Integration Bus</div>
+      <p>The Integration Bus provides bi-directional adapter pairs for all eight integrated systems, each with independent schema contracts, retry policies, and circuit breakers. The <strong style="color:var(--text);">ARIA (UC18) adapter</strong> consumes call-completed events from the ARIA voice platform, extracts intent classifications and sentiment scores, and appends them to the customer interaction timeline. In the reverse direction, it serves enriched customer context to ARIA agents at call-start via a push-ahead cache warmed 2 seconds before connection.</p>
+      <p>The <strong style="color:var(--text);">PayGuard (UC16) adapter</strong> ingests real-time fraud signal events and updates the customer riskProfile.fraudScore field, triggering downstream churn and NBA model re-scoring if the delta exceeds a configured threshold. The banking core adapter supports both real-time CDC (Debezium) and batch overnight feeds. All adapter telemetry is emitted to CloudWatch for SLA monitoring.</p>
+      <div class="tag-row">
+        <span class="tag tag-indigo">UC18 ARIA</span><span class="tag tag-red">UC16 PayGuard</span><span class="tag tag-teal">Banking Core CDC</span><span class="tag tag-violet">Circuit Breakers</span><span class="tag tag-amber">Retry Policies</span><span class="tag tag-green">Debezium</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="card-icon">&#127759;</div>Customer 360 API</div>
+      <p>The Customer 360 API is the primary external interface, implemented with FastAPI (REST) and Strawberry (GraphQL). All endpoints require mTLS client certificates and JWT bearer tokens with RBAC scope enforcement. Responses are served from the Redis profile cache with a stale-while-revalidate pattern; cache misses trigger a synchronous profile hydration from PostgreSQL with a 200ms p99 budget enforced via a timeout circuit breaker.</p>
+      <p>Every API call is audit-logged &mdash; including the caller identity, requested resource, response code, and latency &mdash; to an immutable CloudWatch Logs stream. Rate limiting applies per-consumer-key at 1,000 RPM for read endpoints and 200 RPM for write endpoints. GraphQL persisted queries are enforced in production to prevent arbitrary depth queries from degrading latency SLAs.</p>
+      <div class="tag-row">
+        <span class="tag tag-teal">&lt;200ms p99</span><span class="tag tag-indigo">REST + GraphQL</span><span class="tag tag-violet">mTLS + JWT</span><span class="tag tag-amber">Rate Limited</span><span class="tag tag-green">Audit Logged</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: DATA FLOW DIAGRAMS -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">03</span>Data Flow Diagrams</div>
+
+    <div class="flow-diagram">
+      <div class="flow-title">Ingest Flow &mdash; Source Systems to Profile Store</div>
+      <div class="flow-row">
+        <span class="flow-node source">Banking Core</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node source">Telephony / ARIA</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node source">Support Desk</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node source">Web Analytics</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node source">Txn Ledger</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node process">Kafka Topics (per source)</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node process">Normaliser Service</span><span class="flow-label">&nbsp;schema validate + enrich</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node process">customer.events.v1 Topic</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node process">Entity Resolution Engine</span><span class="flow-label">&nbsp;match + merge</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node store">Profile Store (PostgreSQL)</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node cache">Redis Cache Invalidation</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node process">AI Inference Trigger</span>
+      </div>
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-title">Query Flow &mdash; API Request to Enriched Response</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node ext">Consumer (ARIA / PayGuard / CRM)</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node process">Customer 360 API (FastAPI)</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node process">Auth Middleware (mTLS + JWT + RBAC)</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node cache">Redis Cache Hit?</span>
+        <span class="flow-arrow">&nbsp;YES &#8594;&nbsp;</span>
+        <span class="flow-node output">Cached Profile Response</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:13px;margin:4px 0;">&#8595; NO</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node store">PostgreSQL Profile Store</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node process">AI Enrichment (NBA + Risk)</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node cache">Cache Write</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node output">Enriched Response</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node process">Audit Log &#8594; CloudWatch Logs</span>
+      </div>
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-title">Integration Flow &mdash; ARIA Call End &#8594; Profile Update &#8594; PayGuard Risk Refresh</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node source">ARIA Voice Platform (UC18)</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-label">call_completed webhook&nbsp;</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node process">Integration Bus ARIA Adapter</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node process">Normalise + Enrich Event</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node store">Profile Store: interactions[] append</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node process">NBA Model Re-score Trigger</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node store">Profile: nextBestActions[] updated</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node cache">Redis Cache Invalidated</span>
+      </div>
+      <div style="text-align:center;color:var(--text-dim);font-size:20px;margin:6px 0;">&#8595;</div>
+      <div class="flow-row" style="justify-content:center;">
+        <span class="flow-node process">PayGuard Adapter (UC16)</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-label">fraud signal delta check&nbsp;</span><span class="flow-arrow">&#8594;</span>
+        <span class="flow-node store">Profile: riskProfile.fraudScore updated</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: TECHNOLOGY STACK -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">04</span>Technology Stack</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>Technology</th><th>Purpose</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="bold">API / Runtime</td><td class="mono">Python / FastAPI</td><td>REST + async endpoints, OpenAPI schema</td><td>Python 3.12, Pydantic v2 validation</td></tr>
+          <tr><td class="bold">API / Runtime</td><td class="mono">TypeScript / Next.js</td><td>Edge-facing consumer proxy, BFF pattern</td><td>Node 20 LTS, ESM modules</td></tr>
+          <tr><td class="bold">AI / ML</td><td class="mono">LangChain</td><td>LLM orchestration, prompt chaining for NBA</td><td>LangChain 0.3.x, async chains</td></tr>
+          <tr><td class="bold">AI / ML</td><td class="mono">LightGBM</td><td>NBA ranker, churn classifier, CLV model</td><td>GPU inference, ONNX export for serving</td></tr>
+          <tr><td class="bold">AI / LLM</td><td class="mono">OpenAI GPT-4o</td><td>NBA action narration, profile summarisation</td><td>gpt-4o via Azure OpenAI (SA region)</td></tr>
+          <tr><td class="bold">Streaming</td><td class="mono">Apache Kafka (MSK)</td><td>Event ingestion, inter-service messaging</td><td>AWS MSK Serverless, SASL/SCRAM auth</td></tr>
+          <tr><td class="bold">Primary Store</td><td class="mono">PostgreSQL (RDS)</td><td>Durable event-sourced profile store</td><td>RDS PostgreSQL 16, Multi-AZ, encrypted</td></tr>
+          <tr><td class="bold">Cache</td><td class="mono">Redis (ElastiCache)</td><td>Hot profile cache, feature store, rate limiter</td><td>ElastiCache Serverless, TLS, encrypted</td></tr>
+          <tr><td class="bold">Vector Store</td><td class="mono">Pinecone</td><td>Customer embedding store, similarity search</td><td>1536-dim, cosine metric, filtered metadata</td></tr>
+          <tr><td class="bold">GraphQL</td><td class="mono">Strawberry (Python)</td><td>Schema-first GraphQL layer over profile API</td><td>Persisted queries enforced in prod</td></tr>
+          <tr><td class="bold">Observability</td><td class="mono">AWS CloudWatch</td><td>Metrics, logs, alarms, dashboards</td><td>Structured JSON logs, X-Ray tracing</td></tr>
+          <tr><td class="bold">Secrets</td><td class="mono">AWS Secrets Manager</td><td>DB credentials, API keys, mTLS certs</td><td>Automatic rotation enabled</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 5: API CONTRACTS -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">05</span>API Contracts</div>
+
+    <div class="api-card">
+      <div class="api-header"><span class="method-badge method-get">GET</span><span class="api-path">/v1/customers/{id}/profile</span></div>
+      <div class="api-body">
+        <div class="api-desc">Returns the full unified customer profile including identifiers, consent history, interaction timeline, risk profile, and current next-best-actions. Served from Redis cache with 200ms p99 target; cache miss triggers synchronous hydration from PostgreSQL + AI enrichment.</div>
+        <div class="api-meta-row">
+          <div class="api-meta">Auth: <span>mTLS + JWT (scope: customer:read)</span></div>
+          <div class="api-meta">Rate Limit: <span>1,000 RPM per consumer key</span></div>
+          <div class="api-meta">SLA: <span>&lt;200ms p99</span></div>
+          <div class="api-meta">Audit: <span>Every call logged</span></div>
+        </div>
+        <div class="code-block">
+<span class="cm">// Response (200 OK)</span>
+{
+  <span class="key">"customerId"</span>: <span class="str">"cus_01HZXQ9..."</span>,
+  <span class="key">"identifiers"</span>: [...],
+  <span class="key">"riskProfile"</span>: { <span class="key">"fraudScore"</span>: <span class="num">0.04</span>, <span class="key">"ficaStatus"</span>: <span class="str">"COMPLIANT"</span> },
+  <span class="key">"nextBestActions"</span>: [
+    { <span class="key">"action"</span>: <span class="str">"OFFER_SAVINGS_ACCOUNT"</span>, <span class="key">"score"</span>: <span class="num">0.87</span>, <span class="key">"rationale"</span>: <span class="str">"..."</span> }
+  ],
+  <span class="key">"_meta"</span>: { <span class="key">"cacheHit"</span>: <span class="kw">true</span>, <span class="key">"profileVersion"</span>: <span class="num">142</span>, <span class="key">"modelVersion"</span>: <span class="str">"nba-v3.2"</span> }
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="api-card">
+      <div class="api-header"><span class="method-badge method-post">POST</span><span class="api-path">/v1/customers/{id}/events</span></div>
+      <div class="api-body">
+        <div class="api-desc">Ingests a customer interaction event from an external system. The event is validated against the unified event schema, appended to the interaction timeline, and enqueued for AI re-scoring. Idempotent on eventId &mdash; duplicate submissions are accepted with 200 and a deduplicated flag.</div>
+        <div class="api-meta-row">
+          <div class="api-meta">Auth: <span>mTLS + JWT (scope: customer:write)</span></div>
+          <div class="api-meta">Rate Limit: <span>200 RPM per consumer key</span></div>
+          <div class="api-meta">Idempotency: <span>eventId deduplication</span></div>
+        </div>
+        <div class="code-block">
+<span class="cm">// Request body</span>
+{
+  <span class="key">"eventId"</span>:   <span class="str">"evt_01HZ..."</span>,
+  <span class="key">"eventType"</span>: <span class="str">"CALL_COMPLETED"</span>,
+  <span class="key">"source"</span>:    <span class="str">"ARIA_VOICE"</span>,
+  <span class="key">"timestamp"</span>: <span class="str">"2026-05-09T10:22:00Z"</span>,
+  <span class="key">"payload"</span>: { <span class="key">"durationSeconds"</span>: <span class="num">187</span>, <span class="key">"intent"</span>: <span class="str">"BALANCE_ENQUIRY"</span> }
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="api-card">
+      <div class="api-header"><span class="method-badge method-get">GET</span><span class="api-path">/v1/customers/{id}/next-best-actions</span></div>
+      <div class="api-body">
+        <div class="api-desc">Returns the current ranked list of next-best-actions for the customer, each with a confidence score (0&ndash;1), LLM-generated rationale, recommended channel, and expiry timestamp. Consumed by ARIA agents, support desk tooling, and the CRM product recommendation panel.</div>
+        <div class="api-meta-row">
+          <div class="api-meta">Auth: <span>mTLS + JWT (scope: customer:read)</span></div>
+          <div class="api-meta">Model: <span>nba-lightgbm-v3.2 + gpt-4o</span></div>
+          <div class="api-meta">Max Results: <span>10 (configurable)</span></div>
+        </div>
+        <div class="code-block">
+<span class="cm">// Response (200 OK)</span>
+{
+  <span class="key">"customerId"</span>: <span class="str">"cus_01HZ..."</span>,
+  <span class="key">"actions"</span>: [
+    {
+      <span class="key">"rank"</span>: <span class="num">1</span>,
+      <span class="key">"action"</span>: <span class="str">"OFFER_SAVINGS_ACCOUNT"</span>,
+      <span class="key">"score"</span>: <span class="num">0.87</span>,
+      <span class="key">"rationale"</span>: <span class="str">"Customer has held a current account 3+ years with no savings product..."</span>,
+      <span class="key">"channel"</span>: <span class="str">"VOICE"</span>,
+      <span class="key">"expiresAt"</span>: <span class="str">"2026-05-16T00:00:00Z"</span>
+    }
+  ],
+  <span class="key">"_meta"</span>: { <span class="key">"modelVersion"</span>: <span class="str">"nba-v3.2"</span>, <span class="key">"scoredAt"</span>: <span class="str">"2026-05-09T08:00:00Z"</span> }
+}
+        </div>
+      </div>
+    </div>
+
+    <div class="api-card">
+      <div class="api-header"><span class="method-badge method-delete">DELETE</span><span class="api-path">/v1/customers/{id}</span></div>
+      <div class="api-body">
+        <div class="api-desc">POPIA Right-to-Erasure endpoint. Initiates the two-phase deletion protocol &mdash; Phase 1 pseudonymises the profile and suspends inference pipelines; Phase 2 dispatches erasure requests to all eight integrated systems and collects cryptographic acknowledgements. Returns an erasureRequestId for status polling. Requires elevated RBAC scope and dual-sign approval for production execution.</div>
+        <div class="api-meta-row">
+          <div class="api-meta">Auth: <span>mTLS + JWT (scope: customer:erasure)</span></div>
+          <div class="api-meta">Approval: <span>Dual-sign required (prod)</span></div>
+          <div class="api-meta">SLA: <span>Full erasure within 30 days (POPIA)</span></div>
+          <div class="api-meta">Audit: <span>Sealed record retained 5yr</span></div>
+        </div>
+        <div class="code-block">
+<span class="cm">// Response (202 Accepted)</span>
+{
+  <span class="key">"erasureRequestId"</span>:     <span class="str">"era_01HZ..."</span>,
+  <span class="key">"status"</span>:               <span class="str">"PHASE_1_COMPLETE"</span>,
+  <span class="key">"estimatedCompletion"</span>: <span class="str">"2026-05-10T00:00:00Z"</span>,
+  <span class="key">"systemsPending"</span>: [<span class="str">"ARIA"</span>, <span class="str">"PAYGUARD"</span>, <span class="str">"BANKING_CORE"</span>, <span class="str">"SUPPORT_DESK"</span>]
+}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: DEPLOYMENT -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">06</span>Deployment Architecture</div>
+    <div class="card">
+      <p>The platform is deployed on AWS within the af-south-1 (Cape Town) region to satisfy SARB and FSCA data residency requirements. All services run as containerised workloads on ECS Fargate &mdash; no persistent EC2 instances. Infrastructure is defined in Terraform with GitOps-driven promotion across dev &#8594; staging &#8594; production environments gated by the DevSecOps Security Gate (UC23).</p>
+    </div>
+    <div class="deploy-grid">
+      <div class="deploy-card"><div class="deploy-service">ECS Fargate</div><div class="deploy-detail">API, Normaliser, Entity Resolution, AI Inference &mdash; containerised, auto-scaled, no EC2 management</div></div>
+      <div class="deploy-card"><div class="deploy-service">RDS PostgreSQL 16</div><div class="deploy-detail">Multi-AZ, encrypted at rest (AES-256), automated backups (35-day retention), read replicas for analytics</div></div>
+      <div class="deploy-card"><div class="deploy-service">ElastiCache Redis</div><div class="deploy-detail">Serverless Redis cluster, TLS in-transit, at-rest encryption, replication group for HA, TTL profile eviction</div></div>
+      <div class="deploy-card"><div class="deploy-service">MSK Kafka</div><div class="deploy-detail">AWS MSK Serverless, SASL/SCRAM auth, TLS in-transit, 7-day log retention, 3-AZ broker distribution</div></div>
+      <div class="deploy-card"><div class="deploy-service">CloudWatch</div><div class="deploy-detail">Structured JSON logs, custom metrics, latency alarms, dead-letter monitors, X-Ray distributed tracing</div></div>
+      <div class="deploy-card"><div class="deploy-service">Secrets Manager</div><div class="deploy-detail">DB credentials, API keys, mTLS certificates &mdash; automatic rotation, IAM role access, CloudTrail audit</div></div>
+      <div class="deploy-card"><div class="deploy-service">ECR</div><div class="deploy-detail">Private container registry, vulnerability scanning on push, lifecycle policies for image retention</div></div>
+      <div class="deploy-card"><div class="deploy-service">Route 53 + ACM</div><div class="deploy-detail">Internal DNS, mTLS certificate provisioning via ACM Private CA for service-to-service authentication</div></div>
+    </div>
+  </div>
+
+  <!-- SECTION 7: SECURITY -->
+  <div class="section">
+    <div class="section-title"><span class="section-num">07</span>Security Architecture</div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><div class="card-icon">&#128272;</div>Transport &amp; Service Authentication</div>
+        <ul class="sec-list">
+          <li><span class="sec-bullet">1</span>mTLS enforced on all service-to-service communication &mdash; ACM Private CA issues certificates with 90-day rotation</li>
+          <li><span class="sec-bullet">2</span>JWT bearer tokens (RS256, 15-min expiry) required for all API calls; issued by the platform IdP with RBAC claims embedded</li>
+          <li><span class="sec-bullet">3</span>External-facing endpoints behind AWS API Gateway with WAF rules &mdash; OWASP Top 10 and rate-limiting at the edge</li>
+          <li><span class="sec-bullet">4</span>VPC with private subnets &mdash; no service directly reachable from the public internet; all ingress via ALB + NLB</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-icon">&#128065;</div>Data Protection &amp; PII Controls</div>
+        <ul class="sec-list">
+          <li><span class="sec-bullet">1</span>Field-level encryption for PII at rest &mdash; RSA-ID, passport, full name, DOB encrypted with customer-specific KMS data keys</li>
+          <li><span class="sec-bullet">2</span>PCI-DSS PANs masked at normaliser boundary &mdash; only last 4 digits enter the profile store; no full PAN stored</li>
+          <li><span class="sec-bullet">3</span>Column-level PostgreSQL encryption for consentHistory and identifiers tables using pgcrypto</li>
+          <li><span class="sec-bullet">4</span>Data minimisation enforced in API responses &mdash; fields returned only if RBAC scope explicitly grants access</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-icon">&#128203;</div>RBAC &amp; Access Control</div>
+        <ul class="sec-list">
+          <li><span class="sec-bullet">1</span>Scoped RBAC: customer:read, customer:write, customer:erasure &mdash; least-privilege, reviewed quarterly</li>
+          <li><span class="sec-bullet">2</span>Service accounts use IAM roles (ECS task roles) &mdash; no static credentials; short-lived STS tokens</li>
+          <li><span class="sec-bullet">3</span>Admin operations (erasure approval, role grant) require dual-sign from two authorised principals</li>
+          <li><span class="sec-bullet">4</span>Break-glass procedure documented and tested quarterly; emergency access triggers PagerDuty alert</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-icon">&#128196;</div>Audit Trail &amp; Compliance</div>
+        <ul class="sec-list">
+          <li><span class="sec-bullet">1</span>Immutable audit trail &mdash; every profile read, write, and erasure logged to CloudWatch Logs with write-once retention (5 years)</li>
+          <li><span class="sec-bullet">2</span>CloudTrail enabled for all AWS API calls; S3 audit bucket with Object Lock (COMPLIANCE mode, 5yr)</li>
+          <li><span class="sec-bullet">3</span>POPIA erasure records retained as sealed, PII-free proof-of-compliance artefacts for FSCA audit window</li>
+          <li><span class="sec-bullet">4</span>Quarterly POPIA compliance review automated via Regulatory Radar (UC22) integration</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="compliance-grid">
+      <div class="compliance-card"><div class="compliance-icon">&#128196;</div><div class="compliance-name">POPIA</div><div class="compliance-desc">Protection of Personal Information Act &mdash; consent ledger, right-to-erasure, data minimisation, purpose limitation</div></div>
+      <div class="compliance-card"><div class="compliance-icon">&#127956;</div><div class="compliance-name">FSCA</div><div class="compliance-desc">Financial Sector Conduct Authority &mdash; 5-year audit retention, data residency in af-south-1, conduct reporting</div></div>
+      <div class="compliance-card"><div class="compliance-icon">&#127981;</div><div class="compliance-name">SARB</div><div class="compliance-desc">South African Reserve Bank &mdash; data sovereignty, af-south-1 region enforcement, cross-border transfer controls</div></div>
+      <div class="compliance-card"><div class="compliance-icon">&#128203;</div><div class="compliance-name">FICA</div><div class="compliance-desc">Financial Intelligence Centre Act &mdash; KYC data integration, PEP flagging, FICA status in risk profile</div></div>
+      <div class="compliance-card"><div class="compliance-icon">&#128179;</div><div class="compliance-name">PCI-DSS</div><div class="compliance-desc">Payment Card Industry DSS &mdash; PAN masking at ingestion, no full card data stored, scoped network zones</div></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div>
+      <div class="footer-text">UC24 &mdash; AI Customer Intelligence Layer &nbsp;&middot;&nbsp; ARCH-UC24-CIL-v0.1</div>
+      <div class="footer-text" style="margin-top:4px;">Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;&middot;&nbsp; May 2026 &nbsp;&middot;&nbsp; IntelligenceHub SA Fintech</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <span class="footer-badge">POPIA</span>
+      <span class="footer-badge">FSCA</span>
+      <span class="footer-badge">SARB</span>
+      <span class="footer-badge">FICA</span>
+      <span class="footer-badge">PCI-DSS</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

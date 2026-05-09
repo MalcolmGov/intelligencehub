@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC24 — AI Customer Intelligence Layer | Integration Map</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-2: #263348;
+    --border: rgba(255,255,255,.07);
+    --border-hover: rgba(129,140,248,.3);
+    --indigo: #818cf8;
+    --violet: #a78bfa;
+    --teal: #2dd4bf;
+    --amber: #fbbf24;
+    --rose: #fb7185;
+    --green: #34d399;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Back button */
+  .back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(129,140,248,.12);
+    border: 1px solid rgba(129,140,248,.3);
+    border-radius: 8px;
+    color: var(--indigo);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all .2s;
+  }
+  .back-btn:hover {
+    background: rgba(129,140,248,.22);
+    border-color: var(--indigo);
+  }
+  .back-btn svg { width: 14px; height: 14px; }
+
+  /* Layout */
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* Header */
+  .header {
+    padding-top: 40px;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+  }
+
+  .uc-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--indigo);
+    margin-bottom: 12px;
+  }
+  .uc-label::before {
+    content: '';
+    display: block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--indigo);
+    box-shadow: 0 0 8px var(--indigo);
+  }
+
+  .header h1 {
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    background: linear-gradient(135deg, #f1f5f9 0%, #a78bfa 60%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+
+  .header-sub {
+    color: var(--text-muted);
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: rgba(251,191,36,.1);
+    border: 1px solid rgba(251,191,36,.3);
+    color: var(--amber);
+  }
+  .badge-status::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--amber);
+  }
+
+  .badge-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(129,140,248,.2), rgba(167,139,250,.2));
+    border: 1px solid rgba(167,139,250,.4);
+    color: #c4b5fd;
+    position: relative;
+  }
+
+  .owner-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--indigo), var(--violet));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(129,140,248,.3);
+  }
+  .owner-info { line-height: 1.3; }
+  .owner-name { font-weight: 600; font-size: 13.5px; color: var(--text); }
+  .owner-role { font-size: 12px; color: var(--text-muted); }
+
+  /* Section titles */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-title .icon {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    background: rgba(129,140,248,.12);
+    border: 1px solid rgba(129,140,248,.2);
+  }
+
+  /* Integration topology */
+  .topology-section {
+    margin-bottom: 56px;
+  }
+
+  .topology-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    overflow-x: auto;
+  }
+
+  .topology-diagram {
+    min-width: 700px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Hub node */
+  .hub-node {
+    background: linear-gradient(135deg, rgba(129,140,248,.2), rgba(45,212,191,.1));
+    border: 2px solid rgba(129,140,248,.5);
+    border-radius: 16px;
+    padding: 20px 32px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    width: 260px;
+    box-shadow: 0 0 40px rgba(129,140,248,.15), 0 0 0 1px rgba(129,140,248,.1);
+  }
+  .hub-node-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 4px;
+  }
+  .hub-node-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .hub-node-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Orbit rows */
+  .orbit-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    position: relative;
+  }
+  .orbit-row.top { margin-bottom: 0; }
+  .orbit-row.bottom { margin-top: 0; }
+
+  /* Connector lines area */
+  .connectors-area {
+    position: relative;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .conn-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
+
+  /* Satellite nodes */
+  .sat-node {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: center;
+    min-width: 140px;
+    max-width: 160px;
+    flex: 1;
+    transition: border-color .2s, box-shadow .2s;
+    cursor: default;
+    position: relative;
+  }
+  .sat-node:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 4px 20px rgba(129,140,248,.1);
+  }
+  .sat-icon {
+    font-size: 20px;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .sat-name {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+  .sat-dir {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    padding: 2px 6px;
+    display: inline-block;
+  }
+  .dir-in { background: rgba(45,212,191,.1); color: var(--teal); border: 1px solid rgba(45,212,191,.2); }
+  .dir-out { background: rgba(129,140,248,.1); color: var(--indigo); border: 1px solid rgba(129,140,248,.2); }
+  .dir-bi { background: rgba(167,139,250,.1); color: var(--violet); border: 1px solid rgba(167,139,250,.2); }
+
+  /* Centre hub layout */
+  .topo-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto auto auto auto auto;
+    gap: 0;
+    align-items: center;
+    justify-items: center;
+    width: 100%;
+    min-width: 800px;
+  }
+
+  .col-left { display: flex; flex-direction: column; gap: 12px; align-items: flex-end; width: 100%; }
+  .col-right { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; width: 100%; }
+  .col-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
+    position: relative;
+  }
+
+  .v-line {
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, rgba(129,140,248,.4), rgba(129,140,248,.4), transparent);
+    height: 100%;
+    min-height: 40px;
+  }
+
+  .sat-node-r { text-align: left; }
+
+  .conn-line-left {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to left, rgba(129,140,248,.4), transparent);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .conn-line-right {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, rgba(129,140,248,.4), transparent);
+    position: relative;
+  }
+
+  .left-connector, .right-connector {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 28px;
+    position: relative;
+  }
+
+  .lc-line {
+    flex: 1;
+    height: 2px;
+    position: relative;
+  }
+  .lc-line.inbound { background: linear-gradient(to left, rgba(45,212,191,.5), transparent); }
+  .lc-line.outbound { background: linear-gradient(to right, rgba(129,140,248,.5), transparent); }
+  .lc-line.bidi { background: linear-gradient(to right, rgba(167,139,250,.4), rgba(167,139,250,.4)); }
+
+  .arrow-right {
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid rgba(129,140,248,.7);
+    flex-shrink: 0;
+  }
+  .arrow-left {
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 8px solid rgba(45,212,191,.7);
+    flex-shrink: 0;
+  }
+  .arrow-both {
+    font-size: 14px;
+    color: var(--violet);
+    flex-shrink: 0;
+    line-height: 1;
+    font-weight: 700;
+  }
+
+  /* Integration cards */
+  .integrations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(560px, 1fr));
+    gap: 20px;
+    margin-bottom: 56px;
+  }
+
+  @media (max-width: 900px) {
+    .integrations-grid { grid-template-columns: 1fr; }
+  }
+
+  .int-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .int-card:hover { border-color: rgba(129,140,248,.2); }
+
+  .int-card-header {
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .int-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .int-card-meta { flex: 1; min-width: 0; }
+  .int-card-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .int-card-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .dir-chip {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .int-card-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .int-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .flow-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .flow-block {
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .flow-block.inbound { border-left: 3px solid rgba(45,212,191,.5); }
+  .flow-block.outbound { border-left: 3px solid rgba(129,140,248,.5); }
+  .flow-block-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .flow-block.inbound .flow-block-title { color: var(--teal); }
+  .flow-block.outbound .flow-block-title { color: var(--indigo); }
+  .flow-block p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .meta-item {
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .meta-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text-dim);
+    margin-bottom: 3px;
+  }
+  .meta-value { font-size: 12px; color: var(--text-muted); }
+  .meta-value strong { color: var(--text); }
+
+  .data-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .data-tag {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .popia-flag {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    background: rgba(251,191,36,.04);
+    border: 1px solid rgba(251,191,36,.15);
+    border-radius: 8px;
+    font-size: 12px;
+    color: #fde68a;
+    line-height: 1.5;
+  }
+  .popia-flag-icon { flex-shrink: 0; margin-top: 1px; font-size: 13px; }
+
+  .error-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    background: rgba(251,113,133,.04);
+    border: 1px solid rgba(251,113,133,.15);
+    border-radius: 8px;
+    font-size: 12px;
+    color: #fca5a5;
+    line-height: 1.5;
+  }
+
+  /* Priority matrix */
+  .priority-section { margin-bottom: 56px; }
+
+  .priority-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: rgba(255,255,255,.03);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(255,255,255,.04);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.015); }
+  td strong { color: var(--text); }
+
+  .priority-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .p1 { background: rgba(251,113,133,.12); color: #fb7185; border: 1px solid rgba(251,113,133,.25); }
+  .p2 { background: rgba(251,191,36,.1); color: var(--amber); border: 1px solid rgba(251,191,36,.2); }
+  .p3 { background: rgba(45,212,191,.08); color: var(--teal); border: 1px solid rgba(45,212,191,.15); }
+
+  .wave-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(129,140,248,.1);
+    border: 1px solid rgba(129,140,248,.2);
+    color: var(--indigo);
+  }
+
+  /* Data quality */
+  .dq-section { margin-bottom: 56px; }
+
+  .dq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+  }
+
+  .dq-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .dq-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dq-req {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .dq-req::before {
+    content: '▸';
+    color: var(--indigo);
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 10px;
+  }
+  .dq-score {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .dq-score-label { font-size: 11px; color: var(--text-dim); }
+  .dq-bar-wrap { flex: 1; height: 5px; background: rgba(255,255,255,.07); border-radius: 3px; overflow: hidden; }
+  .dq-bar { height: 100%; border-radius: 3px; }
+  .dq-score-val { font-size: 11px; font-weight: 700; color: var(--text); width: 32px; text-align: right; }
+
+  /* Conflict resolution */
+  .conflict-section { margin-bottom: 56px; }
+
+  .cr-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .winner-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(52,211,153,.1);
+    border: 1px solid rgba(52,211,153,.2);
+    color: var(--green);
+  }
+
+  /* Footer */
+  .doc-footer {
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+  .footer-left { display: flex; gap: 20px; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 3px; }
+
+  /* Topo layout */
+  .topo-outer {
+    display: grid;
+    grid-template-columns: 1fr 200px 1fr;
+    grid-template-rows: auto;
+    gap: 0;
+    align-items: center;
+    min-width: 860px;
+    padding: 12px 0;
+  }
+
+  .left-sats { display: flex; flex-direction: column; gap: 10px; padding-right: 0; }
+  .right-sats { display: flex; flex-direction: column; gap: 10px; padding-left: 0; }
+
+  .topo-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .topo-item {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 64px;
+  }
+
+  .topo-item-r {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    gap: 0;
+    height: 64px;
+  }
+
+  .topo-sat {
+    background: var(--surface-2);
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 10px;
+    padding: 10px 13px;
+    width: 100%;
+    max-width: 220px;
+    transition: border-color .2s;
+  }
+  .topo-sat:hover { border-color: rgba(129,140,248,.25); }
+  .topo-sat-name { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
+  .topo-sat-proto { font-size: 10.5px; color: var(--text-dim); margin-top: 2px; }
+
+  .connector-h {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 30px;
+    height: 2px;
+    position: relative;
+  }
+  .connector-h-line {
+    flex: 1;
+    height: 2px;
+  }
+  .ch-in { background: linear-gradient(to left, rgba(45,212,191,.5), rgba(45,212,191,.1)); }
+  .ch-out { background: linear-gradient(to right, rgba(129,140,248,.5), rgba(129,140,248,.1)); }
+  .ch-bi { background: linear-gradient(90deg, rgba(167,139,250,.4) 0%, rgba(167,139,250,.6) 50%, rgba(167,139,250,.4) 100%); }
+
+  .arr-r { border-left: 7px solid rgba(45,212,191,.7); border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+  .arr-l { border-right: 7px solid rgba(129,140,248,.7); border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+  .arr-bi-l { border-right: 7px solid rgba(167,139,250,.7); border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+  .arr-bi-r { border-left: 7px solid rgba(167,139,250,.7); border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+
+  .center-line-v {
+    width: 2px;
+    background: linear-gradient(to bottom, rgba(129,140,248,.2), rgba(129,140,248,.4), rgba(129,140,248,.4), rgba(45,212,191,.3), rgba(45,212,191,.1));
+    flex: 1;
+    min-height: 8px;
+  }
+
+  .legend-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+  .legend-line {
+    width: 28px;
+    height: 2px;
+    border-radius: 1px;
+  }
+  .ll-in { background: rgba(45,212,191,.7); }
+  .ll-out { background: rgba(129,140,248,.7); }
+  .ll-bi { background: rgba(167,139,250,.7); }
+</style>
+</head>
+<body>
+
+<a href="../" class="back-btn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 12H5M12 5l-7 7 7 7"/>
+  </svg>
+  Back
+</a>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="uc-label">UC24 · System Integration Map · v1.0</div>
+    <h1>AI Customer Intelligence Layer</h1>
+    <p class="header-sub">Unified cross-system integration architecture — data flows, protocols, conflict resolution &amp; compliance</p>
+
+    <div class="badges">
+      <span class="badge-status">Not Started — Planning Phase</span>
+      <span class="badge-new">✦ New — Gap Identified by Malcolm</span>
+    </div>
+
+    <div class="owner-row">
+      <div class="avatar">MG</div>
+      <div class="owner-info">
+        <div class="owner-name">Malcolm Govender</div>
+        <div class="owner-role">Head of AI &amp; Engineering</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTEGRATION TOPOLOGY -->
+  <div class="topology-section">
+    <div class="section-title">
+      <span class="icon">⬡</span>
+      Integration Topology — Visual Map
+    </div>
+    <div class="topology-wrapper">
+      <div class="topo-outer">
+
+        <!-- LEFT SATELLITES -->
+        <div class="left-sats">
+
+          <div class="topo-item">
+            <div class="topo-sat">
+              <div class="topo-sat-name">🎙️ UC18 ARIA Voice Agent</div>
+              <div class="topo-sat-proto">REST webhooks · Kafka · Bi-directional</div>
+            </div>
+            <div class="connector-h" style="width:40px">
+              <div class="arr-bi-l" style="flex-shrink:0"></div>
+              <div class="connector-h-line ch-bi"></div>
+              <div class="arr-bi-r" style="flex-shrink:0"></div>
+            </div>
+          </div>
+
+          <div class="topo-item">
+            <div class="topo-sat">
+              <div class="topo-sat-name">🛡️ UC16 PayGuard Fraud Shield</div>
+              <div class="topo-sat-proto">gRPC · Low-latency · Bi-directional</div>
+            </div>
+            <div class="connector-h" style="width:40px">
+              <div class="arr-bi-l" style="flex-shrink:0"></div>
+              <div class="connector-h-line ch-bi"></div>
+              <div class="arr-bi-r" style="flex-shrink:0"></div>
+            </div>
+          </div>
+
+          <div class="topo-item">
+            <div class="topo-sat">
+              <div class="topo-sat-name">🏦 Banking Core System</div>
+              <div class="topo-sat-proto">REST API · DB Replication · Inbound</div>
+            </div>
+            <div class="connector-h" style="width:40px">
+              <div class="connector-h-line ch-in"></div>
+              <div class="arr-r" style="flex-shrink:0"></div>
+            </div>
+          </div>
+
+          <div class="topo-item">
+            <div class="topo-sat">
+              <div class="topo-sat-name">📞 Telephony / IVR System</div>
+              <div class="topo-sat-proto">SFTP CDR · SIP Events · Inbound</div>
+            </div>
+            <div class="connector-h" style="width:40px">
+              <div class="connector-h-line ch-in"></div>
+              <div class="arr-r" style="flex-shrink:0"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- CENTER HUB -->
+        <div class="topo-center">
+          <div class="hub-node">
+            <div class="hub-node-label">Central Hub</div>
+            <div class="hub-node-title">Customer Intelligence Layer</div>
+            <div class="hub-node-sub">UC24 · Unified Profile Engine</div>
+          </div>
+        </div>
+
+        <!-- RIGHT SATELLITES -->
+        <div class="right-sats">
+
+          <div class="topo-item-r">
+            <div class="topo-sat">
+              <div class="topo-sat-name">🎫 Support Desk (JSM/Zendesk)</div>
+              <div class="topo-sat-proto">REST polling · Webhooks · Inbound</div>
+            </div>
+            <div class="connector-h" style="width:40px">
+              <div class="arr-r" style="flex-shrink:0"></div>
+              <div class="connector-h-line ch-in"></div>
+            </div>
+          </div>
+
+          <div class="topo-item-r">
+            <div class="topo-sat">
+              <div class="topo-sat-name">📊 Web &amp; Mobile Analytics</div>
+              <div class="topo-sat-proto">Kafka Streaming · SDK · Inbound</div>
+            </div>
+            <div class="connector-h" style="width:40px">
+              <div class="arr-r" style="flex-shrink:0"></div>
+              <div class="connector-h-line ch-in"></div>
+            </div>
+          </div>
+
+          <div class="topo-item-r">
+            <div class="topo-sat">
+              <div class="topo-sat-name">💳 Transaction Ledger</div>
+              <div class="topo-sat-proto">CDC · Debezium · PostgreSQL</div>
+            </div>
+            <div class="connector-h" style="width:40px">
+              <div class="arr-r" style="flex-shrink:0"></div>
+              <div class="connector-h-line ch-in"></div>
+            </div>
+          </div>
+
+          <div class="topo-item-r">
+            <div class="topo-sat">
+              <div class="topo-sat-name">📣 Marketing Platform</div>
+              <div class="topo-sat-proto">REST Batch · Webhooks · Outbound</div>
+            </div>
+            <div class="connector-h" style="width:40px">
+              <div class="arr-l" style="flex-shrink:0"></div>
+              <div class="connector-h-line ch-out"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend-row">
+        <div class="legend-item">
+          <div class="legend-line ll-in"></div>
+          <span>Inbound to CIL</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-line ll-out"></div>
+          <span>Outbound from CIL</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-line ll-bi"></div>
+          <span>Bi-directional exchange</span>
+        </div>
+        <div class="legend-item" style="margin-left:auto; color: var(--text-dim)">
+          CIL = Customer Intelligence Layer (UC24 Hub)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTEGRATION DETAIL CARDS -->
+  <div class="section-title">
+    <span class="icon">⇄</span>
+    Integration Detail — All 8 Systems
+  </div>
+  <div class="integrations-grid">
+
+    <!-- INT 1: ARIA Voice -->
+    <div class="int-card">
+      <div class="int-card-header">
+        <div class="int-icon" style="background:rgba(167,139,250,.12); border:1px solid rgba(167,139,250,.2);">🎙️</div>
+        <div class="int-card-meta">
+          <div class="int-card-title">UC18 ARIA Voice Agent</div>
+          <div class="int-card-subtitle">Conversational AI voice system — call handling &amp; intent resolution</div>
+        </div>
+        <span class="dir-chip dir-bi">Bi-directional</span>
+      </div>
+      <div class="int-card-body">
+        <div>
+          <div class="int-section-label">Data Flows</div>
+          <div class="flow-row">
+            <div class="flow-block inbound">
+              <div class="flow-block-title">⬇ Inbound to CIL</div>
+              <p>Call-ended event → transcript summary, intent classification, sentiment score, resolution status → merged into unified customer profile</p>
+            </div>
+            <div class="flow-block outbound">
+              <div class="flow-block-title">⬆ Outbound from CIL</div>
+              <p>Customer profile context → ARIA pre-call briefing: name, interaction history, product holdings, preferences, risk flags</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="int-section-label">Data Elements</div>
+          <div class="data-tags">
+            <span class="data-tag">transcriptSummary</span>
+            <span class="data-tag">satisfactionScore</span>
+            <span class="data-tag">agentId</span>
+            <span class="data-tag">callDurationMs</span>
+            <span class="data-tag">intentClassification</span>
+            <span class="data-tag">sentimentScore</span>
+            <span class="data-tag">resolutionStatus</span>
+            <span class="data-tag">riskFlags</span>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value"><strong>REST webhooks</strong> + event-driven via Kafka</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Frequency / Latency</div>
+            <div class="meta-value">Event-triggered; <strong>&lt;2s post-call</strong> webhook delivery</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Pattern</div>
+            <div class="meta-value">Event-driven · Push</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Auth</div>
+            <div class="meta-value">HMAC-signed webhook + mTLS for Kafka</div>
+          </div>
+        </div>
+        <div class="popia-flag">
+          <div class="popia-flag-icon">⚖️</div>
+          <span><strong>POPIA:</strong> Call transcripts are personal information under POPIA. Requires explicit consent to record; data must be stored with purpose limitation. Retention max 12 months unless legally required longer. Transcript content must be masked for PII (ID numbers, card digits) before storage.</span>
+        </div>
+        <div class="error-block">
+          <span style="flex-shrink:0">🔁</span>
+          <span><strong>Error Handling:</strong> Webhook delivery failures retry with exponential backoff (3 attempts, max 30s). If pre-call briefing unavailable, ARIA falls back to static customer name only. Dead-letter queue captures failed events for replay.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INT 2: PayGuard -->
+    <div class="int-card">
+      <div class="int-card-header">
+        <div class="int-icon" style="background:rgba(251,113,133,.1); border:1px solid rgba(251,113,133,.2);">🛡️</div>
+        <div class="int-card-meta">
+          <div class="int-card-title">UC16 PayGuard Fraud Shield</div>
+          <div class="int-card-subtitle">Real-time fraud detection, AML screening &amp; device intelligence</div>
+        </div>
+        <span class="dir-chip dir-bi">Bi-directional</span>
+      </div>
+      <div class="int-card-body">
+        <div>
+          <div class="int-section-label">Data Flows</div>
+          <div class="flow-row">
+            <div class="flow-block inbound">
+              <div class="flow-block-title">⬇ Inbound to CIL</div>
+              <p>Fraud risk score, AML flag, device fingerprint, last fraud event timestamp → merged into unified customer risk profile</p>
+            </div>
+            <div class="flow-block outbound">
+              <div class="flow-block-title">⬆ Outbound from CIL</div>
+              <p>Behavioural history, interaction pattern signals, channel usage, cross-product activity → enriches PayGuard risk model</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="int-section-label">Data Elements</div>
+          <div class="data-tags">
+            <span class="data-tag">fraudRiskScore (0–100)</span>
+            <span class="data-tag">amlRisk</span>
+            <span class="data-tag">deviceId</span>
+            <span class="data-tag">deviceFingerprint</span>
+            <span class="data-tag">lastFraudFlag</span>
+            <span class="data-tag">amlFlagReason</span>
+            <span class="data-tag">interactionCount</span>
+            <span class="data-tag">channelPattern</span>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value"><strong>gRPC</strong> — low-latency binary framing</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Frequency / Latency</div>
+            <div class="meta-value">Real-time; <strong>p99 &lt;50ms</strong> fraud signal delivery</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Pattern</div>
+            <div class="meta-value">Synchronous request/response + async enrichment stream</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Auth</div>
+            <div class="meta-value">mTLS + service account JWT</div>
+          </div>
+        </div>
+        <div class="popia-flag">
+          <div class="popia-flag-icon">⚖️</div>
+          <span><strong>POPIA:</strong> Fraud scores and AML flags constitute processing of personal information for fraud prevention — a legitimate interest basis. Device fingerprints must be pseudonymised. Profiling for risk purposes requires disclosure in privacy notice. Cross-border transfer restriction applies if PayGuard is hosted outside RSA.</span>
+        </div>
+        <div class="error-block">
+          <span style="flex-shrink:0">🔁</span>
+          <span><strong>Error Handling:</strong> gRPC circuit-breaker pattern. If PayGuard is unreachable, CIL falls back to last-known risk score (max 5 min stale). Scores older than 5 min flagged as STALE in the unified profile. Alert triggers if circuit opens for &gt;60s.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INT 3: Banking Core -->
+    <div class="int-card">
+      <div class="int-card-header">
+        <div class="int-icon" style="background:rgba(45,212,191,.1); border:1px solid rgba(45,212,191,.2);">🏦</div>
+        <div class="int-card-meta">
+          <div class="int-card-title">Banking Core System</div>
+          <div class="int-card-subtitle">Accounts, balances, product holdings &amp; transaction history</div>
+        </div>
+        <span class="dir-chip dir-in">Inbound</span>
+      </div>
+      <div class="int-card-body">
+        <div>
+          <div class="int-section-label">Data Flows</div>
+          <div class="flow-row">
+            <div class="flow-block inbound" style="grid-column:1/-1">
+              <div class="flow-block-title">⬇ Inbound to CIL — Full Scope</div>
+              <p>Account data (account numbers, types, statuses, balances), transaction history (last 24 months), product holdings (savings, credit, investments, insurance), KYC status, credit limit, relationship start date</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="int-section-label">Data Elements</div>
+          <div class="data-tags">
+            <span class="data-tag">accountId</span>
+            <span class="data-tag">accountType</span>
+            <span class="data-tag">balance</span>
+            <span class="data-tag">kycStatus</span>
+            <span class="data-tag">productHoldings[]</span>
+            <span class="data-tag">creditLimit</span>
+            <span class="data-tag">relationshipStartDate</span>
+            <span class="data-tag">transactionHistory</span>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value"><strong>REST API</strong> + database replication (read replica)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Frequency / Latency</div>
+            <div class="meta-value">Near-real-time; <strong>5 min lag</strong> for balances; event-driven for transactions</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Pattern</div>
+            <div class="meta-value">Pull (REST) + CDC event stream for new transactions</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Auth</div>
+            <div class="meta-value">OAuth2 client credentials + IP allowlist</div>
+          </div>
+        </div>
+        <div class="popia-flag">
+          <div class="popia-flag-icon">⚖️</div>
+          <span><strong>POPIA:</strong> Financial account data is sensitive personal information. Strict purpose limitation — only used for customer-facing intelligence, not sold or profiled for third-party marketing without explicit consent. Data minimisation: CIL should not store raw transaction amounts beyond aggregated features.</span>
+        </div>
+        <div class="error-block">
+          <span style="flex-shrink:0">🔁</span>
+          <span><strong>Error Handling:</strong> Stale data marked with lastSyncTimestamp. If core system is unavailable, CIL serves from cache with DEGRADED flag. Automatic reconciliation job runs nightly to detect drift between CIL profile and core system.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INT 4: Telephony/IVR -->
+    <div class="int-card">
+      <div class="int-card-header">
+        <div class="int-icon" style="background:rgba(129,140,248,.1); border:1px solid rgba(129,140,248,.2);">📞</div>
+        <div class="int-card-meta">
+          <div class="int-card-title">Telephony / IVR System</div>
+          <div class="int-card-subtitle">Call logs, IVR paths, wait times &amp; abandonment signals</div>
+        </div>
+        <span class="dir-chip dir-in">Inbound</span>
+      </div>
+      <div class="int-card-body">
+        <div>
+          <div class="int-section-label">Data Flows</div>
+          <div class="flow-row">
+            <div class="flow-block inbound" style="grid-column:1/-1">
+              <div class="flow-block-title">⬇ Inbound to CIL</div>
+              <p>Call logs (timestamps, ANI, DNIS), IVR menu path selections (intent tree traversal), wait time per queue, abandonment events with abandonment point, call transfer chains, callback request events</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="int-section-label">Data Elements</div>
+          <div class="data-tags">
+            <span class="data-tag">callId</span>
+            <span class="data-tag">ani</span>
+            <span class="data-tag">callTimestamp</span>
+            <span class="data-tag">ivrPathSequence</span>
+            <span class="data-tag">waitTimeMs</span>
+            <span class="data-tag">abandonmentPoint</span>
+            <span class="data-tag">queueId</span>
+            <span class="data-tag">transferChain</span>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value"><strong>SFTP</strong> (CDR batch files) + real-time <strong>SIP events</strong></div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Frequency / Latency</div>
+            <div class="meta-value">CDR batch: <strong>hourly</strong>; SIP events: real-time (&lt;500ms)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Pattern</div>
+            <div class="meta-value">Batch (CDR) + real-time event push (SIP)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Auth</div>
+            <div class="meta-value">SFTP key pair + SIP trunk authentication</div>
+          </div>
+        </div>
+        <div class="popia-flag">
+          <div class="popia-flag-icon">⚖️</div>
+          <span><strong>POPIA:</strong> ANI (phone number) is personal information. CDR files must be encrypted at rest and in transit. IVR paths may reveal sensitive intent (e.g., "I want to cancel"). Access limited to data science and engineering roles with logged access. Retention: 6 months for CDR, 12 months for intent patterns.</span>
+        </div>
+        <div class="error-block">
+          <span style="flex-shrink:0">🔁</span>
+          <span><strong>Error Handling:</strong> CDR file integrity verified via checksum. Missing hourly files trigger alert within 90 min. SIP event drops caught by sequence gap detection; backfill from CDR batch within next hourly window.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INT 5: Support Desk -->
+    <div class="int-card">
+      <div class="int-card-header">
+        <div class="int-icon" style="background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.2);">🎫</div>
+        <div class="int-card-meta">
+          <div class="int-card-title">Customer Support Desk</div>
+          <div class="int-card-subtitle">Jira Service Management / Zendesk — tickets, CSAT &amp; resolution</div>
+        </div>
+        <span class="dir-chip dir-in">Inbound</span>
+      </div>
+      <div class="int-card-body">
+        <div>
+          <div class="int-section-label">Data Flows</div>
+          <div class="flow-row">
+            <div class="flow-block inbound" style="grid-column:1/-1">
+              <div class="flow-block-title">⬇ Inbound to CIL</div>
+              <p>Full ticket history (open, resolved, escalated), resolution times (first response + full resolution), CSAT scores per ticket, issue category taxonomy, agent assigned, SLA breach flags, linked account/product</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="int-section-label">Data Elements</div>
+          <div class="data-tags">
+            <span class="data-tag">ticketId</span>
+            <span class="data-tag">issueCategory</span>
+            <span class="data-tag">csatScore</span>
+            <span class="data-tag">resolutionTimeMs</span>
+            <span class="data-tag">firstResponseTimeMs</span>
+            <span class="data-tag">slaBreach</span>
+            <span class="data-tag">agentId</span>
+            <span class="data-tag">escalationCount</span>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value"><strong>REST API</strong> polling + webhook on ticket close</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Frequency / Latency</div>
+            <div class="meta-value">Polling every <strong>15 min</strong>; close webhook &lt;1s</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Pattern</div>
+            <div class="meta-value">Pull (polling) + event push (ticket lifecycle)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Auth</div>
+            <div class="meta-value">API key + OAuth2 (Zendesk) / PAT (JSM)</div>
+          </div>
+        </div>
+        <div class="popia-flag">
+          <div class="popia-flag-icon">⚖️</div>
+          <span><strong>POPIA:</strong> Ticket content may contain sensitive personal information. Issue descriptions should be summarised (not stored verbatim) in CIL. CSAT scores and resolution times are aggregated. Customer identity in tickets linked via masked customer reference, not raw ID numbers.</span>
+        </div>
+        <div class="error-block">
+          <span style="flex-shrink:0">🔁</span>
+          <span><strong>Error Handling:</strong> Polling failures logged; retry on next cycle. Webhook failures trigger REST fallback poll within 5 min. Duplicate ticket events deduplicated by ticketId + updatedAt timestamp. Schema mismatch (JSM vs Zendesk) handled by normalization adapter.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INT 6: Web & Mobile Analytics -->
+    <div class="int-card">
+      <div class="int-card-header">
+        <div class="int-icon" style="background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.2);">📊</div>
+        <div class="int-card-meta">
+          <div class="int-card-title">Web &amp; Mobile Analytics</div>
+          <div class="int-card-subtitle">Behavioural signals — page views, product interest, drop-off &amp; sessions</div>
+        </div>
+        <span class="dir-chip dir-in">Inbound</span>
+      </div>
+      <div class="int-card-body">
+        <div>
+          <div class="int-section-label">Data Flows</div>
+          <div class="flow-row">
+            <div class="flow-block inbound" style="grid-column:1/-1">
+              <div class="flow-block-title">⬇ Inbound to CIL</div>
+              <p>Page view events, product page views (interest signals), funnel drop-off points, session duration, feature interaction events, app screen transitions, push notification open events, A/B test group assignments</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="int-section-label">Data Elements</div>
+          <div class="data-tags">
+            <span class="data-tag">sessionId</span>
+            <span class="data-tag">pageUrl</span>
+            <span class="data-tag">productPageViews[]</span>
+            <span class="data-tag">dropOffPoint</span>
+            <span class="data-tag">sessionDurationMs</span>
+            <span class="data-tag">deviceType</span>
+            <span class="data-tag">pushOpenRate</span>
+            <span class="data-tag">abTestGroup</span>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value"><strong>Kafka</strong> event streaming (browser SDK + mobile SDK)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Frequency / Latency</div>
+            <div class="meta-value">Real-time streaming; <strong>&lt;200ms</strong> event publish latency</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Pattern</div>
+            <div class="meta-value">Event streaming · pub/sub · micro-batch windows</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Auth</div>
+            <div class="meta-value">SDK API key + server-side customer ID resolution</div>
+          </div>
+        </div>
+        <div class="popia-flag">
+          <div class="popia-flag-icon">⚖️</div>
+          <span><strong>POPIA:</strong> Digital behaviour tracking requires POPIA-compliant cookie/consent banner. Behavioural data linked to customer identity only after explicit consent. Anonymous sessions stored without identity link until opt-in. IP addresses must be masked to subnet level before storage.</span>
+        </div>
+        <div class="error-block">
+          <span style="flex-shrink:0">🔁</span>
+          <span><strong>Error Handling:</strong> Kafka consumer lag monitoring — alert at &gt;10k events backlog. SDK events buffered client-side up to 100 events if offline. Out-of-order events handled with 30s event-time windowing. Bot/crawler traffic filtered before ingestion via user-agent + behaviour heuristics.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INT 7: Transaction Ledger -->
+    <div class="int-card">
+      <div class="int-card-header">
+        <div class="int-icon" style="background:rgba(45,212,191,.08); border:1px solid rgba(45,212,191,.15);">💳</div>
+        <div class="int-card-meta">
+          <div class="int-card-title">Transaction Ledger</div>
+          <div class="int-card-subtitle">Payment history, merchant categories, spend patterns &amp; recurring payments</div>
+        </div>
+        <span class="dir-chip dir-in">Inbound</span>
+      </div>
+      <div class="int-card-body">
+        <div>
+          <div class="int-section-label">Data Flows</div>
+          <div class="flow-row">
+            <div class="flow-block inbound" style="grid-column:1/-1">
+              <div class="flow-block-title">⬇ Inbound to CIL</div>
+              <p>Payment history (MCC category, amount, merchant, timestamp), merchant category spend patterns (monthly aggregates), recurring payment detection (subscriptions, debit orders), high-value transaction flags</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="int-section-label">Data Elements</div>
+          <div class="data-tags">
+            <span class="data-tag">transactionId</span>
+            <span class="data-tag">mccCode</span>
+            <span class="data-tag">merchantName</span>
+            <span class="data-tag">amount</span>
+            <span class="data-tag">currencyCode</span>
+            <span class="data-tag">spendCategoryAggregates</span>
+            <span class="data-tag">recurringFlag</span>
+            <span class="data-tag">highValueFlag</span>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value"><strong>CDC</strong> via Debezium from PostgreSQL write-ahead log</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Frequency / Latency</div>
+            <div class="meta-value">Near-real-time; <strong>&lt;30s</strong> from transaction commit to CIL</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Pattern</div>
+            <div class="meta-value">WAL-based CDC · Kafka outbox · exactly-once semantics</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Auth</div>
+            <div class="meta-value">Debezium service account with pg_read_replication slot</div>
+          </div>
+        </div>
+        <div class="popia-flag">
+          <div class="popia-flag-icon">⚖️</div>
+          <span><strong>POPIA:</strong> Transaction data is highly sensitive. CIL stores aggregated spend features (category buckets, monthly totals), not raw transaction amounts or merchant names. Raw transaction data is not persisted in CIL — only derived features. Audit log required for all access to transaction-derived features.</span>
+        </div>
+        <div class="error-block">
+          <span style="flex-shrink:0">🔁</span>
+          <span><strong>Error Handling:</strong> Debezium slot health monitored — WAL slot lag alert at &gt;1GB. Replication slot failure triggers fallback to hourly REST API snapshot from Banking Core. Deduplication by transactionId using idempotent Kafka topic key. Exactly-once delivery enforced via Kafka transactions.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- INT 8: Marketing Platform -->
+    <div class="int-card">
+      <div class="int-card-header">
+        <div class="int-icon" style="background:rgba(129,140,248,.1); border:1px solid rgba(129,140,248,.2);">📣</div>
+        <div class="int-card-meta">
+          <div class="int-card-title">Marketing Platform</div>
+          <div class="int-card-subtitle">Next-best-action signals, campaign targeting &amp; consent enforcement</div>
+        </div>
+        <span class="dir-chip dir-out">Outbound</span>
+      </div>
+      <div class="int-card-body">
+        <div>
+          <div class="int-section-label">Data Flows</div>
+          <div class="flow-row">
+            <div class="flow-block outbound">
+              <div class="flow-block-title">⬆ Next-Best-Action</div>
+              <p>NBA signals → campaign targeting: product recommendations, churn risk score, upsell propensity scores, preferred channel for outreach</p>
+            </div>
+            <div class="flow-block outbound">
+              <div class="flow-block-title">⬆ Consent Enforcement</div>
+              <p>Customer consent status → suppress non-consented contacts from all campaign sends in real-time; consent withdrawal propagates within 24h</p>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="int-section-label">Data Elements</div>
+          <div class="data-tags">
+            <span class="data-tag">customerId</span>
+            <span class="data-tag">nextBestAction</span>
+            <span class="data-tag">churnRiskScore</span>
+            <span class="data-tag">upsellPropensity</span>
+            <span class="data-tag">preferredChannel</span>
+            <span class="data-tag">consentStatus</span>
+            <span class="data-tag">suppressionFlag</span>
+            <span class="data-tag">consentWithdrawnAt</span>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Protocol</div>
+            <div class="meta-value"><strong>REST API</strong> batch push + real-time consent webhook</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Frequency / Latency</div>
+            <div class="meta-value">NBA batch: <strong>daily 02:00 SAST</strong>; consent: real-time &lt;5s</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Pattern</div>
+            <div class="meta-value">Batch (NBA) + event push (consent) — CIL as publisher</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Auth</div>
+            <div class="meta-value">OAuth2 + Marketing Platform API key</div>
+          </div>
+        </div>
+        <div class="popia-flag">
+          <div class="popia-flag-icon">⚖️</div>
+          <span><strong>POPIA:</strong> Direct marketing requires opt-in consent under POPIA Section 69. CIL is the consent authority — marketing platform must not send to suppressed contacts. Consent withdrawal is a hard stop; CIL must propagate suppression within 24 hours. NBA signals shared are aggregate scores only (not raw behaviour data).</span>
+        </div>
+        <div class="error-block">
+          <span style="flex-shrink:0">🔁</span>
+          <span><strong>Error Handling:</strong> NBA batch failures trigger retry with full resend next day. Consent webhook failure escalates to critical alert — marketing campaigns must pause for that customer until confirmed suppression delivered. Audit trail of all consent state changes retained for 5 years.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PRIORITY MATRIX -->
+  <div class="priority-section">
+    <div class="section-title">
+      <span class="icon">↑</span>
+      Integration Priority Matrix
+    </div>
+    <div class="priority-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Integration</th>
+            <th>Wave</th>
+            <th>Rationale</th>
+            <th>Complexity</th>
+            <th>Business Value</th>
+            <th>Dependencies</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="priority-badge p1">P1 — Critical</span></td>
+            <td><strong>Banking Core System</strong></td>
+            <td><span class="wave-badge">Wave 1</span></td>
+            <td>Foundation data source — no unified profile without account and product data. All other integrations depend on core identity linkage.</td>
+            <td>High — requires core system access agreement</td>
+            <td>Essential</td>
+            <td>None</td>
+          </tr>
+          <tr>
+            <td><span class="priority-badge p1">P1 — Critical</span></td>
+            <td><strong>Transaction Ledger</strong></td>
+            <td><span class="wave-badge">Wave 1</span></td>
+            <td>Spend intelligence is the primary value driver for NBA models. CDC via Debezium enables near-real-time enrichment without load on core system.</td>
+            <td>High — Debezium setup, WAL access</td>
+            <td>Very High</td>
+            <td>Banking Core</td>
+          </tr>
+          <tr>
+            <td><span class="priority-badge p1">P1 — Critical</span></td>
+            <td><strong>UC16 PayGuard Fraud Shield</strong></td>
+            <td><span class="wave-badge">Wave 1</span></td>
+            <td>Risk data is required before any outbound signals can be trusted. Fraud enrichment prevents CIL from amplifying risk through marketing or ARIA pre-briefings.</td>
+            <td>Medium — gRPC service contract already exists in UC16</td>
+            <td>High (risk mitigation)</td>
+            <td>Banking Core</td>
+          </tr>
+          <tr>
+            <td><span class="priority-badge p2">P2 — High</span></td>
+            <td><strong>UC18 ARIA Voice Agent</strong></td>
+            <td><span class="wave-badge">Wave 2</span></td>
+            <td>Pre-call briefing drives immediate agent experience improvement. Post-call enrichment closes the interaction loop in the unified profile.</td>
+            <td>Medium — UC18 webhook contracts to be defined</td>
+            <td>High (agent efficiency)</td>
+            <td>Banking Core, PayGuard</td>
+          </tr>
+          <tr>
+            <td><span class="priority-badge p2">P2 — High</span></td>
+            <td><strong>Customer Support Desk</strong></td>
+            <td><span class="wave-badge">Wave 2</span></td>
+            <td>Ticket history is essential for churn risk scoring and CSAT trend analysis. Both JSM and Zendesk have stable REST APIs.</td>
+            <td>Low-Medium — REST API, normalisation adapter needed</td>
+            <td>High (churn signals)</td>
+            <td>Banking Core</td>
+          </tr>
+          <tr>
+            <td><span class="priority-badge p2">P2 — High</span></td>
+            <td><strong>Web &amp; Mobile Analytics</strong></td>
+            <td><span class="wave-badge">Wave 2</span></td>
+            <td>Digital behaviour signals are critical for product interest detection and next-best-action. SDK already deployed; Kafka topic setup is primary effort.</td>
+            <td>Medium — consent framework alignment required</td>
+            <td>High (NBA precision)</td>
+            <td>Consent framework live</td>
+          </tr>
+          <tr>
+            <td><span class="priority-badge p3">P3 — Standard</span></td>
+            <td><strong>Telephony / IVR System</strong></td>
+            <td><span class="wave-badge">Wave 3</span></td>
+            <td>IVR path data enriches intent modelling but ARIA voice integration (Wave 2) already captures most call intent. CDR batch is supplementary.</td>
+            <td>Medium — SFTP CDR pipeline + SIP event integration</td>
+            <td>Medium</td>
+            <td>ARIA Voice (Wave 2)</td>
+          </tr>
+          <tr>
+            <td><span class="priority-badge p3">P3 — Standard</span></td>
+            <td><strong>Marketing Platform</strong></td>
+            <td><span class="wave-badge">Wave 3</span></td>
+            <td>Outbound NBA signals require mature CIL with validated models. Consent suppression is high-priority but can be a standalone lightweight integration before full NBA.</td>
+            <td>Low — REST API; consent webhook is simple push</td>
+            <td>High (when NBA models ready)</td>
+            <td>NBA model pipeline live</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DATA QUALITY REQUIREMENTS -->
+  <div class="dq-section">
+    <div class="section-title">
+      <span class="icon">◎</span>
+      Data Quality Requirements per Source
+    </div>
+    <div class="dq-grid">
+
+      <div class="dq-card">
+        <div class="dq-card-title">🏦 Banking Core System</div>
+        <div class="dq-req">Customer ID must be canonical and match CIL master identity key. No orphaned accounts.</div>
+        <div class="dq-req">Account status transitions must arrive in order — out-of-order events rejected and re-queued.</div>
+        <div class="dq-req">Balance figures must carry effective timestamp — CIL must not serve stale balances as current.</div>
+        <div class="dq-req">Product holding records must be complete — partial sets trigger data-fetch retry.</div>
+        <div class="dq-score">
+          <div class="dq-score-label">Min quality threshold</div>
+          <div class="dq-bar-wrap"><div class="dq-bar" style="width:99%; background: var(--teal);"></div></div>
+          <div class="dq-score-val">99%</div>
+        </div>
+      </div>
+
+      <div class="dq-card">
+        <div class="dq-card-title">💳 Transaction Ledger</div>
+        <div class="dq-req">Every transaction must carry a valid MCC code — null MCC classified as "Uncategorised" only after validation attempt.</div>
+        <div class="dq-req">Amount must be in ZAR or include currency code for FX conversion.</div>
+        <div class="dq-req">Duplicate transaction IDs from CDC must be idempotently handled — no double-counting in spend aggregates.</div>
+        <div class="dq-req">Recurring payment detection requires minimum 3-month history; new customers flagged as INSUFFICIENT_HISTORY.</div>
+        <div class="dq-score">
+          <div class="dq-score-label">Min quality threshold</div>
+          <div class="dq-bar-wrap"><div class="dq-bar" style="width:99.5%; background: var(--teal);"></div></div>
+          <div class="dq-score-val">99.5%</div>
+        </div>
+      </div>
+
+      <div class="dq-card">
+        <div class="dq-card-title">🛡️ UC16 PayGuard Fraud Shield</div>
+        <div class="dq-req">fraudRiskScore must be a float 0.0–100.0. Values outside range rejected with alert.</div>
+        <div class="dq-req">Score must carry model version and score timestamp — scores &gt;5 min old marked STALE.</div>
+        <div class="dq-req">AML flag must include flag reason code from approved taxonomy — free-text reasons rejected.</div>
+        <div class="dq-req">Device fingerprint must be pseudonymised SHA-256 hash — raw device IDs not accepted.</div>
+        <div class="dq-score">
+          <div class="dq-score-label">Min quality threshold</div>
+          <div class="dq-bar-wrap"><div class="dq-bar" style="width:99%; background: var(--rose);"></div></div>
+          <div class="dq-score-val">99%</div>
+        </div>
+      </div>
+
+      <div class="dq-card">
+        <div class="dq-card-title">🎙️ UC18 ARIA Voice Agent</div>
+        <div class="dq-req">Transcript summaries must be &lt;500 tokens — full transcripts not stored in CIL.</div>
+        <div class="dq-req">intentClassification must match approved intent taxonomy v2.x — unmapped intents flagged for taxonomy review.</div>
+        <div class="dq-req">satisfactionScore must be normalised 0–10; CSAT collection optional but null accepted.</div>
+        <div class="dq-req">callId must be globally unique and linked to telephony CDR callId for cross-source join.</div>
+        <div class="dq-score">
+          <div class="dq-score-label">Min quality threshold</div>
+          <div class="dq-bar-wrap"><div class="dq-bar" style="width:97%; background: var(--amber);"></div></div>
+          <div class="dq-score-val">97%</div>
+        </div>
+      </div>
+
+      <div class="dq-card">
+        <div class="dq-card-title">🎫 Customer Support Desk</div>
+        <div class="dq-req">Ticket must link to a canonical customer ID — unlinked tickets go into a resolution queue (not discarded).</div>
+        <div class="dq-req">Issue category must use normalised taxonomy across JSM and Zendesk — mapping adapter enforced at ingestion.</div>
+        <div class="dq-req">CSAT score is optional but must be 1–5 if present; out-of-range scores rejected.</div>
+        <div class="dq-req">Resolution time calculated server-side in CIL from raw timestamps — not trusted from source.</div>
+        <div class="dq-score">
+          <div class="dq-score-label">Min quality threshold</div>
+          <div class="dq-bar-wrap"><div class="dq-bar" style="width:95%; background: var(--amber);"></div></div>
+          <div class="dq-score-val">95%</div>
+        </div>
+      </div>
+
+      <div class="dq-card">
+        <div class="dq-card-title">📊 Web &amp; Mobile Analytics</div>
+        <div class="dq-req">Events must carry resolved customerId (not just sessionId) for profile linkage — anonymous events retained separately.</div>
+        <div class="dq-req">Event schema must pass Avro schema registry validation — malformed events sent to DLQ.</div>
+        <div class="dq-req">sessionId must be consistent within a session — SDK session hijacking detection applied.</div>
+        <div class="dq-req">Bot/crawler traffic must be filtered before Kafka publish; CIL will reject events without valid consent token.</div>
+        <div class="dq-score">
+          <div class="dq-score-label">Min quality threshold</div>
+          <div class="dq-bar-wrap"><div class="dq-bar" style="width:90%; background: var(--amber);"></div></div>
+          <div class="dq-score-val">90%</div>
+        </div>
+      </div>
+
+      <div class="dq-card">
+        <div class="dq-card-title">📞 Telephony / IVR System</div>
+        <div class="dq-req">CDR files must be delivered hourly with checksum — missing files trigger alert; backfill from SFTP archive.</div>
+        <div class="dq-req">ANI (phone number) must be normalised to E.164 format before ingestion.</div>
+        <div class="dq-req">IVR path sequence must be valid against published IVR menu tree version — stale path sequences flagged for review.</div>
+        <div class="dq-req">Wait time must be in milliseconds — seconds-level values auto-converted with audit flag.</div>
+        <div class="dq-score">
+          <div class="dq-score-label">Min quality threshold</div>
+          <div class="dq-bar-wrap"><div class="dq-bar" style="width:92%; background: var(--indigo);"></div></div>
+          <div class="dq-score-val">92%</div>
+        </div>
+      </div>
+
+      <div class="dq-card">
+        <div class="dq-card-title">📣 Marketing Platform (Outbound)</div>
+        <div class="dq-req">NBA signals must include model version and confidence score — low-confidence scores (&lt;0.6) must be flagged before send.</div>
+        <div class="dq-req">consentStatus must be binary (true/false) — no null consent; unknown defaults to false (suppressed).</div>
+        <div class="dq-req">Batch push must be idempotent — marketing platform must handle duplicate customer records gracefully.</div>
+        <div class="dq-req">suppressionFlag changes must be acknowledged within 5 minutes — unacknowledged suppressions escalated immediately.</div>
+        <div class="dq-score">
+          <div class="dq-score-label">Min quality threshold</div>
+          <div class="dq-bar-wrap"><div class="dq-bar" style="width:100%; background: var(--rose);"></div></div>
+          <div class="dq-score-val">100%</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CONFLICT RESOLUTION RULES -->
+  <div class="conflict-section">
+    <div class="section-title">
+      <span class="icon">⚡</span>
+      Conflict Resolution Rules — When Sources Disagree
+    </div>
+    <div class="cr-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data Attribute</th>
+            <th>Conflicting Sources</th>
+            <th>Resolution Rule</th>
+            <th>Winner</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Customer Identity / Name</strong></td>
+            <td>Banking Core vs Support Desk vs ARIA</td>
+            <td>Banking Core is authoritative for legal name. Support desk and ARIA preferred name are stored as aliases — displayed where contextually appropriate.</td>
+            <td><span class="winner-tag">Banking Core</span></td>
+            <td>Preferred name from support/ARIA stored as preferredDisplayName field</td>
+          </tr>
+          <tr>
+            <td><strong>Contact Phone Number</strong></td>
+            <td>Banking Core vs Telephony CDR vs ARIA</td>
+            <td>Banking Core holds the KYC-verified number. Telephony ANI may differ (shared phones). CDR ANI stored as lastCallANI, not as verified contact.</td>
+            <td><span class="winner-tag">Banking Core</span></td>
+            <td>ANI mismatch logged as a signal — potential fraud indicator</td>
+          </tr>
+          <tr>
+            <td><strong>Fraud Risk Score</strong></td>
+            <td>PayGuard real-time vs stale cached score</td>
+            <td>Most recent score wins unconditionally. Score must carry timestamp; stale scores (&gt;5 min) marked STALE and not used for decisions — CIL re-requests fresh score.</td>
+            <td><span class="winner-tag">Most Recent Timestamp</span></td>
+            <td>Never blend scores — always point-in-time latest</td>
+          </tr>
+          <tr>
+            <td><strong>Account Balance</strong></td>
+            <td>Banking Core REST vs Transaction Ledger CDC</td>
+            <td>Banking Core authoritative for balance. Ledger CDC used for transaction event enrichment only, not balance override. Discrepancy triggers reconciliation alert.</td>
+            <td><span class="winner-tag">Banking Core</span></td>
+            <td>Balance discrepancy &gt;R100 triggers async reconciliation job</td>
+          </tr>
+          <tr>
+            <td><strong>Product Holdings</strong></td>
+            <td>Banking Core vs Transaction Ledger (inferred)</td>
+            <td>Banking Core holds authoritative product register. Ledger-inferred products (e.g., merchant pattern suggests credit card) stored as inferred_holdings — not promoted to confirmed without Banking Core confirmation.</td>
+            <td><span class="winner-tag">Banking Core</span></td>
+            <td>Inferred holdings used for NBA modelling; confirmed holdings for factual display</td>
+          </tr>
+          <tr>
+            <td><strong>Customer Intent / Topic</strong></td>
+            <td>ARIA voice intent vs IVR path vs Support Desk issue category</td>
+            <td>Most recent interaction wins for "current intent". Historical intents aggregated into intentHistory[] for trend analysis. No single source overrides another for history.</td>
+            <td><span class="winner-tag">Most Recent Event</span></td>
+            <td>Intent taxonomy must be normalised across all three sources before comparison</td>
+          </tr>
+          <tr>
+            <td><strong>Satisfaction Score (CSAT)</strong></td>
+            <td>Support Desk CSAT vs ARIA post-call CSAT</td>
+            <td>Both scores stored independently with source tag (CSAT_DESK, CSAT_VOICE). Composite score = weighted average (0.4 desk, 0.6 voice) if both present within same 7-day window.</td>
+            <td><span class="winner-tag">Composite (weighted)</span></td>
+            <td>Single-source CSAT stored as-is if only one present</td>
+          </tr>
+          <tr>
+            <td><strong>Consent Status</strong></td>
+            <td>Marketing Platform consent record vs CIL consent store</td>
+            <td>CIL is the consent authority. Marketing platform is a consumer of consent state, not a source. If marketing platform reports consent=true but CIL has withdrawn=true, CIL suppression wins unconditionally.</td>
+            <td><span class="winner-tag">CIL Consent Store</span></td>
+            <td>POPIA requirement — data subject consent is managed centrally</td>
+          </tr>
+          <tr>
+            <td><strong>Digital Behaviour / Product Interest</strong></td>
+            <td>Web analytics vs Mobile analytics vs ARIA expressed intent</td>
+            <td>All three signals contribute to a product interest score. Weights: ARIA expressed intent (0.5) + web/mobile page views (0.3) + IVR path (0.2). Expressed intent always carries highest weight.</td>
+            <td><span class="winner-tag">Weighted Ensemble</span></td>
+            <td>Interest scores decay over time — 30-day half-life applied to all signals</td>
+          </tr>
+          <tr>
+            <td><strong>Last Interaction Date</strong></td>
+            <td>ARIA, Support Desk, Web, Telephony (all)</td>
+            <td>lastInteractionDate = max(all source event timestamps). Each source also stores its own lastInteractionDate in the source-specific profile block.</td>
+            <td><span class="winner-tag">MAX across all sources</span></td>
+            <td>Used for churn risk — channel-specific last interactions available for drill-down</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div class="footer-left">
+      <span>UC24 — AI Customer Intelligence Layer</span>
+      <span>Integration Map v1.0</span>
+      <span>Status: Planning Phase</span>
+    </div>
+    <div>
+      Owner: Malcolm Govender &nbsp;·&nbsp; Last updated: 09 May 2026
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
