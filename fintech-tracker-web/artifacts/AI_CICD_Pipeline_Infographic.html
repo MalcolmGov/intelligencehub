@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Enabled CI/CD Pipeline — Azure DevOps</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --dim: #484f58;
+    --green: #3fb950;
+    --green-bg: #1a2f1a;
+    --green-border: #238636;
+    --blue: #58a6ff;
+    --blue-bg: #0d1f36;
+    --blue-border: #1f6feb;
+    --purple: #bc8cff;
+    --purple-bg: #1e1427;
+    --purple-border: #6e40c9;
+    --orange: #d29922;
+    --orange-bg: #271d07;
+    --orange-border: #9e6a03;
+    --red: #f78166;
+    --red-bg: #2d1116;
+    --red-border: #da3633;
+    --cyan: #79c0ff;
+    --cyan-bg: #0d1e30;
+    --cyan-border: #1f6feb;
+    --ai-green: #3fb950;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    padding: 40px 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ──────────────────────────────────────────── */
+  .header { text-align: center; margin-bottom: 48px; }
+  .header-badge {
+    display: inline-block;
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .header-sub {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .env-flow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .env-pill {
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .pill-dev    { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+  .pill-uat    { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+  .pill-preprod{ background: var(--cyan-bg);   color: var(--cyan);   border: 1px solid var(--cyan-border); }
+  .pill-prod   { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+  .flow-arrow  { color: var(--dim); font-size: 16px; }
+
+  /* ── Key Metrics ─────────────────────────────────────── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .metric-value { font-size: 28px; font-weight: 800; color: var(--blue); }
+  .metric-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* ── Section headings ────────────────────────────────── */
+  .section-heading {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Stage cards ─────────────────────────────────────── */
+  .stages { display: flex; flex-direction: column; gap: 16px; margin-bottom: 48px; }
+
+  .stage-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .stage-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .stage-num-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    white-space: nowrap;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .stage-header-content { flex: 1; }
+  .stage-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .stage-subtitle { font-size: 12px; color: var(--muted); }
+  .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .badge {
+    display: inline-block;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    letter-spacing: 0.3px;
+  }
+  .badge-ai     { background: var(--green-bg);   color: var(--green);   border: 1px solid var(--green-border); }
+  .badge-sec    { background: var(--orange-bg);  color: var(--orange);  border: 1px solid var(--orange-border); }
+  .badge-gate   { background: var(--red-bg);     color: var(--red);     border: 1px solid var(--red-border); }
+  .badge-tool   { background: var(--surface2);   color: var(--muted);   border: 1px solid var(--border); font-family: monospace; }
+  .badge-info   { background: var(--blue-bg);    color: var(--blue);    border: 1px solid var(--blue-border); }
+
+  .stage-card-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .stage-col {
+    padding: 16px 20px;
+  }
+  .stage-col + .stage-col {
+    border-left: 1px solid var(--border);
+  }
+  .col-heading {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .step-list { list-style: none; }
+  .step-list li {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 4px 0 4px 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .step-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--blue);
+    font-size: 10px;
+    top: 5px;
+  }
+  .step-list li strong { color: var(--text); }
+
+  /* Connector between stages */
+  .stage-connector {
+    text-align: center;
+    color: var(--dim);
+    font-size: 20px;
+    padding: 2px 0;
+  }
+
+  /* ── Environment table ───────────────────────────────── */
+  .env-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+  .env-card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .env-card-header {
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .env-dev-card  .env-card-header { background: var(--green-bg);  color: var(--green);  border-bottom: 1px solid var(--green-border); }
+  .env-uat-card  .env-card-header { background: var(--purple-bg); color: var(--purple); border-bottom: 1px solid var(--purple-border); }
+  .env-pp-card   .env-card-header { background: var(--cyan-bg);   color: var(--cyan);   border-bottom: 1px solid var(--cyan-border); }
+  .env-prod-card .env-card-header { background: var(--red-bg);    color: var(--red);    border-bottom: 1px solid var(--red-border); }
+  .env-card-body { background: var(--surface); padding: 12px 14px; }
+  .env-item {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.4;
+  }
+  .env-item::before { content: '▸'; color: var(--dim); flex-shrink: 0; font-size: 9px; margin-top: 2px; }
+  .env-item strong { color: var(--text); }
+
+  /* ── AI capabilities callout ─────────────────────────── */
+  .ai-callout {
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 48px;
+  }
+  .ai-callout-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ai-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .ai-item { }
+  .ai-item-title { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .ai-item-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* ── Footer ──────────────────────────────────────────── */
+  .footer {
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-left { font-size: 11px; color: var(--dim); }
+  .footer-right { font-size: 11px; color: var(--dim); text-align: right; }
+
+  /* ── Print ───────────────────────────────────────────── */
+  @media print {
+    body { background: #fff; color: #111; padding: 20px; }
+    .stage-card, .env-card, .metric, .ai-callout { border-color: #ccc; }
+    .stage-card-body { page-break-inside: avoid; }
+    h1 { color: #111; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-badge">Azure DevOps · Internal Architecture</div>
+  <h1>🤖 AI-Enabled CI/CD Pipeline</h1>
+  <p class="header-sub">Automated Build · AI Security · Intelligent Testing · Anomaly Detection &amp; Rollback</p>
+  <div class="env-flow">
+    <span class="env-pill pill-dev">DEV</span>
+    <span class="flow-arrow">→</span>
+    <span class="env-pill pill-uat">UAT</span>
+    <span class="flow-arrow">→</span>
+    <span class="env-pill pill-preprod">PRE-PROD</span>
+    <span class="flow-arrow">→</span>
+    <span class="env-pill pill-prod">PRODUCTION</span>
+  </div>
+</div>
+
+<!-- Metrics -->
+<div class="metrics">
+  <div class="metric">
+    <div class="metric-value">10</div>
+    <div class="metric-label">Pipeline Stages</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">3</div>
+    <div class="metric-label">AI Capabilities</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">3</div>
+    <div class="metric-label">Manual Approval Gates</div>
+  </div>
+  <div class="metric">
+    <div class="metric-value">Auto</div>
+    <div class="metric-label">Prod Rollback</div>
+  </div>
+</div>
+
+<!-- AI Capabilities Callout -->
+<p class="section-heading">🤖 AI Capabilities</p>
+<div class="ai-callout">
+  <div class="ai-callout-title">🟢 Three AI-powered capabilities embedded across the pipeline</div>
+  <div class="ai-grid">
+    <div class="ai-item">
+      <div class="ai-item-title">🛡️ AI Security Prioritisation</div>
+      <div class="ai-item-desc">After SAST scanning (Bandit, Roslyn, Checkov), Azure OpenAI GPT-4 re-ranks findings by exploitability and business impact — so engineers fix the vulnerabilities that matter most, not just the noisiest ones.</div>
+    </div>
+    <div class="ai-item">
+      <div class="ai-item-title">🧪 Intelligent Test Selection</div>
+      <div class="ai-item-desc">Analyses git diff to determine which source files changed, maps them to their corresponding test classes via heuristics and coverage history, then runs only that subset — cutting test time significantly without sacrificing confidence.</div>
+    </div>
+    <div class="ai-item">
+      <div class="ai-item-title">📊 Anomaly Detection &amp; Rollback</div>
+      <div class="ai-item-desc">Post-deploy, an Isolation Forest model evaluates error rate, P50/P95/P99 latency, exception count and dependency failures against a 24-hour baseline. Score &gt; 0.7 triggers automatic rollback to the previous Container Apps revision.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Pipeline Stages -->
+<p class="section-heading">📋 Pipeline Stages — Full Detail</p>
+<div class="stages">
+
+  <!-- STAGE 1 -->
+  <div class="stage-card">
+    <div class="stage-card-header">
+      <div class="stage-num-badge">STAGE 1</div>
+      <div class="stage-header-content">
+        <div class="stage-title">🔨 Build &amp; Package</div>
+        <div class="stage-subtitle">Compiles the application, runs unit tests, builds and pushes the Docker image to Azure Container Registry</div>
+        <div class="badge-row">
+          <span class="badge badge-tool">dotnet build</span>
+          <span class="badge badge-tool">docker build</span>
+          <span class="badge badge-tool">ACR push</span>
+          <span class="badge badge-tool">code coverage</span>
+        </div>
+      </div>
+    </div>
+    <div class="stage-card-body">
+      <div class="stage-col">
+        <div class="col-heading">What happens</div>
+        <ul class="step-list">
+          <li>NuGet package restore and <strong>.NET solution compile</strong> in Release configuration</li>
+          <li>Unit tests run via <strong>dotnet test</strong>; code coverage report published as pipeline artifact</li>
+          <li>Docker image built and tagged with <strong>Build.BuildId</strong> plus branch metadata</li>
+          <li>Image pushed to <strong>Azure Container Registry (Premium)</strong> — geo-replicated, zone-redundant</li>
+          <li>Pipeline artifacts published for downstream stages</li>
+        </ul>
+      </div>
+      <div class="stage-col">
+        <div class="col-heading">Gates &amp; outputs</div>
+        <ul class="step-list">
+          <li>Stage fails if unit tests fail or coverage drops below threshold</li>
+          <li>Triggers on commits to <strong>main</strong>, <strong>release/*</strong>, and <strong>hotfix/*</strong> branches</li>
+          <li>Output: Docker image <code style="font-size:11px;background:#21262d;padding:1px 4px;border-radius:3px">acr.azurecr.io/app:$(BuildId)</code></li>
+          <li>Output: Published build artifact with test results and coverage XML</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage-connector">↓</div>
+
+  <!-- STAGE 2 -->
+  <div class="stage-card">
+    <div class="stage-card-header">
+      <div class="stage-num-badge">STAGE 2</div>
+      <div class="stage-header-content">
+        <div class="stage-title">🛡️ AI Security Scan</div>
+        <div class="stage-subtitle">Three parallel security jobs — SAST, container scanning, IaC validation. Blocks deployment on any CRITICAL finding.</div>
+        <div class="badge-row">
+          <span class="badge badge-ai">AI PRIORITISED</span>
+          <span class="badge badge-sec">HARD GATE</span>
+          <span class="badge badge-tool">MSDO</span>
+          <span class="badge badge-tool">Trivy</span>
+          <span class="badge badge-tool">Gitleaks</span>
+          <span class="badge badge-tool">Checkov</span>
+        </div>
+      </div>
+    </div>
+    <div class="stage-card-body">
+      <div class="stage-col">
+        <div class="col-heading">3 parallel jobs</div>
+        <ul class="step-list">
+          <li><strong>Job 1 – SAST:</strong> Microsoft Security DevOps extension runs Bandit, Roslyn Analysers, ESLint. Azure OpenAI GPT-4 re-ranks findings by exploitability and blast radius.</li>
+          <li><strong>Job 2 – Container Scan:</strong> Trivy scans the Docker image for OS and library CVEs. Microsoft Defender for Containers provides runtime threat protection.</li>
+          <li><strong>Job 3 – IaC Scan:</strong> Checkov and Template Analyzer validate Bicep infrastructure templates against CIS benchmark controls.</li>
+        </ul>
+      </div>
+      <div class="stage-col">
+        <div class="col-heading">Secrets &amp; gate logic</div>
+        <ul class="step-list">
+          <li><strong>Gitleaks</strong> scans every commit for hardcoded secrets, API keys, and credentials</li>
+          <li>Any <strong>CRITICAL</strong> CVE or SAST finding fails the stage immediately — no deployment proceeds</li>
+          <li>HIGH findings produce warnings but do not block (configurable)</li>
+          <li>SARIF results published to Azure DevOps Security tab for audit trail</li>
+          <li>Scan runs in parallel across all three jobs to minimise pipeline duration</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage-connector">↓</div>
+
+  <!-- STAGES 3 & 4: DEV -->
+  <div class="stage-card">
+    <div class="stage-card-header">
+      <div class="stage-num-badge">STAGES 3 &amp; 4</div>
+      <div class="stage-header-content">
+        <div class="stage-title"><span style="color:var(--green)">●</span> Deploy + Test — Dev</div>
+        <div class="stage-subtitle">Helm deployment to the Dev environment followed by AI-powered test selection and integration testing</div>
+        <div class="badge-row">
+          <span class="badge badge-ai">AI TEST SELECT</span>
+          <span class="badge badge-info">NO APPROVAL GATE</span>
+          <span class="badge badge-tool">Helm</span>
+          <span class="badge badge-tool">dotnet test</span>
+        </div>
+      </div>
+    </div>
+    <div class="stage-card-body">
+      <div class="stage-col">
+        <div class="col-heading">Deployment (Stage 3)</div>
+        <ul class="step-list">
+          <li>Pre-flight infra validation — confirms Key Vault, ACR, and App Insights are reachable</li>
+          <li><strong>Helm upgrade --atomic</strong> deploys the new image; Helm rolls back automatically if the release fails to become ready</li>
+          <li>Secrets injected from <strong>Azure Key Vault</strong> via User-Assigned Managed Identity — no credentials stored in the pipeline</li>
+          <li>Smoke tests verify the app is responding on its health endpoint</li>
+          <li>Deployment tagged in <strong>App Insights</strong> for post-deploy correlation</li>
+        </ul>
+      </div>
+      <div class="stage-col">
+        <div class="col-heading">AI Test Selection (Stage 4)</div>
+        <ul class="step-list">
+          <li><strong>git diff</strong> analysed to extract changed source files since last green build</li>
+          <li>Critical file changes (pipeline config, auth, infra) trigger the <strong>full test suite</strong> automatically</li>
+          <li>For targeted changes: heuristic mapping links e.g. <code style="font-size:10px;background:#21262d;padding:1px 3px;border-radius:2px">Services/PaymentService.cs</code> → <code style="font-size:10px;background:#21262d;padding:1px 3px;border-radius:2px">PaymentServiceTests</code></li>
+          <li>Test history service supplements heuristics with historically-failing tests for the changed code</li>
+          <li>Filter expression passed to <strong>dotnet test --filter</strong>; results logged to App Insights</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage-connector">↓</div>
+
+  <!-- STAGES 5 & 6: UAT -->
+  <div class="stage-card">
+    <div class="stage-card-header">
+      <div class="stage-num-badge">STAGES 5 &amp; 6</div>
+      <div class="stage-header-content">
+        <div class="stage-title"><span style="color:var(--purple)">●</span> Deploy + Test — UAT</div>
+        <div class="stage-subtitle">Manual approval gate, blue/green deployment, full test suite including user acceptance scenarios and App Insights baseline</div>
+        <div class="badge-row">
+          <span class="badge badge-gate">MANUAL APPROVAL</span>
+          <span class="badge badge-ai">AI TEST SELECT</span>
+          <span class="badge badge-tool">Blue/Green</span>
+          <span class="badge badge-tool">Smart Detection</span>
+        </div>
+      </div>
+    </div>
+    <div class="stage-card-body">
+      <div class="stage-col">
+        <div class="col-heading">Deployment (Stage 5)</div>
+        <ul class="step-list">
+          <li><strong>Manual approval gate</strong> — a designated approver must sign off within 7 days before UAT deployment proceeds</li>
+          <li><strong>Blue/green deployment</strong>: new version deployed to green revision; traffic flipped atomically via Azure Container Apps revision weights</li>
+          <li>Previous blue revision kept warm for rapid rollback if issues surface during testing</li>
+          <li>Smoke tests and UAT health checks run against the live environment</li>
+        </ul>
+      </div>
+      <div class="stage-col">
+        <div class="col-heading">Testing &amp; monitoring (Stage 6)</div>
+        <ul class="step-list">
+          <li>AI Test Selector runs the <strong>full UAT-scoped test suite</strong> including user acceptance scenarios</li>
+          <li>API contract tests validate backward compatibility — no breaking changes allowed</li>
+          <li><strong>App Insights Smart Detection</strong> establishes a ML behavioural baseline post-deployment</li>
+          <li>Dynamic threshold metric alerts notify the DevOps team of error rate or latency deviations (Sev 2)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage-connector">↓</div>
+
+  <!-- STAGES 7 & 8: PRE-PROD -->
+  <div class="stage-card">
+    <div class="stage-card-header">
+      <div class="stage-num-badge">STAGES 7 &amp; 8</div>
+      <div class="stage-header-content">
+        <div class="stage-title"><span style="color:var(--cyan)">●</span> Deploy + Monitor — Pre-Prod</div>
+        <div class="stage-subtitle">Manual approval gate, canary deployment at 10% traffic, performance regression checks, and Azure Monitor anomaly alerting</div>
+        <div class="badge-row">
+          <span class="badge badge-gate">MANUAL APPROVAL</span>
+          <span class="badge badge-tool">Canary 10%→100%</span>
+          <span class="badge badge-tool">Dynamic Alerts</span>
+        </div>
+      </div>
+    </div>
+    <div class="stage-card-body">
+      <div class="stage-col">
+        <div class="col-heading">Deployment (Stage 7)</div>
+        <ul class="step-list">
+          <li><strong>Manual approval gate</strong> — sign-off required before Pre-Prod promotion</li>
+          <li><strong>Canary deployment</strong>: 10% of traffic routed to new revision via Container Apps revision weights</li>
+          <li>Smoke tests run against the canary slice; on pass, traffic shifts to <strong>100%</strong></li>
+          <li>Production-equivalent configuration and sizing — mirrors Prod infrastructure exactly</li>
+          <li>Deployment event tagged in App Insights for correlation with monitoring data</li>
+        </ul>
+      </div>
+      <div class="stage-col">
+        <div class="col-heading">Monitoring (Stage 8)</div>
+        <ul class="step-list">
+          <li>3-minute warm-up wait before monitoring begins to avoid cold-start false positives</li>
+          <li><strong>Azure Monitor dynamic threshold alerts</strong> for error rate (Sev 2) and P95 latency using ML-learned seasonal baselines</li>
+          <li>Performance regression check: P95 latency compared against Dev/UAT baselines</li>
+          <li>Alert emails dispatched to DevOps team Action Group on threshold breach</li>
+          <li><strong>No auto-rollback</strong> in Pre-Prod — anomalies alert the team for human decision</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage-connector">↓</div>
+
+  <!-- STAGES 9 & 10: PROD -->
+  <div class="stage-card">
+    <div class="stage-card-header">
+      <div class="stage-num-badge">STAGES 9 &amp; 10</div>
+      <div class="stage-header-content">
+        <div class="stage-title"><span style="color:var(--red)">●</span> Deploy + Monitor — Production</div>
+        <div class="stage-subtitle">Senior engineer approval, blue/green deployment, Isolation Forest anomaly detection, automatic rollback on score &gt; 0.7</div>
+        <div class="badge-row">
+          <span class="badge badge-gate">SENIOR APPROVAL</span>
+          <span class="badge badge-ai">AI ANOMALY DETECT</span>
+          <span class="badge badge-sec">AUTO ROLLBACK</span>
+          <span class="badge badge-tool">Blue/Green</span>
+        </div>
+      </div>
+    </div>
+    <div class="stage-card-body">
+      <div class="stage-col">
+        <div class="col-heading">Deployment (Stage 9)</div>
+        <ul class="step-list">
+          <li><strong>Senior engineer manual approval gate</strong> — required before any Production deployment</li>
+          <li><strong>Blue/green deployment</strong>: new version deployed alongside current; traffic flipped atomically</li>
+          <li>Previous blue revision kept warm for <strong>5 minutes</strong> — instant revert if anomaly detected</li>
+          <li>Post-deploy smoke tests confirm critical user journeys are functional</li>
+          <li>Deployment telemetry sent to App Insights and Log Analytics for correlation</li>
+        </ul>
+      </div>
+      <div class="stage-col">
+        <div class="col-heading">AI Anomaly Detection (Stage 10)</div>
+        <ul class="step-list">
+          <li>Queries Azure Monitor Log Analytics (KQL) for: error rate, P50/P95/P99 latency, exception count, dependency failure rate</li>
+          <li><strong>Isolation Forest</strong> model (scikit-learn) trained on 24-hour pre-deploy baseline; normalised anomaly score 0–1</li>
+          <li>Score <strong>&gt; 0.7</strong> triggers automatic rollback to previous Container Apps revision via Azure CLI</li>
+          <li><strong>Azure Monitor dynamic threshold alerts</strong> (Sev 1) run in parallel — belt-and-suspenders approach</li>
+          <li>All anomaly decisions logged with score, contributing metrics, and action taken</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Environment Summary -->
+<p class="section-heading">🌐 Environment Summary</p>
+<div class="env-grid">
+  <div class="env-card env-dev-card">
+    <div class="env-card-header">Dev</div>
+    <div class="env-card-body">
+      <div class="env-item"><strong>Trigger:</strong> Automatic on every commit</div>
+      <div class="env-item"><strong>Deploy:</strong> Helm + --atomic rollback</div>
+      <div class="env-item"><strong>Tests:</strong> AI-selected integration suite</div>
+      <div class="env-item"><strong>Approval:</strong> None</div>
+      <div class="env-item"><strong>Rollback:</strong> Helm automatic on fail</div>
+    </div>
+  </div>
+  <div class="env-card env-uat-card">
+    <div class="env-card-header">UAT</div>
+    <div class="env-card-body">
+      <div class="env-item"><strong>Trigger:</strong> After Dev tests pass</div>
+      <div class="env-item"><strong>Deploy:</strong> Blue/green</div>
+      <div class="env-item"><strong>Tests:</strong> Full suite + user acceptance</div>
+      <div class="env-item"><strong>Approval:</strong> Manual gate (7-day window)</div>
+      <div class="env-item"><strong>Rollback:</strong> Manual — warm revision standby</div>
+    </div>
+  </div>
+  <div class="env-card env-pp-card">
+    <div class="env-card-header">Pre-Prod</div>
+    <div class="env-card-body">
+      <div class="env-item"><strong>Trigger:</strong> After UAT tests pass</div>
+      <div class="env-item"><strong>Deploy:</strong> Canary 10% → 100%</div>
+      <div class="env-item"><strong>Tests:</strong> Perf regression + contract</div>
+      <div class="env-item"><strong>Approval:</strong> Manual gate</div>
+      <div class="env-item"><strong>Rollback:</strong> Manual — dynamic alerts notify</div>
+    </div>
+  </div>
+  <div class="env-card env-prod-card">
+    <div class="env-card-header">Production</div>
+    <div class="env-card-body">
+      <div class="env-item"><strong>Trigger:</strong> After Pre-Prod passes</div>
+      <div class="env-item"><strong>Deploy:</strong> Blue/green</div>
+      <div class="env-item"><strong>Tests:</strong> Smoke tests + anomaly scan</div>
+      <div class="env-item"><strong>Approval:</strong> Senior engineer gate</div>
+      <div class="env-item"><strong>Rollback:</strong> <strong>Automatic</strong> if anomaly score &gt; 0.7</div>
+    </div>
+  </div>
+</div>
+
+<!-- Infrastructure -->
+<p class="section-heading">🏗️ Infrastructure (Azure Bicep)</p>
+<div class="stage-card" style="margin-bottom:48px">
+  <div class="stage-card-body" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="stage-col">
+      <div class="col-heading">Shared Resources</div>
+      <ul class="step-list">
+        <li><strong>Azure Container Registry</strong> — Premium SKU, zone-redundant, geo-replicated to secondary region</li>
+        <li><strong>Log Analytics Workspace</strong> — Central telemetry, 90-day retention, 5GB/day cap</li>
+        <li><strong>User-Assigned Managed Identity</strong> — AcrPush + AcrPull roles, no stored credentials</li>
+      </ul>
+    </div>
+    <div class="stage-col">
+      <div class="col-heading">Per-Environment Resources</div>
+      <ul class="step-list">
+        <li><strong>Key Vault</strong> — RBAC-enabled, purge-protected, soft-delete 90 days</li>
+        <li><strong>Application Insights</strong> — Workspace-based, 100% sampling in prod, 50% elsewhere</li>
+        <li><strong>Action Group</strong> — Email + Teams notification on alert trigger</li>
+      </ul>
+    </div>
+    <div class="stage-col">
+      <div class="col-heading">Monitoring &amp; Alerting</div>
+      <ul class="step-list">
+        <li><strong>Smart Detection</strong> — Built-in App Insights ML for slow page loads, exception spikes</li>
+        <li><strong>Dynamic Threshold Alerts</strong> — Error rate (Sev 1 prod / Sev 2 others) and latency alerts</li>
+        <li><strong>AzureDevOpsAuditEvent</strong> table in Log Analytics for pipeline audit trail</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="footer-left">
+    AI-Enabled CI/CD Pipeline — Azure DevOps<br>
+    Generated by Claude · Confidential — Internal Use Only
+  </div>
+  <div class="footer-right">
+    Environments: Dev → UAT → Pre-Prod → Prod<br>
+    Infrastructure: Azure Bicep · Helm · Container Apps
+  </div>
+</div>
+
+</body>
+</html>

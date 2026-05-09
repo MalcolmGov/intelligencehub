@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-08: PR Intelligence & Merge Gating</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: #58a6ff;
+            font-size: 2.2em;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: #8b949e;
+            margin: 6px 0;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-priority-p1 {
+            background-color: #da3633;
+            color: white;
+        }
+
+        .badge-status {
+            background-color: #238636;
+            color: white;
+        }
+
+        .section {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #58a6ff;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        .section h3 {
+            color: #79c0ff;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .persona-card {
+            background-color: #0d1117;
+            border-left: 4px solid #58a6ff;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .persona-card strong {
+            color: #58a6ff;
+        }
+
+        .user-story {
+            background-color: #0d1117;
+            border-left: 4px solid #79c0ff;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .user-story-id {
+            color: #79c0ff;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .priority-high {
+            background-color: #da3633;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+
+        .priority-medium {
+            background-color: #9e6a03;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+
+        .requirement-item {
+            background-color: #0d1117;
+            border-left: 4px solid #238636;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .requirement-id {
+            color: #238636;
+            font-weight: 600;
+        }
+
+        .acceptance-criteria {
+            background-color: #0d1117;
+            border-left: 4px solid #d29922;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .criteria-item {
+            margin: 8px 0;
+            padding-left: 15px;
+        }
+
+        .criteria-item:before {
+            content: "• ";
+            color: #d29922;
+        }
+
+        .dependency-item {
+            background-color: #0d1117;
+            border-left: 4px solid #a371f7;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .assumption-item {
+            background-color: #0d1117;
+            border-left: 4px solid #79c0ff;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .out-of-scope-item {
+            background-color: #0d1117;
+            border-left: 4px solid #8b949e;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #238636;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <h1>UC-08: PR Intelligence & Merge Gating</h1>
+            <p><strong>Owner:</strong> Anupam Sharma<br><strong>Author:</strong> Malcolm Govender (Head of AI &amp; Engineering)</p>
+            <p><strong>Version:</strong> v1.0</p>
+            <p><strong>Date:</strong> May 2026</p>
+            <div class="badge-group">
+                <span class="badge badge-priority-p1">Priority: P1</span>
+                <span class="badge badge-status">Status: Done (100%)</span>
+            </div>
+                <div class="meta-item">
+                    <span class="meta-label">Author</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+        </header>
+
+        <div class="section">
+            <h2>Problem Statement</h2>
+            <p>
+                Pull requests are critical checkpoints in the software development lifecycle, yet teams lack visibility into test coverage impact, quality metrics, and risk indicators before merging. Engineers spend hours manually reviewing PR changes against test results, often missing gaps in test coverage or potential regressions. Quality gates are inflexible or missing entirely, leading to untested code reaching production. Merge decisions are made without sufficient intelligence about the PR's scope, dependencies, or automation readiness.
+            </p>
+            <p style="margin-top: 12px;">
+                An AI-powered PR Intelligence system would automatically analyze pull requests, synthesize test coverage and automation data, identify quality risks, and provide intelligent merge recommendations based on configurable policies and historical patterns. This enables teams to enforce consistent quality standards, prevent regressions, and accelerate the merge process for safe, well-tested changes.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Target Users & Personas</h2>
+
+            <h3>Personas</h3>
+
+            <div class="persona-card">
+                <strong>Dev Lead - Engineering Team</strong><br/>
+                Manages a team of engineers and is responsible for code quality and deployment velocity. Needs clear visibility into PR quality before merge approval. Wants to enforce consistent standards across all PRs without slowing down development. Concerned about regressions and test coverage gaps.
+            </div>
+
+            <div class="persona-card">
+                <strong>QA Automation Engineer</strong><br/>
+                Creates and maintains automated test suites and integration tests. Reviews PRs for test coverage adequacy and ensures automation scripts are updated alongside code changes. Relies on merge gates to prevent untested code from merging. Needs to quickly identify which tests should run for a given PR.
+            </div>
+
+            <div class="persona-card">
+                <strong>Platform/DevOps Engineer</strong><br/>
+                Manages CI/CD pipelines and deployment infrastructure. Responsible for defining quality gates and merge policies. Needs detailed signals from PR analysis to make safe deployment decisions. Wants to reduce manual intervention and automate quality checks.
+            </div>
+
+            <div class="persona-card">
+                <strong>Product Manager</strong><br/>
+                Owns feature roadmap and release schedules. Concerned about time-to-market and ensuring quality. Wants visibility into which features/PRs are ready for release. Benefits from automated risk assessment and merge readiness predictions.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>User Stories</h2>
+
+            <div class="user-story">
+                <span class="user-story-id">US-25:</span> As a Dev Lead, I want the system to automatically analyze each PR and provide a comprehensive quality report including test coverage changes, affected components, and risk assessment.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-26:</span> As a QA Engineer, I want to see which existing test cases are affected by this PR's code changes and which tests need to be updated or added.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-27:</span> As a Platform Engineer, I want to configure merge gate policies (test coverage threshold, automation readiness, code review approvals) and have them automatically enforced.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-28:</span> As a Dev Lead, I want the system to predict merge readiness using ML patterns: "This PR is 92% ready to merge based on test coverage, similar PRs, and quality signals."
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-29:</span> As a QA Engineer, I want the system to flag test coverage gaps and recommend which test cases should be generated or updated for this PR.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-30:</span> As a Dev Lead, I want to receive automated PR comments with quality feedback, blockers, and recommended actions without cluttering the discussion thread.
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-31:</span> As a Platform Engineer, I want integration with GitHub status checks so merge gates automatically block/approve PRs based on quality criteria.
+                <span class="priority-high">High Priority</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-01:</span> Analyze PR diffs and identify all affected files, functions, and components.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-02:</span> Calculate test coverage change (delta) for files modified in the PR.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-03:</span> Cross-reference PR changes with existing test cases and identify which tests may be affected.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-04:</span> Generate a "Coverage Gap Report" recommending which test cases should be generated for uncovered code paths.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-05:</span> Support configurable merge gate policies: coverage threshold, automation readiness, required approvals, and custom rules.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-06:</span> Provide GitHub status check integration to enforce merge gates and block/approve PRs.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-07:</span> Analyze historical PR data and use ML to predict merge readiness confidence scores (0–100%).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-08:</span> Generate automated PR comments with quality metrics, risks, and recommended actions.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-09:</span> Support risk assessment: flag high-risk changes (large refactors, critical path modifications, deprecated API usage).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-10:</span> Integrate with CI/CD pipeline to access test execution results and coverage reports.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-11:</span> Provide a dashboard showing PR quality metrics, trends, and merge gate health across all repos.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-12:</span> Support API endpoint for external tools to query PR quality scores and merge readiness.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-01:</span> PR analysis must complete within 2 minutes of PR creation or update.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-02:</span> Support repos with 10,000+ commits and 1000+ test cases without performance degradation.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-03:</span> Maintain 99.9% uptime for merge gate enforcement to prevent false positives/negatives.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-04:</span> All PR metadata and quality scores must be encrypted at rest and in transit.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-05:</span> Support GitHub Enterprise, GitLab, and Bitbucket via plugins.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-06:</span> Provide audit logs for all merge gate decisions and policy changes.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Acceptance Criteria</h2>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 1: PR Coverage Analysis</strong><br/>
+                <div class="criteria-item">Given a PR that modifies 5 files with 200 new lines of code, When the system analyzes the PR, Then it should report: (a) file-level coverage changes, (b) affected test cases, (c) coverage gap recommendations within 2 minutes.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 2: Merge Gate Enforcement</strong><br/>
+                <div class="criteria-item">Given a merge gate policy requiring 85% coverage and 5 approvals, When a PR reaches 84% coverage with 4 approvals, Then GitHub status check should block merge with clear explanation.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 3: Risk Assessment</strong><br/>
+                <div class="criteria-item">Given a PR that modifies payment processing logic (critical path), When the system analyzes it, Then it should flag as "High Risk" and require additional validation/approval.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 4: Merge Readiness Prediction</strong><br/>
+                <div class="criteria-item">Given historical data from 500+ PRs, When a new PR is submitted, Then system should predict merge readiness % with 85%+ accuracy compared to actual merge decisions.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dependencies & Integrations</h2>
+
+            <div class="dependency-item">
+                <strong>GitHub API:</strong> PR metadata, file diffs, status checks, comments
+            </div>
+
+            <div class="dependency-item">
+                <strong>SentinelQA Coverage Metrics:</strong> Test coverage reports and trending data
+            </div>
+
+            <div class="dependency-item">
+                <strong>CI/CD Pipeline (GitHub Actions/Jenkins):</strong> Test execution results and logs
+            </div>
+
+            <div class="dependency-item">
+                <strong>Code Repository (Git):</strong> Commit history, blame, and change analysis
+            </div>
+
+            <div class="dependency-item">
+                <strong>ML/Analytics Engine:</strong> For merge readiness prediction and risk scoring
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Assumptions & Constraints</h2>
+
+            <div class="assumption-item">
+                Assumes test suite is reasonably comprehensive and coverage reports are generated for all PRs.
+            </div>
+
+            <div class="assumption-item">
+                Assumes GitHub/GitLab/Bitbucket integrations are available and properly configured.
+            </div>
+
+            <div class="assumption-item">
+                Merge gate policies are configurable per repo or organization but require admin access.
+            </div>
+
+            <div class="assumption-item">
+                System operates within rate limits of Git platform APIs.
+            </div>
+
+            <div class="assumption-item">
+                Constraint: Does not replace human code review; serves as intelligent quality assistant.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Out of Scope (v1)</h2>
+
+            <div class="out-of-scope-item">
+                Support for Gerrit or other non-GitHub/GitLab/Bitbucket platforms
+            </div>
+
+            <div class="out-of-scope-item">
+                Automatic code remediation or security patch generation
+            </div>
+
+            <div class="out-of-scope-item">
+                Manual code review quality assessment (relies on review approvals)
+            </div>
+
+            <div class="out-of-scope-item">
+                Integration with project management tools (Jira, Linear) beyond basic links
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Definition of Done</h2>
+            <ul class="checklist">
+                <li>PR diff analysis engine complete and tested with 500+ real PRs</li>
+                <li>Coverage delta calculation accurate within 2% of actual coverage tools</li>
+                <li>GitHub status check integration implemented and deployed</li>
+                <li>Merge gate policy engine supports all required rule types</li>
+                <li>Merge readiness ML model trained and validated</li>
+                <li>PR comment generation enabled and tested with team feedback</li>
+                <li>Risk assessment rules defined and tuned for 90%+ precision</li>
+                <li>Dashboard fully functional with real-time metrics</li>
+                <li>API endpoints documented and tested</li>
+                <li>Performance benchmarks met: 2-minute analysis, 99.9% uptime</li>
+                <li>Security audit completed: encryption, access control, audit logs</li>
+                <li>Documentation completed: admin guide, user guide, API reference</li>
+                <li>UAT with 3+ engineering teams completed with sign-off</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

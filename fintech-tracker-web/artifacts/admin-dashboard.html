@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC-19 LNC Orchestration — Admin Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-2: #1e2430;
+    --border: #30363d;
+    --text-1: #e6edf3;
+    --text-2: #8b949e;
+    --green: #3fb950;
+    --amber: #d29922;
+    --red: #f85149;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text-1); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; min-height: 100vh; }
+
+  /* Header */
+  .app-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; }
+  .logo-badge { background: linear-gradient(135deg, var(--blue), var(--purple)); border-radius: 6px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: #fff; }
+  .header-meta { display: flex; align-items: center; gap: 16px; color: var(--text-2); font-size: 12px; }
+  .live-indicator { display: flex; align-items: center; gap: 6px; color: var(--green); font-weight: 600; }
+  .live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse-green 2s infinite; }
+  @keyframes pulse-green { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Tab Bar */
+  .tab-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; overflow-x: auto; }
+  .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-2); cursor: pointer; font-size: 13px; font-weight: 500; padding: 14px 18px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+  .tab-btn:hover { color: var(--text-1); }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .tab-badge { background: var(--amber); color: #000; border-radius: 10px; padding: 1px 6px; font-size: 10px; font-weight: 700; }
+  .tab-badge.red { background: var(--red); color: #fff; }
+
+  /* Panels */
+  .tab-panel { display: none; padding: 24px; }
+  .tab-panel.active { display: block; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .panel-header { padding: 14px 18px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: space-between; }
+
+  /* KPI Cards */
+  .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; }
+  .kpi-card.k-green { border-color: var(--green); box-shadow: 0 0 16px rgba(63,185,80,.15); }
+  .kpi-card.k-blue  { border-color: var(--blue);  box-shadow: 0 0 16px rgba(88,166,255,.15); }
+  .kpi-card.k-amber { border-color: var(--amber); animation: amber-glow 2s ease-in-out infinite; }
+  .kpi-card.k-red   { border-color: var(--red);   box-shadow: 0 0 16px rgba(248,81,73,.15); }
+  @keyframes amber-glow { 0%,100%{box-shadow:0 0 8px rgba(210,153,34,.2)} 50%{box-shadow:0 0 28px rgba(210,153,34,.55)} }
+  .kpi-label { font-size: 11px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-2); margin-bottom: 10px; }
+  .kpi-value { font-size: 30px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+  .kv-green { color: var(--green); } .kv-blue { color: var(--blue); } .kv-amber { color: var(--amber); } .kv-red { color: var(--red); }
+  .kpi-sub { font-size: 11px; color: var(--text-2); margin-top: 6px; }
+
+  /* Two-col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; padding: 10px 14px; color: var(--text-2); font-size: 11px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 10px 14px; border-bottom: 1px solid rgba(48,54,61,.5); color: var(--text-1); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .mono { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 11px; color: var(--text-2); }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; }
+  .bg { background: rgba(63,185,80,.15); color: var(--green); }
+  .bb { background: rgba(88,166,255,.15); color: var(--blue); }
+  .ba { background: rgba(210,153,34,.15); color: var(--amber); }
+  .br { background: rgba(248,81,73,.15); color: var(--red); }
+  .bp { background: rgba(188,140,255,.15); color: var(--purple); }
+  .bx { background: rgba(139,148,158,.15); color: var(--text-2); }
+
+  /* Heatmap */
+  .heatmap-wrap { overflow-x: auto; padding: 14px; }
+  .heatmap-container { display: flex; gap: 6px; }
+  .hm-labels { display: flex; flex-direction: column; }
+  .hm-label { font-size: 9px; color: var(--text-2); height: 18px; line-height: 18px; white-space: nowrap; padding-right: 6px; text-align: right; margin-bottom: 2px; }
+  .hm-label.sp { height: 20px; }
+  .hm-grid-wrap { flex: 1; overflow-x: auto; }
+  .hm-hours { display: flex; gap: 2px; margin-bottom: 4px; }
+  .hm-hour { width: 16px; text-align: center; font-size: 8px; color: var(--text-2); flex-shrink: 0; }
+  .hm-row { display: flex; gap: 2px; margin-bottom: 2px; }
+  .hm-cell { width: 16px; height: 18px; border-radius: 2px; cursor: default; transition: transform .1s; flex-shrink: 0; }
+  .hm-cell:hover { transform: scale(1.3); z-index: 10; position: relative; }
+  .hm-legend { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-2); margin-top: 8px; justify-content: flex-end; }
+  .hm-lc { width: 12px; height: 12px; border-radius: 2px; }
+
+  /* Approval Cards */
+  .appr-header-bar { margin-bottom: 20px; }
+  .appr-header-bar h2 { font-size: 16px; font-weight: 600; }
+  .appr-header-bar p { color: var(--text-2); font-size: 12px; margin-top: 4px; }
+  .acard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+  .acard.resolved { opacity: .65; }
+  .acard-top { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); background: rgba(248,81,73,.05); flex-wrap: wrap; gap: 8px; }
+  .acard-top.appr-bg { background: rgba(63,185,80,.05); }
+  .acard-top.reje-bg { background: rgba(139,148,158,.05); }
+  .acard-body { padding: 18px; }
+  .afield { margin-bottom: 14px; }
+  .afield-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-2); margin-bottom: 5px; }
+  .afield-val { font-size: 13px; line-height: 1.5; }
+  .a-reasoning { background: var(--surface-2); border-left: 3px solid var(--amber); border-radius: 0 4px 4px 0; padding: 10px 14px; font-size: 12px; color: var(--text-2); line-height: 1.6; }
+  .code-block { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 11px; color: #79c0ff; overflow-x: auto; white-space: pre; line-height: 1.6; }
+  .acard-foot { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 10px; }
+  .acard-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .acard-acts { display: flex; gap: 10px; }
+  .res-banner { display: none; padding: 10px 18px; font-size: 12px; font-weight: 600; align-items: center; gap: 8px; }
+  .res-banner.show { display: flex; }
+  .res-banner.appr { color: var(--green); background: rgba(63,185,80,.08); }
+  .res-banner.reje { color: var(--text-2); background: rgba(139,148,158,.08); }
+
+  /* Buttons */
+  .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: opacity .15s, transform .1s; }
+  .btn:hover { opacity: .85; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-g { background: var(--green); color: #000; }
+  .btn-r { background: var(--red); color: #fff; }
+  .btn-ghost { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-1); }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+
+  /* Timeline */
+  .search-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 16px; font-size: 13px; color: var(--text-1); width: 100%; margin-bottom: 20px; outline: none; transition: border-color .15s; }
+  .search-bar::placeholder { color: var(--text-2); }
+  .search-bar:focus { border-color: var(--blue); }
+  .trace-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
+  .trace-hdr { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .trace-hdr h3 { font-size: 13px; font-weight: 600; }
+  .trace-hdr p { font-size: 11px; color: var(--text-2); margin-top: 3px; }
+  .timeline { padding: 20px 18px; position: relative; }
+  .timeline::before { content:''; position:absolute; left:42px; top:20px; bottom:20px; width:2px; background:var(--border); }
+  .tl-step { display: flex; gap: 16px; margin-bottom: 20px; position: relative; }
+  .tl-step:last-child { margin-bottom: 0; }
+  .tl-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--surface-2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; z-index: 1; }
+  .tl-icon.ic-blue   { border-color:var(--blue);   background:rgba(88,166,255,.1); }
+  .tl-icon.ic-green  { border-color:var(--green);  background:rgba(63,185,80,.1); }
+  .tl-icon.ic-purple { border-color:var(--purple); background:rgba(188,140,255,.1); }
+  .tl-body { flex: 1; padding-top: 4px; }
+  .tl-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .tl-desc { font-size: 12px; color: var(--text-2); margin-bottom: 8px; line-height: 1.5; }
+  .dur-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .dur-bar { height: 6px; border-radius: 3px; min-width: 5px; }
+  .dur-lbl { font-size: 11px; color: var(--text-2); white-space: nowrap; }
+  .raw-section { margin-bottom: 20px; }
+  .raw-toggle { background: var(--surface-2); border: 1px solid var(--border); color: var(--blue); cursor: pointer; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+  .raw-json { display: none; }
+  .raw-json.open { display: block; }
+
+  /* Circuit Breakers */
+  .cb-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(210px,1fr)); gap: 14px; margin-bottom: 28px; }
+  .cb-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .cb-card.cb-open { border-color: rgba(248,81,73,.45); }
+  .cb-card.cb-half { border-color: rgba(210,153,34,.45); }
+  .cb-card.cb-clos { border-color: rgba(63,185,80,.2); }
+  .cb-name { font-size: 12px; font-weight: 700; margin-bottom: 10px; }
+  .cb-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .cb-meta { font-size: 11px; color: var(--text-2); }
+  .prog-bg { background: var(--surface-2); border-radius: 4px; height: 6px; overflow: hidden; margin: 8px 0 4px; }
+  .prog-fill { height: 100%; border-radius: 4px; transition: width .4s; }
+  .chart-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+  .chart-box h3 { font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+
+  /* Audit */
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .fsel { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text-1); font-size: 12px; padding: 7px 12px; cursor: pointer; outline: none; }
+  .fsel:focus { border-color: var(--blue); }
+  .flbl { font-size: 11px; color: var(--text-2); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+  .audit-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+  .exp-btn { background: none; border: 1px solid var(--border); color: var(--blue); border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 700; padding: 2px 7px; }
+  .json-detail { display: none; }
+  .json-detail.open { display: table-row; }
+  .export-bar { display: flex; justify-content: flex-end; }
+
+  /* Section title */
+  .sec-title { font-size: 13px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .sec-sub { font-size: 12px; color: var(--text-2); font-weight: 400; }
+  .hist-section { margin-top: 32px; }
+
+  /* Dialog */
+  dialog { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; width: 420px; max-width: 95vw; color: var(--text-1); box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+  dialog::backdrop { background: rgba(0,0,0,.7); }
+  dialog h3 { font-size: 15px; margin-bottom: 8px; }
+  dialog p { color: var(--text-2); font-size: 12px; margin-bottom: 16px; line-height: 1.5; }
+  dialog textarea { width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:6px; color:var(--text-1); font-size:13px; padding:10px 12px; resize:vertical; min-height:80px; outline:none; font-family:inherit; margin-bottom:16px; }
+  dialog textarea:focus { border-color:var(--blue); }
+  .dlg-acts { display:flex; gap:10px; justify-content:flex-end; }
+
+  @media(max-width:900px){ .kpi-row{grid-template-columns:1fr 1fr} .two-col{grid-template-columns:1fr} .cb-grid{grid-template-columns:1fr 1fr} }
+  @media(max-width:600px){ .kpi-row{grid-template-columns:1fr} .cb-grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">
+    <div class="logo-badge">UC</div>
+    <span>UC-19 LNC Orchestration</span>
+    <span style="color:var(--text-2);font-weight:400;font-size:12px">/ Admin Dashboard</span>
+  </div>
+  <div class="header-meta">
+    <div class="live-indicator"><div class="live-dot"></div>LIVE</div>
+    <span>Env: <strong style="color:var(--text-1)">production</strong></span>
+    <span id="clock" style="font-family:monospace"></span>
+  </div>
+</header>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
+  <button class="tab-btn" onclick="switchTab('approvals',this)">Approval Queue <span class="tab-badge" id="appr-badge">2</span></button>
+  <button class="tab-btn" onclick="switchTab('traces',this)">Execution Traces</button>
+  <button class="tab-btn" onclick="switchTab('circuit',this)">Circuit Breakers <span class="tab-badge red" id="cb-badge">1</span></button>
+  <button class="tab-btn" onclick="switchTab('audit',this)">Audit Log</button>
+</nav>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="tab-overview" class="tab-panel active">
+  <div class="kpi-row">
+    <div class="kpi-card k-green"><div class="kpi-label">Active Sessions</div><div class="kpi-value kv-green">3</div><div class="kpi-sub">Up 1 from 5 min ago</div></div>
+    <div class="kpi-card k-blue"><div class="kpi-label">Avg Session Duration</div><div class="kpi-value kv-blue">4.2s</div><div class="kpi-sub">p95: 12.4s &nbsp;|&nbsp; p99: 28.1s</div></div>
+    <div class="kpi-card k-amber"><div class="kpi-label">Approval Queue</div><div class="kpi-value kv-amber">2 pending</div><div class="kpi-sub">Oldest: 18 min ago</div></div>
+    <div class="kpi-card k-red"><div class="kpi-label">Circuit Breakers</div><div class="kpi-value kv-red">1 OPEN</div><div class="kpi-sub">payment-gateway &nbsp;|&nbsp; 2 HALF_OPEN</div></div>
+  </div>
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-header">Recent Sessions <span style="font-size:11px;color:var(--text-2);font-weight:400">Last 8</span></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Session ID</th><th>User Input</th><th>Status</th><th>Duration</th><th>Tools</th><th>Time</th></tr></thead><tbody id="sess-tbody"></tbody></table></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">Tool Call Heatmap <span style="font-size:11px;color:var(--text-2);font-weight:400">Calls/hour today</span></div>
+      <div class="heatmap-wrap">
+        <div id="heatmap-root"></div>
+        <div class="hm-legend">
+          <span>Low</span>
+          <div class="hm-lc" style="background:rgba(63,185,80,.1)"></div>
+          <div class="hm-lc" style="background:rgba(63,185,80,.3)"></div>
+          <div class="hm-lc" style="background:rgba(63,185,80,.55)"></div>
+          <div class="hm-lc" style="background:rgba(63,185,80,.8)"></div>
+          <div class="hm-lc" style="background:rgba(63,185,80,1)"></div>
+          <span>High</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: APPROVAL QUEUE -->
+<div id="tab-approvals" class="tab-panel">
+  <div class="appr-header-bar">
+    <h2>Approval Queue</h2>
+    <p id="appr-sub">2 pending approvals require action before execution can continue.</p>
+  </div>
+
+  <!-- Card 0 -->
+  <div class="acard" id="ac-0">
+    <div class="acard-top" id="ac-top-0">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge br">HIGH RISK</span><span class="mono">sess_a8f2b1c4</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:var(--text-2)">Received 09:41:22 UTC</span><span class="badge ba">AWAITING APPROVAL</span></div>
+    </div>
+    <div class="acard-body">
+      <div class="afield"><div class="afield-lbl">User Input</div><div class="afield-val" style="font-weight:600">"Freeze account ACC-8821 — flagged for suspected fraud activity"</div></div>
+      <div class="afield"><div class="afield-lbl">AI Planner Reasoning</div><div class="a-reasoning">This action will immediately freeze the account, preventing any further transactions. Account freezes are irreversible without manual intervention and directly impact customer access. Flagged HIGH risk: (1) financial impact on customer, (2) targets production, (3) no automated rollback. Human approval required per policy GVN-ACC-017.</div></div>
+      <div class="afield" style="margin-top:12px"><div class="afield-lbl">Tool &amp; Parameters</div>
+        <div class="code-block">{
+  "tool": "freeze_account",
+  "service": "account-service",
+  "environment": "production",
+  "parameters": {
+    "account_id": "ACC-8821",
+    "reason": "SUSPECTED_FRAUD",
+    "freeze_type": "FULL",
+    "notify_customer": true,
+    "notification_channel": ["email", "sms"],
+    "case_reference": "FRAUD-2026-0429"
+  }
+}</div>
+      </div>
+    </div>
+    <div class="acard-foot">
+      <div class="acard-meta"><span class="badge bx">account-service</span><span class="badge br">production</span><span style="font-size:11px;color:var(--text-2)">Agent: orchestration-agent@uc19</span></div>
+      <div class="acard-acts" id="aa-0"><button class="btn btn-g" onclick="openModal(0,'approve')">Approve</button><button class="btn btn-r" onclick="openModal(0,'reject')">Reject</button></div>
+    </div>
+    <div class="res-banner" id="ab-0"></div>
+  </div>
+
+  <!-- Card 1 -->
+  <div class="acard" id="ac-1">
+    <div class="acard-top" id="ac-top-1">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge br">HIGH RISK</span><span class="mono">sess_c9d3e7f0</span></div>
+      <div style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:var(--text-2)">Received 09:59:07 UTC</span><span class="badge ba">AWAITING APPROVAL</span></div>
+    </div>
+    <div class="acard-body">
+      <div class="afield"><div class="afield-lbl">User Input</div><div class="afield-val" style="font-weight:600">"Update feature flag ENABLE_NEW_PAYMENT_FLOW to true — requested by product team for global rollout"</div></div>
+      <div class="afield"><div class="afield-lbl">AI Planner Reasoning</div><div class="a-reasoning">Enabling ENABLE_NEW_PAYMENT_FLOW in production will immediately affect 100% of payment processing traffic. No canary rollout is configured. Flagged HIGH risk: (1) global customer impact, (2) payment-critical path change, (3) requires a second flag update to reverse. Senior engineer approval required per policy REL-FLAG-003.</div></div>
+      <div class="afield" style="margin-top:12px"><div class="afield-lbl">Tool &amp; Parameters</div>
+        <div class="code-block">{
+  "tool": "update_feature_flag",
+  "service": "config-service",
+  "environment": "production",
+  "parameters": {
+    "flag_name": "ENABLE_NEW_PAYMENT_FLOW",
+    "current_value": false,
+    "new_value": true,
+    "scope": "GLOBAL",
+    "requested_by": "product-team",
+    "ticket_ref": "PROD-1847"
+  }
+}</div>
+      </div>
+    </div>
+    <div class="acard-foot">
+      <div class="acard-meta"><span class="badge bx">config-service</span><span class="badge br">production</span><span style="font-size:11px;color:var(--text-2)">Agent: orchestration-agent@uc19</span></div>
+      <div class="acard-acts" id="aa-1"><button class="btn btn-g" onclick="openModal(1,'approve')">Approve</button><button class="btn btn-r" onclick="openModal(1,'reject')">Reject</button></div>
+    </div>
+    <div class="res-banner" id="ab-1"></div>
+  </div>
+
+  <div class="hist-section">
+    <div class="sec-title">Approval History <span class="sec-sub">Last 10 decisions</span></div>
+    <div class="panel"><div style="overflow-x:auto"><table><thead><tr><th>Timestamp</th><th>Action</th><th>Tool</th><th>Decision</th><th>Approver</th><th>Reason</th></tr></thead><tbody id="hist-tbody"></tbody></table></div></div>
+  </div>
+</div>
+
+<!-- TAB 3: EXECUTION TRACES -->
+<div id="tab-traces" class="tab-panel">
+  <input type="text" class="search-bar" placeholder="Search by session ID, tool name, or user input..." oninput="filterTC(this.value)">
+
+  <div class="trace-box">
+    <div class="trace-hdr">
+      <h3>Session: sess_b7c2d9a1 — Reconciliation Status Query</h3>
+      <p>COMPLETED &nbsp;|&nbsp; 2026-05-09T09:38:51Z &nbsp;|&nbsp; Total: 639ms &nbsp;|&nbsp; 2 tool calls &nbsp;|&nbsp; User: sarah.chen@finco.io</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-step">
+        <div class="tl-icon ic-blue">&#129504;</div>
+        <div class="tl-body">
+          <div class="tl-title">NL Translation</div>
+          <div class="tl-desc">Input: <em>"Get reconciliation status for March"</em><br>Intent: <span class="badge bb" style="font-size:10px">QUERY</span> &nbsp; Service: <code style="font-size:11px;color:var(--purple)">reporting-service</code> &nbsp; Risk: <span class="badge bg" style="font-size:10px">LOW</span> &nbsp; Confidence: 0.97</div>
+          <div class="dur-wrap"><div class="dur-bar" style="width:26px;background:var(--blue)"></div><span class="dur-lbl">42ms</span></div>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-icon ic-purple">&#128203;</div>
+        <div class="tl-body">
+          <div class="tl-title">Planning</div>
+          <div class="tl-desc">Generated 2-step plan: [get_reconciliation_status &#8594; export_reconciliation]<br>No approval required &nbsp;|&nbsp; Confidence: 0.97</div>
+          <div class="dur-wrap"><div class="dur-bar" style="width:218px;background:var(--purple)"></div><span class="dur-lbl">380ms</span></div>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-icon ic-green">&#128295;</div>
+        <div class="tl-body">
+          <div class="tl-title">Tool: get_reconciliation_status &nbsp;<span class="badge bg">SUCCESS</span></div>
+          <div class="tl-desc"><div class="code-block" style="margin-top:6px;font-size:10px">{"month": "2026-03", "environment": "staging"}</div></div>
+          <div class="dur-wrap" style="margin-top:8px"><div class="dur-bar" style="width:74px;background:var(--green)"></div><span class="dur-lbl">120ms</span></div>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-icon ic-green">&#128295;</div>
+        <div class="tl-body">
+          <div class="tl-title">Tool: export_reconciliation &nbsp;<span class="badge bg">SUCCESS</span></div>
+          <div class="tl-desc"><div class="code-block" style="margin-top:6px;font-size:10px">{"report_id": "REC-2026-03", "format": "csv"}</div></div>
+          <div class="dur-wrap" style="margin-top:8px"><div class="dur-bar" style="width:55px;background:var(--green)"></div><span class="dur-lbl">89ms</span></div>
+        </div>
+      </div>
+      <div class="tl-step">
+        <div class="tl-icon ic-green">&#9989;</div>
+        <div class="tl-body">
+          <div class="tl-title">Response Delivered</div>
+          <div class="tl-desc">Returned reconciliation summary + CSV download link (182 KB). Tokens: 847 in / 312 out.</div>
+          <div class="dur-wrap"><div class="dur-bar" style="width:5px;background:var(--green)"></div><span class="dur-lbl">8ms</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="raw-section">
+    <button class="raw-toggle" onclick="toggleRaw(this)">&#9654; View raw OTLP trace</button>
+    <div class="raw-json" id="raw-json">
+      <div class="code-block" style="max-height:300px;overflow-y:auto;color:#e6edf3;white-space:pre;font-size:11px;line-height:1.55">{
+  "resourceSpans": [{
+    "resource": {
+      "attributes": [
+        {"key": "service.name",           "value": {"stringValue": "uc19-orchestration"}},
+        {"key": "deployment.environment", "value": {"stringValue": "production"}},
+        {"key": "service.version",        "value": {"stringValue": "2.4.1"}}
+      ]
+    },
+    "scopeSpans": [{
+      "scope": {"name": "lnc.orchestration", "version": "1.0.0"},
+      "spans": [
+        {
+          "traceId": "a1b2c3d4e5f6789012345678abcdef01",
+          "spanId": "0102030405060708",
+          "name": "session.process",
+          "startTimeUnixNano": "1746784731000000000",
+          "endTimeUnixNano":   "1746784731639000000",
+          "attributes": [
+            {"key": "session.id",     "value": {"stringValue": "sess_b7c2d9a1"}},
+            {"key": "user.input",     "value": {"stringValue": "Get reconciliation status for March"}},
+            {"key": "session.status", "value": {"stringValue": "COMPLETED"}},
+            {"key": "session.tools",  "value": {"intValue": 2}},
+            {"key": "session.risk",   "value": {"stringValue": "LOW"}}
+          ],
+          "status": {"code": "STATUS_CODE_OK"}
+        },
+        {
+          "traceId": "a1b2c3d4e5f6789012345678abcdef01",
+          "spanId": "1112131415161718",
+          "parentSpanId": "0102030405060708",
+          "name": "lnc.translate",
+          "startTimeUnixNano": "1746784731000000000",
+          "endTimeUnixNano":   "1746784731042000000",
+          "attributes": [
+            {"key": "lnc.intent",         "value": {"stringValue": "QUERY"}},
+            {"key": "lnc.target_service", "value": {"stringValue": "reporting-service"}},
+            {"key": "lnc.risk_level",     "value": {"stringValue": "LOW"}},
+            {"key": "lnc.confidence",     "value": {"doubleValue": 0.97}}
+          ]
+        },
+        {
+          "traceId": "a1b2c3d4e5f6789012345678abcdef01",
+          "spanId": "2122232425262728",
+          "parentSpanId": "0102030405060708",
+          "name": "planner.generate",
+          "startTimeUnixNano": "1746784731042000000",
+          "endTimeUnixNano":   "1746784731422000000",
+          "attributes": [
+            {"key": "planner.steps",             "value": {"intValue": 2}},
+            {"key": "planner.requires_approval", "value": {"boolValue": false}}
+          ]
+        },
+        {
+          "traceId": "a1b2c3d4e5f6789012345678abcdef01",
+          "spanId": "3132333435363738",
+          "parentSpanId": "0102030405060708",
+          "name": "tool.call/get_reconciliation_status",
+          "startTimeUnixNano": "1746784731422000000",
+          "endTimeUnixNano":   "1746784731542000000",
+          "attributes": [
+            {"key": "tool.name",    "value": {"stringValue": "get_reconciliation_status"}},
+            {"key": "tool.service", "value": {"stringValue": "reporting-service"}},
+            {"key": "tool.status",  "value": {"stringValue": "SUCCESS"}},
+            {"key": "tool.params",  "value": {"stringValue": "{\"month\":\"2026-03\",\"environment\":\"staging\"}"}}
+          ]
+        },
+        {
+          "traceId": "a1b2c3d4e5f6789012345678abcdef01",
+          "spanId": "4142434445464748",
+          "parentSpanId": "0102030405060708",
+          "name": "tool.call/export_reconciliation",
+          "startTimeUnixNano": "1746784731542000000",
+          "endTimeUnixNano":   "1746784731631000000",
+          "attributes": [
+            {"key": "tool.name",    "value": {"stringValue": "export_reconciliation"}},
+            {"key": "tool.service", "value": {"stringValue": "reporting-service"}},
+            {"key": "tool.status",  "value": {"stringValue": "SUCCESS"}},
+            {"key": "tool.params",  "value": {"stringValue": "{\"report_id\":\"REC-2026-03\",\"format\":\"csv\"}"}}
+          ]
+        }
+      ]
+    }]
+  }]
+}</div>
+    </div>
+  </div>
+
+  <div class="sec-title">Recent Tool Calls <span class="sec-sub">Last 20 across all sessions</span></div>
+  <div class="panel"><div style="overflow-x:auto"><table><thead><tr><th>Timestamp</th><th>Session ID</th><th>Tool Name</th><th>Duration (ms)</th><th>Status</th><th>Risk</th></tr></thead><tbody id="tc-tbody"></tbody></table></div></div>
+</div>
+
+<!-- TAB 4: CIRCUIT BREAKERS -->
+<div id="tab-circuit" class="tab-panel">
+  <div class="sec-title" style="margin-bottom:20px">Service Health — Circuit Breaker Status <span class="sec-sub" id="cb-sum">1 OPEN &nbsp;|&nbsp; 2 HALF_OPEN &nbsp;|&nbsp; 8 CLOSED</span></div>
+  <div class="cb-grid" id="cb-grid"></div>
+  <div class="chart-box">
+    <h3>Failure Timeline — Error Counts per Service (last 24h)</h3>
+    <svg id="fail-chart" width="100%" height="230" viewBox="0 0 920 230" preserveAspectRatio="xMidYMid meet" style="display:block"></svg>
+  </div>
+</div>
+
+<!-- TAB 5: AUDIT LOG -->
+<div id="tab-audit" class="tab-panel">
+  <div class="filter-bar">
+    <span class="flbl">Risk:</span>
+    <select class="fsel" id="f-risk" onchange="filterAudit()">
+      <option value="ALL">All Levels</option><option value="LOW">LOW</option><option value="MEDIUM">MEDIUM</option><option value="HIGH">HIGH</option>
+    </select>
+    <span class="flbl">Event Type:</span>
+    <select class="fsel" id="f-type" onchange="filterAudit()">
+      <option value="ALL">All Types</option><option value="TOOL_CALL">TOOL_CALL</option><option value="APPROVAL">APPROVAL</option><option value="ROLLBACK">ROLLBACK</option><option value="ERROR">ERROR</option>
+    </select>
+    <span class="flbl">Period:</span>
+    <select class="fsel" id="f-period" onchange="filterAudit()">
+      <option value="24h">Last 24h</option><option value="1h">Last 1h</option><option value="7d">Last 7d</option>
+    </select>
+  </div>
+  <div class="audit-wrap"><div style="overflow-x:auto"><table><thead><tr><th>Timestamp</th><th>Session ID</th><th>Event Type</th><th>Tool / Action</th><th>Risk</th><th>Outcome</th><th>User / System</th><th>Details</th></tr></thead><tbody id="audit-tbody"></tbody></table></div></div>
+  <div class="export-bar"><button class="btn btn-ghost" onclick="exportCSV()">&#8595; Export CSV</button></div>
+</div>
+
+<!-- Approval Dialog -->
+<dialog id="appr-modal">
+  <h3 id="m-title">Approve Action</h3>
+  <p id="m-desc">Provide a reason. It will be recorded in the audit log.</p>
+  <textarea id="m-reason" placeholder="Enter reason..."></textarea>
+  <div class="dlg-acts">
+    <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+    <button class="btn" id="m-confirm" onclick="confirmModal()">Confirm</button>
+  </div>
+</dialog>
+
+<script>
+// ============================
+// DATA
+// ============================
+var SESSIONS=[
+  {id:"sess_b7c2d9a1",input:"Get reconciliation status for March",status:"COMPLETED",dur:"639ms",tools:2,time:"09:38:51"},
+  {id:"sess_a8f2b1c4",input:"Freeze account ACC-8821 — suspected fraud",status:"RUNNING",dur:"—",tools:0,time:"09:41:22"},
+  {id:"sess_c9d3e7f0",input:"Update feature flag ENABLE_NEW_PAYMENT_FLOW to true",status:"RUNNING",dur:"—",tools:0,time:"09:59:07"},
+  {id:"sess_d4e8f2a0",input:"Run KYC check for account ACC-3302",status:"COMPLETED",dur:"1.2s",tools:3,time:"09:22:14"},
+  {id:"sess_e1f5c9b7",input:"Export customer transaction report Q1 2026",status:"COMPLETED",dur:"2.8s",tools:4,time:"08:57:33"},
+  {id:"sess_f6a2d3c8",input:"Send notification to 4,200 customers — PENDING APPROVAL",status:"FAILED",dur:"403ms",tools:1,time:"08:43:09"},
+  {id:"sess_g7b1e4d9",input:"Check AML screening status for batch B-2204",status:"COMPLETED",dur:"882ms",tools:2,time:"08:31:47"},
+  {id:"sess_h8c3f0e2",input:"Reconcile payment gateway settlement for 2026-05-08",status:"COMPLETED",dur:"3.1s",tools:5,time:"08:14:22"}
+];
+
+var TOOLS=[
+  "get_reconciliation_status","export_reconciliation","run_kyc_check","freeze_account",
+  "update_feature_flag","send_notification","check_aml_screening","get_payment_settlement",
+  "audit_log_write","fraud_score_lookup","circuit_breaker_probe"
+];
+
+function mkHeatmap(){
+  return TOOLS.map(function(t,ti){
+    return Array.from({length:24},function(_,h){
+      var base=(h>=9&&h<=17)?Math.random()*5+1.5:Math.random()*1.2;
+      if(h===9) base+=(ti<4)?9:3;
+      if(h===14) base+=(ti===0||ti===1)?11:2;
+      if(h===10&&ti===2) base+=6;
+      if(h===11&&ti===5) base+=7;
+      if(h===16&&ti===6) base+=5;
+      if(h===13&&ti===8) base+=4;
+      return Math.floor(Math.min(base,20));
+    });
+  });
+}
+var HMAP=mkHeatmap();
+
+var HIST=[
+  {time:"2026-05-09 09:12:04",action:"SEND_BULK_EMAIL",tool:"send_notification",dec:"APPROVED",approver:"james.okonkwo@finco.io",reason:"Verified campaign list, approved for send"},
+  {time:"2026-05-09 08:44:18",action:"DELETE_TRANSACTION_BATCH",tool:"delete_records",dec:"REJECTED",approver:"sarah.chen@finco.io",reason:"Missing compliance sign-off"},
+  {time:"2026-05-09 07:59:33",action:"FREEZE_ACCOUNT ACC-5501",tool:"freeze_account",dec:"APPROVED",approver:"james.okonkwo@finco.io",reason:"Confirmed fraud alert from risk team"},
+  {time:"2026-05-08 17:22:41",action:"UPDATE_RATE_LIMIT_CONFIG",tool:"update_config",dec:"APPROVED",approver:"priya.sharma@finco.io",reason:"Matches approved ticket INFRA-2291"},
+  {time:"2026-05-08 16:05:09",action:"ROLLBACK_PAYMENT_JOB",tool:"trigger_rollback",dec:"APPROVED",approver:"sarah.chen@finco.io",reason:"Emergency rollback after settlement error"},
+  {time:"2026-05-08 14:38:57",action:"EXPORT_PII_REPORT",tool:"export_customer_data",dec:"REJECTED",approver:"priya.sharma@finco.io",reason:"Data export requires DPO approval first"},
+  {time:"2026-05-08 13:11:22",action:"ENABLE_FLAG BETA_FEES",tool:"update_feature_flag",dec:"APPROVED",approver:"james.okonkwo@finco.io",reason:"Canary test approved — under 5% traffic"},
+  {time:"2026-05-08 11:44:03",action:"BATCH_KYC_REFRESH",tool:"run_kyc_check",dec:"APPROVED",approver:"sarah.chen@finco.io",reason:"Scheduled quarterly refresh"},
+  {time:"2026-05-08 10:02:48",action:"DISABLE_FLAG LEGACY_AUTH",tool:"update_feature_flag",dec:"REJECTED",approver:"priya.sharma@finco.io",reason:"Legacy auth still needed for 3 accounts"},
+  {time:"2026-05-08 09:17:36",action:"FREEZE_ACCOUNT ACC-1147",tool:"freeze_account",dec:"APPROVED",approver:"james.okonkwo@finco.io",reason:"Coordinated with fraud ops team"}
+];
+
+var CB_DATA=[
+  {name:"payment-gateway",     status:"OPEN",      f:5,t:5,lf:"2026-05-09 09:44:12",sr:23},
+  {name:"fraud-detection",     status:"HALF_OPEN", f:3,t:5,lf:"2026-05-09 09:31:05",sr:61},
+  {name:"account-service",     status:"HALF_OPEN", f:2,t:5,lf:"2026-05-09 08:57:48",sr:74},
+  {name:"reporting-service",   status:"CLOSED",    f:0,t:5,lf:null,sr:99},
+  {name:"notification-service",status:"CLOSED",    f:1,t:5,lf:"2026-05-09 07:22:33",sr:97},
+  {name:"kyc-service",         status:"CLOSED",    f:0,t:5,lf:null,sr:100},
+  {name:"aml-screening",       status:"CLOSED",    f:0,t:5,lf:null,sr:98},
+  {name:"config-service",      status:"CLOSED",    f:0,t:5,lf:null,sr:100},
+  {name:"audit-log-service",   status:"CLOSED",    f:0,t:5,lf:null,sr:100},
+  {name:"settlement-service",  status:"CLOSED",    f:1,t:5,lf:"2026-05-08 18:11:22",sr:96},
+  {name:"identity-service",    status:"CLOSED",    f:0,t:5,lf:null,sr:99}
+];
+var cbState=CB_DATA.map(function(c){return Object.assign({},c);});
+
+var TC=[
+  {time:"09:38:51",sess:"sess_b7c2d9a1",tool:"get_reconciliation_status",dur:120,status:"SUCCESS",risk:"LOW"},
+  {time:"09:38:51",sess:"sess_b7c2d9a1",tool:"export_reconciliation",dur:89,status:"SUCCESS",risk:"LOW"},
+  {time:"09:22:14",sess:"sess_d4e8f2a0",tool:"run_kyc_check",dur:340,status:"SUCCESS",risk:"MEDIUM"},
+  {time:"09:22:14",sess:"sess_d4e8f2a0",tool:"fraud_score_lookup",dur:210,status:"SUCCESS",risk:"MEDIUM"},
+  {time:"09:22:14",sess:"sess_d4e8f2a0",tool:"audit_log_write",dur:28,status:"SUCCESS",risk:"LOW"},
+  {time:"08:57:33",sess:"sess_e1f5c9b7",tool:"get_reconciliation_status",dur:118,status:"SUCCESS",risk:"LOW"},
+  {time:"08:57:33",sess:"sess_e1f5c9b7",tool:"export_reconciliation",dur:92,status:"SUCCESS",risk:"LOW"},
+  {time:"08:57:33",sess:"sess_e1f5c9b7",tool:"get_payment_settlement",dur:441,status:"SUCCESS",risk:"LOW"},
+  {time:"08:57:33",sess:"sess_e1f5c9b7",tool:"audit_log_write",dur:31,status:"SUCCESS",risk:"LOW"},
+  {time:"08:43:09",sess:"sess_f6a2d3c8",tool:"send_notification",dur:403,status:"ERROR",risk:"HIGH"},
+  {time:"08:31:47",sess:"sess_g7b1e4d9",tool:"check_aml_screening",dur:612,status:"SUCCESS",risk:"MEDIUM"},
+  {time:"08:31:47",sess:"sess_g7b1e4d9",tool:"audit_log_write",dur:24,status:"SUCCESS",risk:"LOW"},
+  {time:"08:14:22",sess:"sess_h8c3f0e2",tool:"get_payment_settlement",dur:520,status:"SUCCESS",risk:"LOW"},
+  {time:"08:14:22",sess:"sess_h8c3f0e2",tool:"get_reconciliation_status",dur:135,status:"SUCCESS",risk:"LOW"},
+  {time:"08:14:22",sess:"sess_h8c3f0e2",tool:"export_reconciliation",dur:98,status:"SUCCESS",risk:"LOW"},
+  {time:"08:14:22",sess:"sess_h8c3f0e2",tool:"fraud_score_lookup",dur:188,status:"SUCCESS",risk:"MEDIUM"},
+  {time:"08:14:22",sess:"sess_h8c3f0e2",tool:"audit_log_write",dur:30,status:"SUCCESS",risk:"LOW"},
+  {time:"07:59:10",sess:"sess_i3d8a2c5",tool:"circuit_breaker_probe",dur:45,status:"SUCCESS",risk:"LOW"},
+  {time:"07:44:02",sess:"sess_j9e1b4f7",tool:"run_kyc_check",dur:388,status:"SUCCESS",risk:"MEDIUM"},
+  {time:"07:31:55",sess:"sess_k2f7c0d3",tool:"get_reconciliation_status",dur:109,status:"ERROR",risk:"LOW"}
+];
+
+var AUDIT=[
+  {time:"2026-05-09 09:59:07",sess:"sess_c9d3e7f0",type:"APPROVAL",tool:"update_feature_flag",risk:"HIGH",out:"PENDING",user:"orchestration-agent",d:{event:"APPROVAL_REQUESTED",tool:"update_feature_flag",params:{flag_name:"ENABLE_NEW_PAYMENT_FLOW",new_value:true,scope:"GLOBAL"},policy:"REL-FLAG-003"}},
+  {time:"2026-05-09 09:41:22",sess:"sess_a8f2b1c4",type:"APPROVAL",tool:"freeze_account",risk:"HIGH",out:"PENDING",user:"orchestration-agent",d:{event:"APPROVAL_REQUESTED",tool:"freeze_account",params:{account_id:"ACC-8821",freeze_type:"FULL"},policy:"GVN-ACC-017"}},
+  {time:"2026-05-09 09:38:51",sess:"sess_b7c2d9a1",type:"TOOL_CALL",tool:"export_reconciliation",risk:"LOW",out:"SUCCESS",user:"sarah.chen@finco.io",d:{event:"TOOL_CALL",tool:"export_reconciliation",duration_ms:89,params:{report_id:"REC-2026-03",format:"csv"},status:"SUCCESS"}},
+  {time:"2026-05-09 09:38:51",sess:"sess_b7c2d9a1",type:"TOOL_CALL",tool:"get_reconciliation_status",risk:"LOW",out:"SUCCESS",user:"sarah.chen@finco.io",d:{event:"TOOL_CALL",tool:"get_reconciliation_status",duration_ms:120,params:{month:"2026-03"},status:"SUCCESS"}},
+  {time:"2026-05-09 09:22:14",sess:"sess_d4e8f2a0",type:"TOOL_CALL",tool:"audit_log_write",risk:"LOW",out:"SUCCESS",user:"lee.morgan@finco.io",d:{event:"TOOL_CALL",tool:"audit_log_write",duration_ms:28}},
+  {time:"2026-05-09 09:22:14",sess:"sess_d4e8f2a0",type:"TOOL_CALL",tool:"fraud_score_lookup",risk:"MEDIUM",out:"SUCCESS",user:"lee.morgan@finco.io",d:{event:"TOOL_CALL",tool:"fraud_score_lookup",duration_ms:210,params:{account_id:"ACC-3302"},result:{score:0.12}}},
+  {time:"2026-05-09 09:22:14",sess:"sess_d4e8f2a0",type:"TOOL_CALL",tool:"run_kyc_check",risk:"MEDIUM",out:"SUCCESS",user:"lee.morgan@finco.io",d:{event:"TOOL_CALL",tool:"run_kyc_check",duration_ms:340,params:{account_id:"ACC-3302"},result:"PASS"}},
+  {time:"2026-05-09 08:57:33",sess:"sess_e1f5c9b7",type:"TOOL_CALL",tool:"get_payment_settlement",risk:"LOW",out:"SUCCESS",user:"priya.sharma@finco.io",d:{event:"TOOL_CALL",tool:"get_payment_settlement",duration_ms:441,params:{date:"2026-05-08"}}},
+  {time:"2026-05-09 08:43:09",sess:"sess_f6a2d3c8",type:"ERROR",tool:"send_notification",risk:"HIGH",out:"FAILED",user:"orchestration-agent",d:{event:"TOOL_ERROR",tool:"send_notification",error:"CircuitBreaker OPEN: notification-service",duration_ms:403}},
+  {time:"2026-05-09 08:31:47",sess:"sess_g7b1e4d9",type:"TOOL_CALL",tool:"check_aml_screening",risk:"MEDIUM",out:"SUCCESS",user:"james.okonkwo@finco.io",d:{event:"TOOL_CALL",tool:"check_aml_screening",duration_ms:612,params:{batch_id:"B-2204"},flags:0}},
+  {time:"2026-05-09 08:14:22",sess:"sess_h8c3f0e2",type:"TOOL_CALL",tool:"fraud_score_lookup",risk:"MEDIUM",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"fraud_score_lookup",duration_ms:188}},
+  {time:"2026-05-09 08:14:22",sess:"sess_h8c3f0e2",type:"TOOL_CALL",tool:"get_payment_settlement",risk:"LOW",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"get_payment_settlement",duration_ms:520}},
+  {time:"2026-05-09 07:59:10",sess:"sess_i3d8a2c5",type:"TOOL_CALL",tool:"circuit_breaker_probe",risk:"LOW",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"circuit_breaker_probe",duration_ms:45}},
+  {time:"2026-05-09 07:44:02",sess:"sess_j9e1b4f7",type:"TOOL_CALL",tool:"run_kyc_check",risk:"MEDIUM",out:"SUCCESS",user:"sarah.chen@finco.io",d:{event:"TOOL_CALL",tool:"run_kyc_check",duration_ms:388,result:"PASS"}},
+  {time:"2026-05-09 07:31:55",sess:"sess_k2f7c0d3",type:"ERROR",tool:"get_reconciliation_status",risk:"LOW",out:"FAILED",user:"system",d:{event:"TOOL_ERROR",tool:"get_reconciliation_status",error:"Timeout after 500ms"}},
+  {time:"2026-05-09 07:12:04",sess:"sess_l4a9d1b8",type:"APPROVAL",tool:"send_notification",risk:"HIGH",out:"APPROVED",user:"james.okonkwo@finco.io",d:{event:"APPROVAL_RESOLVED",decision:"APPROVED",approver:"james.okonkwo@finco.io",reason:"Verified campaign list"}},
+  {time:"2026-05-09 06:44:18",sess:"sess_m5b0e2c9",type:"APPROVAL",tool:"delete_records",risk:"HIGH",out:"REJECTED",user:"sarah.chen@finco.io",d:{event:"APPROVAL_RESOLVED",decision:"REJECTED",approver:"sarah.chen@finco.io",reason:"Missing compliance sign-off"}},
+  {time:"2026-05-09 06:22:33",sess:"sess_n6c1f3d0",type:"ROLLBACK",tool:"trigger_rollback",risk:"HIGH",out:"SUCCESS",user:"priya.sharma@finco.io",d:{event:"ROLLBACK_EXECUTED",reason:"Settlement mismatch detected",affected_sessions:3}},
+  {time:"2026-05-09 05:59:47",sess:"sess_o7d2a4e1",type:"TOOL_CALL",tool:"audit_log_write",risk:"LOW",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"audit_log_write",duration_ms:22}},
+  {time:"2026-05-09 05:38:12",sess:"sess_p8e3b5f2",type:"TOOL_CALL",tool:"fraud_score_lookup",risk:"MEDIUM",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"fraud_score_lookup",duration_ms:201}},
+  {time:"2026-05-09 04:11:58",sess:"sess_q9f4c6a3",type:"ERROR",tool:"payment-gateway",risk:"HIGH",out:"FAILED",user:"system",d:{event:"CIRCUIT_BREAKER_OPEN",service:"payment-gateway",failures:5,threshold:5}},
+  {time:"2026-05-09 03:47:29",sess:"sess_r0a5d7b4",type:"TOOL_CALL",tool:"check_aml_screening",risk:"MEDIUM",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"check_aml_screening",duration_ms:589}},
+  {time:"2026-05-09 02:31:05",sess:"sess_s1b6e8c5",type:"TOOL_CALL",tool:"audit_log_write",risk:"LOW",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"audit_log_write",duration_ms:19}},
+  {time:"2026-05-09 01:14:44",sess:"sess_t2c7f9d6",type:"TOOL_CALL",tool:"circuit_breaker_probe",risk:"LOW",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"circuit_breaker_probe",duration_ms:38}},
+  {time:"2026-05-09 00:02:17",sess:"sess_u3d8a0e7",type:"TOOL_CALL",tool:"get_reconciliation_status",risk:"LOW",out:"SUCCESS",user:"system",d:{event:"TOOL_CALL",tool:"get_reconciliation_status",duration_ms:114}}
+];
+
+// ============================
+// HELPERS
+// ============================
+function trunc(s,n){return s.length>n?s.slice(0,n)+'...':s;}
+function bSt(s){var m={COMPLETED:'bg',RUNNING:'bb',FAILED:'br',SUCCESS:'bg',ERROR:'br',PENDING:'ba',APPROVED:'bg',REJECTED:'bx'};return '<span class="badge '+(m[s]||'bx')+'">'+s+'</span>';}
+function bRk(r){var m={LOW:'bg',MEDIUM:'ba',HIGH:'br'};return '<span class="badge '+(m[r]||'bx')+'">'+r+'</span>';}
+function bTy(t){var m={TOOL_CALL:'bb',APPROVAL:'ba',ROLLBACK:'bp',ERROR:'br'};return '<span class="badge '+(m[t]||'bx')+'">'+t+'</span>';}
+
+// ============================
+// TAB SWITCHING
+// ============================
+function switchTab(n,btn){
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('tab-'+n).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================
+// CLOCK
+// ============================
+function updateClock(){
+  var el=document.getElementById('clock');
+  if(el) el.textContent=new Date().toISOString().replace('T',' ').slice(0,19)+' UTC';
+}
+setInterval(updateClock,1000); updateClock();
+
+// ============================
+// SESSIONS TABLE
+// ============================
+function renderSessions(){
+  document.getElementById('sess-tbody').innerHTML=SESSIONS.map(function(s){
+    return '<tr><td><span class="mono">'+s.id.slice(0,14)+'...</span></td>'+
+      '<td title="'+s.input+'">'+trunc(s.input,44)+'</td>'+
+      '<td>'+bSt(s.status)+'</td>'+
+      '<td style="font-size:12px">'+s.dur+'</td>'+
+      '<td style="text-align:center">'+s.tools+'</td>'+
+      '<td class="mono">'+s.time+'</td></tr>';
+  }).join('');
+}
+
+// ============================
+// HEATMAP
+// ============================
+function renderHeatmap(){
+  var maxV=Math.max.apply(null,HMAP.reduce(function(a,r){return a.concat(r);},[]));
+  var html='<div class="heatmap-container">';
+  html+='<div class="hm-labels"><div class="hm-label sp"></div>';
+  TOOLS.forEach(function(t){html+='<div class="hm-label">'+t.replace(/_/g,' ')+'</div>';});
+  html+='</div>';
+  html+='<div class="hm-grid-wrap"><div class="hm-hours">';
+  for(var h=0;h<24;h++) html+='<div class="hm-hour">'+h+'</div>';
+  html+='</div>';
+  HMAP.forEach(function(row,ri){
+    html+='<div class="hm-row">';
+    row.forEach(function(val,hi){
+      var alpha=val===0?0.04:(0.1+0.9*(val/maxV));
+      html+='<div class="hm-cell" style="background:rgba(63,185,80,'+alpha.toFixed(2)+')" title="'+TOOLS[ri]+' @ '+hi+':00 — '+val+' calls"></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div></div>';
+  document.getElementById('heatmap-root').innerHTML=html;
+}
+
+// ============================
+// TOOL CALLS TABLE
+// ============================
+function renderTC(){
+  document.getElementById('tc-tbody').innerHTML=TC.map(function(t){
+    return '<tr><td class="mono">'+t.time+'</td>'+
+      '<td><span class="mono">'+t.sess.slice(0,14)+'...</span></td>'+
+      '<td style="font-family:monospace;font-size:11px;color:var(--blue)">'+t.tool+'</td>'+
+      '<td>'+t.dur+'</td>'+
+      '<td>'+bSt(t.status)+'</td>'+
+      '<td>'+bRk(t.risk)+'</td></tr>';
+  }).join('');
+}
+function filterTC(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('#tc-tbody tr').forEach(function(r){
+    r.style.display=r.textContent.toLowerCase().indexOf(q)>=0?'':'none';
+  });
+}
+
+// ============================
+// APPROVAL HISTORY
+// ============================
+function renderHist(){
+  document.getElementById('hist-tbody').innerHTML=HIST.map(function(h){
+    return '<tr><td class="mono" style="white-space:nowrap">'+h.time+'</td>'+
+      '<td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+h.action+'">'+trunc(h.action,26)+'</td>'+
+      '<td style="font-family:monospace;font-size:11px;color:var(--blue)">'+h.tool+'</td>'+
+      '<td>'+bSt(h.dec)+'</td>'+
+      '<td style="font-size:11px">'+h.approver+'</td>'+
+      '<td style="font-size:11px;color:var(--text-2);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+h.reason+'">'+trunc(h.reason,42)+'</td></tr>';
+  }).join('');
+}
+
+// ============================
+// APPROVAL MODAL
+// ============================
+var _ms={idx:null,act:null};
+var _pending=2;
+
+function openModal(idx,act){
+  _ms={idx:idx,act:act};
+  var tools=['freeze_account','update_feature_flag'];
+  var modal=document.getElementById('appr-modal');
+  var btn=document.getElementById('m-confirm');
+  if(act==='approve'){
+    document.getElementById('m-title').textContent='Approve Action';
+    document.getElementById('m-desc').textContent='You are approving execution of: '+tools[idx]+'. This executes immediately in production. Provide a reason for the audit log.';
+    btn.className='btn btn-g'; btn.textContent='Approve';
+  } else {
+    document.getElementById('m-title').textContent='Reject Action';
+    document.getElementById('m-desc').textContent='You are rejecting execution of: '+tools[idx]+'. The session will be terminated. Provide a reason for the audit log.';
+    btn.className='btn btn-r'; btn.textContent='Reject';
+  }
+  document.getElementById('m-reason').value='';
+  modal.showModal();
+}
+function closeModal(){document.getElementById('appr-modal').close();}
+function confirmModal(){
+  var reason=document.getElementById('m-reason').value.trim()||'No reason provided';
+  var idx=_ms.idx; var act=_ms.act;
+  var now=new Date().toISOString().replace('T',' ').slice(0,19)+' UTC';
+  var approver='admin@finco.io';
+  var tools=['freeze_account','update_feature_flag'];
+  var actions=['FREEZE_ACCOUNT ACC-8821','ENABLE_FLAG ENABLE_NEW_PAYMENT_FLOW'];
+
+  document.getElementById('ac-'+idx).classList.add('resolved');
+  document.getElementById('aa-'+idx).innerHTML='';
+  var banner=document.getElementById('ab-'+idx);
+  var top=document.getElementById('ac-top-'+idx);
+
+  if(act==='approve'){
+    top.className='acard-top appr-bg';
+    banner.className='res-banner show appr';
+    banner.innerHTML='&#10003; Approved by <strong>'+approver+'</strong> at '+now+' &mdash; &ldquo;'+reason+'&rdquo;';
+    HIST.unshift({time:now,action:actions[idx],tool:tools[idx],dec:'APPROVED',approver:approver,reason:reason});
+  } else {
+    top.className='acard-top reje-bg';
+    banner.className='res-banner show reje';
+    banner.innerHTML='&#10005; Rejected by <strong>'+approver+'</strong> at '+now+' &mdash; &ldquo;'+reason+'&rdquo;';
+    HIST.unshift({time:now,action:actions[idx],tool:tools[idx],dec:'REJECTED',approver:approver,reason:reason});
+  }
+  _pending=Math.max(0,_pending-1);
+  document.getElementById('appr-badge').textContent=_pending;
+  document.getElementById('appr-sub').textContent=_pending>0?_pending+' pending approval'+(_pending>1?'s':'')+' require action.':'All approvals resolved.';
+  renderHist();
+  closeModal();
+}
+
+// ============================
+// CIRCUIT BREAKERS
+// ============================
+function renderCB(){
+  document.getElementById('cb-grid').innerHTML=cbState.map(function(cb,i){
+    var sc=cb.status==='OPEN'?'cb-open':cb.status==='HALF_OPEN'?'cb-half':'cb-clos';
+    var bc=cb.status==='OPEN'?'br':cb.status==='HALF_OPEN'?'ba':'bg';
+    var bar=cb.status==='OPEN'?'var(--red)':cb.status==='HALF_OPEN'?'var(--amber)':'var(--green)';
+    var lf=cb.lf||'No recent failures';
+    var rst=cb.status!=='CLOSED'?'<button class="btn btn-ghost btn-sm" onclick="resetCB('+i+')">Reset</button>':'<span></span>';
+    return '<div class="cb-card '+sc+'" id="cbc-'+i+'">'+
+      '<div class="cb-name">'+cb.name+'</div>'+
+      '<div class="cb-row"><span class="badge '+bc+'">'+cb.status+'</span>'+rst+'</div>'+
+      '<div class="cb-meta" style="margin-top:8px">Failures: '+cb.f+' / '+cb.t+'</div>'+
+      '<div class="prog-bg"><div class="prog-fill" style="width:'+cb.sr+'%;background:'+bar+'"></div></div>'+
+      '<div class="cb-meta">Success rate: '+cb.sr+'%</div>'+
+      '<div class="cb-meta" style="margin-top:5px;font-size:10px">Last failure: '+lf+'</div>'+
+      '</div>';
+  }).join('');
+  var open=cbState.filter(function(c){return c.status==='OPEN';}).length;
+  var half=cbState.filter(function(c){return c.status==='HALF_OPEN';}).length;
+  var clos=cbState.filter(function(c){return c.status==='CLOSED';}).length;
+  document.getElementById('cb-sum').textContent=open+' OPEN  |  '+half+' HALF_OPEN  |  '+clos+' CLOSED';
+  document.getElementById('cb-badge').textContent=open;
+}
+function resetCB(i){
+  cbState[i].status='CLOSED'; cbState[i].f=0;
+  cbState[i].sr=Math.min(cbState[i].sr+22,99);
+  renderCB(); renderChart();
+}
+
+// ============================
+// FAILURE SVG CHART
+// ============================
+function renderChart(){
+  var svg=document.getElementById('fail-chart');
+  var data=cbState.map(function(c){return {name:c.name,f:c.f};});
+  var maxF=Math.max.apply(null,data.map(function(d){return d.f;}));
+  if(maxF<1) maxF=1;
+  var W=920,H=230,pL=30,pR=10,pT=16,pB=50;
+  var cW=W-pL-pR, cH=H-pT-pB;
+  var bW=Math.floor(cW/data.length)-10;
+  var out='';
+  out+='<line x1="'+pL+'" y1="'+pT+'" x2="'+pL+'" y2="'+(pT+cH)+'" stroke="var(--border)" stroke-width="1"/>';
+  out+='<line x1="'+pL+'" y1="'+(pT+cH)+'" x2="'+(W-pR)+'" y2="'+(pT+cH)+'" stroke="var(--border)" stroke-width="1"/>';
+  for(var g=0;g<=maxF;g++){
+    var y=pT+cH-Math.round((g/maxF)*cH);
+    out+='<line x1="'+pL+'" y1="'+y+'" x2="'+(W-pR)+'" y2="'+y+'" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="4"/>';
+    out+='<text x="'+(pL-4)+'" y="'+(y+4)+'" text-anchor="end" fill="var(--text-2)" font-size="10">'+g+'</text>';
+  }
+  data.forEach(function(d,i){
+    var x=pL+Math.round((cW/data.length)*i)+5;
+    var barH=Math.max(0,Math.round((d.f/maxF)*cH));
+    var y=pT+cH-barH;
+    var color=d.f>=5?'var(--red)':d.f>=2?'var(--amber)':d.f===1?'#3a6a38':'var(--surface-2)';
+    var cx=x+bW/2;
+    if(d.f>0){
+      out+='<rect x="'+x+'" y="'+y+'" width="'+bW+'" height="'+barH+'" rx="3" fill="'+color+'" opacity="0.85"/>';
+      out+='<text x="'+cx+'" y="'+(y-5)+'" text-anchor="middle" fill="'+color+'" font-size="10" font-weight="700">'+d.f+'</text>';
+    } else {
+      out+='<rect x="'+x+'" y="'+(pT+cH-3)+'" width="'+bW+'" height="3" rx="1" fill="var(--border)"/>';
+    }
+    var lbl=d.name.replace(/-service$/,'').replace(/-/g,' ');
+    var lx=cx, ly=pT+cH+14;
+    out+='<text x="'+lx+'" y="'+ly+'" text-anchor="end" fill="var(--text-2)" font-size="9" transform="rotate(-38 '+lx+' '+ly+')">'+lbl+'</text>';
+  });
+  svg.innerHTML=out;
+}
+
+// ============================
+// AUDIT LOG
+// ============================
+var expanded=new Set();
+function renderAudit(rows){
+  document.getElementById('audit-tbody').innerHTML=rows.map(function(r,i){
+    var json=JSON.stringify(r.d,null,2);
+    var eid='ad-'+i;
+    var op=expanded.has(i);
+    return '<tr class="audit-row" data-risk="'+r.risk+'" data-type="'+r.type+'">'+
+      '<td class="mono" style="white-space:nowrap;font-size:11px">'+r.time+'</td>'+
+      '<td><span class="mono">'+r.sess.slice(0,14)+'...</span></td>'+
+      '<td>'+bTy(r.type)+'</td>'+
+      '<td style="font-family:monospace;font-size:11px;color:var(--blue);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+r.tool+'</td>'+
+      '<td>'+bRk(r.risk)+'</td>'+
+      '<td>'+bSt(r.out)+'</td>'+
+      '<td style="font-size:11px;color:var(--text-2)">'+r.user+'</td>'+
+      '<td><button class="exp-btn" onclick="toggleDetail('+i+',\''+eid+'\')">'+( op?'&#9650; Hide':'&#9654; Show')+'</button></td>'+
+      '</tr>'+
+      '<tr class="json-detail'+(op?' open':'')+'" id="'+eid+'">'+
+      '<td colspan="8" style="padding:0 14px 12px">'+
+      '<div class="code-block" style="font-size:10px;color:#e6edf3;white-space:pre;line-height:1.5;max-height:200px;overflow-y:auto">'+json+'</div>'+
+      '</td></tr>';
+  }).join('');
+}
+function toggleDetail(i,eid){
+  var el=document.getElementById(eid);
+  var btn=el.previousElementSibling.querySelector('.exp-btn');
+  if(expanded.has(i)){expanded.delete(i);el.classList.remove('open');btn.innerHTML='&#9654; Show';}
+  else{expanded.add(i);el.classList.add('open');btn.innerHTML='&#9650; Hide';}
+}
+function filterAudit(){
+  expanded.clear();
+  var risk=document.getElementById('f-risk').value;
+  var type=document.getElementById('f-type').value;
+  renderAudit(AUDIT.filter(function(r){
+    return (risk==='ALL'||r.risk===risk)&&(type==='ALL'||r.type===type);
+  }));
+}
+function exportCSV(){
+  var risk=document.getElementById('f-risk').value;
+  var type=document.getElementById('f-type').value;
+  var rows=AUDIT.filter(function(r){return (risk==='ALL'||r.risk===risk)&&(type==='ALL'||r.type===type);});
+  var hdr=['Timestamp','Session ID','Event Type','Tool/Action','Risk','Outcome','User/System'];
+  var lines=rows.map(function(r){
+    return [r.time,r.sess,r.type,r.tool,r.risk,r.out,r.user].map(function(v){return '"'+v+'"';}).join(',');
+  });
+  var csv=[hdr.join(',')].concat(lines).join('\n');
+  var blob=new Blob([csv],{type:'text/csv'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url; a.download='uc19-audit-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ============================
+// RAW JSON TOGGLE
+// ============================
+function toggleRaw(btn){
+  var block=document.getElementById('raw-json');
+  var op=block.classList.toggle('open');
+  btn.textContent=op?'▼ Hide raw OTLP trace':'► View raw OTLP trace';
+}
+
+// ============================
+// INIT
+// ============================
+renderSessions();
+renderHeatmap();
+renderTC();
+renderHist();
+renderCB();
+renderChart();
+renderAudit(AUDIT);
+</script>
+</body>
+</html>

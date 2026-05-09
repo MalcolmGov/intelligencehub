@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Production Readiness Report — AI-Enabled CI/CD Pipeline</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --dim: #484f58;
+    --green: #3fb950;
+    --green-bg: #1a2f1a;
+    --green-border: #238636;
+    --blue: #58a6ff;
+    --blue-bg: #0d1f36;
+    --blue-border: #1f6feb;
+    --orange: #d29922;
+    --orange-bg: #271d07;
+    --orange-border: #9e6a03;
+    --red: #f78166;
+    --red-bg: #2d1116;
+    --red-border: #da3633;
+    --purple: #bc8cff;
+    --purple-bg: #1e1427;
+    --purple-border: #6e40c9;
+    --yellow: #e3b341;
+    --yellow-bg: #2b2005;
+    --yellow-border: #9e6a03;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    padding: 40px 36px;
+    max-width: 1060px;
+    margin: 0 auto;
+  }
+
+  /* ── Header ─────────────────────────────────────────── */
+  .header { margin-bottom: 40px; }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .doc-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--orange);
+    background: var(--orange-bg);
+    border: 1px solid var(--orange-border);
+    padding: 4px 12px;
+    border-radius: 4px;
+  }
+  .doc-meta { font-size: 11px; color: var(--dim); text-align: right; }
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+    letter-spacing: -0.4px;
+  }
+  .header-desc { font-size: 14px; color: var(--muted); max-width: 680px; }
+
+  /* ── Summary scorecard ───────────────────────────────── */
+  .scorecard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+  }
+  .score-value { font-size: 30px; font-weight: 800; margin-bottom: 4px; }
+  .score-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+  .val-green  { color: var(--green); }
+  .val-orange { color: var(--orange); }
+  .val-red    { color: var(--red); }
+  .val-blue   { color: var(--blue); }
+
+  /* ── Overall status banner ───────────────────────────── */
+  .status-banner {
+    background: var(--yellow-bg);
+    border: 1px solid var(--yellow-border);
+    border-left: 4px solid var(--yellow);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .status-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .status-title { font-size: 13px; font-weight: 700; color: var(--yellow); margin-bottom: 4px; }
+  .status-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* ── Section headings ────────────────────────────────── */
+  .section-heading {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-top: 40px;
+  }
+  .section-heading:first-of-type { margin-top: 0; }
+
+  /* ── Built items table ───────────────────────────────── */
+  .built-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .built-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 24px 1fr 120px 80px;
+    align-items: center;
+    gap: 12px;
+  }
+  .built-check { font-size: 14px; }
+  .built-name { }
+  .built-filename { font-size: 11px; font-family: monospace; color: var(--blue); }
+  .built-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .built-desc { font-size: 11px; color: var(--muted); }
+  .built-category {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .cat-pipeline { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-border); }
+  .cat-script   { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+  .cat-infra    { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+  .cat-doc      { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-border); }
+  .status-done {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--green);
+    background: var(--green-bg);
+    border: 1px solid var(--green-border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    text-align: center;
+  }
+
+  /* ── Outstanding items ───────────────────────────────── */
+  .outstanding-grid { display: flex; flex-direction: column; gap: 16px; }
+  .outstanding-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .og-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .og-title { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .og-effort {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .effort-low  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+  .effort-med  { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-border); }
+  .effort-high { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+  .og-body { padding: 12px 16px; }
+  .og-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .og-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .og-item-icon { flex-shrink: 0; width: 18px; text-align: center; font-size: 12px; margin-top: 1px; }
+  .og-item-content { flex: 1; }
+  .og-item-title { color: var(--text); font-weight: 600; font-size: 12px; margin-bottom: 2px; }
+  .og-item-desc { font-size: 11px; color: var(--muted); }
+  .priority-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .pri-blocker { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+  .pri-high    { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-border); }
+  .pri-med     { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-border); }
+
+  /* ── Phase plan ──────────────────────────────────────── */
+  .phase-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .phase-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .phase-title { font-size: 12px; font-weight: 700; color: var(--text); }
+  .phase-timeline { font-size: 10px; color: var(--muted); font-weight: 600; }
+  .phase-body { padding: 12px 16px; }
+  .phase-item {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 3px 0 3px 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+  .phase-item::before { content: '→'; position: absolute; left: 0; color: var(--blue); font-size: 9px; top: 4px; }
+  .phase-item strong { color: var(--text); }
+  .phase-outcome {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border-radius: 5px;
+    font-size: 11px;
+    color: var(--muted);
+    border-left: 3px solid var(--blue);
+  }
+  .phase-outcome strong { color: var(--text); }
+
+  /* ── Risk register ───────────────────────────────────── */
+  .risk-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .risk-table th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--dim);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  .risk-table td {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .risk-table tr:nth-child(even) td { background: var(--surface); }
+  .risk-table tr:nth-child(odd) td { background: var(--bg); }
+  .risk-high   { color: var(--red);    font-weight: 700; }
+  .risk-med    { color: var(--orange); font-weight: 700; }
+  .risk-low    { color: var(--green);  font-weight: 700; }
+  .risk-name   { color: var(--text); font-weight: 600; }
+
+  /* ── Footer ──────────────────────────────────────────── */
+  .footer {
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-text { font-size: 11px; color: var(--dim); }
+
+  @media print {
+    body { background: #fff; color: #111; padding: 20px; }
+    .status-banner, .built-row, .outstanding-group, .phase-card { border-color: #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <span class="doc-label">Production Readiness Report</span>
+    <div class="doc-meta">
+      AI-Enabled CI/CD Pipeline · Azure DevOps<br>
+      Generated: May 2026 · Confidential — Internal Use Only
+    </div>
+  </div>
+  <h1>Pipeline Production Readiness Report</h1>
+  <p class="header-desc">Assessment of what has been designed and built versus what remains outstanding before this pipeline can be deployed and running in a live production environment.</p>
+</div>
+
+<!-- Scorecard -->
+<div class="scorecard">
+  <div class="score-card">
+    <div class="score-value val-green">14</div>
+    <div class="score-label">Artifacts Built</div>
+  </div>
+  <div class="score-card">
+    <div class="score-value val-orange">27</div>
+    <div class="score-label">Outstanding Tasks</div>
+  </div>
+  <div class="score-card">
+    <div class="score-value val-blue">2–3</div>
+    <div class="score-label">Weeks to Prod (est.)</div>
+  </div>
+  <div class="score-card">
+    <div class="score-value val-orange">~40%</div>
+    <div class="score-label">Overall Readiness</div>
+  </div>
+</div>
+
+<!-- Status Banner -->
+<div class="status-banner">
+  <div class="status-icon">⚠️</div>
+  <div>
+    <div class="status-title">Status: Design Complete — Implementation Required</div>
+    <div class="status-body">All pipeline code, infrastructure templates, AI scripts, and architecture documentation have been created and are ready to be committed to your Azure DevOps repository. However, the pipeline cannot run until the Azure environment is provisioned, service connections and variable groups are configured in Azure DevOps, and the application is containerised. Assuming the application is already containerised, a dedicated DevOps engineer should be able to reach a working Dev pipeline within 1 week and full production deployment within 2–3 weeks.</div>
+  </div>
+</div>
+
+<!-- BUILT -->
+<p class="section-heading">✅ What Has Been Built</p>
+<div class="built-grid">
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">azure-pipelines.yml</div>
+      <div class="built-title">Main Pipeline Orchestration</div>
+      <div class="built-desc">10-stage pipeline: Build → Security → Deploy Dev → Test Dev → Deploy UAT → Test UAT → Deploy Pre-Prod → Monitor Pre-Prod → Deploy Prod → Monitor Prod. Correct environment chain, variable groups, approval gates wired.</div>
+    </div>
+    <span class="built-category cat-pipeline">Pipeline YAML</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">templates/build-stage.yml</div>
+      <div class="built-title">Build &amp; Package Stage Template</div>
+      <div class="built-desc">.NET restore, build, unit test, code coverage publish, Docker build and push to ACR with build metadata tagging.</div>
+    </div>
+    <span class="built-category cat-pipeline">Pipeline YAML</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">templates/security-scan-stage.yml</div>
+      <div class="built-title">AI Security Scan Stage Template</div>
+      <div class="built-desc">Three parallel jobs: MSDO SAST with Azure OpenAI prioritisation, Trivy + Defender container scan, Checkov IaC scan. Gitleaks secrets detection. Hard-blocks on CRITICAL findings.</div>
+    </div>
+    <span class="built-category cat-pipeline">Pipeline YAML</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">templates/deploy-stage.yml</div>
+      <div class="built-title">Deploy Stage Template</div>
+      <div class="built-desc">Helm upgrade --atomic deployment, blue/green canary traffic shifting via Container Apps revision weights, smoke tests, App Insights deployment tagging. Supports all four environments.</div>
+    </div>
+    <span class="built-category cat-pipeline">Pipeline YAML</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">templates/test-stage.yml</div>
+      <div class="built-title">Intelligent Test Stage Template</div>
+      <div class="built-desc">Calls AI test selector script, runs dotnet test with AI-generated filter expression, performance baseline in Pre-Prod, API contract tests, App Insights metric logging.</div>
+    </div>
+    <span class="built-category cat-pipeline">Pipeline YAML</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">templates/monitor-stage.yml</div>
+      <div class="built-title">Monitor &amp; Anomaly Stage Template</div>
+      <div class="built-desc">Warm-up wait, calls anomaly detection script, evaluates score against threshold, auto-rollback to previous Container Apps revision in Prod, sets up Azure Monitor dynamic alerts.</div>
+    </div>
+    <span class="built-category cat-pipeline">Pipeline YAML</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">scripts/anomaly-detection.py</div>
+      <div class="built-title">Isolation Forest Anomaly Detector</div>
+      <div class="built-desc">Queries Azure Monitor Log Analytics via KQL for error rate, P50/P95/P99 latency, exception count, dependency failures. scikit-learn Isolation Forest scores against 24h baseline. Exits 1 to trigger rollback. Includes simulation mode.</div>
+    </div>
+    <span class="built-category cat-script">AI Script</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">scripts/intelligent-test-selector.py</div>
+      <div class="built-title">AI Test Selection Script</div>
+      <div class="built-desc">Analyses git diff, detects full-suite triggers, heuristic source→test class mapping, test history integration, optional AI model endpoint. Outputs dotnet test filter expression.</div>
+    </div>
+    <span class="built-category cat-script">AI Script</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">infra/main.bicep</div>
+      <div class="built-title">Bicep Main Template (Subscription Scope)</div>
+      <div class="built-desc">Creates resource groups for all four environments plus shared. Orchestrates all module deployments. Environments: dev, uat, preprod, prod.</div>
+    </div>
+    <span class="built-category cat-infra">Infrastructure</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">infra/modules/log-analytics.bicep</div>
+      <div class="built-title">Log Analytics Workspace Module</div>
+      <div class="built-desc">PerGB2018 SKU, 90-day retention, 5GB/day cap, AzureDevOpsAuditEvent table, full diagnostic configuration.</div>
+    </div>
+    <span class="built-category cat-infra">Infrastructure</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">infra/modules/container-registry.bicep</div>
+      <div class="built-title">Azure Container Registry Module</div>
+      <div class="built-desc">Premium SKU, zone-redundant, geo-replication to secondary region, soft-delete, 30-day retention policy, Log Analytics diagnostics.</div>
+    </div>
+    <span class="built-category cat-infra">Infrastructure</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">infra/modules/environment-resources.bicep</div>
+      <div class="built-title">Per-Environment Resources Module</div>
+      <div class="built-desc">Key Vault (RBAC, purge-protected), Application Insights (workspace-based), Action Group (email), Smart Detection rules, dynamic threshold metric alerts per environment.</div>
+    </div>
+    <span class="built-category cat-infra">Infrastructure</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">infra/modules/managed-identity.bicep</div>
+      <div class="built-title">Managed Identity Module</div>
+      <div class="built-desc">User-assigned managed identity with AcrPush and AcrPull role assignments. Eliminates need for stored service principal credentials.</div>
+    </div>
+    <span class="built-category cat-infra">Infrastructure</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+  <div class="built-row">
+    <div class="built-check">✅</div>
+    <div class="built-name">
+      <div class="built-filename">AI_CICD_Architecture.docx</div>
+      <div class="built-title">Architecture Document (Word)</div>
+      <div class="built-desc">9-section architecture doc: Executive Summary, Pipeline Overview, AI Capabilities, Infrastructure Architecture, Deployment Strategy, Variable Reference, File Structure, Getting Started, Operational Notes.</div>
+    </div>
+    <span class="built-category cat-doc">Documentation</span>
+    <span class="status-done">COMPLETE</span>
+  </div>
+
+</div>
+
+<!-- OUTSTANDING -->
+<p class="section-heading">🔲 What Is Still Outstanding</p>
+<div class="outstanding-grid">
+
+  <!-- Azure DevOps Setup -->
+  <div class="outstanding-group">
+    <div class="og-header">
+      <div class="og-title">🔧 Azure DevOps Configuration</div>
+      <span class="og-effort effort-med">Effort: Medium · 2–3 days</span>
+    </div>
+    <div class="og-body">
+      <div class="og-item">
+        <div class="og-item-icon">🔴</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Install Microsoft Security DevOps Extension</div>
+          <div class="og-item-desc">Install the MSDO marketplace extension in your Azure DevOps organisation. Required for SAST scanning in Stage 2. One-click from the Azure DevOps Marketplace.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🔴</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Create 4 Service Connections</div>
+          <div class="og-item-desc">One service connection per environment: sc-dev, sc-uat, sc-preprod, sc-prod. Each must be an Azure Resource Manager connection scoped to the respective resource group. Set up under Project Settings → Service Connections.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🔴</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Create Variable Groups with Secrets</div>
+          <div class="og-item-desc">Create variable groups in Azure DevOps Pipelines → Library and populate: ACR_NAME, ACR_LOGIN_SERVER, IMAGE_REPO, LOG_ANALYTICS_WORKSPACE_ID, APPINSIGHTS_INSTRUMENTATIONKEY (×4 environments), AZURE_SUBSCRIPTION_ID, AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_KEY.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🔴</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Configure Pipeline Environments with Approval Gates</div>
+          <div class="og-item-desc">Create four Environments (Dev, UAT, Pre-Prod, Prod) under Pipelines → Environments. Add manual approval checks to UAT, Pre-Prod and Prod. Assign named approvers to each gate. Set 7-day timeout for UAT/Pre-Prod, 24-hour for Prod.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Configure Agent Pools</div>
+          <div class="og-item-desc">Verify ubuntu-latest is available in your organisation, or update vmImageName in azure-pipelines.yml to match your hosted or self-hosted pool name.</div>
+        </div>
+        <span class="priority-badge pri-high">HIGH</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Commit Pipeline Files to Repository</div>
+          <div class="og-item-desc">Commit the azure-pipelines.yml and all templates/, scripts/, and infra/ folders to the root of your Azure DevOps repository. Configure the pipeline to use this YAML file under Pipelines → New Pipeline.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Azure Infrastructure -->
+  <div class="outstanding-group">
+    <div class="og-header">
+      <div class="og-title">🏗️ Azure Infrastructure Provisioning</div>
+      <span class="og-effort effort-med">Effort: Medium · 1–2 days</span>
+    </div>
+    <div class="og-body">
+      <div class="og-item">
+        <div class="og-item-icon">🔴</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Deploy Bicep Templates to Azure Subscription</div>
+          <div class="og-item-desc">Run: <code style="font-size:10px;background:#21262d;padding:1px 4px;border-radius:3px">az deployment sub create --location australiaeast --template-file infra/main.bicep --parameters appName=yourapp alertEmail=team@company.com</code>. Requires Owner or Contributor role at subscription level.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🔴</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Grant Managed Identity Key Vault Access</div>
+          <div class="og-item-desc">After Bicep deployment, assign the pipeline managed identity the Key Vault Secrets User role on each of the four Key Vault instances (dev, uat, preprod, prod) so the pipeline can read secrets at deploy time.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Provision Azure Container Apps Environments</div>
+          <div class="og-item-desc">Create an Azure Container Apps environment per deployment environment (dev, uat, preprod, prod) in the respective resource groups. These are not provisioned by the Bicep templates and need to be created separately, then referenced by the Helm charts.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Provision Azure OpenAI Endpoint</div>
+          <div class="og-item-desc">Request access and deploy an Azure OpenAI resource with a GPT-4 deployment. Copy the endpoint URL and API key into the AZURE_OPENAI_ENDPOINT and AZURE_OPENAI_KEY variable group entries. Required for AI security finding prioritisation in Stage 2.</div>
+        </div>
+        <span class="priority-badge pri-high">HIGH</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Readiness -->
+  <div class="outstanding-group">
+    <div class="og-header">
+      <div class="og-title">📦 Application Readiness</div>
+      <span class="og-effort effort-high">Effort: High (if not done) · 1–4 weeks</span>
+    </div>
+    <div class="og-body">
+      <div class="og-item">
+        <div class="og-item-icon">🔴</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Containerise the Application (Dockerfile)</div>
+          <div class="og-item-desc">The pipeline expects a Dockerfile at the repository root. If the application is not yet containerised, this is the single highest-effort prerequisite. The multi-stage Dockerfile should produce a minimal runtime image from the .NET SDK build.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🔴</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Create Helm Charts</div>
+          <div class="og-item-desc">The deploy-stage.yml template calls helm upgrade. Helm charts (Chart.yaml, values.yaml, templates/) need to be authored for the application, with per-environment values files (values-dev.yaml, values-uat.yaml, values-preprod.yaml, values-prod.yaml).</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Update Test Selector Heuristics</div>
+          <div class="og-item-desc">The intelligent-test-selector.py script uses a source→test heuristic that assumes test classes are named after source classes (e.g. PaymentService → PaymentServiceTests). Update the mapping logic to match your actual test project structure if it differs.</div>
+        </div>
+        <span class="priority-badge pri-high">HIGH</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Add Health Check Endpoint</div>
+          <div class="og-item-desc">The smoke test steps in the deploy template call a /health endpoint on the deployed application. Ensure your application exposes a health check endpoint that returns HTTP 200 when the app is ready.</div>
+        </div>
+        <span class="priority-badge pri-high">HIGH</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Python Dependencies -->
+  <div class="outstanding-group">
+    <div class="og-header">
+      <div class="og-title">🐍 Python Script Dependencies</div>
+      <span class="og-effort effort-low">Effort: Low · Half a day</span>
+    </div>
+    <div class="og-body">
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Create requirements.txt for AI Scripts</div>
+          <div class="og-item-desc">Add a requirements.txt to the scripts/ folder listing: azure-monitor-query, azure-identity, scikit-learn, numpy. The pipeline template needs a pip install step before calling the Python scripts.</div>
+        </div>
+        <span class="priority-badge pri-high">HIGH</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟢</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Validate Python Scripts in Simulation Mode</div>
+          <div class="og-item-desc">Both AI scripts include a simulation mode that runs without Azure SDK connectivity. Run them locally to verify they execute without errors before wiring them into the live pipeline.</div>
+        </div>
+        <span class="priority-badge pri-med">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monitoring Calibration -->
+  <div class="outstanding-group">
+    <div class="og-header">
+      <div class="og-title">📊 Monitoring &amp; Alerting Calibration</div>
+      <span class="og-effort effort-med">Effort: Medium · Ongoing first 2 weeks</span>
+    </div>
+    <div class="og-body">
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Populate Variable Group with App Insights Connection Strings</div>
+          <div class="og-item-desc">After Bicep deployment, retrieve the Application Insights instrumentation keys and connection strings for all four environments and add them to the pipeline variable groups. The Bicep outputs expose these values.</div>
+        </div>
+        <span class="priority-badge pri-blocker">BLOCKER</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Tune Anomaly Detection Threshold</div>
+          <div class="og-item-desc">The Isolation Forest anomaly threshold is currently 0.85 for Prod. After 2–4 deployments with real traffic, review the anomaly scores logged in each run and adjust the threshold in azure-pipelines.yml. Too low triggers false rollbacks; too high misses real issues.</div>
+        </div>
+        <span class="priority-badge pri-high">HIGH</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Validate Alert Group Email Addresses</div>
+          <div class="og-item-desc">The Bicep environment-resources module creates Action Groups using the alertEmail parameter. Confirm the email address and test the action group by triggering a test alert from Azure Monitor after deployment.</div>
+        </div>
+        <span class="priority-badge pri-high">HIGH</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟢</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Establish Performance Baselines</div>
+          <div class="og-item-desc">The test-stage.yml compares P95 latency against a stored baseline artifact. This baseline is captured automatically on the first successful UAT and Pre-Prod run — no manual action needed, but the first two pipeline runs will not have a comparison target.</div>
+        </div>
+        <span class="priority-badge pri-med">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Process & Governance -->
+  <div class="outstanding-group">
+    <div class="og-header">
+      <div class="og-title">📋 Process &amp; Governance</div>
+      <span class="og-effort effort-low">Effort: Low · 1 day</span>
+    </div>
+    <div class="og-body">
+      <div class="og-item">
+        <div class="og-item-icon">🟡</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Define Approval Group Members</div>
+          <div class="og-item-desc">Decide who is authorised to approve deployments to UAT, Pre-Prod, and Prod respectively, and add them as approvers in the Azure DevOps Environment settings. Document the approval criteria (what checks must be done before clicking approve).</div>
+        </div>
+        <span class="priority-badge pri-high">HIGH</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟢</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Create Rollback Runbook</div>
+          <div class="og-item-desc">Document the manual rollback procedure for scenarios where automatic rollback does not trigger (e.g. Pre-Prod incidents) — which Azure CLI command to run, who to notify, and how to verify rollback success.</div>
+        </div>
+        <span class="priority-badge pri-med">MEDIUM</span>
+      </div>
+      <div class="og-item">
+        <div class="og-item-icon">🟢</div>
+        <div class="og-item-content">
+          <div class="og-item-title">Team Onboarding &amp; Walkthrough</div>
+          <div class="og-item-desc">Run a walkthrough session with the DevOps and development team covering how to read pipeline results, what to do when a security scan blocks a build, how to interpret anomaly scores, and how to re-trigger a failed deployment.</div>
+        </div>
+        <span class="priority-badge pri-med">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Phased Implementation Plan -->
+<p class="section-heading">🗓️ Recommended Implementation Phases</p>
+<div class="phase-grid">
+
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-title">Phase 1 — Foundation &amp; Dev Pipeline</div>
+      <div class="phase-timeline">Week 1</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-item"><strong>Commit</strong> all pipeline files to the Azure DevOps repository</div>
+      <div class="phase-item"><strong>Deploy Bicep</strong> infrastructure to Azure subscription</div>
+      <div class="phase-item"><strong>Create</strong> service connections and variable groups</div>
+      <div class="phase-item"><strong>Install</strong> Microsoft Security DevOps marketplace extension</div>
+      <div class="phase-item"><strong>Configure</strong> Dev Environment (no approval gate)</div>
+      <div class="phase-item"><strong>Trigger</strong> first pipeline run: Build → Security → Deploy Dev → Test Dev</div>
+      <div class="phase-outcome"><strong>Outcome:</strong> Working Build + Security + Dev deployment pipeline delivering real security scan results and AI-selected tests on every commit.</div>
+    </div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-title">Phase 2 — UAT &amp; Pre-Prod Promotion</div>
+      <div class="phase-timeline">Week 2</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-item"><strong>Configure</strong> UAT and Pre-Prod Environments with approval gates and approver groups</div>
+      <div class="phase-item"><strong>Create</strong> sc-uat and sc-preprod service connections</div>
+      <div class="phase-item"><strong>Provision</strong> Azure Container Apps environments for UAT and Pre-Prod</div>
+      <div class="phase-item"><strong>Enable</strong> Stages 5–8 in the pipeline (UAT + Pre-Prod)</div>
+      <div class="phase-item"><strong>Validate</strong> alert emails and App Insights connectivity</div>
+      <div class="phase-outcome"><strong>Outcome:</strong> Full Dev → UAT → Pre-Prod pipeline with manual approvals, blue/green deployments, and dynamic monitoring alerts active.</div>
+    </div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-title">Phase 3 — Production Go-Live</div>
+      <div class="phase-timeline">Week 3</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-item"><strong>Configure</strong> Prod Environment with senior engineer approval gate</div>
+      <div class="phase-item"><strong>Create</strong> sc-prod service connection</div>
+      <div class="phase-item"><strong>Verify</strong> anomaly detection script with real Pre-Prod metrics</div>
+      <div class="phase-item"><strong>Review</strong> anomaly scores from Phase 2 runs and tune threshold if needed</div>
+      <div class="phase-item"><strong>Enable</strong> Stages 9–10 (Deploy Prod + Monitor Prod)</div>
+      <div class="phase-item"><strong>Run team walkthrough</strong> and document rollback runbook</div>
+      <div class="phase-outcome"><strong>Outcome:</strong> Full 10-stage pipeline live. AI anomaly detection active in Production with automatic rollback capability.</div>
+    </div>
+  </div>
+
+  <div class="phase-card">
+    <div class="phase-header">
+      <div class="phase-title">Phase 4 — Tuning &amp; Optimisation</div>
+      <div class="phase-timeline">Weeks 4–6</div>
+    </div>
+    <div class="phase-body">
+      <div class="phase-item"><strong>Calibrate</strong> anomaly detection threshold based on real production traffic patterns</div>
+      <div class="phase-item"><strong>Refine</strong> intelligent test selector heuristics based on missed test coverage</div>
+      <div class="phase-item"><strong>Add Teams webhook</strong> to Action Groups for alert notifications</div>
+      <div class="phase-item"><strong>Review SARIF</strong> reports and tune SAST severity thresholds</div>
+      <div class="phase-item"><strong>Establish</strong> performance baselines after 3+ successful production deployments</div>
+      <div class="phase-outcome"><strong>Outcome:</strong> Stable, calibrated pipeline with low false-positive rate on anomaly detection and reliable test selection.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Risk Register -->
+<p class="section-heading">⚠️ Key Risks</p>
+<table class="risk-table">
+  <thead>
+    <tr>
+      <th>Risk</th>
+      <th>Likelihood</th>
+      <th>Impact</th>
+      <th>Mitigation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="risk-name">Application not yet containerised</span></td>
+      <td class="risk-med">Medium</td>
+      <td class="risk-high">High</td>
+      <td>Assess containerisation effort upfront. This is the single largest unknown — address in pre-Phase 1 spike.</td>
+    </tr>
+    <tr>
+      <td><span class="risk-name">Azure OpenAI access not available</span></td>
+      <td class="risk-med">Medium</td>
+      <td class="risk-low">Low</td>
+      <td>AI security prioritisation degrades gracefully — SAST still runs, findings just aren't re-ranked. Remove the OpenAI step temporarily until access is provisioned.</td>
+    </tr>
+    <tr>
+      <td><span class="risk-name">Anomaly threshold too aggressive in Prod</span></td>
+      <td class="risk-high">High</td>
+      <td class="risk-med">Medium</td>
+      <td>Start with threshold = 0.9 (conservative) and reduce gradually over 4 weeks of real deployments. Monitor score logs before adjusting.</td>
+    </tr>
+    <tr>
+      <td><span class="risk-name">Test selector misses coverage gaps</span></td>
+      <td class="risk-med">Medium</td>
+      <td class="risk-med">Medium</td>
+      <td>Run the full test suite for the first 3–4 pipeline runs to validate that the selector's subset produces the same pass/fail outcome as the full suite.</td>
+    </tr>
+    <tr>
+      <td><span class="risk-name">Service principal permissions insufficient</span></td>
+      <td class="risk-low">Low</td>
+      <td class="risk-high">High</td>
+      <td>Confirm the service connections have Contributor on the target resource groups and that the managed identity has AcrPush on ACR and Key Vault Secrets User before first run.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="footer-text">
+    AI-Enabled CI/CD Pipeline — Azure DevOps<br>
+    Production Readiness Report · Confidential — Internal Use Only
+  </div>
+  <div class="footer-text" style="text-align:right">
+    Environments: Dev → UAT → Pre-Prod → Prod<br>
+    Overall Readiness: ~40% · Est. 2–3 weeks to Production
+  </div>
+</div>
+
+</body>
+</html>

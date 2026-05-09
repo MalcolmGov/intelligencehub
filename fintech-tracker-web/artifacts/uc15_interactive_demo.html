@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UC-15 AI Engineering Copilot — Interactive Demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --surface2:  #21262d;
+      --border:    #30363d;
+      --border2:   #21262d;
+      --text:      #e6edf3;
+      --text-muted:#8b949e;
+      --accent:    #58a6ff;
+      --accent2:   #79c0ff;
+      --green:     #3fb950;
+      --yellow:    #d29922;
+      --red:       #f85149;
+      --purple:    #bc8cff;
+      --orange:    #ffa657;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .header-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .header-badge {
+      background: var(--accent);
+      color: var(--bg);
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* ---- Main Layout ---- */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ---- Left Panel ---- */
+    .left-panel {
+      width: 380px;
+      min-width: 320px;
+      max-width: 440px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .panel-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--border2);
+    }
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 12px;
+    }
+    .example-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .example-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s;
+      text-align: left;
+    }
+    .example-btn:hover { border-color: var(--accent); background: #58a6ff11; }
+    .example-btn.active { border-color: var(--accent); background: #58a6ff18; }
+    .example-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .example-info strong { display: block; font-weight: 600; margin-bottom: 1px; }
+    .example-info small { color: var(--text-muted); font-size: 11px; }
+    .brd-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 20px;
+      gap: 10px;
+      overflow: hidden;
+    }
+    .brd-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .brd-textarea {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 11.5px;
+      line-height: 1.6;
+      padding: 12px;
+      resize: none;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .brd-textarea:focus { border-color: var(--accent); }
+    .generate-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .generate-btn:hover { background: var(--accent2); }
+    .generate-btn:active { transform: scale(0.98); }
+    .generate-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+
+    /* ---- Right Panel ---- */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ---- Tabs ---- */
+    .tabs-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      overflow-x: auto;
+      flex-shrink: 0;
+      padding: 0 8px;
+    }
+    .tabs-bar::-webkit-scrollbar { height: 3px; }
+    .tabs-bar::-webkit-scrollbar-track { background: transparent; }
+    .tabs-bar::-webkit-scrollbar-thumb { background: var(--border); }
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 16px;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ---- Tab Content ---- */
+    .tabs-content {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    .tab-pane {
+      display: none;
+      height: 100%;
+      overflow: auto;
+      padding: 24px;
+    }
+    .tab-pane.active { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ---- Diagram container ---- */
+    .diagram-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      overflow: auto;
+    }
+    .diagram-container .mermaid {
+      width: 100%;
+    }
+
+    /* ---- Code block ---- */
+    .code-block-wrapper {
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      font-family: inherit;
+      transition: color 0.15s, border-color 0.15s;
+      z-index: 2;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+    .copy-btn.copied { color: var(--green); border-color: var(--green); }
+    pre.code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 20px 20px 20px;
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      overflow: auto;
+      white-space: pre;
+      color: var(--text);
+    }
+
+    /* ---- YAML Highlighting ---- */
+    .yaml-key { color: #79c0ff; }
+    .yaml-string { color: #a5d6ff; }
+    .yaml-number { color: #ffa657; }
+    .yaml-bool { color: var(--purple); }
+    .yaml-comment { color: var(--text-muted); font-style: italic; }
+    .yaml-anchor { color: var(--green); }
+
+    /* ---- Gherkin Highlighting ---- */
+    .gherkin-feature  { color: var(--accent); font-weight: 700; }
+    .gherkin-scenario { color: var(--purple); font-weight: 700; }
+    .gherkin-step     { color: var(--green); font-weight: 600; }
+    .gherkin-tag      { color: var(--yellow); }
+    .gherkin-comment  { color: var(--text-muted); font-style: italic; }
+    .gherkin-table    { color: #a5d6ff; }
+    .gherkin-example  { color: var(--orange); font-weight: 600; }
+
+    /* ---- Test Scenarios ---- */
+    .test-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .test-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .test-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .test-id {
+      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--surface2);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .test-name { font-weight: 600; font-size: 14px; }
+    .priority-badge {
+      margin-left: auto;
+      padding: 1px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .p0 { background: #f8514922; color: var(--red); border: 1px solid #f8514944; }
+    .p1 { background: #d2992222; color: var(--yellow); border: 1px solid #d2992244; }
+    .p2 { background: #3fb95022; color: var(--green); border: 1px solid #3fb95044; }
+    .type-badge {
+      padding: 1px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .type-functional   { background: #58a6ff22; color: var(--accent); border: 1px solid #58a6ff44; }
+    .type-integration  { background: #bc8cff22; color: var(--purple); border: 1px solid #bc8cff44; }
+    .type-performance  { background: #ffa65722; color: var(--orange); border: 1px solid #ffa65744; }
+    .type-security     { background: #f8514922; color: var(--red); border: 1px solid #f8514944; }
+    .test-body { font-size: 12.5px; color: var(--text-muted); }
+    .test-section { margin-bottom: 6px; }
+    .test-section strong { color: var(--text); }
+    .test-steps { list-style: decimal; margin-left: 18px; margin-top: 4px; }
+    .test-steps li { margin-bottom: 2px; }
+
+    /* ---- Stats bar ---- */
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      padding: 14px 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .stat-value {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--accent);
+    }
+
+    /* ---- Loading overlay ---- */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      opacity: 0.92;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 100;
+    }
+    .loading-overlay.show { display: flex; }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: var(--text); font-size: 14px; font-weight: 500; }
+    .loading-sub { color: var(--text-muted); font-size: 12px; }
+
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--green);
+      color: var(--bg);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ---- Footer ---- */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 10px 24px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .api-note {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .api-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--yellow);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">&#9881;</div>
+    <div>
+      <div class="header-title">UC-15 AI Engineering Copilot</div>
+      <div class="header-subtitle">BRD &rarr; Diagrams, API Spec, Tests in seconds</div>
+    </div>
+  </div>
+  <span class="header-badge">PROTOTYPE</span>
+</header>
+
+<!-- Stats bar -->
+<div class="stats-bar" id="statsBar" style="display:none">
+  <div class="stat-item"><span class="stat-value" id="stat-actors">—</span> Actors</div>
+  <div class="stat-item"><span class="stat-value" id="stat-entities">—</span> Data Entities</div>
+  <div class="stat-item"><span class="stat-value" id="stat-endpoints">—</span> API Endpoints</div>
+  <div class="stat-item"><span class="stat-value" id="stat-scenarios">—</span> Test Scenarios</div>
+  <div class="stat-item"><span class="stat-value" id="stat-rules">—</span> Business Rules</div>
+  <div class="stat-item" style="margin-left:auto;color:var(--green)">&#10003; Package generated</div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Left Panel -->
+  <aside class="left-panel">
+    <div class="panel-header">
+      <div class="panel-title">Load Example BRD</div>
+      <div class="example-buttons">
+        <button class="example-btn active" id="exPayment" onclick="loadExample('payment')">
+          <div class="example-icon" style="background:#58a6ff22">&#128179;</div>
+          <div class="example-info">
+            <strong>PayShap Payment</strong>
+            <small>Real-time payment initiation</small>
+          </div>
+        </button>
+        <button class="example-btn" id="exKyc" onclick="loadExample('kyc')">
+          <div class="example-icon" style="background:#bc8cff22">&#128100;</div>
+          <div class="example-info">
+            <strong>KYC Onboarding</strong>
+            <small>Digital identity verification</small>
+          </div>
+        </button>
+        <button class="example-btn" id="exLoan" onclick="loadExample('loan')">
+          <div class="example-icon" style="background:#3fb95022">&#128200;</div>
+          <div class="example-info">
+            <strong>Instant Loan</strong>
+            <small>AI-driven credit assessment</small>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="brd-area">
+      <div class="brd-label">Business Requirements Document</div>
+      <textarea class="brd-textarea" id="brdInput" placeholder="Paste your BRD, feature description, or user stories here...&#10;&#10;Or click one of the examples above to load a pre-built SA fintech BRD."></textarea>
+      <button class="generate-btn" id="generateBtn" onclick="generatePackage()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+        </svg>
+        Generate Engineering Package
+      </button>
+    </div>
+  </aside>
+
+  <!-- Right Panel -->
+  <div class="right-panel">
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="switchTab('processFlow', this)">
+        <div class="tab-dot" style="background:#58a6ff"></div>
+        Process Flow
+      </button>
+      <button class="tab-btn" onclick="switchTab('sequence', this)">
+        <div class="tab-dot" style="background:#bc8cff"></div>
+        Sequence Diagram
+      </button>
+      <button class="tab-btn" onclick="switchTab('erDiagram', this)">
+        <div class="tab-dot" style="background:#3fb950"></div>
+        ER Diagram
+      </button>
+      <button class="tab-btn" onclick="switchTab('apiSpec', this)">
+        <div class="tab-dot" style="background:#ffa657"></div>
+        API Spec
+      </button>
+      <button class="tab-btn" onclick="switchTab('acceptance', this)">
+        <div class="tab-dot" style="background:#d29922"></div>
+        Acceptance Criteria
+      </button>
+      <button class="tab-btn" onclick="switchTab('testScenarios', this)">
+        <div class="tab-dot" style="background:#f85149"></div>
+        Test Scenarios
+      </button>
+    </div>
+
+    <!-- Tab content -->
+    <div class="tabs-content">
+
+      <!-- Loading overlay -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">Analysing requirements...</div>
+        <div class="loading-sub" id="loadingSub">Claude is reading your BRD</div>
+      </div>
+
+      <!-- Process Flow -->
+      <div class="tab-pane active" id="tab-processFlow">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <h2 style="font-size:16px;font-weight:600">Process Flow Diagram</h2>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:4px">End-to-end business process with decision points, happy path, and error paths</p>
+          </div>
+          <button class="copy-btn" style="position:static" onclick="copyDiagram('processFlow')">Copy Mermaid</button>
+        </div>
+        <div class="diagram-container" id="diag-processFlow">
+          <div style="text-align:center;color:var(--text-muted)">
+            <div style="font-size:48px;margin-bottom:16px">&#128196;</div>
+            <div>Load an example or paste a BRD and click Generate</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sequence -->
+      <div class="tab-pane" id="tab-sequence">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <h2 style="font-size:16px;font-weight:600">Sequence Diagram</h2>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:4px">Actor-to-service interactions with API calls, async flows, and error handling</p>
+          </div>
+          <button class="copy-btn" style="position:static" onclick="copyDiagram('sequence')">Copy Mermaid</button>
+        </div>
+        <div class="diagram-container" id="diag-sequence">
+          <div style="text-align:center;color:var(--text-muted)">
+            <div style="font-size:48px;margin-bottom:16px">&#128203;</div>
+            <div>Generate a package to see the sequence diagram</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ER Diagram -->
+      <div class="tab-pane" id="tab-erDiagram">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <h2 style="font-size:16px;font-weight:600">Entity-Relationship Diagram</h2>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:4px">Data model with typed attributes, primary/foreign keys, and cardinality</p>
+          </div>
+          <button class="copy-btn" style="position:static" onclick="copyDiagram('erDiagram')">Copy Mermaid</button>
+        </div>
+        <div class="diagram-container" id="diag-erDiagram">
+          <div style="text-align:center;color:var(--text-muted)">
+            <div style="font-size:48px;margin-bottom:16px">&#128195;</div>
+            <div>Generate a package to see the ER diagram</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Spec -->
+      <div class="tab-pane" id="tab-apiSpec">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <h2 style="font-size:16px;font-weight:600">OpenAPI 3.0 Specification</h2>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:4px">Complete YAML spec with endpoints, schemas, security, and examples</p>
+          </div>
+          <button class="copy-btn" style="position:static" id="copyApiBtn" onclick="copyText('apiSpecContent')">Copy YAML</button>
+        </div>
+        <div class="code-block-wrapper">
+          <pre class="code-block" id="apiSpecContent"><!-- populated by JS --></pre>
+        </div>
+      </div>
+
+      <!-- Acceptance Criteria -->
+      <div class="tab-pane" id="tab-acceptance">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <h2 style="font-size:16px;font-weight:600">Acceptance Criteria (Gherkin BDD)</h2>
+            <p style="color:var(--text-muted);font-size:12px;margin-top:4px">Feature file with Scenarios, Background, and parameterised Scenario Outlines</p>
+          </div>
+          <button class="copy-btn" style="position:static" onclick="copyText('gherkinContent')">Copy Gherkin</button>
+        </div>
+        <div class="code-block-wrapper">
+          <pre class="code-block" id="gherkinContent"><!-- populated by JS --></pre>
+        </div>
+      </div>
+
+      <!-- Test Scenarios -->
+      <div class="tab-pane" id="tab-testScenarios">
+        <div>
+          <h2 style="font-size:16px;font-weight:600">Test Scenarios</h2>
+          <p style="color:var(--text-muted);font-size:12px;margin-top:4px">Functional, integration, performance, and security test cases</p>
+        </div>
+        <div class="test-grid" id="testGrid">
+          <div style="text-align:center;color:var(--text-muted);padding:48px">
+            <div style="font-size:48px;margin-bottom:16px">&#9989;</div>
+            <div>Generate a package to see test scenarios</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tabs-content -->
+  </div><!-- /right-panel -->
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<footer class="footer">
+  <span>UC-15 AI Engineering Copilot &mdash; Peter Onu &bull; Fintech AI Programme 2025</span>
+  <div class="api-note">
+    <div class="api-dot"></div>
+    Connect to FastAPI backend at <a href="http://localhost:8000/docs" target="_blank">&nbsp;/api&nbsp;</a> for live generation &mdash; demo uses pre-built examples
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// Example data (pre-built outputs from templates/fintech_examples.py)
+// ============================================================
+
+const EXAMPLES = {
+  payment: {
+    title: "Real-Time Payment Initiation (PayShap)",
+    stats: { actors: 9, entities: 4, endpoints: 8, scenarios: 15, rules: 10 },
+    brd: `Business Requirements Document
+Project: Real-Time Payment Initiation via PayShap
+Version: 1.2  |  Date: 2025-01-15
+
+OVERVIEW
+Enable retail banking customers to initiate real-time payments via the South African
+PayShap instant payment scheme. Payments must settle within 10 seconds and conform
+to SARB/BankservAfrica PayShap technical and regulatory standards.
+
+ACTORS: Customer, Bank Mobile App, Payment Gateway Service, PayShap Gateway,
+Fraud Engine, Core Banking System (T24), Notification Service, Compliance Logger
+
+BUSINESS RULES
+BR-001: Maximum single PayShap payment: R5,000,000
+BR-002: Daily limit per account: configurable (default R50,000)
+BR-003: Fraud score > 75 requires manual review
+BR-004: Fraud score > 90 results in automatic rejection
+BR-005: Payment must settle within 10 seconds
+BR-006: POPIA consent required before displaying beneficiary details
+
+DATA ENTITIES: Payment, Account, FraudScore, Notification, AuditLog
+
+INTEGRATION POINTS: PayShap CDR API, PayShap Clearing API (ISO 20022),
+Fraud Engine API, Core Banking T24, Notification Service (Kafka), POPIA Logger`,
+    processFlow: `flowchart TD
+    START([Customer Initiates Payment]) --> authCheck{Authenticated?}
+    authCheck -- No --> loginPage["Redirect to Login"]
+    loginPage --> START
+    authCheck -- Yes --> enterDetails["Enter Payment Details\\n(Amount, Reference, Recipient)"]
+
+    subgraph BankApp["Bank Application"]
+        enterDetails --> resolveProxy["Resolve PayShap Proxy\\nvia CDR API"]
+        resolveProxy --> proxyOk{Proxy Resolved?}
+        proxyOk -- No --> proxyError["Display Error:\\nProxy Not Found"]
+        proxyOk -- Yes --> displayRecipient["Display Recipient Details\\n+ POPIA Consent Prompt"]
+        displayRecipient --> consentGiven{POPIA Consent\\nGiven?}
+        consentGiven -- No --> END_CONSENT([Session Ended])
+        consentGiven -- Yes --> confirmPayment["Customer Reviews & Confirms"]
+        confirmPayment --> reauth["Re-authenticate\\n(OTP / Biometric)"]
+        reauth --> reauthOk{Auth Passed?}
+        reauthOk -- No --> reauthFail["3 Fails → Lock Session"]
+        reauthOk -- Yes --> submitRequest["Submit to Payment Gateway"]
+    end
+
+    subgraph PaymentGateway["Payment Gateway Service"]
+        submitRequest --> validateBalance{Sufficient\\nBalance?}
+        validateBalance -- No --> insufficientFunds["Return 422\\nInsufficient Funds"]
+        validateBalance -- Yes --> checkLimit{Daily Limit\\nExceeded?}
+        checkLimit -- Yes --> limitExceeded["Return 422\\nDaily Limit Exceeded"]
+        checkLimit -- No --> fraudCheck["Call Fraud Engine"]
+        fraudCheck --> fraudScore{Risk Score?}
+        fraudScore -- "> 90" --> autoReject["Auto Reject\\nReturn 403"]
+        fraudScore -- "75-90" --> manualReview["Queue for Manual Review\\nReturn 202 Pending"]
+        fraudScore -- "< 75" --> submitPayShap["Submit to PayShap Gateway"]
+    end
+
+    subgraph PayShapGateway["BankservAfrica PayShap"]
+        submitPayShap --> payshapProcess["PayShap Clears Payment"]
+        payshapProcess --> settlementOk{Settlement\\nConfirmed?}
+        settlementOk -- No --> payshapFail["PayShap Technical Failure"]
+        settlementOk -- Yes --> debitCredit["Core Banking:\\nDebit Payer / Credit Beneficiary"]
+    end
+
+    debitCredit --> notifyPayer["Send Confirmation:\\nSMS + Push Notification"]
+    notifyPayer --> END_SUCCESS([Payment Settled])
+    insufficientFunds --> notifyFail["Notify Customer of Failure"]
+    limitExceeded --> notifyFail
+    autoReject --> notifyFail
+    payshapFail --> reversal["Trigger Compensating Reversal"]
+    reversal --> notifyFail
+    notifyFail --> END_FAIL([Transaction Failed])`,
+    sequence: `sequenceDiagram
+    participant C as Customer
+    participant App as Bank App
+    participant GW as Payment Gateway
+    participant CDR as PayShap CDR
+    participant FE as Fraud Engine
+    participant PS as PayShap Gateway
+    participant CBS as Core Banking T24
+    participant NS as Notification Service
+
+    C->>App: Initiate PayShap Payment
+    activate App
+    note right of App: POST /v1/auth/verify-session
+
+    App->>CDR: Resolve proxy to account
+    activate CDR
+    note right of CDR: GET /v1/cdr/resolve?proxy=+27821234567
+    CDR-->>App: Account details (bank code, account number)
+    deactivate CDR
+
+    App->>C: Display recipient details + POPIA consent
+    C->>App: Confirm payment + re-authenticate OTP
+    App->>GW: Submit payment instruction
+    activate GW
+    note right of GW: POST /v1/payments/initiate
+
+    GW->>GW: Validate balance and daily limits
+    GW->>FE: Request fraud score
+    activate FE
+    note right of FE: POST /v1/fraud/score
+    FE-->>GW: FraudScore {score: 32, level: LOW}
+    deactivate FE
+
+    alt Fraud Score > 90
+        GW-->>App: 403 Forbidden - Payment Blocked
+        App->>C: Show rejection with reference number
+    else Fraud Score < 75
+        GW->>PS: Submit ISO 20022 payment message
+        activate PS
+        loop Await settlement (max 10s)
+            PS->>PS: Clear and settle payment
+        end
+        PS-->>GW: Settlement confirmation pacs.002
+        deactivate PS
+        GW->>CBS: Debit payer account
+        activate CBS
+        CBS-->>GW: Debit confirmed
+        deactivate CBS
+        GW-->>App: 200 OK - Payment settled
+        deactivate GW
+        App->>C: Display settlement confirmation
+        deactivate App
+        GW--)NS: Publish PaymentSettled event Kafka
+        NS->>C: Push notification + SMS confirmation
+    end`,
+    erDiagram: `erDiagram
+    CUSTOMER {
+        UUID customer_id PK
+        VARCHAR_100 first_name
+        VARCHAR_100 last_name
+        VARCHAR_13 sa_id_number
+        VARCHAR_20 mobile_number
+        VARCHAR_255 email_address
+        BOOLEAN popia_consent
+        TIMESTAMP created_at
+    }
+    ACCOUNT {
+        UUID account_id PK
+        UUID customer_id FK
+        VARCHAR_20 account_number
+        ENUM account_type
+        DECIMAL_15_2 balance
+        DECIMAL_15_2 available_balance
+        DECIMAL_15_2 daily_payshap_limit
+        ENUM status
+    }
+    PAYMENT {
+        UUID payment_id PK
+        UUID payer_account_id FK
+        ENUM beneficiary_proxy_type
+        VARCHAR_50 beneficiary_proxy_value
+        DECIMAL_15_2 amount
+        CHAR_3 currency
+        VARCHAR_255 reference
+        ENUM status
+        VARCHAR_50 payshap_transaction_id
+        DECIMAL_5_2 fraud_score
+        TIMESTAMP created_at
+        TIMESTAMP settled_at
+    }
+    FRAUD_SCORE {
+        UUID score_id PK
+        UUID payment_id FK
+        DECIMAL_5_2 risk_score
+        ENUM risk_level
+        JSONB signals
+        VARCHAR_20 model_version
+        TIMESTAMP evaluated_at
+    }
+    NOTIFICATION {
+        UUID notification_id PK
+        UUID payment_id FK
+        ENUM channel
+        VARCHAR_255 recipient_address
+        TEXT message
+        ENUM status
+        TIMESTAMP sent_at
+    }
+    CUSTOMER ||--o{ ACCOUNT : "holds"
+    ACCOUNT ||--o{ PAYMENT : "initiates"
+    PAYMENT ||--|| FRAUD_SCORE : "scored by"
+    PAYMENT ||--o{ NOTIFICATION : "triggers"`,
+    apiSpec: `openapi: "3.0.3"
+info:
+  title: PayShap Payment Initiation API
+  version: "1.0.0"
+  description: |
+    Real-time payment initiation API conforming to SARB PayShap scheme.
+    All endpoints require Bearer JWT authentication.
+  contact:
+    name: Payments Team
+    email: payments-api@neobank.co.za
+
+servers:
+  - url: https://api.neobank.co.za/v1
+    description: Production
+  - url: https://api-dev.neobank.co.za/v1
+    description: Development
+
+security:
+  - BearerAuth: []
+
+paths:
+  /payments/initiate:
+    post:
+      summary: Initiate a PayShap real-time payment
+      operationId: initiatePayment
+      tags: [Payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInitiateRequest'
+            example:
+              payer_account_id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              beneficiary_proxy_type: "MSISDN"
+              beneficiary_proxy_value: "+27831234567"
+              amount: 500.00
+              currency: "ZAR"
+              reference: "Rent contribution March 2025"
+      responses:
+        '200':
+          description: Payment initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /payments/{payment_id}:
+    get:
+      summary: Get payment status
+      operationId: getPaymentStatus
+      tags: [Payments]
+      parameters:
+        - name: payment_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Payment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /cdr/resolve:
+    get:
+      summary: Resolve PayShap proxy to account details
+      operationId: resolveProxy
+      tags: [CDR]
+      parameters:
+        - name: proxy
+          in: query
+          required: true
+          schema:
+            type: string
+          example: "+27831234567"
+        - name: proxy_type
+          in: query
+          schema:
+            type: string
+            enum: [MSISDN, SA_ID, ACCOUNT]
+          example: "MSISDN"
+      responses:
+        '200':
+          description: Resolved account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProxyResolutionResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    PaymentInitiateRequest:
+      type: object
+      required: [payer_account_id, beneficiary_proxy_type, beneficiary_proxy_value, amount, reference]
+      properties:
+        payer_account_id:
+          type: string
+          format: uuid
+        beneficiary_proxy_type:
+          type: string
+          enum: [MSISDN, SA_ID, ACCOUNT]
+        beneficiary_proxy_value:
+          type: string
+          maxLength: 50
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          maximum: 5000000
+        currency:
+          type: string
+          default: ZAR
+          pattern: '^[A-Z]{3}$'
+        reference:
+          type: string
+          maxLength: 140
+
+    PaymentResponse:
+      type: object
+      properties:
+        payment_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [PENDING, PROCESSING, CLEARED, SETTLED, FAILED, REVERSED]
+        amount:
+          type: number
+        payshap_transaction_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        settled_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    ProxyResolutionResponse:
+      type: object
+      properties:
+        account_number:
+          type: string
+        bank_code:
+          type: string
+        account_holder_name:
+          type: string
+        bank_name:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        reference:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UnprocessableEntity:
+      description: Business rule violation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'`,
+    gherkin: `Feature: Real-Time Payment Initiation via PayShap
+  As a retail banking customer
+  I want to initiate real-time payments using the PayShap instant payment scheme
+  So that I can transfer money to any South African bank account within seconds
+
+  Background:
+    Given I am authenticated as customer "TC_CUST_001" with a valid session
+    And my account "4001234567" has an available balance of R15,000.00
+    And my daily PayShap limit is R50,000.00 and R0.00 has been used today
+    And the PayShap CDR service is operational
+    And the Fraud Engine service is operational
+
+  @happy-path @p0 @regression
+  Scenario: Successful real-time payment to registered PayShap proxy
+    Given I have provided POPIA consent for the current session
+    When I navigate to "Pay" and select "Real-Time Payment (PayShap)"
+    And I enter the recipient proxy "+27831234567" of type "MSISDN"
+    And I enter the payment amount "R500.00"
+    And I enter the payment reference "Rent contribution March 2025"
+    And I click "Review Payment"
+    Then the system should resolve the proxy to account "ABSA-4009876543"
+    And I should see the recipient name "Thabo Nkosi" and bank "ABSA"
+    When I click "Confirm and Pay"
+    And I authenticate with a valid OTP "123456"
+    Then the payment should settle within 10 seconds
+    And my account balance should be reduced by R500.00
+    And I should receive a push notification "Payment of R500.00 sent to Thabo Nkosi"
+
+  @negative @p0 @security
+  Scenario: Payment blocked by fraud engine - critical risk score
+    Given the Fraud Engine will return a risk score of 95 for the next transaction
+    When I enter amount "R4,999,999.00" and confirm with OTP
+    Then the payment should be rejected with HTTP status 403
+    And I should see the error message "Payment blocked for security reasons"
+    And my account balance should remain unchanged
+
+  @negative @p1 @validation
+  Scenario: Payment rejected due to insufficient funds
+    Given my account has an available balance of R100.00
+    When I attempt to pay "R500.00" to proxy "+27831234567"
+    And I click "Confirm and Pay" and authenticate with OTP
+    Then the payment should be rejected with HTTP status 422
+    And I should see "Insufficient funds" error message
+    And no debit should appear on my account statement
+
+  @p1 @regression
+  Scenario Outline: Payment rejected when daily limit is exceeded
+    Given my daily PayShap limit is R50,000.00
+    And I have already used <used_today> today
+    When I attempt to pay <amount>
+    Then the payment should be <outcome>
+
+    Examples:
+      | used_today  | amount      | outcome                    |
+      | R49,000.00  | R1,500.00   | rejected with limit error  |
+      | R50,000.00  | R1.00       | rejected with limit error  |
+      | R48,000.00  | R2,000.00   | accepted and processed     |`,
+    testScenarios: [
+      { id:"TC-001", name:"Successful PayShap payment to MSISDN proxy", type:"functional", priority:"P0", preconditions:["Authenticated customer","Sufficient balance","Fraud score < 75"], steps:["Navigate to PayShap Pay","Enter +27831234567 as recipient proxy","Enter R500.00 amount","Confirm with OTP"], expected_result:"Payment settles within 10 seconds, balance reduced, SMS sent" },
+      { id:"TC-002", name:"Payment blocked - fraud score > 90", type:"functional", priority:"P0", preconditions:["Fraud Engine configured to return score 95"], steps:["Initiate payment for R4,999,999","Confirm with valid OTP"], expected_result:"HTTP 403, payment not debited, reference number returned" },
+      { id:"TC-003", name:"Insufficient funds rejection", type:"functional", priority:"P0", preconditions:["Account balance R100.00"], steps:["Attempt to pay R500.00"], expected_result:"HTTP 422 Insufficient Funds, no debit applied" },
+      { id:"TC-004", name:"Daily limit exceeded rejection", type:"functional", priority:"P0", preconditions:["R49,500 of R50,000 daily limit used"], steps:["Attempt to pay R1,000.00"], expected_result:"HTTP 422 Daily Limit Exceeded" },
+      { id:"TC-005", name:"PayShap CDR proxy resolution failure", type:"functional", priority:"P1", preconditions:["CDR returns 404 for proxy"], steps:["Enter unregistered proxy +27799999999"], expected_result:"Error shown, customer prompted to enter account number" },
+      { id:"TC-006", name:"Fraud score 75-90 triggers manual review", type:"functional", priority:"P1", preconditions:["Fraud Engine configured to return score 82"], steps:["Initiate and confirm payment"], expected_result:"HTTP 202 Accepted, status PENDING_REVIEW" },
+      { id:"TC-007", name:"POPIA consent not given - payment cancelled", type:"functional", priority:"P1", preconditions:["CDR resolved successfully"], steps:["Review recipient details","Decline POPIA consent"], expected_result:"Session ended, no PII retained" },
+      { id:"TC-008", name:"OTP authentication failure - 3 attempts", type:"functional", priority:"P0", preconditions:["Payment details captured"], steps:["Enter wrong OTP 3 times"], expected_result:"Session locked, payment aborted" },
+      { id:"TC-009", name:"PayShap Gateway timeout recovery", type:"integration", priority:"P1", preconditions:["PayShap Gateway configured to timeout at 9s"], steps:["Initiate valid payment"], expected_result:"System initiates status enquiry, resolves within 30s" },
+      { id:"TC-010", name:"Core banking debit failure compensation", type:"integration", priority:"P0", preconditions:["CBS configured to reject debit"], steps:["Payment cleared by PayShap","CBS debit fails"], expected_result:"Compensating reversal triggered within 30s, ops alerted" },
+      { id:"TC-011", name:"Fraud Engine unavailable - conservative policy", type:"integration", priority:"P0", preconditions:["Fraud Engine service down"], steps:["Initiate payment for R15,000 (>R10,000 threshold)"], expected_result:"Payment blocked per conservative policy, R10,000 or less allowed" },
+      { id:"TC-012", name:"High volume concurrent payment processing", type:"performance", priority:"P2", preconditions:["Load test environment"], steps:["Submit 500 concurrent payment requests"], expected_result:"P99 latency < 8s, no data corruption, all settle or fail cleanly" },
+      { id:"TC-013", name:"Payment API response time SLA", type:"performance", priority:"P2", preconditions:["Normal load conditions"], steps:["Measure end-to-end API latency for 1000 payments"], expected_result:"P50 < 3s, P99 < 9s, settlement < 10s" },
+      { id:"TC-014", name:"JWT token injection attempt on payment endpoint", type:"security", priority:"P0", preconditions:["Tampered JWT with elevated permissions"], steps:["POST /v1/payments/initiate with modified JWT claims"], expected_result:"HTTP 401, request rejected, security event logged" },
+      { id:"TC-015", name:"SQL injection attempt in payment reference field", type:"security", priority:"P0", preconditions:["Valid authenticated session"], steps:["Submit payment with reference: '; DROP TABLE payments; --"], expected_result:"Input sanitised, HTTP 400, no database impact" },
+    ]
+  },
+  kyc: {
+    title: "Digital KYC Onboarding",
+    stats: { actors: 9, entities: 5, endpoints: 10, scenarios: 16, rules: 10 },
+    brd: `Business Requirements Document
+Project: Digital KYC Onboarding — Neobank Customer Acquisition
+Version: 2.0  |  Date: 2025-01-15
+
+OVERVIEW
+Enable end-to-end digital KYC onboarding for new customers of a South African neobank.
+Must comply with FICA and POPIA. Completable in under 5 minutes with no branch visit.
+
+ACTORS: Applicant, Neobank Mobile App, KYC Orchestrator, Document Verification Service,
+Biometric Service, DHA-AFIS, TransUnion Credit Bureau, Risk Scoring Engine,
+Account Provisioning Service
+
+BUSINESS RULES
+BR-001: Applicant must be 18+ years old (validated from SA ID number)
+BR-002: Document authenticity score >= 80% to proceed
+BR-003: Biometric liveness >= 85%, face match >= 80%
+BR-004: Maximum 3 biometric attempts before manual review
+BR-005: DHA-AFIS must confirm ID and surname match
+BR-006: Applicants under 90-day cooling-off are rejected
+BR-007: All PII encrypted at rest (AES-256) and in transit (TLS 1.3)
+
+DATA ENTITIES: KycApplication, Applicant, DocumentVerification, BiometricCheck, RiskScore`,
+    processFlow: `flowchart TD
+    START([Applicant Opens App]) --> popiaTnC["Present POPIA Consent & T&Cs"]
+    popiaTnC --> consentAccepted{Consent Accepted?}
+    consentAccepted -- No --> END_CONSENT([Session Ended])
+    consentAccepted -- Yes --> personalDetails["Enter Personal Details"]
+    subgraph Validation["Input Validation"]
+        personalDetails --> idLuhn{SA ID Luhn Check?}
+        idLuhn -- No --> idError["Show ID Error"]
+        idLuhn -- Yes --> ageCheck{Age >= 18?}
+        ageCheck -- No --> underage["Reject: Under 18"]
+        ageCheck -- Yes --> coolingCheck{Cooling-Off Active?}
+        coolingCheck -- Yes --> coolingReject["Reject: Cooling-Off Period"]
+        coolingCheck -- No --> docUpload["Upload ID Document"]
+    end
+    subgraph DocVerification["Document Verification"]
+        docUpload --> ocrProcess["OCR & Authenticity Check"]
+        ocrProcess --> docAuth{Score >= 80%?}
+        docAuth -- No --> docRetry{1st Attempt?}
+        docRetry -- Yes --> docUpload
+        docRetry -- No --> docManual["Manual Document Review"]
+        docAuth -- Yes --> biometricCapture["Capture Selfie + Liveness"]
+    end
+    subgraph Biometrics["Biometric Verification"]
+        biometricCapture --> livenessCheck{Liveness >= 85%?}
+        livenessCheck -- No --> bioAttempt{Attempts < 3?}
+        bioAttempt -- Yes --> biometricCapture
+        bioAttempt -- No --> bioManual["Biometric Review Queue"]
+        livenessCheck -- Yes --> faceMatch{Face Match >= 80%?}
+        faceMatch -- No --> bioAttempt
+        faceMatch -- Yes --> dhaVerify["Verify with DHA-AFIS"]
+    end
+    dhaVerify --> dhaOk{DHA Match?}
+    dhaOk -- No --> dhaReject["Decline: ID Not Verified"]
+    dhaOk -- Yes --> bureauCheck["TransUnion Soft Enquiry"]
+    bureauCheck --> riskScore["Compute Risk Score"]
+    riskScore --> riskTier{Risk Tier?}
+    riskTier -- LOW --> autoApprove["Auto-Approve & Provision"]
+    riskTier -- MEDIUM --> addQuestions["Source of Funds Questions"]
+    riskTier -- HIGH --> humanReview["Human Review Queue"]
+    riskTier -- DECLINED --> declined["Decline + Cooling-Off"]
+    autoApprove --> END_SUCCESS([Account Active])`,
+    sequence: `sequenceDiagram
+    participant A as Applicant
+    participant App as Neobank App
+    participant KYC as KYC Orchestrator
+    participant DVS as Document Verification
+    participant BIO as Biometric Service
+    participant DHA as DHA-AFIS
+    participant TB as TransUnion
+    participant RSE as Risk Scoring Engine
+    participant APS as Account Provisioning
+
+    A->>App: Open Account
+    App->>A: POPIA Consent & T&Cs
+    A->>App: Accept Consent
+    App->>KYC: Initialise KYC Application
+    note right of KYC: POST /v1/kyc/applications
+    KYC-->>App: application_id: kyc_abc123
+    A->>App: Submit personal details
+    App->>DVS: Submit document for verification
+    activate DVS
+    note right of DVS: POST /v1/documents/verify
+    DVS-->>App: {authenticity_score: 94.2, status: PASSED}
+    deactivate DVS
+    App->>BIO: Run biometric verification
+    activate BIO
+    alt Liveness fails (attempt < 3)
+        BIO-->>App: {status: FAILED}
+        App->>A: Retry with guidance
+    end
+    BIO-->>App: {liveness_score: 92.1, face_match: 88.5, status: PASSED}
+    deactivate BIO
+    KYC->>DHA: Verify identity
+    note right of DHA: POST /v1/dha/verify
+    DHA-->>KYC: {match: true}
+    KYC->>TB: Soft credit enquiry
+    TB-->>KYC: {credit_score: 620}
+    KYC->>RSE: Compute risk score
+    RSE-->>KYC: {risk_tier: LOW}
+    KYC->>APS: Provision account
+    note right of APS: POST /v1/accounts/provision
+    APS-->>KYC: {account_number: 4009876543}
+    KYC-->>App: APPROVED
+    App->>A: Account details & welcome`,
+    erDiagram: `erDiagram
+    APPLICANT {
+        UUID applicant_id PK
+        VARCHAR_100 first_name
+        VARCHAR_100 last_name
+        VARCHAR_13 sa_id_number
+        DATE date_of_birth
+        VARCHAR_255 email
+        VARCHAR_15 mobile
+        BOOLEAN popia_consent
+        TIMESTAMP popia_consent_timestamp
+        DATE cooling_off_until
+    }
+    KYC_APPLICATION {
+        UUID application_id PK
+        UUID applicant_id FK
+        ENUM status
+        ENUM risk_tier
+        TIMESTAMP created_at
+        TIMESTAMP completed_at
+    }
+    DOCUMENT_VERIFICATION {
+        UUID verification_id PK
+        UUID application_id FK
+        ENUM document_type
+        DECIMAL_5_2 authenticity_score
+        BOOLEAN mrz_valid
+        DECIMAL_5_2 data_match_score
+        ENUM status
+        INTEGER attempt_count
+    }
+    BIOMETRIC_CHECK {
+        UUID check_id PK
+        UUID application_id FK
+        DECIMAL_5_2 liveness_score
+        DECIMAL_5_2 face_match_score
+        BOOLEAN liveness_passed
+        INTEGER attempt_count
+        ENUM status
+    }
+    RISK_SCORE {
+        UUID score_id PK
+        UUID application_id FK
+        DECIMAL_5_2 composite_score
+        INTEGER credit_score
+        BOOLEAN dha_match
+        ENUM risk_tier
+        TIMESTAMP scored_at
+    }
+    APPLICANT ||--o{ KYC_APPLICATION : "submits"
+    KYC_APPLICATION ||--o{ DOCUMENT_VERIFICATION : "requires"
+    KYC_APPLICATION ||--|| BIOMETRIC_CHECK : "undergoes"
+    KYC_APPLICATION ||--|| RISK_SCORE : "assessed by"`,
+    apiSpec: `openapi: "3.0.3"
+info:
+  title: KYC Onboarding API
+  version: "1.0.0"
+  description: Digital KYC onboarding for neobank customers. FICA and POPIA compliant.
+
+servers:
+  - url: https://api.neobank.co.za/v1
+    description: Production
+
+security:
+  - BearerAuth: []
+
+paths:
+  /kyc/applications:
+    post:
+      summary: Create a new KYC application
+      operationId: createKycApplication
+      tags: [KYC]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KycApplicationRequest'
+      responses:
+        '201':
+          description: KYC application created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /kyc/applications/{application_id}:
+    get:
+      summary: Get KYC application status
+      operationId: getKycApplication
+      tags: [KYC]
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Application details
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /documents/verify:
+    post:
+      summary: Submit document for OCR and authenticity verification
+      operationId: verifyDocument
+      tags: [Documents]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                application_id:
+                  type: string
+                document_type:
+                  type: string
+                  enum: [SA_ID_GREEN, SA_SMART_ID, PASSPORT]
+                document_image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Verification result
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    KycApplicationRequest:
+      type: object
+      required: [first_name, last_name, sa_id_number, email, mobile, popia_consent]
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        sa_id_number:
+          type: string
+          pattern: '^[0-9]{13}$'
+        email:
+          type: string
+          format: email
+        mobile:
+          type: string
+        popia_consent:
+          type: boolean
+          enum: [true]
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+    UnprocessableEntity:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object`,
+    gherkin: `Feature: Digital KYC Onboarding for Neobank
+  As a prospective neobank customer
+  I want to complete identity verification digitally
+  So that I can open a bank account without visiting a branch
+
+  Background:
+    Given the KYC system is operational
+    And Document Verification and Biometric Services are available
+    And DHA-AFIS integration is available
+
+  @happy-path @p0 @regression
+  Scenario: Successful KYC with Smart ID - low risk profile
+    Given I have a valid SA Smart ID card and I am 25 years old
+    And I have not previously applied for an account
+    When I tap "Open an Account" and accept POPIA consent
+    And I complete the personal details form
+    And I upload a clear Smart ID photograph (authenticity: 94.2%)
+    And I complete liveness challenge (score: 92.1%, face match: 88.5%)
+    And DHA-AFIS confirms my identity
+    And my risk tier is assessed as LOW
+    Then my KYC application should be APPROVED
+    And an account should be provisioned within 60 seconds
+    And I should receive a welcome SMS and email
+
+  @negative @p0
+  Scenario: KYC rejected for applicant in cooling-off period
+    Given I was declined on "2025-01-01" (90-day cooling-off applied)
+    When I attempt to start a new application with SA ID "9901015009087"
+    Then I should see a cooling-off rejection message
+    And I should be told I can reapply after "2025-04-01"
+    And no further PII should be collected`,
+    testScenarios: [
+      { id:"TC-001", name:"Full KYC onboarding - Smart ID, low risk", type:"functional", priority:"P0", preconditions:["Valid Smart ID","No previous application","DHA-AFIS operational"], steps:["Accept POPIA consent","Enter personal details","Upload Smart ID","Complete liveness challenge","Submit"], expected_result:"Application APPROVED, account provisioned within 60s" },
+      { id:"TC-002", name:"Under-age applicant rejected at validation", type:"functional", priority:"P0", preconditions:["SA ID of 17-year-old entered"], steps:["Enter SA ID: 0801015009081","Submit personal details"], expected_result:"HTTP 422 rejected at age validation, no PII stored" },
+      { id:"TC-003", name:"Cooling-off period enforcement", type:"functional", priority:"P0", preconditions:["Previous decline within 90 days"], steps:["Start new application with same SA ID"], expected_result:"Immediately rejected with cooling-off expiry date" },
+      { id:"TC-004", name:"Document authenticity below 80% - retry and manual", type:"functional", priority:"P1", preconditions:["Poor quality document image"], steps:["Upload blurry ID image (score 65%)","Retry with different image (score 70%)"], expected_result:"After 2nd failure, escalated to manual document review queue" },
+      { id:"TC-005", name:"Biometric liveness failure - 3 attempts", type:"functional", priority:"P0", preconditions:["Poor lighting conditions"], steps:["Fail liveness 3 times"], expected_result:"Application escalated to biometric manual review" },
+      { id:"TC-006", name:"DHA-AFIS hard rejection - decline with cooling-off", type:"functional", priority:"P0", preconditions:["DHA returns no match for SA ID"], steps:["Complete document and biometric steps","DHA-AFIS returns rejection"], expected_result:"Application DECLINED, 90-day cooling-off applied" },
+      { id:"TC-007", name:"Medium risk - additional questions required", type:"functional", priority:"P1", preconditions:["Credit score < 550"], steps:["Pass all verification steps","Risk engine returns MEDIUM tier"], expected_result:"Source of funds questions presented, manual review if unsatisfactory" },
+      { id:"TC-008", name:"Duplicate mobile number conflict", type:"functional", priority:"P1", preconditions:["Mobile number linked to existing account"], steps:["Submit personal details with registered mobile"], expected_result:"HTTP 409 Conflict, customer directed to login or support" },
+      { id:"TC-009", name:"DHA-AFIS timeout - fallback handling", type:"integration", priority:"P1", preconditions:["DHA-AFIS configured to timeout"], steps:["Complete all prior steps","DHA API call times out"], expected_result:"Application queued for retry, customer notified within 1 hour" },
+      { id:"TC-010", name:"TransUnion bureau timeout - self-declaration fallback", type:"integration", priority:"P1", preconditions:["TransUnion API down"], steps:["Proceed to bureau pull step"], expected_result:"Income self-declaration form presented as fallback" },
+      { id:"TC-011", name:"Account provisioning failure - retry and escalation", type:"integration", priority:"P0", preconditions:["Account Provisioning Service returns 500"], steps:["KYC approved","Account provisioning called"], expected_result:"3 retries with exponential backoff, ops alerted if all fail" },
+      { id:"TC-012", name:"Concurrent onboarding throughput", type:"performance", priority:"P2", preconditions:["Load test environment"], steps:["Submit 200 concurrent KYC applications"], expected_result:"All complete within 5 minutes, no data cross-contamination" },
+      { id:"TC-013", name:"PII encryption at rest validation", type:"security", priority:"P0", preconditions:["DB access for audit"], steps:["Submit KYC application","Inspect database records for SA ID, mobile, email"], expected_result:"All PII fields AES-256 encrypted, not readable in plaintext" },
+      { id:"TC-014", name:"Document image stored encrypted and access-controlled", type:"security", priority:"P0", preconditions:["Document uploaded successfully"], steps:["Attempt to access document image URL without auth token"], expected_result:"HTTP 403 Forbidden, pre-signed URL required" },
+      { id:"TC-015", name:"POPIA data minimisation - session PII cleanup", type:"security", priority:"P1", preconditions:["Applicant abandons after personal details step"], steps:["Enter details","Close app without proceeding"], expected_result:"PII removed from session store after 24-hour TTL" }
+    ]
+  },
+  loan: {
+    title: "AI-Driven Instant Loan Application",
+    stats: { actors: 11, entities: 6, endpoints: 9, scenarios: 15, rules: 12 },
+    brd: `Business Requirements Document
+Project: AI-Driven Instant Personal Loan Application
+Version: 1.1  |  Date: 2025-01-15
+
+OVERVIEW
+Enable existing neobank customers to apply for instant personal loans with decisions
+within 60 seconds. Complies with NCA, Credit Providers Registration, and POPIA.
+Approved loans disbursed within 2 hours of customer acceptance.
+
+ACTORS: Customer, Neobank App, Loan Application Service, Credit Scoring Engine,
+TransUnion Bureau, Experian Bureau, Affordability Engine, NCA Compliance Service,
+Loan Offer Engine, Disbursement Service, Collection Service
+
+BUSINESS RULES
+BR-001: Max loan amount R250,000 (NCA Section 10)
+BR-002: Max term 84 months; min 1 month
+BR-003: Max interest rate: repo + 21% (NCA Section 100)
+BR-004: NDI after instalment must be >= 0 (reckless lending check)
+BR-005: Debt service ratio <= 75% of gross income
+BR-006: No adverse listings (judgements, administration)
+BR-007: Loan offer valid 5 business days
+BR-008: DebiCheck authenticated mandate required
+BR-009: NCR registration within 2 business days of signing
+
+DATA ENTITIES: LoanApplication, CreditBureauReport, AffordabilityAssessment, LoanOffer, LoanAgreement, Disbursement`,
+    processFlow: `flowchart TD
+    START([Customer Opens Loan Section]) --> eligibility{Existing Customer\nIn Good Standing?}
+    eligibility -- No --> ineligible["Display Ineligibility Message"]
+    ineligible --> END_INELIGIBLE([Session Ended])
+    eligibility -- Yes --> selectAmount["Select Amount & Term\nR1,000-R250,000 / 1-84 months"]
+    subgraph Capture["Application Data Capture"]
+        selectAmount --> incomeDetails["Enter Income & Expenses"]
+        incomeDetails --> bureauConsent["NCA Bureau Consent Disclosure"]
+        bureauConsent --> consentGiven{Consent Accepted?}
+        consentGiven -- No --> END_CONSENT([Application Abandoned])
+        consentGiven -- Yes --> submitApp["Submit Application"]
+    end
+    subgraph Assessment["Creditworthiness Assessment"]
+        submitApp --> bureauPull["Pull TransUnion & Experian\nCredit Reports"]
+        bureauPull --> bureauOk{Bureaux OK?}
+        bureauOk -- No --> bureauFail["Both Failed: Decline"]
+        bureauOk -- Yes --> affordability["Affordability Engine:\nNDI & DSR Calculation"]
+        affordability --> ncaCheck{NCA Check Passes?}
+        ncaCheck -- No --> ncaDecline["Decline: NCA Non-Compliant"]
+        ncaCheck -- Yes --> adverseCheck{Adverse Listings?}
+        adverseCheck -- Yes --> adverseDecline["Decline: Adverse Listings"]
+        adverseCheck -- No --> creditScore["AI Credit Scoring"]
+    end
+    subgraph Offers["Offer Generation"]
+        creditScore --> genOffers["Generate 1-3 Personalised Offers"]
+        genOffers --> presentOffers["Present Offers to Customer"]
+        presentOffers --> offerChoice{Customer Decision?}
+        offerChoice -- "Decline All" --> cancelled["Mark CANCELLED"]
+        offerChoice -- "Select Offer" --> signAgreement["Digital Loan Agreement\nOTP e-Signature"]
+    end
+    subgraph Disbursement["Disbursement"]
+        signAgreement --> debiCheck["Register DebiCheck Mandate"]
+        debiCheck --> mandateOk{Mandate OK?}
+        mandateOk -- No --> mandateFail["Contact for Alternate Details"]
+        mandateOk -- Yes --> disburse["Transfer Loan to Account"]
+        disburse --> disbOk{Disbursement OK?}
+        disbOk -- No --> disbFail["Retry x3 → Escalate Ops"]
+        disbOk -- Yes --> createSchedule["Create Repayment Schedule"]
+    end
+    createSchedule --> notify["Confirmation: SMS + Email + PDF"]
+    notify --> END_SUCCESS([Loan Active])`,
+    sequence: `sequenceDiagram
+    participant C as Customer
+    participant App as Neobank App
+    participant LAS as Loan App Service
+    participant TU as TransUnion
+    participant EX as Experian
+    participant AFF as Affordability Engine
+    participant NCA as NCA Compliance
+    participant CSE as Credit Scoring
+    participant LOE as Loan Offer Engine
+    participant DS as Disbursement Service
+
+    C->>App: Navigate to Loans
+    App->>LAS: Check eligibility
+    note right of LAS: GET /v1/loans/eligibility
+    LAS-->>App: {eligible: true, max_prescreen: 150000}
+    App->>C: Show amount slider and term picker
+    C->>App: Enter income/expenses + bureau consent
+    App->>LAS: Submit application
+    note right of LAS: POST /v1/loans/applications
+    par Bureau Enquiries parallel
+        LAS->>TU: Hard credit enquiry
+        TU-->>LAS: {score: 650}
+    and
+        LAS->>EX: Secondary enquiry
+        EX-->>LAS: {score: 630}
+    end
+    LAS->>AFF: Calculate affordability
+    note right of AFF: POST /v1/affordability/assess
+    AFF-->>LAS: {ndi: 8200, dsr: 0.42, max_instalment: 3500}
+    LAS->>NCA: Validate NCA compliance
+    NCA-->>LAS: {compliant: true}
+    LAS->>CSE: Compute credit score
+    CSE-->>LAS: {score: 710, max_approved: 85000}
+    LAS->>LOE: Generate loan offers
+    LOE-->>LAS: [{R50k/36m/24.5%}, {R30k/24m/22.0%}]
+    LAS-->>App: Offers presented
+    App->>C: Display loan offers
+    C->>App: Select Offer 1 and sign with OTP
+    App->>LAS: Record acceptance
+    note right of LAS: POST /v1/loans/applications/{id}/accept
+    LAS->>DS: Initiate disbursement
+    activate DS
+    loop Retry on failure up to 3 times
+        DS->>DS: Transfer R50,000
+    end
+    DS-->>LAS: {status: COMPLETED}
+    deactivate DS
+    LAS-->>App: Loan DISBURSED
+    App->>C: Success screen with loan details`,
+    erDiagram: `erDiagram
+    CUSTOMER {
+        UUID customer_id PK
+        VARCHAR_100 full_name
+        VARCHAR_13 sa_id_number
+        VARCHAR_255 email
+        ENUM account_status
+    }
+    LOAN_APPLICATION {
+        UUID application_id PK
+        UUID customer_id FK
+        DECIMAL_15_2 requested_amount
+        INTEGER requested_term_months
+        DECIMAL_15_2 monthly_gross_income
+        ENUM employment_status
+        BOOLEAN bureau_consent
+        ENUM status
+        TIMESTAMP created_at
+        TIMESTAMP decision_at
+    }
+    CREDIT_BUREAU_REPORT {
+        UUID report_id PK
+        UUID application_id FK
+        ENUM bureau
+        INTEGER credit_score
+        JSONB adverse_listings
+        DECIMAL_15_2 total_outstanding_debt
+        TIMESTAMP retrieved_at
+    }
+    AFFORDABILITY_ASSESSMENT {
+        UUID assessment_id PK
+        UUID application_id FK
+        DECIMAL_15_2 ndi
+        DECIMAL_5_4 debt_service_ratio
+        DECIMAL_15_2 max_instalment
+        BOOLEAN nca_compliant
+    }
+    LOAN_OFFER {
+        UUID offer_id PK
+        UUID application_id FK
+        INTEGER offer_rank
+        DECIMAL_15_2 principal_amount
+        INTEGER term_months
+        DECIMAL_5_4 interest_rate_annual
+        DECIMAL_15_2 monthly_instalment
+        DECIMAL_15_2 total_repayment
+        TIMESTAMP expires_at
+    }
+    LOAN_AGREEMENT {
+        UUID agreement_id PK
+        UUID offer_id FK
+        VARCHAR_30 agreement_number
+        TIMESTAMP signed_at
+        ENUM status
+    }
+    DISBURSEMENT {
+        UUID disbursement_id PK
+        UUID agreement_id FK
+        DECIMAL_15_2 amount
+        ENUM status
+        TIMESTAMP processed_at
+    }
+    CUSTOMER ||--o{ LOAN_APPLICATION : "submits"
+    LOAN_APPLICATION ||--o{ CREDIT_BUREAU_REPORT : "generates"
+    LOAN_APPLICATION ||--|| AFFORDABILITY_ASSESSMENT : "assessed by"
+    LOAN_APPLICATION ||--o{ LOAN_OFFER : "produces"
+    LOAN_OFFER ||--o| LOAN_AGREEMENT : "formalised as"
+    LOAN_AGREEMENT ||--|| DISBURSEMENT : "triggers"`,
+    apiSpec: `openapi: "3.0.3"
+info:
+  title: Instant Loan Application API
+  version: "1.0.0"
+  description: AI-driven personal loan application API. NCA compliant.
+
+servers:
+  - url: https://api.neobank.co.za/v1
+    description: Production
+
+paths:
+  /loans/eligibility:
+    get:
+      summary: Check customer loan eligibility
+      operationId: checkEligibility
+      tags: [Loans]
+      responses:
+        '200':
+          description: Eligibility result
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /loans/applications:
+    post:
+      summary: Submit a loan application
+      operationId: createLoanApplication
+      tags: [Loans]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoanApplicationRequest'
+      responses:
+        '202':
+          description: Application submitted, assessment in progress
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /loans/applications/{application_id}/accept:
+    post:
+      summary: Accept a loan offer and sign agreement
+      operationId: acceptLoanOffer
+      tags: [Loans]
+      parameters:
+        - name: application_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                offer_id:
+                  type: string
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: Offer accepted, disbursement initiated
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    LoanApplicationRequest:
+      type: object
+      required: [requested_amount, requested_term_months, monthly_gross_income, bureau_consent]
+      properties:
+        requested_amount:
+          type: number
+          minimum: 1000
+          maximum: 250000
+        requested_term_months:
+          type: integer
+          minimum: 1
+          maximum: 84
+        monthly_gross_income:
+          type: number
+        employment_status:
+          type: string
+          enum: [EMPLOYED, SELF_EMPLOYED, RETIRED]
+        monthly_expenses:
+          type: object
+        bureau_consent:
+          type: boolean
+          enum: [true]
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+    UnprocessableEntity:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            type: object`,
+    gherkin: `Feature: AI-Driven Instant Personal Loan Application
+  As an existing neobank customer
+  I want to apply for a personal loan and receive an instant decision
+  So that I can access credit quickly without visiting a branch
+
+  Background:
+    Given I am authenticated as customer "CUST_001"
+    And my account "4001234567" is active and in good standing
+    And I have not applied for a loan in the past 30 days
+    And the TransUnion and Experian bureau services are operational
+
+  @happy-path @p0 @regression
+  Scenario: Successful loan application with instant approval
+    Given my TransUnion score is 710 and Experian score is 695
+    And my monthly gross income is R35,000.00 and expenses are R18,000.00
+    And I have no adverse listings
+    When I select loan amount R50,000 and term 36 months
+    And I enter income details and accept bureau consent
+    And I submit the application
+    Then I should receive a loan offer within 60 seconds
+    And the offer should show monthly instalment and total cost
+    When I select the first offer and sign with OTP "789012"
+    Then R50,000.00 should be disbursed within 2 hours
+    And I should receive confirmation via SMS, email, and push
+
+  @negative @p0 @compliance
+  Scenario: Loan declined due to NCA reckless lending check failure
+    Given my gross income is R12,000.00 and existing debt repayments are R10,500.00
+    When I request R50,000 over 12 months and submit with bureau consent
+    Then the NCA check should fail with "Debt service ratio exceeds 75%"
+    And the application should be DECLINED
+    And I should not be charged any fees`,
+    testScenarios: [
+      { id:"TC-001", name:"Successful loan - approval and disbursement", type:"functional", priority:"P0", preconditions:["Active account","No adverse listings","Score 710"], steps:["Select R50k/36m","Enter income R35k","Submit","Sign with OTP"], expected_result:"Disbursed within 2 hours, repayment schedule created" },
+      { id:"TC-002", name:"NCA reckless lending check failure", type:"functional", priority:"P0", preconditions:["DSR would exceed 75% with requested loan"], steps:["Submit application","Affordability engine computes DSR = 87.5%"], expected_result:"Declined with NCA reason, no fees charged" },
+      { id:"TC-003", name:"Adverse listing causes immediate decline", type:"functional", priority:"P0", preconditions:["Customer has active judgement on credit file"], steps:["Submit application","Bureau returns adverse listing"], expected_result:"Declined: adverse listings, inform customer" },
+      { id:"TC-004", name:"Request above creditworthy limit - counter-offer", type:"functional", priority:"P1", preconditions:["Customer requests R200k but scores for R80k max"], steps:["Select R200k","Submit application"], expected_result:"Offer generated for R80k at approved rate" },
+      { id:"TC-005", name:"Customer declines all offers - cancel and cool-off", type:"functional", priority:"P1", preconditions:["Offers generated"], steps:["Review offers","Decline all"], expected_result:"Application marked CANCELLED, reapply allowed in 30 days" },
+      { id:"TC-006", name:"Loan offer expiry during signing", type:"functional", priority:"P1", preconditions:["Offer valid for 5 business days"], steps:["Leave offers without signing","Attempt to sign after expiry"], expected_result:"Error shown, customer prompted to regenerate offers" },
+      { id:"TC-007", name:"Both bureaux timeout - decline gracefully", type:"integration", priority:"P0", preconditions:["Both TU and Experian APIs down"], steps:["Submit application"], expected_result:"Graceful decline, customer invited to reapply in 24 hours" },
+      { id:"TC-008", name:"TransUnion/Experian score delta > 100 - conservative", type:"integration", priority:"P1", preconditions:["TU score 700, Experian score 590"], steps:["Submit application","Both bureaux return results"], expected_result:"Lower score (590) used for decisioning" },
+      { id:"TC-009", name:"DebiCheck mandate rejected by bank", type:"integration", priority:"P0", preconditions:["Customer's bank rejects mandate"], steps:["Accept offer","Sign agreement","DebiCheck rejected"], expected_result:"Customer prompted for alternate bank account details" },
+      { id:"TC-010", name:"Disbursement failure - retry and escalation", type:"integration", priority:"P0", preconditions:["Disbursement Service returns 500"], steps:["Agreement signed","3 disbursement attempts fail"], expected_result:"Ops escalation, customer notified within 30 minutes" },
+      { id:"TC-011", name:"NCR registration within SLA", type:"integration", priority:"P1", preconditions:["Loan signed"], steps:["Loan agreement signed","Wait 2 business days"], expected_result:"NCR registration completed, confirmation stored" },
+      { id:"TC-012", name:"Loan API response time - decision within 60s", type:"performance", priority:"P2", preconditions:["Normal load"], steps:["Submit 100 loan applications sequentially"], expected_result:"P95 decision time < 60 seconds" },
+      { id:"TC-013", name:"Concurrent loan applications - no data leakage", type:"performance", priority:"P2", preconditions:["Load test"], steps:["Submit 100 concurrent applications","Verify each gets own assessment"], expected_result:"No cross-contamination of credit data between applications" },
+      { id:"TC-014", name:"Bureau consent scope enforcement", type:"security", priority:"P0", preconditions:["Customer has not given bureau consent"], steps:["Attempt to submit application without bureau_consent=true"], expected_result:"HTTP 422 rejected, no bureau enquiry made" },
+      { id:"TC-015", name:"Loan amount manipulation via API tampering", type:"security", priority:"P0", preconditions:["Offer generated for R50k"], steps:["Tamper accept request to change amount to R250k"], expected_result:"Server validates against generated offer, rejects if mismatch" }
+    ]
+  }
+};
+
+// ============================================================
+// State
+// ============================================================
+let currentExample = 'payment';
+let generatedData = null;
+let diagramSources = {};
+
+// ============================================================
+// Boot
+// ============================================================
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'dark',
+  securityLevel: 'loose',
+  fontFamily: 'ui-monospace, "SF Mono", Menlo, monospace',
+  flowchart: { htmlLabels: true, curve: 'basis' },
+  sequence: { actorMargin: 50, messageMargin: 40 },
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadExample('payment');
+});
+
+// ============================================================
+// Load example
+// ============================================================
+function loadExample(key) {
+  currentExample = key;
+  document.querySelectorAll('.example-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('ex' + key.charAt(0).toUpperCase() + key.slice(1));
+  if (btn) btn.classList.add('active');
+
+  const ex = EXAMPLES[key];
+  document.getElementById('brdInput').value = ex.brd;
+}
+
+// ============================================================
+// Generate package (simulated with pre-built data)
+// ============================================================
+async function generatePackage() {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+
+  const overlay = document.getElementById('loadingOverlay');
+  const loadingText = document.getElementById('loadingText');
+  const loadingSub = document.getElementById('loadingSub');
+
+  const steps = [
+    ['Analysing requirements...', 'Claude is reading your BRD'],
+    ['Extracting actors & entities...', 'Identifying data model'],
+    ['Generating process flow...', 'Building Mermaid flowchart'],
+    ['Generating sequence diagram...', 'Mapping service interactions'],
+    ['Generating ER diagram...', 'Modelling data entities'],
+    ['Generating OpenAPI spec...', 'Designing REST endpoints'],
+    ['Generating acceptance criteria...', 'Writing Gherkin BDD scenarios'],
+    ['Generating test scenarios...', 'Building test plan'],
+  ];
+
+  overlay.classList.add('show');
+
+  for (const [text, sub] of steps) {
+    loadingText.textContent = text;
+    loadingSub.textContent = sub;
+    await sleep(340);
+  }
+
+  const ex = EXAMPLES[currentExample];
+  generatedData = ex;
+  diagramSources = {
+    processFlow: ex.processFlow,
+    sequence: ex.sequence,
+    erDiagram: ex.erDiagram,
+  };
+
+  overlay.classList.remove('show');
+  btn.disabled = false;
+
+  // Update stats bar
+  updateStats(ex.stats);
+
+  // Render diagrams
+  await renderDiagram('processFlow', ex.processFlow);
+  await renderDiagram('sequence', ex.sequence);
+  await renderDiagram('erDiagram', ex.erDiagram);
+
+  // Populate text tabs
+  document.getElementById('apiSpecContent').innerHTML = highlightYaml(ex.apiSpec);
+  document.getElementById('gherkinContent').innerHTML = highlightGherkin(ex.gherkin);
+
+  // Render test scenarios
+  renderTestScenarios(ex.testScenarios);
+
+  showToast('Engineering package generated!');
+}
+
+// ============================================================
+// Render a Mermaid diagram into a container
+// ============================================================
+async function renderDiagram(key, code) {
+  const container = document.getElementById('diag-' + key);
+  const id = 'mermaid-' + key + '-' + Date.now();
+
+  try {
+    const { svg } = await mermaid.render(id, code);
+    container.innerHTML = svg;
+    container.querySelector('svg').style.maxWidth = '100%';
+  } catch (e) {
+    container.innerHTML = `<div style="color:var(--red);padding:16px;font-family:monospace;font-size:12px">
+      Mermaid render error: ${e.message || e}<br><br>
+      <pre style="color:var(--text-muted);font-size:11px;white-space:pre-wrap">${code}</pre>
+    </div>`;
+  }
+}
+
+// ============================================================
+// Test scenario cards
+// ============================================================
+function renderTestScenarios(scenarios) {
+  const grid = document.getElementById('testGrid');
+  grid.innerHTML = scenarios.map(tc => `
+    <div class="test-card">
+      <div class="test-card-header">
+        <span class="test-id">${tc.id}</span>
+        <span class="type-badge type-${tc.type}">${tc.type}</span>
+        <span class="test-name">${tc.name}</span>
+        <span class="priority-badge ${tc.priority.toLowerCase()}">${tc.priority}</span>
+      </div>
+      <div class="test-body">
+        <div class="test-section">
+          <strong>Preconditions:</strong>
+          <ul class="test-steps">${tc.preconditions.map(p => `<li>${p}</li>`).join('')}</ul>
+        </div>
+        <div class="test-section">
+          <strong>Steps:</strong>
+          <ol class="test-steps">${tc.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+        </div>
+        <div class="test-section">
+          <strong>Expected Result:</strong> ${tc.expected_result}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// Stats
+// ============================================================
+function updateStats(stats) {
+  document.getElementById('stat-actors').textContent = stats.actors;
+  document.getElementById('stat-entities').textContent = stats.entities;
+  document.getElementById('stat-endpoints').textContent = stats.endpoints;
+  document.getElementById('stat-scenarios').textContent = stats.scenarios;
+  document.getElementById('stat-rules').textContent = stats.rules;
+  document.getElementById('statsBar').style.display = 'flex';
+}
+
+// ============================================================
+// Tab switching
+// ============================================================
+function switchTab(key, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + key).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// Copy helpers
+// ============================================================
+function copyDiagram(key) {
+  const src = diagramSources[key];
+  if (!src) { showToast('Generate a package first'); return; }
+  navigator.clipboard.writeText(src).then(() => showToast('Mermaid source copied!'));
+}
+
+function copyText(elementId) {
+  const el = document.getElementById(elementId);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ============================================================
+// Syntax highlighting
+// ============================================================
+function highlightYaml(code) {
+  return code
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^(\s*)(#.*)$/gm, '$1<span class="yaml-comment">$2</span>')
+    .replace(/^(\s*)([\w\-]+)(\s*:)/gm, '$1<span class="yaml-key">$2</span>$3')
+    .replace(/:\s*("([^"]*)")/g, ': <span class="yaml-string">$1</span>')
+    .replace(/:\s*('([^']*)')/g, ': <span class="yaml-string">$1</span>')
+    .replace(/:\s*(\d+\.?\d*)\s*$/gm, ': <span class="yaml-number">$1</span>')
+    .replace(/:\s*(true|false|null)\s*$/gm, ': <span class="yaml-bool">$1</span>');
+}
+
+function highlightGherkin(code) {
+  return code
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/^(\s*)(#.*)$/gm, '$1<span class="gherkin-comment">$2</span>')
+    .replace(/^(\s*)(@\S+)/gm, '$1<span class="gherkin-tag">$2</span>')
+    .replace(/^(Feature:.*)$/gm, '<span class="gherkin-feature">$1</span>')
+    .replace(/^(\s*)(Scenario Outline:|Scenario:|Background:)/gm, '$1<span class="gherkin-scenario">$2</span>')
+    .replace(/^(\s*)(Examples:)/gm, '$1<span class="gherkin-example">$2</span>')
+    .replace(/^(\s*)(Given |When |Then |And |But )(.*)$/gm, '$1<span class="gherkin-step">$2</span>$3')
+    .replace(/(\|[^|]+\|)/g, '<span class="gherkin-table">$&</span>');
+}
+</script>
+</body>
+</html>

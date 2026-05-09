@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR-05: AI in Performance Testing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1419;
+            --surface: #1a1f2e;
+            --surface-2: #252d3d;
+            --accent: #00d9ff;
+            --accent-dark: #0099cc;
+            --text-1: #e8eef2;
+            --text-2: #b8c1cc;
+            --text-3: #8892a0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-1);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 40px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .header p {
+            color: var(--text-2);
+            font-size: 1.1em;
+        }
+
+        .use-case-id {
+            display: inline-block;
+            background-color: var(--surface-2);
+            padding: 8px 16px;
+            border-radius: 4px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        h3 {
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: var(--text-1);
+        }
+
+        .section {
+            background-color: var(--surface);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border: 1px solid var(--surface-2);
+        }
+
+        .metric {
+            display: inline-block;
+            background-color: var(--surface-2);
+            padding: 12px 20px;
+            margin: 5px 10px 5px 0;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .metric-label {
+            color: var(--text-3);
+            font-size: 0.85em;
+        }
+
+        .metric-value {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.3em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background-color: var(--surface-2);
+            color: var(--accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--surface-2);
+        }
+
+        tr:hover {
+            background-color: var(--surface-2);
+        }
+
+        code {
+            background-color: var(--surface-2);
+            color: var(--accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--surface-2);
+            color: var(--text-1);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 3px solid var(--accent);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-in-progress {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-complete {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-not-started {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .risk-high {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid var(--danger);
+        }
+
+        .risk-medium {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--warning);
+        }
+
+        .risk-low {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success);
+        }
+
+        .phase-box {
+            background-color: var(--surface-2);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .phase-title {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .warning-box {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .info-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--info);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .success-box {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <div class="header">
+            <div class="use-case-id">PR-05 | AI in Performance Testing</div>
+            <h1>AI-Powered Performance Testing & Optimization</h1>
+            <p>Intelligent load testing, bottleneck detection, and auto-scaling recommendations using ML-driven performance analysis</p>
+        </div>
+
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p>
+                This Production Readiness Report documents the implementation of <span class="highlight">AI-Powered Performance Testing</span>,
+                a critical use case for optimizing system performance testing in the fintech platform. The system uses machine learning to:
+            </p>
+            <ul style="margin-left: 20px; margin-top: 15px;">
+                <li>Intelligently generate load test scenarios based on production traffic patterns</li>
+                <li>Detect performance bottlenecks and anomalies in real-time</li>
+                <li>Predict system degradation and recommend auto-scaling configurations</li>
+                <li>Optimize test execution by prioritizing high-impact scenarios</li>
+            </ul>
+            <div style="margin-top: 20px;">
+                <div class="metric">
+                    <div class="metric-label">Current Completion</div>
+                    <div class="metric-value">0%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Target Completion</div>
+                    <div class="metric-value">100%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Effort (Days)</div>
+                    <div class="metric-value">45</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Current State & Implementation Gaps</h2>
+            <p><span class="status-badge status-not-started">Not Started (0%)</span></p>
+
+            <h3>Current Situation</h3>
+            <p>
+                Performance testing is currently executed using manual load test generation and basic threshold-based alerting.
+                No ML-driven optimization exists for load test scenario generation, bottleneck prediction, or auto-scaling recommendations.
+            </p>
+
+            <h3>Critical Gaps</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gap Category</th>
+                        <th>Current State</th>
+                        <th>Required State</th>
+                        <th>Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Load Test Generation</strong></td>
+                        <td>Manual scenario creation</td>
+                        <td>ML-driven scenario generation from production patterns</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bottleneck Detection</strong></td>
+                        <td>Manual analysis of metrics</td>
+                        <td>Real-time anomaly detection with root cause analysis</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scaling Recommendations</strong></td>
+                        <td>Manual capacity planning</td>
+                        <td>AI-generated auto-scaling policies</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance Prediction</strong></td>
+                        <td>Historical analysis only</td>
+                        <td>Predictive modeling for system degradation</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Test Execution Optimization</strong></td>
+                        <td>Fixed test duration</td>
+                        <td>Adaptive execution with intelligent early-stopping</td>
+                        <td>Medium</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Technical Architecture</h2>
+
+            <h3>System Components</h3>
+            <p>The AI-Powered Performance Testing system consists of five core components:</p>
+
+            <div class="phase-box">
+                <div class="phase-title">1. Load Test Generation Engine</div>
+                <p>
+                    Analyzes production traffic patterns and generates realistic load test scenarios using ML clustering
+                    and sequence prediction algorithms.
+                </p>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">2. Performance Analysis Pipeline</div>
+                <p>
+                    Ingests metrics from Prometheus, detects anomalies using isolation forests, and identifies bottlenecks
+                    through correlation analysis.
+                </p>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">3. Auto-Scaling Optimizer</div>
+                <p>
+                    Uses gradient boosting to predict optimal resource allocation and generates Kubernetes HPA/VPA
+                    configurations.
+                </p>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">4. Real-time Anomaly Detector</div>
+                <p>
+                    Employs LSTM neural networks for time-series anomaly detection with explainable predictions
+                    (SHAP values).
+                </p>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">5. Web UI & Reporting</div>
+                <p>
+                    React-based dashboard for test execution, real-time metric visualization, and recommendation review.
+                </p>
+            </div>
+
+            <h3>Technology Stack</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Load Generation</strong></td>
+                        <td>Apache JMeter, Locust, k6</td>
+                        <td>Distributed load test execution</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ML Frameworks</strong></td>
+                        <td>scikit-learn, XGBoost, PyTorch</td>
+                        <td>ML model development and inference</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backend Services</strong></td>
+                        <td>FastAPI, PostgreSQL, Redis</td>
+                        <td>API layer, data persistence, caching</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Metrics & Monitoring</strong></td>
+                        <td>Prometheus, InfluxDB, Grafana</td>
+                        <td>Metrics collection and visualization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Frontend</strong></td>
+                        <td>React 18, D3.js, Chart.js</td>
+                        <td>Interactive dashboards and reports</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Orchestration</strong></td>
+                        <td>Kubernetes, Helm, KEDA</td>
+                        <td>Container orchestration and auto-scaling</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Production Architecture & Data Flow</h2>
+
+            <pre>┌─────────────────────────────────────────────────────────────┐
+│                    Production Environment                    │
+│                                                              │
+│  ┌──────────────────┐         ┌──────────────────┐         │
+│  │  Load Generator  │         │  Prometheus      │         │
+│  │  (JMeter/k6)     │────────▶│  Metrics         │         │
+│  └──────────────────┘         └──────────────────┘         │
+│           │                            │                    │
+│           ▼                            ▼                    │
+│  ┌──────────────────────────────────────────────┐           │
+│  │      Metrics Ingestion Service (FastAPI)     │           │
+│  │  - Time-series data normalization            │           │
+│  │  - Real-time anomaly detection               │           │
+│  │  - Bottleneck identification                 │           │
+│  └──────────────────────────────────────────────┘           │
+│           │              │              │                   │
+│           ▼              ▼              ▼                   │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐        │
+│  │ ML Inference │ │ PostgreSQL   │ │ Redis Cache  │        │
+│  │ Service      │ │ (Results)    │ │ (Live Data)  │        │
+│  └──────────────┘ └──────────────┘ └──────────────┘        │
+│           │              │              │                   │
+│           └──────────────┴──────────────┘                   │
+│                    │                                         │
+│                    ▼                                         │
+│  ┌──────────────────────────────────────────────┐           │
+│  │  Optimization Service                        │           │
+│  │  - Load scenario generation                  │           │
+│  │  - Bottleneck analysis                       │           │
+│  │  - Auto-scaling recommendations              │           │
+│  │  - Degradation prediction                    │           │
+│  └──────────────────────────────────────────────┘           │
+│           │              │                                  │
+│           ▼              ▼                                  │
+│  ┌──────────────┐ ┌──────────────────────┐                │
+│  │ Kubernetes   │ │  React Dashboard     │                │
+│  │ (Apply HPA)  │ │  - Real-time charts  │                │
+│  └──────────────┘ │  - Recommendations   │                │
+│                   │  - Report generation │                │
+│                   └──────────────────────┘                │
+└─────────────────────────────────────────────────────────────┘</pre>
+        </div>
+
+        <div class="section">
+            <h2>Detailed Implementation Plan (Build from Scratch)</h2>
+
+            <h3>Phase 1: Foundation & Data Infrastructure (Days 1-15)</h3>
+
+            <div class="phase-box">
+                <div class="phase-title">PostgreSQL Schema for Performance Data</div>
+                <pre>CREATE TABLE test_runs (
+    id SERIAL PRIMARY KEY,
+    test_name VARCHAR(255) NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP,
+    load_profile JSONB,
+    status VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_test_runs_time (start_time)
+);
+
+CREATE TABLE performance_metrics (
+    id BIGSERIAL PRIMARY KEY,
+    test_run_id INTEGER NOT NULL REFERENCES test_runs(id),
+    timestamp TIMESTAMP NOT NULL,
+    metric_name VARCHAR(100),
+    metric_value FLOAT,
+    dimension_labels JSONB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_metrics_test_time (test_run_id, timestamp),
+    INDEX idx_metrics_name (metric_name)
+);
+
+CREATE TABLE load_scenarios (
+    id SERIAL PRIMARY KEY,
+    scenario_name VARCHAR(255) NOT NULL,
+    traffic_pattern JSONB,
+    user_behaviors JSONB,
+    expected_load_profile JSONB,
+    created_by VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE scaling_recommendations (
+    id SERIAL PRIMARY KEY,
+    test_run_id INTEGER NOT NULL REFERENCES test_runs(id),
+    recommendation_type VARCHAR(100),
+    resource_type VARCHAR(50),
+    current_value FLOAT,
+    recommended_value FLOAT,
+    confidence_score FLOAT,
+    reasoning TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</pre>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">Metrics Ingestion Service (FastAPI)</div>
+                <pre>from fastapi import FastAPI, BackgroundTasks
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, JSONB
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import json
+from datetime import datetime
+import asyncio
+
+app = FastAPI(title="Performance Metrics API")
+DATABASE_URL = "postgresql://user:password@postgres:5432/perf_db"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine)
+Base = declarative_base()
+
+class MetricPoint(Base):
+    __tablename__ = "performance_metrics"
+    id = Column(Integer, primary_key=True)
+    test_run_id = Column(Integer)
+    timestamp = Column(DateTime)
+    metric_name = Column(String)
+    metric_value = Column(Float)
+
+@app.post("/metrics/ingest")
+async def ingest_metrics(metrics: list, background_tasks: BackgroundTasks):
+    """Ingest metrics from Prometheus scrape or direct push"""
+    background_tasks.add_task(process_metrics, metrics)
+    return {"status": "accepted", "count": len(metrics)}
+
+def process_metrics(metrics: list):
+    db = SessionLocal()
+    try:
+        for metric in metrics:
+            point = MetricPoint(
+                timestamp=datetime.fromisoformat(metric['timestamp']),
+                metric_name=metric['name'],
+                metric_value=metric['value'],
+                test_run_id=metric.get('test_run_id')
+            )
+            db.add(point)
+        db.commit()
+    finally:
+        db.close()
+
+@app.get("/test-runs/{test_run_id}/metrics")
+async def get_metrics(test_run_id: int, metric_name: str = None):
+    """Retrieve metrics for a test run"""
+    db = SessionLocal()
+    try:
+        query = db.query(MetricPoint).filter(
+            MetricPoint.test_run_id == test_run_id
+        )
+        if metric_name:
+            query = query.filter(MetricPoint.metric_name == metric_name)
+        metrics = query.all()
+        return [
+            {
+                "timestamp": m.timestamp.isoformat(),
+                "name": m.metric_name,
+                "value": m.metric_value
+            }
+            for m in metrics
+        ]
+    finally:
+        db.close()</pre>
+            </div>
+
+            <p><strong>Deliverables:</strong> PostgreSQL schema, metrics ingestion API, Prometheus remote-write integration</p>
+
+            <h3>Phase 2: ML Models & Analysis Engine (Days 16-30)</h3>
+
+            <div class="phase-box">
+                <div class="phase-title">Anomaly Detection Model (Isolation Forest)</div>
+                <pre>import pandas as pd
+import numpy as np
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
+from sklearn.externals import joblib
+import pickle
+
+class PerformanceAnomalyDetector:
+    def __init__(self, contamination=0.05):
+        self.scaler = StandardScaler()
+        self.model = IsolationForest(contamination=contamination, random_state=42)
+        self.metrics_window = 300  # 5-minute window
+
+    def extract_features(self, metrics_df):
+        """Extract statistical features from metric windows"""
+        features = {
+            'response_time_mean': metrics_df['response_time'].mean(),
+            'response_time_std': metrics_df['response_time'].std(),
+            'response_time_p99': metrics_df['response_time'].quantile(0.99),
+            'cpu_usage': metrics_df['cpu_usage'].mean(),
+            'memory_usage': metrics_df['memory_usage'].mean(),
+            'error_rate': (metrics_df['errors'].sum() / len(metrics_df)),
+            'throughput': len(metrics_df) / (metrics_df['timestamp'].max() -
+                           metrics_df['timestamp'].min()).total_seconds(),
+            'gc_pause_time': metrics_df['gc_pause_ms'].mean(),
+        }
+        return features
+
+    def train(self, historical_metrics_df):
+        """Train anomaly detector on historical data"""
+        feature_list = []
+
+        # Create sliding windows
+        for i in range(len(historical_metrics_df) - self.metrics_window):
+            window = historical_metrics_df.iloc[i:i+self.metrics_window]
+            features = self.extract_features(window)
+            feature_list.append(features)
+
+        features_df = pd.DataFrame(feature_list)
+        scaled_features = self.scaler.fit_transform(features_df)
+        self.model.fit(scaled_features)
+
+        return {"training_samples": len(feature_list)}
+
+    def predict(self, current_metrics_df):
+        """Detect anomalies in current metrics"""
+        features = self.extract_features(current_metrics_df)
+        features_df = pd.DataFrame([features])
+        scaled = self.scaler.transform(features_df)
+
+        prediction = self.model.predict(scaled)[0]
+        anomaly_score = self.model.score_samples(scaled)[0]
+
+        return {
+            "is_anomaly": prediction == -1,
+            "anomaly_score": float(anomaly_score),
+            "features": features
+        }
+
+    def save_model(self, path):
+        joblib.dump(self.scaler, f"{path}/scaler.pkl")
+        joblib.dump(self.model, f"{path}/model.pkl")
+
+    def load_model(self, path):
+        self.scaler = joblib.load(f"{path}/scaler.pkl")
+        self.model = joblib.load(f"{path}/model.pkl")</pre>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">Load Scenario Generator (Clustering)</div>
+                <pre>from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+from typing import List, Dict
+
+class LoadScenarioGenerator:
+    def __init__(self, n_scenarios=5):
+        self.n_scenarios = n_scenarios
+        self.scaler = StandardScaler()
+        self.kmeans = KMeans(n_clusters=n_scenarios, random_state=42)
+        self.scenario_templates = []
+
+    def extract_traffic_features(self, traffic_history):
+        """Extract features from production traffic history"""
+        features = []
+        for hour_data in traffic_history:
+            feature_vec = [
+                hour_data['request_rate'],
+                hour_data['avg_response_time'],
+                hour_data['p99_response_time'],
+                hour_data['concurrent_users'],
+                hour_data['error_rate'],
+                hour_data['transaction_size_mean'],
+                hour_data['cache_hit_rate'],
+            ]
+            features.append(feature_vec)
+        return np.array(features)
+
+    def train_scenarios(self, production_traffic_history):
+        """Cluster traffic patterns into scenarios"""
+        features = self.extract_traffic_features(production_traffic_history)
+        scaled_features = self.scaler.fit_transform(features)
+        self.kmeans.fit(scaled_features)
+
+        # Create templates for each cluster
+        for cluster_id in range(self.n_scenarios):
+            cluster_data = production_traffic_history[self.kmeans.labels_ == cluster_id]
+            template = {
+                'id': cluster_id,
+                'request_rate': np.mean([d['request_rate'] for d in cluster_data]),
+                'avg_response_time': np.mean([d['avg_response_time'] for d in cluster_data]),
+                'concurrent_users': int(np.mean([d['concurrent_users'] for d in cluster_data])),
+                'error_rate': np.mean([d['error_rate'] for d in cluster_data]),
+                'frequency': len(cluster_data) / len(production_traffic_history),
+            }
+            self.scenario_templates.append(template)
+
+        return self.scenario_templates
+
+    def generate_jmeter_config(self, scenario_id):
+        """Generate JMeter test plan for scenario"""
+        template = self.scenario_templates[scenario_id]
+
+        jmeter_config = {
+            'thread_group': {
+                'num_threads': template['concurrent_users'],
+                'ramp_time': 60,
+                'duration': 600,
+            },
+            'samplers': [
+                {
+                    'name': 'API Request',
+                    'url': '/api/transaction',
+                    'method': 'POST',
+                    'payload_size': 1024,
+                }
+            ],
+            'assertions': [
+                {
+                    'response_time_percentile': 99,
+                    'threshold_ms': template['avg_response_time'] * 1.5,
+                }
+            ]
+        }
+        return jmeter_config</pre>
+            </div>
+
+            <p><strong>Deliverables:</strong> Anomaly detection model, load scenario generator, model training pipeline</p>
+
+            <h3>Phase 3: Auto-Scaling & Optimization (Days 31-45)</h3>
+
+            <div class="phase-box">
+                <div class="phase-title">Scaling Recommendation Engine (XGBoost)</div>
+                <pre>import xgboost as xgb
+import pandas as pd
+import numpy as np
+from typing import Dict, List
+
+class AutoScalingOptimizer:
+    def __init__(self):
+        self.xgb_model = None
+        self.feature_names = [
+            'cpu_usage_current',
+            'memory_usage_current',
+            'response_time_p99',
+            'error_rate',
+            'request_rate',
+            'concurrent_users',
+            'cpu_trend_slope',
+            'memory_trend_slope',
+        ]
+
+    def prepare_training_data(self, historical_test_results):
+        """Prepare data from historical test runs"""
+        X = []
+        y_replicas = []
+        y_memory = []
+
+        for test in historical_test_results:
+            features = [
+                test['metrics']['cpu_usage'],
+                test['metrics']['memory_usage'],
+                test['metrics']['response_time_p99'],
+                test['metrics']['error_rate'],
+                test['metrics']['request_rate'],
+                test['metrics']['concurrent_users'],
+                test['metrics']['cpu_trend'],
+                test['metrics']['memory_trend'],
+            ]
+            X.append(features)
+
+            # Target: optimal replica count
+            y_replicas.append(test['optimal_replicas'])
+            # Target: memory per pod (MB)
+            y_memory.append(test['optimal_memory_mb'])
+
+        return pd.DataFrame(X, columns=self.feature_names), np.array(y_replicas), np.array(y_memory)
+
+    def train(self, historical_test_results):
+        """Train XGBoost models for scaling"""
+        X, y_replicas, y_memory = self.prepare_training_data(historical_test_results)
+
+        # Train replica count model
+        dtrain_replicas = xgb.DMatrix(X, label=y_replicas, feature_names=self.feature_names)
+        params_replicas = {
+            'objective': 'reg:squarederror',
+            'max_depth': 6,
+            'learning_rate': 0.1,
+        }
+        self.xgb_model_replicas = xgb.train(params_replicas, dtrain_replicas, num_boost_round=100)
+
+        # Train memory model
+        dtrain_memory = xgb.DMatrix(X, label=y_memory, feature_names=self.feature_names)
+        params_memory = {
+            'objective': 'reg:squarederror',
+            'max_depth': 6,
+            'learning_rate': 0.1,
+        }
+        self.xgb_model_memory = xgb.train(params_memory, dtrain_memory, num_boost_round=100)
+
+    def recommend_scaling(self, current_metrics: Dict) -> Dict:
+        """Generate scaling recommendation"""
+        features_df = pd.DataFrame([
+            [
+                current_metrics['cpu_usage'],
+                current_metrics['memory_usage'],
+                current_metrics['response_time_p99'],
+                current_metrics['error_rate'],
+                current_metrics['request_rate'],
+                current_metrics['concurrent_users'],
+                current_metrics['cpu_trend'],
+                current_metrics['memory_trend'],
+            ]
+        ], columns=self.feature_names)
+
+        dmatrix = xgb.DMatrix(features_df, feature_names=self.feature_names)
+
+        recommended_replicas = int(np.ceil(self.xgb_model_replicas.predict(dmatrix)[0]))
+        recommended_memory = int(self.xgb_model_memory.predict(dmatrix)[0])
+
+        return {
+            'recommended_replicas': max(2, min(10, recommended_replicas)),  # Min 2, max 10
+            'recommended_memory_mb': recommended_memory,
+            'current_replicas': current_metrics.get('current_replicas', 2),
+            'current_memory_mb': current_metrics.get('current_memory_mb', 512),
+            'urgency': 'high' if recommended_replicas > (current_metrics.get('current_replicas', 2) + 2) else 'normal',
+        }
+
+    def generate_kubernetes_config(self, recommendation):
+        """Generate Kubernetes HPA/VPA manifest"""
+        hpa_config = f"""
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-server-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-server
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+"""
+        return hpa_config</pre>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">Optimization API Endpoint</div>
+                <pre>@app.post("/optimize/generate-scenarios")
+async def generate_scenarios(test_config: Dict):
+    """Generate optimal load test scenarios"""
+    generator = LoadScenarioGenerator(n_scenarios=5)
+    scenarios = generator.train_scenarios(
+        await fetch_production_traffic_history(days=30)
+    )
+
+    return {
+        "scenarios": scenarios,
+        "generated_at": datetime.utcnow().isoformat(),
+    }
+
+@app.post("/optimize/detect-bottlenecks")
+async def detect_bottlenecks(test_run_id: int):
+    """Identify performance bottlenecks"""
+    metrics = await fetch_test_metrics(test_run_id)
+    detector = PerformanceAnomalyDetector()
+
+    anomalies = []
+    for window in sliding_windows(metrics, size=300):
+        result = detector.predict(window)
+        if result['is_anomaly']:
+            anomalies.append({
+                'window': window,
+                'score': result['anomaly_score'],
+                'features': result['features']
+            })
+
+    return {"bottlenecks": anomalies}
+
+@app.post("/optimize/scaling-recommendations")
+async def get_scaling_recommendations(test_run_id: int):
+    """Generate auto-scaling recommendations"""
+    metrics = await fetch_test_metrics(test_run_id)
+    current = aggregate_metrics(metrics)
+
+    optimizer = AutoScalingOptimizer()
+    recommendation = optimizer.recommend_scaling(current)
+    k8s_config = optimizer.generate_kubernetes_config(recommendation)
+
+    return {
+        "recommendation": recommendation,
+        "kubernetes_config": k8s_config,
+    }</pre>
+            </div>
+
+            <p><strong>Deliverables:</strong> Auto-scaling optimizer, API endpoints, Kubernetes manifests generator</p>
+        </div>
+
+        <div class="section">
+            <h2>Integration Points</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>System</th>
+                        <th>Integration Type</th>
+                        <th>Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Prometheus</strong></td>
+                        <td>Metrics scraping (HTTP pull) & remote write</td>
+                        <td>Real-time (15s intervals)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jenkins/GitHub Actions</strong></td>
+                        <td>Webhook triggers for test execution</td>
+                        <td>On-demand (per test schedule)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kubernetes API</strong></td>
+                        <td>HPA/VPA manifest application</td>
+                        <td>Per recommendation (asynchronous)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JMeter/Locust</strong></td>
+                        <td>Direct API for test plan submission</td>
+                        <td>Per scenario generation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PostgreSQL</strong></td>
+                        <td>JDBC connection for results storage</td>
+                        <td>Real-time writes</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Slack/Teams</strong></td>
+                        <td>Webhook notifications for bottleneck alerts</td>
+                        <td>Event-driven</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Production Requirements</h2>
+
+            <h3>Infrastructure Specifications</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>CPU</th>
+                        <th>Memory</th>
+                        <th>Storage</th>
+                        <th>High Availability</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Metrics Ingestion API</td>
+                        <td>4 cores</td>
+                        <td>8 GB</td>
+                        <td>N/A</td>
+                        <td>2 replicas, load balancer</td>
+                    </tr>
+                    <tr>
+                        <td>ML Inference Service</td>
+                        <td>8 cores</td>
+                        <td>16 GB</td>
+                        <td>50 GB (model cache)</td>
+                        <td>2 replicas, model replication</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL Database</td>
+                        <td>16 cores</td>
+                        <td>32 GB</td>
+                        <td>1 TB (SSD, with replication)</td>
+                        <td>Primary-replica replication</td>
+                    </tr>
+                    <tr>
+                        <td>Redis Cache</td>
+                        <td>4 cores</td>
+                        <td>16 GB</td>
+                        <td>200 GB (persistent)</td>
+                        <td>Redis Sentinel cluster</td>
+                    </tr>
+                    <tr>
+                        <td>Load Generator (isolated)</td>
+                        <td>32 cores</td>
+                        <td>64 GB</td>
+                        <td>200 GB</td>
+                        <td>Scalable pool</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Security Requirements</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>Authentication:</strong> OAuth 2.0 with OIDC for API access</li>
+                <li><strong>Encryption:</strong> TLS 1.3 for all data in transit, AES-256 for sensitive data at rest</li>
+                <li><strong>Authorization:</strong> RBAC with role-based access to test results and recommendations</li>
+                <li><strong>Audit Logging:</strong> All test execution and scaling actions logged to CloudTrail/audit trail</li>
+                <li><strong>Secrets Management:</strong> HashiCorp Vault for database credentials and API keys</li>
+                <li><strong>Network:</strong> VPC isolation, security group rules limiting access to APIs</li>
+            </ul>
+
+            <h3>Monitoring & Alerting</h3>
+            <ul style="margin-left: 20px;">
+                <li>Prometheus metrics for API latency, error rates, model inference time</li>
+                <li>Custom Grafana dashboards for test execution status and ML model performance</li>
+                <li>Alert rules for failed test runs, anomaly detection accuracy degradation, API latency >500ms</li>
+                <li>ELK stack for centralized logging with structured JSON events</li>
+                <li>PagerDuty integration for on-call incident escalation</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Gap Analysis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Priority</th>
+                        <th>Effort (Days)</th>
+                        <th>Risk</th>
+                        <th>Resolution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>No production traffic data extraction</td>
+                        <td>Critical</td>
+                        <td>5</td>
+                        <td>High</td>
+                        <td>Implement Prometheus metrics exporter; clean PII from logs</td>
+                    </tr>
+                    <tr>
+                        <td>Load generator isolated infrastructure</td>
+                        <td>Critical</td>
+                        <td>7</td>
+                        <td>High</td>
+                        <td>Provision separate Kubernetes namespace; network policies</td>
+                    </tr>
+                    <tr>
+                        <td>ML model training pipeline</td>
+                        <td>High</td>
+                        <td>10</td>
+                        <td>High</td>
+                        <td>Build data pipeline with continuous retraining schedule</td>
+                    </tr>
+                    <tr>
+                        <td>Anomaly detection baseline</td>
+                        <td>High</td>
+                        <td>8</td>
+                        <td>Medium</td>
+                        <td>Collect 30 days of baseline metrics before enabling alerts</td>
+                    </tr>
+                    <tr>
+                        <td>Auto-scaling policy validation</td>
+                        <td>Medium</td>
+                        <td>6</td>
+                        <td>Medium</td>
+                        <td>Test recommendations in staging before production application</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>RACI Matrix</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>QA Lead</th>
+                        <th>ML Engineer</th>
+                        <th>DevOps</th>
+                        <th>Backend Lead</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Schema design & setup</td>
+                        <td>C</td>
+                        <td>C</td>
+                        <td>R</td>
+                        <td>A</td>
+                    </tr>
+                    <tr>
+                        <td>ML model development</td>
+                        <td>C</td>
+                        <td>A/R</td>
+                        <td>C</td>
+                        <td>I</td>
+                    </tr>
+                    <tr>
+                        <td>API development</td>
+                        <td>I</td>
+                        <td>C</td>
+                        <td>I</td>
+                        <td>A/R</td>
+                    </tr>
+                    <tr>
+                        <td>Kubernetes deployment</td>
+                        <td>I</td>
+                        <td>I</td>
+                        <td>A/R</td>
+                        <td>C</td>
+                    </tr>
+                    <tr>
+                        <td>Testing & validation</td>
+                        <td>A/R</td>
+                        <td>C</td>
+                        <td>C</td>
+                        <td>C</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>R</strong> = Responsible, <strong>A</strong> = Accountable, <strong>C</strong> = Consulted, <strong>I</strong> = Informed</p>
+        </div>
+
+        <div class="section">
+            <h2>Risk Register</h2>
+
+            <div class="risk-high">
+                <h3>High Risk: Load Generation Impact on Production</h3>
+                <p>
+                    <strong>Description:</strong> Uncontrolled load generation could degrade production performance.
+                </p>
+                <p>
+                    <strong>Mitigation:</strong> Isolated load generator infrastructure, rate limiting, SLA monitoring,
+                    automated rollback if error rates exceed threshold (5%).
+                </p>
+                <p><strong>Owner:</strong> DevOps Lead</p>
+            </div>
+
+            <div class="risk-high">
+                <h3>High Risk: ML Model Accuracy & Drift</h3>
+                <p>
+                    <strong>Description:</strong> Models may degrade as system topology and traffic patterns evolve.
+                </p>
+                <p>
+                    <strong>Mitigation:</strong> Continuous retraining every 7 days, model performance monitoring
+                    (prediction accuracy >85%), manual review of recommendations before auto-applying.
+                </p>
+                <p><strong>Owner:</strong> ML Engineer</p>
+            </div>
+
+            <div class="risk-medium">
+                <h3>Medium Risk: False Positive Anomaly Detection</h3>
+                <p>
+                    <strong>Description:</strong> Anomaly detector may trigger on legitimate traffic spikes.
+                </p>
+                <p>
+                    <strong>Mitigation:</strong> Conservative anomaly thresholds initially, manual tuning based on
+                    business events, integration with calendar/holiday data.
+                </p>
+                <p><strong>Owner:</strong> QA Lead</p>
+            </div>
+
+            <div class="risk-medium">
+                <h3>Medium Risk: Data Privacy & Security</h3>
+                <p>
+                    <strong>Description:</strong> Production metrics may contain sensitive business/user data.
+                </p>
+                <p>
+                    <strong>Mitigation:</strong> Data masking in test scenarios, encryption at rest/transit, RBAC,
+                    regular security audits, PII scrubbing before model training.
+                </p>
+                <p><strong>Owner:</strong> Security Team</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Effort Estimation</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Duration (Days)</th>
+                        <th>Team Size</th>
+                        <th>Key Activities</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Phase 1: Foundation</strong></td>
+                        <td>15</td>
+                        <td>4 (Backend, DevOps, QA, ML)</td>
+                        <td>Schema design, metrics ingestion, infrastructure setup</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 2: ML Models</strong></td>
+                        <td>15</td>
+                        <td>3 (ML, Backend, QA)</td>
+                        <td>Model development, training pipeline, API integration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 3: Optimization</strong></td>
+                        <td>15</td>
+                        <td>3 (ML, Backend, DevOps)</td>
+                        <td>Auto-scaling engine, Kubernetes integration, UI development</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Testing & Hardening</strong></td>
+                        <td>10</td>
+                        <td>2 (QA, DevOps)</td>
+                        <td>Load testing, chaos engineering, security review</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deployment & Monitoring</strong></td>
+                        <td>5</td>
+                        <td>2 (DevOps, Backend)</td>
+                        <td>Production rollout, monitoring setup, runbooks</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Total Effort: 45 days | Team: 3-4 people | Start to Production: 6-7 weeks</strong></p>
+        </div>
+
+        <div class="section">
+            <h2>Definition of Done</h2>
+            <ul class="checklist">
+                <li>All database schemas created and tested with expected data volumes</li>
+                <li>Metrics ingestion API handles 10,000+ metrics/second with <100ms latency</li>
+                <li>Anomaly detection model achieves >85% accuracy on validation set</li>
+                <li>Load scenario generator produces 5 distinct scenarios from production data</li>
+                <li>Auto-scaling recommendations validated in staging environment</li>
+                <li>API endpoints fully documented with OpenAPI/Swagger</li>
+                <li>React dashboard displays real-time test execution and recommendations</li>
+                <li>Kubernetes HPA/VPA manifests tested and auto-applicable</li>
+                <li>Security review completed (SAST, dependency scanning, penetration testing)</li>
+                <li>Monitoring dashboards and alerting rules deployed</li>
+                <li>Runbooks created for on-call troubleshooting</li>
+                <li>Team trained on system operation and model interpretation</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Action Items</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Owner</th>
+                        <th>Due Date</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Secure load generator infrastructure budget</td>
+                        <td>Head of QA</td>
+                        <td>Week 1</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td>Assign ML engineer to project</td>
+                        <td>Head of AI & Eng</td>
+                        <td>Week 1</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td>Extract 30 days of production traffic data</td>
+                        <td>DevOps Lead</td>
+                        <td>Week 2</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Design PostgreSQL schema</td>
+                        <td>Backend Lead</td>
+                        <td>Week 2</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Provision isolated K8s namespace</td>
+                        <td>DevOps Lead</td>
+                        <td>Week 3</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Complete initial ML model training</td>
+                        <td>ML Engineer</td>
+                        <td>Week 5</td>
+                        <td>High</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Success Metrics</h2>
+            <div class="success-box">
+                <h3>KPIs (Measured at Go-Live and 6-Month Mark)</h3>
+                <ul style="margin-left: 20px;">
+                    <li><strong>Load Test Generation Time:</strong> Reduce from 4 hours to 30 minutes</li>
+                    <li><strong>Bottleneck Detection:</strong> Identify issues within 5 minutes of occurrence</li>
+                    <li><strong>Auto-Scaling Accuracy:</strong> Recommendations accurate within ±20% of actual need</li>
+                    <li><strong>Model Accuracy:</strong> Anomaly detection >85% precision, >80% recall</li>
+                    <li><strong>Test Cost Reduction:</strong> 30% reduction in compute costs through optimization</li>
+                    <li><strong>Team Productivity:</strong> 50% reduction in manual performance testing time</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-12: Chaos Testing Agent - Requirements</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #ffa657;
+            --accent-purple: #6e40aa;
+            --accent-light-blue: #79c0ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .meta-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .meta-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-p4 {
+            background-color: var(--accent-purple);
+            color: #e6edf3;
+        }
+
+        .badge-in-progress {
+            background-color: var(--accent-green);
+            color: #0d1117;
+        }
+
+        section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: var(--accent-light-blue);
+        }
+
+        .persona-card {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-blue);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .persona-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .persona-role {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .user-story {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-purple);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .story-id {
+            font-weight: 700;
+            color: var(--accent-light-blue);
+            margin-bottom: 5px;
+        }
+
+        .story-text {
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .story-priority {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        .requirement {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-green);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .req-id {
+            font-weight: 700;
+            color: var(--accent-light-blue);
+            margin-bottom: 5px;
+        }
+
+        .nfr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nfr-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-orange);
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .nfr-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent-orange);
+        }
+
+        .acceptance-criteria {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-green);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .criteria-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--accent-light-blue);
+        }
+
+        .given-when-then {
+            margin-left: 15px;
+            font-size: 0.95em;
+        }
+
+        .given-when-then > div {
+            margin-bottom: 6px;
+        }
+
+        .given {
+            color: var(--accent-light-blue);
+        }
+
+        .when {
+            color: var(--accent-green);
+        }
+
+        .then {
+            color: var(--accent-orange);
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        code {
+            background: var(--bg-primary);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: var(--accent-light-blue);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 700;
+            color: var(--accent-light-blue);
+        }
+
+        tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+            }
+
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nfr-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div>
+                    <h1>Chaos Testing Agent</h1>
+                    <p style="color: var(--text-secondary); margin-top: 5px;">AI-driven resilience testing through controlled failure injection and system validation</p>
+                </div>
+                <div style="text-align: right;">
+                    <span class="badge badge-p4">P4: Lower</span>
+                    <span class="badge badge-in-progress">In Progress (15%)</span>
+                </div>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">Use Case ID</div>
+                    <div class="meta-value">UC-12</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Owner</div>
+                    <div class="meta-value">Anupam Sharma</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Version</div>
+                    <div class="meta-value">v1.0</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Last Updated</div>
+                    <div class="meta-value">May 2026</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Author</div>
+                    <div class="meta-value" style="color:#60a5fa;font-weight:700;">Malcolm Govender</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Role</div>
+                    <div class="meta-value" style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</div>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>Problem Statement</h2>
+            <p>Systems that work perfectly in ideal conditions often fail catastrophically when faced with real-world infrastructure challenges: network latencies, service outages, database failures, resource exhaustion, and cascading failures. Traditional testing validates happy paths but leaves systems unprepared for chaos. Chaos Engineering has emerged as a discipline to address this, but implementing chaos tests manually is tedious and error-prone. Teams lack systematic approaches to: identify critical failure modes, design meaningful chaos scenarios, determine safe blast radius boundaries, and prioritize which failures to test first. We need an AI-powered Chaos Testing Agent that automatically recommends failure scenarios based on system topology, generates and executes chaos tests, validates recovery behavior, and measures resilience improvements over time.</p>
+        </section>
+
+        <section>
+            <h2>Target Users & Personas</h2>
+            
+            <div class="persona-card">
+                <div class="persona-name">Arun Patel</div>
+                <div class="persona-role">SRE / Platform Engineer</div>
+                <p><strong>Goals:</strong> Identify single points of failure in production systems, validate failover mechanisms, measure system resilience, build confidence before deploying to production.</p>
+                <p><strong>Frustrations:</strong> Manual chaos scenario design is time-consuming and requires deep system knowledge. Hard to predict which failures will cascade. Limited visibility into how systems recover from partial failures. On-call incidents often expose untested failure modes.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Leah Rodriguez</div>
+                <div class="persona-role">DevOps Lead</div>
+                <p><strong>Goals:</strong> Track resilience metrics across services, benchmark chaos test results, identify trends in failure recovery time, prioritize infrastructure improvements.</p>
+                <p><strong>Frustrations:</strong> No systematic way to assess which services are most resilient. Cannot compare resilience before/after infrastructure changes. Hard to justify resilience investment to stakeholders without data.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Chen Wei</div>
+                <div class="persona-role">Quality Assurance / Test Architect</div>
+                <p><strong>Goals:</strong> Define comprehensive test coverage for chaos scenarios, ensure tests are repeatable and safe, integrate chaos tests into CI/CD pipelines, measure test effectiveness.</p>
+                <p><strong>Frustrations:</strong> Hard to know what chaos scenarios are sufficient. Concerns about blast radius and unintended side effects. No clear methodology for prioritizing which failure modes to test first.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Marcus Thompson</div>
+                <div class="persona-role">Incident Commander / On-Call Engineer</div>
+                <p><strong>Goals:</strong> Understand which systems are resilient to common failure modes, respond faster to incidents by knowing recovery procedures, reduce MTTR, prevent similar incidents recurring.</p>
+                <p><strong>Frustrations:</strong> Incidents reveal untested failure scenarios. Recovery procedures unclear when failures happen. Post-incident remediation often targets symptoms rather than root causes.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>User Stories</h2>
+
+            <div class="user-story">
+                <div class="story-id">US-01</div>
+                <div class="story-text">As an SRE, I want the system to analyze my service topology and recommend critical chaos scenarios (e.g., "database failover", "network partition between API and cache"), so that I can focus testing effort on high-risk failure modes.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-02</div>
+                <div class="story-text">As an SRE, I want to inject controlled network latencies (100ms-1000ms) and packet loss (1-10%) into services in a staging environment, so that I can test application behavior under degraded network conditions.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-03</div>
+                <div class="story-text">As an SRE, I want to simulate service unavailability (kill pods, stop containers, force service restarts), so that I can validate that the system detects failures and initiates failover procedures.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-04</div>
+                <div class="story-text">As an SRE, I want to inject database failures (connection pool exhaustion, slow queries, replication lag), so that I can test application resilience when the database is degraded or unavailable.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-05</div>
+                <div class="story-text">As a DevOps Lead, I want to visualize chaos test results (what failed, how long recovery took, which alerts fired) in a dashboard, so that I can assess system resilience and identify improvement areas.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-06</div>
+                <div class="story-text">As an SRE, I want to define blast radius boundaries (e.g., "only kill 1 of 3 pods", "max 5 minute test duration") before running chaos, so that I can ensure production impact is minimized and tests are safe.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-07</div>
+                <div class="story-text">As a Test Architect, I want to integrate chaos tests into CI/CD pipelines (e.g., run chaos on staging after deployment), so that resilience is validated before production release.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-08</div>
+                <div class="story-text">As a DevOps Lead, I want to benchmark resilience metrics before and after infrastructure changes, so that I can quantify the impact of improvements and justify investment.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-09</div>
+                <div class="story-text">As an SRE, I want to simulate memory pressure and CPU exhaustion in services, so that I can test application graceful degradation and resource limits.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-10</div>
+                <div class="story-text">As an Incident Commander, I want chaos test reports to include runbooks and recovery procedures so I can reference them during incidents and respond faster.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-11</div>
+                <div class="story-text">As an SRE, I want to progressively increase chaos intensity (start with low latency, increase to network partitions) in a single test, so that I can identify the exact failure threshold of systems.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-12</div>
+                <div class="story-text">As a DevOps Lead, I want to track resilience trends over time (MTTR improvement, detection time, recovery success rate), so that I can demonstrate continuous resilience maturity to leadership.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Functional Requirements</h2>
+
+            <div class="requirement">
+                <div class="req-id">FR-01: Service Topology Discovery</div>
+                <p>Automatically discover service topology by analyzing Kubernetes manifests, service mesh configs (Istio), or cloud infrastructure (AWS/GCP). Identify: service dependencies, critical paths, single points of failure. Visualize topology graph with resilience annotations.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-02: Chaos Scenario Recommendation Engine</div>
+                <p>Analyze service topology and failure modes to recommend high-value chaos scenarios. Use ML to identify critical dependencies and predict impact of failures. Score scenarios by: blast radius, likelihood, business impact. Rank by ROI.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-03: Network Fault Injection</div>
+                <p>Inject network failures via tc (traffic control) or service mesh (Istio) for Kubernetes. Support: latency (configurable ms), packet loss (%), bandwidth throttling. Apply per-service, per-pod, or per-namespace. Validate that app handles degraded networks.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-04: Service Unavailability Simulation</div>
+                <p>Simulate service outages: kill pods (kubelet termination), stop containers, force service restarts, block traffic via iptables/network policy. Test: failover mechanisms, service discovery updates, load balancer recovery. Validate health checks detect failures.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-05: Database Failure Scenarios</div>
+                <p>Inject database failures: connection pool exhaustion, slow queries (increased latency), replication lag, read-only mode, disk space exhaustion. Support: PostgreSQL, MySQL, MongoDB, DynamoDB. Test: fallback strategies, circuit breakers, data consistency.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-06: Resource Exhaustion Testing</div>
+                <p>Simulate resource constraints: CPU throttling (cgroups), memory pressure (stress-ng), disk I/O saturation, open file descriptor limits. Test: graceful degradation, priority queuing, service shedding, resource limits enforcement.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-07: Blast Radius Definition & Enforcement</div>
+                <p>Allow users to define test boundaries: max pods to kill, max failure duration, excluded services (critical only), max concurrent failures. Enforce via admission controllers or test execution guards. Prevent accidental production impact.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-08: Test Execution & Observation</div>
+                <p>Execute chaos tests: apply failure, observe system behavior, collect metrics (latency, error rates, resource usage), capture logs and traces. Wait for: system stabilization, recovery completion, or timeout. Support manual abort if issues detected.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-09: Alert & Monitoring Integration</div>
+                <p>Verify that alert rules fire during chaos (alert effectiveness validation). Correlate alerts to failure events. Measure: alert latency (time from failure to alert), false positive/negative rates. Test: oncall notification flow, escalation policies.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-10: Resilience Metrics & Reporting</div>
+                <p>Measure resilience: MTTR (mean time to recovery), detection time, error rate during failure, successful recovery rate. Generate report: test scenario, failure details, system response, recovery timeline, insights, recommendations.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-11: CI/CD Pipeline Integration</div>
+                <p>Integrate chaos tests into deployment pipelines: run on staging post-deployment, block release if resilience metrics degrade, generate reports in test results. Support: Jenkins, GitLab CI, GitHub Actions via webhooks/plugins.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-12: Progressive Failure Testing</div>
+                <p>Support ramping scenarios: start with low latency, gradually increase failure intensity until system breaks. Measure: failure threshold (breaking point), graceful degradation curve, resource saturation point.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-13: Resilience Dashboard</div>
+                <p>Display: test history, service resilience scores, MTTR trends, alert effectiveness, most-impactful failure modes. Support filtering: by service, date range, scenario type. Highlight: areas needing improvement, resilience trends.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-14: Runbook & Playbook Generation</div>
+                <p>Auto-generate runbooks from chaos test results: failure symptoms, detection procedures, manual remediation steps. Link to runbooks from test reports for oncall reference. Include: rollback procedures, escalation contacts.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-15: Benchmarking & Trend Analysis</div>
+                <p>Compare resilience metrics before/after infrastructure changes: MTTR improvement, recovery success rate, error rate reduction. Track trends: weekly/monthly resilience scores, improvement trajectory, correlation with deployments.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="nfr-grid">
+                <div class="nfr-card">
+                    <div class="nfr-title">Performance</div>
+                    <ul style="margin: 0;">
+                        <li>Topology discovery: <30 seconds for 50+ services</li>
+                        <li>Scenario recommendation: <5 seconds using ML model</li>
+                        <li>Failure injection: <2 seconds to apply chaos</li>
+                        <li>Metric aggregation: <10 seconds for 5min test window</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Scalability</div>
+                    <ul style="margin: 0;">
+                        <li>Support clusters with 100+ services, 1000+ pods</li>
+                        <li>Handle 100+ concurrent chaos tests (multi-cluster)</li>
+                        <li>Store 2+ years of chaos test history</li>
+                        <li>Real-time metrics ingestion from 1000+ pods</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Safety & Reliability</div>
+                    <ul style="margin: 0;">
+                        <li>Blast radius enforcement: 100% compliance (no unintended impact)</li>
+                        <li>Graceful failure handling: all chaos tests have safe abort path</li>
+                        <li>Dry-run mode: simulate chaos without actual injection</li>
+                        <li>Automatic rollback: revert chaos if health checks fail</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Observability & Transparency</div>
+                    <ul style="margin: 0;">
+                        <li>Detailed logging: every chaos action logged with timestamps</li>
+                        <li>Audit trail: all test executions, parameters, results</li>
+                        <li>Real-time metrics: latency, error rates, pod status during chaos</li>
+                        <li>Distributed tracing: request path during failure scenarios</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Integration & Compatibility</div>
+                    <ul style="margin: 0;">
+                        <li>Kubernetes 1.20+, support multiple CNI/service meshes (Istio, Linkerd)</li>
+                        <li>Work with: Prometheus, Datadog, NewRelic metrics</li>
+                        <li>CI/CD: Jenkins, GitLab CI, GitHub Actions, ArgoCD</li>
+                        <li>Cloud providers: AWS, GCP, Azure, on-premise Kubernetes</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Usability & Learning</div>
+                    <ul style="margin: 0;">
+                        <li>Web UI for scenario creation and test execution (no CLI required)</li>
+                        <li>Built-in scenario templates: database failure, network partition, pod crash</li>
+                        <li>Guided tour: walkthrough setting up first chaos test</li>
+                        <li>Dark theme UI, mobile-responsive dashboards</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Acceptance Criteria</h2>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-01: Topology Discovery Completeness</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a Kubernetes cluster with 50+ services and complex dependencies</div>
+                    <div><span class="when">When</span> I run topology discovery</div>
+                    <div><span class="then">Then</span> >95% of services, dependencies, and communication flows are identified within 30 seconds</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-02: Failure Injection Accuracy</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a chaos scenario targeting network latency (200ms) on specific service</div>
+                    <div><span class="when">When</span> I execute the test</div>
+                    <div><span class="then">Then</span> measured latency is 200ms ±20ms, packet loss matches specification, other services unaffected</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-03: Blast Radius Enforcement</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a blast radius limit of "max 1 pod death per service"</div>
+                    <div><span class="when">When</span> I define a chaos test to kill pods</div>
+                    <div><span class="then">Then</span> system enforces limit: only 1 pod terminated per service, test aborts if limit exceeded</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-04: Recovery Detection & Metrics</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a service experiencing pod failure with automated restart</div>
+                    <div><span class="when">When</span> the test runs and pod recovers</div>
+                    <div><span class="then">Then</span> MTTR is accurately calculated, error rate reduction is measured, successful recovery is marked</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-05: Alert Effectiveness Validation</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> alert rules defined for service latency and error rates</div>
+                    <div><span class="when">When</span> I run a chaos test that triggers those conditions</div>
+                    <div><span class="then">Then</span> alerts fire correctly, detection time <30 seconds, false positive rate <5%</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-06: Progressive Failure Measurement</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a progressive latency test starting 100ms, increasing 50ms every 30 seconds</div>
+                    <div><span class="when">When</span> I run the test to find breaking point</div>
+                    <div><span class="then">Then</span> system identifies failure threshold with ±100ms accuracy and logs graceful degradation curve</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Dependencies & Integrations</h2>
+
+            <h3>Kubernetes & Infrastructure</h3>
+            <ul>
+                <li><strong>Kubernetes API:</strong> Service discovery, pod management, exec into pods</li>
+                <li><strong>Network Tools:</strong> tc (traffic control), iptables, network policies, service mesh APIs (Istio, Linkerd)</li>
+                <li><strong>Container Runtime:</strong> kubectl, container pause/resume, exec for resource exhaustion tools</li>
+                <li><strong>Metrics Collection:</strong> Prometheus, Datadog, NewRelic APIs for observability during chaos</li>
+            </ul>
+
+            <h3>Internal Components</h3>
+            <ul>
+                <li><strong>Topology Engine:</strong> Service discovery from K8s, dependency mapping, critical path analysis</li>
+                <li><strong>ML Recommendation Engine:</strong> Service graph analysis, failure impact prediction, scenario prioritization</li>
+                <li><strong>Chaos Executor:</strong> Orchestrate failure injection, manage test lifecycle, enforce blast radius</li>
+                <li><strong>Metrics Aggregator:</strong> Collect metrics during chaos, calculate resilience KPIs, generate reports</li>
+                <li><strong>State Manager:</strong> Track test execution, store results, audit trail</li>
+            </ul>
+
+            <h3>Optional Integrations</h3>
+            <ul>
+                <li>CI/CD systems: Jenkins, GitLab CI, GitHub Actions (trigger tests on deployment)</li>
+                <li>Incident management: PagerDuty, Opsgenie (link chaos tests to on-call runbooks)</li>
+                <li>Database tools: database-specific failure injection (Chaosdb plugins)</li>
+                <li>Slack/Teams: notifications on test completion, failures, recommendations</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Assumptions & Constraints</h2>
+
+            <h3>Assumptions</h3>
+            <ul>
+                <li>Cluster has sufficient capacity to tolerate temporary resource exhaustion tests</li>
+                <li>Services implement standard health checks (liveness/readiness probes) that Kubernetes uses to detect failures</li>
+                <li>Metrics are available from Prometheus or similar observability platform</li>
+                <li>Network policies and service mesh are properly configured if fault injection relies on them</li>
+                <li>Database connections are properly pooled and timeouts are reasonable (>10s)</li>
+            </ul>
+
+            <h3>Constraints</h3>
+            <ul>
+                <li><strong>Blast Radius Trade-off:</strong> Conservative limits reduce risk but may not expose real failure modes that only occur under high concurrency</li>
+                <li><strong>Metrics Lag:</strong> Observability systems have inherent latency (5-10s); very fast failure/recovery sequences may be missed</li>
+                <li><strong>Stateful Services:</strong> Chaos tests can cause data loss for stateful services without proper backup/recovery mechanisms</li>
+                <li><strong>Cost:</strong> Continuous chaos testing increases cloud infrastructure costs; must be balanced against testing value</li>
+                <li><strong>False Positives:</strong> Transient network issues or temporary slowdowns unrelated to chaos may confound results</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Out of Scope (v1.0)</h2>
+
+            <ul>
+                <li><strong>Advanced Scenario Combinations:</strong> Multi-failure scenarios (simultaneous database + network failures) in v2.0</li>
+                <li><strong>Production Chaos:</strong> Running chaos tests directly in production (v2.0, with strong governance)</li>
+                <li><strong>Custom Failure Injection:</strong> Arbitrary code injection or binary patching (v2.0 with security review)</li>
+                <li><strong>Game Days & War Rooms:</strong> Orchestrated multi-team chaos exercises (future feature)</li>
+                <li><strong>ML-Powered Automatic Remediation:</strong> Auto-fix identified issues (v2.0)</li>
+                <li><strong>Chaos Test Recommendation Based on Incidents:</strong> Learning from production incidents to improve chaos test coverage (v2.0)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Definition of Done</h2>
+
+            <ul class="checklist">
+                <li>Service topology discovery implemented and tested on multi-service Kubernetes cluster</li>
+                <li>Scenario recommendation engine using ML to identify high-impact chaos tests</li>
+                <li>Network fault injection working: latency, packet loss, bandwidth throttling via tc or service mesh</li>
+                <li>Pod termination and service unavailability scenarios fully functional with pod restart validation</li>
+                <li>Database failure injection implemented for PostgreSQL, MySQL, MongoDB (replication lag, slow queries, pool exhaustion)</li>
+                <li>Blast radius definition and enforcement validated with multiple test scenarios</li>
+                <li>Resilience metrics calculation: MTTR, detection time, recovery success rate all accurate within ±5%</li>
+                <li>Alert effectiveness validation: alert firing detection, false positive rate measurement, escalation validation</li>
+                <li>CI/CD integration with Jenkins/GitLab CI/GitHub Actions for automated test execution</li>
+                <li>Progressive failure testing (ramp-up scenarios) working with breaking point identification</li>
+                <li>Resilience dashboard displaying metrics, trends, and improvement recommendations</li>
+                <li>Runbook generation from test results with accurate recovery procedures</li>
+                <li>Benchmarking and trend analysis showing resilience before/after changes</li>
+                <li>Beta testing with 3 DevOps/SRE teams; feedback incorporated, issues resolved</li>
+                <li>Documentation: user guide, scenario templates, CI/CD setup, troubleshooting guide completed</li>
+                <li>Security review: RBAC, audit logging, access controls for test execution validated</li>
+                <li>Product owner and engineering sign-off obtained</li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>

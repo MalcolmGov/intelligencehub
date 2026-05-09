@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PR-03: Intelligent Test Execution & Prioritization</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1d2e;
+      --surface: #20243c;
+      --surface2: #252942;
+      --surface3: #2d3155;
+      --border: #2e3358;
+      --text-1: #e8eaff;
+      --text-2: #8b93c4;
+      --text-3: #555e8a;
+      --accent: #0073ea;
+      --green: #00c875;
+      --amber: #fdab3d;
+      --red: #f87171;
+      --purple: #a78bfa;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      line-height: 1.6;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    .hero {
+      background: linear-gradient(135deg, var(--surface3) 0%, var(--surface2) 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+    }
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .hero-subtitle {
+      color: var(--text-2);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+    .badge-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .badge-status-inprogress {
+      background: rgba(253, 171, 61, 0.15);
+      color: var(--amber);
+      border: 1px solid rgba(253, 171, 61, 0.3);
+    }
+    .badge-priority-high {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+    .badge-tech {
+      background: rgba(0, 115, 234, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(0, 115, 234, 0.3);
+    }
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--surface);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--amber), var(--accent));
+      width: 30%;
+    }
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--surface3);
+    }
+    .card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .card-text {
+      color: var(--text-2);
+      font-size: 0.95rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th {
+      background: var(--surface3);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--text-2);
+    }
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    tr:hover { background: var(--surface3); }
+    .status-done { color: var(--green); font-weight: 600; }
+    .status-partial { color: var(--amber); font-weight: 600; }
+    .status-missing { color: var(--red); font-weight: 600; }
+    .code-block {
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: var(--text-2);
+    }
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+    }
+    li {
+      margin-bottom: 0.5rem;
+      color: var(--text-2);
+    }
+    .highlight {
+      background: rgba(0, 115, 234, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+    .footer {
+      text-align: center;
+      padding-top: 2rem;
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-3);
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+  <div class="container">
+    <!-- HERO HEADER -->
+    <div class="hero">
+      <div class="hero-title">Intelligent Test Execution & Prioritization</div>
+      <div class="hero-subtitle">SentinelQA Use Case #3 — Anupam Sharma (Head of QA Automation)</div>
+      
+      <div class="badge-group">
+        <span class="badge badge-status-inprogress">⏳ In Progress (30%)</span>
+        <span class="badge badge-priority-high">🔴 High Priority</span>
+        <span class="badge badge-tech">Python</span>
+        <span class="badge badge-tech">FastAPI</span>
+        <span class="badge badge-tech">Git Analysis</span>
+        <span class="badge badge-tech">Playwright</span>
+        <span class="badge badge-tech">React</span>
+      </div>
+      
+      <div style="font-size: 0.95rem; color: var(--text-2); margin-bottom: 1rem;">
+        <strong>Completion:</strong> 30% | <strong>Owner:</strong> Anupam Sharma | <strong>Status:</strong> ADVISORY PHASE
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="section">
+      <div class="section-title">Executive Summary</div>
+      <div class="card">
+        <div class="card-title">What It Does</div>
+        <div class="card-text">
+          Intelligent test prioritization engine ranks and orders test execution based on code churn, past defect correlation, business criticality, and risk assessment. Tests most likely to catch defects run first; low-risk areas run last. The system integrates with CI/CD to automatically optimize test execution order, enabling faster feedback loops and more efficient resource allocation.
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Business Value</div>
+        <ul style="margin-top: 0.5rem;">
+          <li><strong>Catch defects faster</strong> — high-risk tests run first (ROI in first 10% of test execution)</li>
+          <li><strong>Reduce time-to-feedback</strong> by 40-50% through intelligent prioritization</li>
+          <li><strong>Fail fast strategy</strong> — CI/CD stops on first defect instead of running all tests</li>
+          <li><strong>Improve developer productivity</strong> — faster PR feedback cycles</li>
+          <li><strong>Optimized test parallelization</strong> — schedule high-value tests on best resources</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Current State</div>
+        <div class="card-text">
+          <code>defect_risk.py</code> exists as an advisory-only module (no runtime execution engine wired). Currently generates reports, but does NOT integrate with live CI/CD test runners or execution engines. No Playwright/Selenium integration for real-time test execution prioritization.
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">What's Needed to Reach Production</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>Build runtime test execution engine with prioritization ordering</li>
+          <li>Integrate with Playwright/Selenium for live test runner control</li>
+          <li>Wire to Jenkins/GitHub Actions CI/CD pipeline hooks</li>
+          <li>Implement fail-fast feedback to developers</li>
+          <li>Create React dashboard for test execution visualization</li>
+          <li>Setup A/B testing to validate prioritization effectiveness</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CURRENT IMPLEMENTATION -->
+    <div class="section">
+      <div class="section-title">Current Implementation</div>
+      <div class="card">
+        <div class="card-title">What IS Built</div>
+        <ul style="margin-top: 0.5rem;">
+          <li><strong>defect_risk.py:</strong> Advisory module that scores test priority (read-only)</li>
+          <li><strong>Git analysis:</strong> Extracts code churn from git history</li>
+          <li><strong>Historical defect correlation:</strong> Analyzes past test execution results</li>
+          <li><strong>Risk scoring algorithm:</strong> Computes priority score for each test</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">What IS NOT Built</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>Runtime test execution engine</li>
+          <li>Playwright/Selenium test runner integration</li>
+          <li>CI/CD pipeline hook (Jenkins/GitHub Actions)</li>
+          <li>Real-time test scheduling & execution prioritization</li>
+          <li>Fail-fast feedback loop to CI/CD</li>
+          <li>React UI for execution visualization</li>
+          <li>A/B testing framework</li>
+          <li>Metrics tracking for prioritization effectiveness</li>
+        </ul>
+      </div>
+      
+      <div class="code-block">
+# Current defect_risk.py (ADVISORY ONLY)
+def analyze_code_churn():
+    # Returns test priority scores
+    pass
+
+def correlate_defects():
+    # Maps tests to past defects
+    pass
+
+def compute_risk_score():
+    # Calculates test priority
+    pass
+      </div>
+    </div>
+
+    <!-- TECHNICAL ARCHITECTURE -->
+    <div class="section">
+      <div class="section-title">Technical Architecture</div>
+      
+      <div class="card">
+        <div class="card-title">System Components</div>
+        <div style="margin-top: 1rem;">
+          <strong style="color: var(--accent);">Git Analysis Engine</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Extracts file change frequency, commit history, author patterns. Identifies high-churn areas that need more testing.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">Defect Correlation Module</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Analyzes historical test execution against bug reports. Maps which tests catch which defects. Builds predictive model.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">Risk Scoring Engine</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Combines code churn, defect history, business criticality, test flakiness into unified priority score (0-100).
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">Runtime Execution Engine</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Orders tests by priority. Controls Playwright/Selenium execution. Implements fail-fast strategy.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">FastAPI Backend</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            API for priority scoring, execution ordering, results reporting. Integrates with CI/CD via webhooks.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">React Dashboard</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Real-time visualization of test execution, priority ordering, pass/fail results, time-to-feedback metrics.
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Data Flow</div>
+        <div class="code-block" style="margin-top: 1rem;">
+Git commit (code push)
+  ↓
+Git Analysis (code churn detection)
+  ↓
+Risk Scoring Engine (priority calculation)
+  ↓
+Test Priority Queue (ordered by score)
+  ↓
+CI/CD Webhook Trigger
+  ↓
+Playwright/Selenium Runtime Engine
+  ↓
+Execute tests (highest priority first)
+  ↓
+Fail-fast feedback (stop on defect)
+  ↓
+Results → PostgreSQL + React Dashboard
+  ↓
+Metrics tracking & A/B validation
+        </div>
+      </div>
+    </div>
+
+    <!-- INTEGRATION POINTS -->
+    <div class="section">
+      <div class="section-title">Integration Points</div>
+      <table>
+        <tr>
+          <th>System</th>
+          <th>Integration Type</th>
+          <th>Protocol</th>
+          <th>Current Status</th>
+        </tr>
+        <tr>
+          <td>Git / GitHub API</td>
+          <td>Code churn analysis</td>
+          <td>REST API (commits, blame)</td>
+          <td><span class="status-partial">⚠ Advisory only</span></td>
+        </tr>
+        <tr>
+          <td>Playwright / Selenium</td>
+          <td>Test execution control</td>
+          <td>WebSocket / Python SDK</td>
+          <td><span class="status-missing">✗ Not integrated</span></td>
+        </tr>
+        <tr>
+          <td>Jenkins / GitHub Actions</td>
+          <td>CI/CD execution ordering</td>
+          <td>Webhooks & API</td>
+          <td><span class="status-missing">✗ Not Started</span></td>
+        </tr>
+        <tr>
+          <td>Defect Tracking (Jira/Linear)</td>
+          <td>Defect correlation</td>
+          <td>REST API</td>
+          <td><span class="status-missing">✗ Not Started</span></td>
+        </tr>
+        <tr>
+          <td>PostgreSQL</td>
+          <td>Results storage</td>
+          <td>SQLAlchemy</td>
+          <td><span class="status-partial">⚠ Schema exists</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- PRODUCTION REQUIREMENTS -->
+    <div class="section">
+      <div class="section-title">Production Requirements</div>
+      
+      <div class="card">
+        <div class="card-title">Infrastructure & Deployment</div>
+        <ul style="margin-top: 0.5rem;">
+          <li><strong>FastAPI service:</strong> 2-4 replicas, 2 GB RAM per pod, auto-scaling on CPU</li>
+          <li><strong>Test Runner Pool:</strong> 10-20 Playwright/Selenium nodes, dynamic scaling</li>
+          <li><strong>PostgreSQL:</strong> RDS, 50 GB+ storage, automated backups</li>
+          <li><strong>Message Queue:</strong> RabbitMQ/AWS SQS for test execution tasks</li>
+          <li><strong>Cache Layer:</strong> Redis for priority score caching</li>
+          <li><strong>Container Orchestration:</strong> Kubernetes with Helm</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Security & Compliance</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>OAuth 2.0 + OIDC authentication</li>
+          <li>Role-based access control (RBAC)</li>
+          <li>TLS 1.3 for all communication</li>
+          <li>Database encryption at rest</li>
+          <li>API rate limiting</li>
+          <li>Audit logging for execution decisions</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Monitoring & Observability</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>Prometheus metrics: test execution time, prioritization accuracy, fail-fast rate</li>
+          <li>Structured logging to ELK, 30-day retention</li>
+          <li>APM with Datadog/New Relic</li>
+          <li>Grafana dashboards for system health</li>
+          <li>PagerDuty alerts for execution failures</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Scaling & Performance</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>Support 5,000+ tests per organization</li>
+          <li>Prioritization scoring: < 50ms per test</li>
+          <li>Test execution: parallel across 10-20 nodes</li>
+          <li>Fail-fast feedback: < 5 min time-to-feedback for first defect</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- IMPLEMENTATION GUIDELINES -->
+    <div class="section">
+      <div class="section-title">Implementation Guidelines</div>
+      
+      <div class="card">
+        <div class="card-title">Phase 1: Runtime Engine (Weeks 1-4)</div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">1.1 Test Priority Queue</strong>
+        <div class="code-block">
+# sentinelqa/execution/priority_queue.py
+from dataclasses import dataclass
+from typing import List
+import heapq
+
+@dataclass
+class PrioritizedTest:
+    priority_score: float
+    test_name: str
+    test_id: int
+    
+    def __lt__(self, other):
+        # Min-heap: highest priority first
+        return self.priority_score > other.priority_score
+
+class TestPriorityQueue:
+    def __init__(self):
+        self.heap = []
+    
+    def add_test(self, test_id: int, test_name: str, priority_score: float):
+        test = PrioritizedTest(priority_score, test_name, test_id)
+        heapq.heappush(self.heap, test)
+    
+    def get_next_test(self):
+        if self.heap:
+            return heapq.heappop(self.heap)
+        return None
+    
+    def size(self):
+        return len(self.heap)
+
+def compute_priority_score(test, git_stats, defect_history, business_criticality):
+    """
+    Calculate test priority score (0-100)
+    
+    Factors:
+    - Code churn (40%): files changed frequently need more testing
+    - Defect history (30%): tests that caught defects before are valuable
+    - Business criticality (20%): core features > nice-to-have
+    - Flakiness (10%): stable tests prioritized over flaky ones
+    """
+    
+    churn_score = git_stats.get(test.name, 0) * 0.4
+    defect_score = defect_history.get(test.name, 0) * 0.3
+    criticality_score = business_criticality.get(test.name, 0) * 0.2
+    stability_score = (1 - test.flakiness_rate) * 0.1
+    
+    return min(100, churn_score + defect_score + criticality_score + stability_score)
+        </div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">1.2 Playwright Integration</strong>
+        <div class="code-block">
+# sentinelqa/execution/playwright_runner.py
+from playwright.async_api import async_playwright
+from typing import List
+import asyncio
+
+class PlaywrightTestRunner:
+    def __init__(self, headless=True, workers=4):
+        self.headless = headless
+        self.workers = workers
+        self.results = []
+    
+    async def run_test(self, test_id, test_script):
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(headless=self.headless)
+            page = await browser.new_page()
+            
+            try:
+                await page.goto('http://localhost:3000')
+                # Execute test script dynamically
+                result = await page.evaluate(test_script)
+                self.results.append({'test_id': test_id, 'passed': result})
+                return result
+            except Exception as e:
+                self.results.append({'test_id': test_id, 'passed': False, 'error': str(e)})
+                return False
+            finally:
+                await browser.close()
+    
+    async def run_tests_ordered(self, prioritized_tests: List[tuple]):
+        """
+        Run tests in priority order.
+        Stop on first failure (fail-fast strategy).
+        """
+        for test_id, test_name, test_script in prioritized_tests:
+            passed = await self.run_test(test_id, test_script)
+            
+            if not passed:
+                print(f"FAIL-FAST: Test {test_name} failed. Stopping execution.")
+                return self.results
+        
+        return self.results
+
+async def run_prioritized_suite(tests):
+    runner = PlaywrightTestRunner(workers=4)
+    results = await runner.run_tests_ordered(tests)
+    return results
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Phase 2: CI/CD Integration (Weeks 5-7)</div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">2.1 Webhook Handler</strong>
+        <div class="code-block">
+# sentinelqa/backend/ci_integration.py
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from sentinelqa.execution.priority_queue import TestPriorityQueue
+
+router = APIRouter(prefix="/ci", tags=["ci"])
+
+class GitPushEvent(BaseModel):
+    repository: str
+    branch: str
+    commits: list
+
+@router.post("/webhook/git-push")
+async def handle_git_push(event: GitPushEvent):
+    """
+    Webhook triggered by git push.
+    Analyze changed files, recompute priorities, trigger test execution.
+    """
+    from sentinelqa.ml.git_analyzer import analyze_code_churn
+    from sentinelqa.ml.defect_correlation import get_defect_history
+    
+    # 1. Analyze code changes
+    changed_files = event.commits[0].get('modified', [])
+    churn_stats = analyze_code_churn(changed_files)
+    
+    # 2. Get defect history for affected tests
+    defect_history = get_defect_history(changed_files)
+    
+    # 3. Recompute priorities
+    priority_queue = TestPriorityQueue()
+    for test_id, test_name, business_criticality in get_all_tests():
+        score = compute_priority_score(
+            test_id, test_name,
+            churn_stats.get(test_name, 0),
+            defect_history.get(test_name, 0),
+            business_criticality
+        )
+        priority_queue.add_test(test_id, test_name, score)
+    
+    # 4. Trigger execution
+    return {
+        'status': 'triggered',
+        'test_count': priority_queue.size(),
+        'execution_id': trigger_test_execution(priority_queue)
+    }
+
+@router.post("/execute-ordered")
+async def execute_tests_ordered(test_list: list):
+    """Execute tests in priority order with fail-fast"""
+    from sentinelqa.execution.playwright_runner import run_prioritized_suite
+    
+    results = await run_prioritized_suite(test_list)
+    
+    # Push results back to CI/CD
+    notify_ci_results(results)
+    
+    return {'status': 'completed', 'results': results}
+        </div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">2.2 Jenkins Pipeline Integration</strong>
+        <div class="code-block">
+# Jenkinsfile
+pipeline {
+    agent any
+    
+    stages {
+        stage('Prioritize Tests') {
+            steps {
+                script {
+                    def priorityResponse = sh(
+                        script: '''
+                            curl -X POST http://sentinelqa-api:8000/ci/webhook/git-push \
+                              -H "Content-Type: application/json" \
+                              -d '{
+                                "repository": "'${GIT_REPOSITORY}'",
+                                "branch": "'${GIT_BRANCH}'",
+                                "commits": '$(git log -1 --format="%H")
+                              }'
+                        ''',
+                        returnStdout: true
+                    ).trim()
+                    
+                    env.EXECUTION_ID = readJSON(text: priorityResponse).execution_id
+                    echo "Test prioritization complete: ${env.EXECUTION_ID}"
+                }
+            }
+        }
+        
+        stage('Execute Prioritized Tests') {
+            steps {
+                script {
+                    sh '''
+                        curl -X POST http://sentinelqa-api:8000/ci/execute-ordered \
+                          -H "Content-Type: application/json" \
+                          -d '{"execution_id": "'${EXECUTION_ID}'"}'
+                    '''
+                }
+            }
+        }
+        
+        stage('Report Results') {
+            steps {
+                sh '''
+                    curl http://sentinelqa-api:8000/ci/results/${EXECUTION_ID} \
+                      | tee test-results.json
+                '''
+                junit 'test-results.json'
+            }
+        }
+    }
+}
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Phase 3: Dashboard & Metrics (Weeks 8-9)</div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">3.1 React Dashboard Component</strong>
+        <div class="code-block">
+// sentinelqa/frontend/TestPrioritization.tsx
+import React, { useEffect, useState } from 'react';
+
+export default function TestPrioritization() {
+  const [execution, setExecution] = useState(null);
+  const [prioritizedTests, setPrioritizedTests] = useState([]);
+  
+  useEffect(() => {
+    const ws = new WebSocket('ws://sentinelqa-api:8000/ws/execution');
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setExecution(data);
+      setPrioritizedTests(data.ordered_tests);
+    };
+  }, []);
+  
+  if (!execution) return <div>Waiting for execution...</div>;
+  
+  return (
+    <div className="test-prioritization">
+      <h2>Test Execution Progress</h2>
+      <div className="metrics">
+        <div>Time to First Defect: {execution.time_to_first_defect}ms</div>
+        <div>Tests Executed: {execution.executed_count} / {execution.total_count}</div>
+        <div>Pass Rate: {(execution.passed_count / execution.executed_count * 100).toFixed(1)}%</div>
+      </div>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Test Name</th>
+            <th>Score</th>
+            <th>Status</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {prioritizedTests.map((test, idx) => (
+            <tr key={test.id} style={{ opacity: test.status === 'pending' ? 0.6 : 1 }}>
+              <td>{idx + 1}</td>
+              <td>{test.name}</td>
+              <td>{test.priority_score.toFixed(1)}</td>
+              <td style={{ color: test.status === 'passed' ? 'green' : test.status === 'failed' ? 'red' : 'gray' }}>
+                {test.status}
+              </td>
+              <td>{test.duration}ms</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Environment Variables</div>
+        <div class="code-block">
+# .env
+DATABASE_URL=postgresql://user:pass@localhost:5432/sentinelqa
+GIT_API_TOKEN=ghp_xxxx
+JIRA_API_TOKEN=xxxx
+PLAYWRIGHT_HEADLESS=true
+PLAYWRIGHT_WORKERS=4
+MESSAGE_QUEUE_URL=amqp://rabbitmq:5672
+LOG_LEVEL=INFO
+        </div>
+      </div>
+    </div>
+
+    <!-- GAP ANALYSIS -->
+    <div class="section">
+      <div class="section-title">Gap Analysis</div>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th>Owner</th>
+          <th>Est. Days</th>
+        </tr>
+        <tr>
+          <td>Test Priority Queue</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Data structure for ordered test execution</td>
+          <td>Anupam Sharma</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>Risk Scoring Engine</td>
+          <td><span class="status-partial">⚠ 30% (advisory)</span></td>
+          <td>Wire to live test execution, improve accuracy</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>Playwright Integration</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Test runner control & execution ordering</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>Defect Correlation</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Map tests to past defects via Jira/Linear API</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>CI/CD Webhook Integration</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Jenkins/GitHub Actions hooks</td>
+          <td>DevOps/Platform</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>Fail-Fast Engine</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Stop execution on first defect, notify CI/CD</td>
+          <td>Anupam Sharma</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>React Dashboard</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Real-time execution visualization</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>A/B Testing Framework</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Validate prioritization effectiveness</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>Monitoring & Metrics</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Time-to-feedback, accuracy, fail-fast rate</td>
+          <td>DevOps/Platform</td>
+          <td>2</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- RACI MATRIX -->
+    <div class="section">
+      <div class="section-title">RACI Matrix</div>
+      <table>
+        <tr>
+          <th>Activity</th>
+          <th>Anupam Sharma</th>
+          <th>Malcolm Govender</th>
+          <th>DevOps/Platform</th>
+          <th>Business/PO</th>
+        </tr>
+        <tr>
+          <td>Risk scoring algorithm refinement</td>
+          <td>R</td>
+          <td>A</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Playwright/Selenium integration</td>
+          <td>R</td>
+          <td>A</td>
+          <td>I</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>CI/CD webhook integration</td>
+          <td>I</td>
+          <td>A</td>
+          <td>R</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Fail-fast feedback engine</td>
+          <td>R</td>
+          <td>A</td>
+          <td>I</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Dashboard development</td>
+          <td>R</td>
+          <td>A</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>A/B testing & validation</td>
+          <td>R</td>
+          <td>A</td>
+          <td>I</td>
+          <td>C</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- RISK REGISTER -->
+    <div class="section">
+      <div class="section-title">Risk Register</div>
+      <table>
+        <tr>
+          <th>Risk</th>
+          <th>Likelihood</th>
+          <th>Impact</th>
+          <th>Mitigation</th>
+        </tr>
+        <tr>
+          <td>Inaccurate prioritization misses defects</td>
+          <td>Medium</td>
+          <td>High</td>
+          <td>A/B testing with control group; monitor false-negative rate; continuously refine scoring algorithm</td>
+        </tr>
+        <tr>
+          <td>Fail-fast stops valid tests (false positives)</td>
+          <td>Medium</td>
+          <td>Medium</td>
+          <td>Configurable fail-fast threshold; allow retry on flaky tests; track flakiness separately</td>
+        </tr>
+        <tr>
+          <td>Playwright test runner stability issues</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Comprehensive error handling; retry logic with exponential backoff; resource limits per container</td>
+        </tr>
+        <tr>
+          <td>Defect correlation data gaps (incomplete Jira history)</td>
+          <td>Medium</td>
+          <td>Medium</td>
+          <td>Manual labeling of high-impact tests; start with high-confidence correlations only</td>
+        </tr>
+        <tr>
+          <td>Performance degradation under load (1000s of tests)</td>
+          <td>Medium</td>
+          <td>Medium</td>
+          <td>Horizontal scaling of test runner nodes; caching priority scores; async processing</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- EFFORT ESTIMATE -->
+    <div class="section">
+      <div class="section-title">Effort Estimate</div>
+      <table>
+        <tr>
+          <th>Task</th>
+          <th>Owner</th>
+          <th>Est. Days</th>
+          <th>Priority</th>
+        </tr>
+        <tr>
+          <td>Risk Scoring Engine refinement</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Test Priority Queue implementation</td>
+          <td>Anupam Sharma</td>
+          <td>2</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Playwright test runner integration</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Defect correlation engine</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Fail-fast feedback engine</td>
+          <td>Anupam Sharma</td>
+          <td>2</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>CI/CD webhook integration (Jenkins/GHA)</td>
+          <td>DevOps/Platform</td>
+          <td>3</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>React dashboard development</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>A/B testing & validation</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+          <td>P1</td>
+        </tr>
+        <tr>
+          <td>Monitoring & alerting setup</td>
+          <td>DevOps/Platform</td>
+          <td>2</td>
+          <td>P1</td>
+        </tr>
+        <tr>
+          <td>Production deployment</td>
+          <td>DevOps/Platform</td>
+          <td>2</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td><strong>TOTAL</strong></td>
+          <td></td>
+          <td><strong>30 days</strong></td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- DEFINITION OF DONE -->
+    <div class="section">
+      <div class="section-title">Definition of Done</div>
+      <div class="card">
+        <ul style="margin-top: 0.5rem;">
+          <li>✓ Risk scoring algorithm achieves > 80% accuracy in test prioritization</li>
+          <li>✓ Playwright integration controls test execution order</li>
+          <li>✓ Fail-fast strategy reduces time-to-feedback by 40%+</li>
+          <li>✓ CI/CD webhooks trigger prioritization automatically on git push</li>
+          <li>✓ Dashboard visualizes real-time execution with metrics</li>
+          <li>✓ A/B testing validates that prioritization doesn't miss defects</li>
+          <li>✓ API latency < 100ms for priority scoring</li>
+          <li>✓ Uptime > 99.5%</li>
+          <li>✓ Security hardening complete (OAuth, RBAC, TLS, encryption)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ACTION ITEMS -->
+    <div class="section">
+      <div class="section-title">Action Items (Prioritised)</div>
+      <table>
+        <tr>
+          <th>Priority</th>
+          <th>Action Item</th>
+          <th>Owner</th>
+          <th>Target Date</th>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Refine risk scoring algorithm from advisory to production-ready</td>
+          <td>Anupam Sharma</td>
+          <td>2026-05-22</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Implement test priority queue data structure</td>
+          <td>Anupam Sharma</td>
+          <td>2026-05-29</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Integrate Playwright for test runner control</td>
+          <td>Anupam Sharma</td>
+          <td>2026-06-12</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Build defect correlation engine (Jira/Linear API)</td>
+          <td>Anupam Sharma</td>
+          <td>2026-06-19</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Implement fail-fast feedback loop</td>
+          <td>Anupam Sharma</td>
+          <td>2026-06-26</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Setup CI/CD webhook integration (Jenkins/GitHub Actions)</td>
+          <td>DevOps/Platform</td>
+          <td>2026-07-03</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Build React dashboard for execution visualization</td>
+          <td>Anupam Sharma</td>
+          <td>2026-07-10</td>
+        </tr>
+        <tr>
+          <td>P1</td>
+          <td>Implement A/B testing framework & validation</td>
+          <td>Anupam Sharma</td>
+          <td>2026-07-31</td>
+        </tr>
+        <tr>
+          <td>P1</td>
+          <td>Production deployment & go-live</td>
+          <td>DevOps/Platform</td>
+          <td>2026-08-14</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="footer">
+      <strong>Report Generated:</strong> 2026-05-08<br>
+      <strong>Owned By:</strong> Anupam Sharma<br>
+      <strong>Status:</strong> Production Readiness Report — In Progress (30%)<br>
+      <em>This is a living document. Update as implementation progresses.</em>
+    </div>
+  </div>
+</body>
+</html>

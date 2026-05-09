@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Programme Roadmap — Interactive</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh;padding:24px 20px}
+:root{--mcw:68px;--border:#30363d;--surface:#161b22;--surface2:#21262d;--text1:#e6edf3;--text2:#8b949e;--accent:#0073ea;--radius:8px}
+[contenteditable]{outline:none;cursor:text}
+[contenteditable]:hover{background:rgba(255,255,255,.04);border-radius:4px}
+[contenteditable]:focus{background:rgba(0,115,234,.1);border-radius:4px;box-shadow:0 0 0 1px rgba(0,115,234,.4)}
+input,select,textarea{font-family:inherit;font-size:inherit;color:inherit;background:transparent;border:none;outline:none}
+select{cursor:pointer}
+select option{background:#161b22;color:#e6edf3}
+
+/* ── Layout ── */
+.page{max-width:1600px;margin:0 auto}
+
+/* ── Header ── */
+.header{background:linear-gradient(135deg,#0f2027,#1a3040);border:1px solid var(--border);border-radius:10px;padding:28px 32px;margin-bottom:20px}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+.header-title .sub{font-size:.8rem;color:var(--text2);margin-bottom:4px}
+.header-title h1{font-size:1.6rem;font-weight:800;color:#fff;letter-spacing:-.02em}
+.header-title .author{font-size:.8rem;color:#60a5fa;margin-top:4px;font-weight:600}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font-size:11px;font-weight:600;padding:6px 13px;border-radius:6px;border:1px solid;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;transition:all .12s;white-space:nowrap}
+.btn-primary{background:#0073ea;color:#fff;border-color:#0073ea}
+.btn-primary:hover{background:#0060c7}
+.btn-ghost{background:transparent;color:var(--text2);border-color:var(--border)}
+.btn-ghost:hover{background:var(--surface2);color:var(--text1)}
+.btn-green{color:#34d399;border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)}
+.btn-green:hover{background:rgba(52,211,153,.18)}
+.save-indicator{font-size:.75rem;color:var(--text2);padding:4px 10px;border-radius:6px;background:var(--surface);border:1px solid var(--border)}
+.save-indicator.saved{color:#34d399;border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.08)}
+
+/* ── Phase Cards ── */
+.phase-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.phase-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 18px}
+.phase-card.c-done{border-top:3px solid #00c875}
+.phase-card.c-p1{border-top:3px solid #fdab3d}
+.phase-card.c-p2{border-top:3px solid #60a5fa}
+.phase-card.c-p3{border-top:3px solid #f87171}
+.pc-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);margin-bottom:4px}
+.pc-val{font-size:1.4rem;font-weight:800;color:#fff}
+.pc-sub{font-size:.75rem;color:var(--text2);margin-top:2px}
+.pc-bar{height:4px;background:var(--border);border-radius:2px;margin-top:10px}
+.pc-fill{height:100%;border-radius:2px;transition:width .3s}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.toolbar-sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+.search-box{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text1);width:180px}
+.search-box:focus{border-color:var(--accent);outline:none}
+.filter-select{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;color:var(--text1);cursor:pointer}
+
+/* ── Gantt Table ── */
+.gantt-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.gantt-section-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.gantt-section-header h2{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+.gantt-wrap{overflow-x:auto}
+table.gantt{width:100%;border-collapse:collapse;min-width:1200px}
+table.gantt th{background:var(--surface2);padding:9px 10px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);white-space:nowrap;text-align:left}
+table.gantt th.month-h{text-align:center;width:68px}
+table.gantt th.now-h{background:rgba(0,115,234,.12);color:#60a5fa}
+table.gantt th.comment-h{min-width:180px}
+table.gantt td{border-bottom:1px solid #21262d;border-right:1px solid #21262d;vertical-align:middle}
+table.gantt tr:last-child td{border-bottom:none}
+table.gantt tr:hover td{background:rgba(255,255,255,.015)}
+table.gantt tr.phase-sep td{background:#1c2128;padding:5px 14px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text2);border-bottom:1px solid var(--border)}
+table.gantt tr.dragging td{opacity:.4}
+table.gantt tr.drag-over td{border-top:2px solid #0073ea}
+
+/* ── Cell styles ── */
+.td-drag{width:28px;text-align:center;cursor:grab;color:var(--text2);padding:0 4px;font-size:14px;user-select:none}
+.td-drag:active{cursor:grabbing}
+.td-ucid{width:56px;padding:8px 10px;font-size:.72rem;font-weight:700;color:var(--text2)}
+.td-name{min-width:180px;max-width:220px;padding:8px 10px}
+.td-name [contenteditable]{font-size:.83rem;font-weight:600;color:var(--text1);display:block;width:100%}
+.td-owner{width:130px;padding:4px 8px}
+.td-owner select{font-size:.75rem;font-weight:600;width:100%;padding:4px 6px;border-radius:5px;border:1px solid transparent;background:transparent}
+.td-owner select:hover,.td-owner select:focus{border-color:var(--border);background:var(--surface2)}
+.td-pri{width:54px;padding:4px 8px;text-align:center}
+.td-pri select{font-size:.68rem;font-weight:700;width:100%;text-align:center;border-radius:4px;border:1px solid transparent;background:transparent;padding:3px 4px}
+.td-pri select:hover{border-color:var(--border);background:var(--surface2)}
+.td-pct{width:80px;padding:6px 8px}
+.pct-wrap{display:flex;flex-direction:column;gap:3px}
+.pct-input{font-size:.8rem;font-weight:700;color:#fff;width:54px;border:none;background:transparent;text-align:center;padding:2px 4px;border-radius:4px}
+/* hide number spinner arrows */
+.pct-input::-webkit-inner-spin-button,
+.pct-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.pct-input[type=number]{-moz-appearance:textfield}
+.pct-input:focus{background:rgba(0,115,234,.15);border:1px solid rgba(0,115,234,.4)}
+.pct-bar{height:3px;background:var(--border);border-radius:2px}
+.pct-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+.td-phase{width:90px;padding:4px 8px}
+.td-phase select{font-size:.72rem;width:100%;border-radius:5px;border:1px solid transparent;background:transparent;padding:4px 5px}
+.td-phase select:hover{border-color:var(--border);background:var(--surface2)}
+.td-month{width:80px;padding:4px 8px}
+.td-month select{font-size:.72rem;width:100%;border-radius:5px;border:1px solid transparent;background:transparent;padding:4px 5px}
+.td-month select:hover{border-color:var(--border);background:var(--surface2)}
+.td-gantt{width:68px;padding:6px 4px;text-align:center;position:relative;overflow:visible}
+.td-gantt.now-col{background:rgba(0,115,234,.06)}
+/* single spanning bar */
+.gbar-single{position:absolute;left:4px;top:50%;transform:translateY(-50%);
+  height:16px;border-radius:4px;cursor:grab;z-index:4;
+  box-shadow:0 1px 5px rgba(0,0,0,.35);transition:opacity .1s}
+.gbar-single:active{cursor:grabbing;opacity:.8}
+.gbar-single.is-done{background:rgba(0,200,117,.85)}
+.gbar-single.is-future{opacity:.55}
+.gbar-preview-bar{position:absolute;left:4px;top:50%;transform:translateY(-50%);
+  height:16px;border-radius:4px;z-index:3;pointer-events:none;
+  background:rgba(0,115,234,.25);border:1.5px dashed rgba(0,115,234,.7)}
+/* ── Gantt bar drag handles ── */
+.gbar-handle{position:absolute;top:0;bottom:0;width:8px;cursor:col-resize;z-index:5;border-radius:3px}
+.gbar-handle:hover{background:rgba(255,255,255,.5)}
+.gbar-handle-l{left:0}
+.gbar-handle-r{right:0}
+.td-comment{padding:6px 10px;min-width:180px}
+.comment-area{font-size:.78rem;color:var(--text1);background:transparent;border:1px solid transparent;border-radius:5px;width:100%;min-height:32px;resize:vertical;padding:4px 7px;line-height:1.5;transition:border .12s}
+.comment-area:hover{border-color:var(--border)}
+.comment-area:focus{border-color:var(--accent);background:rgba(0,115,234,.06);outline:none}
+.comment-area::placeholder{color:var(--text2)}
+.td-del{width:32px;text-align:center;padding:0 4px}
+.btn-del{background:none;border:none;color:#484f58;cursor:pointer;font-size:14px;padding:4px;border-radius:4px;line-height:1}
+.btn-del:hover{color:#f87171;background:rgba(248,113,113,.1)}
+
+/* ── Priority colours ── */
+.pri-p1{color:#f87171}
+.pri-p2{color:#fdab3d}
+.pri-p3{color:#60a5fa}
+.pri-p4{color:#8b94c4}
+
+/* ── Owner colour dots ── */
+.owner-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle;flex-shrink:0}
+
+/* ── Milestones section ── */
+.ms-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.ms-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ms-header h2{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+table.ms-table{width:100%;border-collapse:collapse;font-size:.82rem}
+table.ms-table th{background:var(--surface2);padding:9px 14px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);border-bottom:1px solid var(--border);text-align:left}
+table.ms-table td{padding:10px 14px;border-bottom:1px solid #21262d;vertical-align:middle}
+table.ms-table tr:last-child td{border-bottom:none}
+table.ms-table tr:hover td{background:rgba(255,255,255,.015)}
+.ms-status{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.ms-done{background:rgba(0,200,117,.12);color:#00c875;border:1px solid rgba(0,200,117,.25)}
+.ms-upcoming{background:rgba(253,171,61,.12);color:#fdab3d;border:1px solid rgba(253,171,61,.25)}
+.ms-planned{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.25)}
+.ms-status-sel{font-family:inherit;font-size:.7rem;font-weight:700;border:none;border-radius:4px;padding:2px 6px;cursor:pointer}
+
+/* ── Legend ── */
+.legend{display:flex;flex-wrap:wrap;gap:14px;padding:10px 18px;border-bottom:1px solid var(--border);font-size:.75rem;color:var(--text2)}
+.leg{display:flex;align-items:center;gap:5px}
+.leg-swatch{width:14px;height:10px;border-radius:2px;flex-shrink:0}
+
+
+/* ── Assignee cell ── */
+.td-assignee{width:150px;min-width:130px;padding:4px 8px}
+.assignee-input{font-size:.78rem;font-weight:600;color:#a78bfa;width:100%;
+  background:transparent;border:1px solid transparent;border-radius:5px;
+  padding:4px 7px;cursor:text}
+.assignee-input:hover{border-color:var(--border);background:var(--surface2)}
+.assignee-input:focus{border-color:var(--accent);background:rgba(0,115,234,.08);
+  outline:none;color:#e6edf3}
+.assignee-input::placeholder{color:var(--text2)}
+
+/* ── Column resize ── */
+.col-resizable{position:relative}
+.col-resize-handle{position:absolute;right:-3px;top:0;bottom:0;width:6px;cursor:col-resize;z-index:10;background:transparent}
+.col-resize-handle:hover,.col-resize-handle.active{background:rgba(0,115,234,.4)}
+
+
+
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:28px;right:28px;background:#1f2937;border:1px solid var(--border);color:#34d399;font-size:.82rem;font-weight:600;padding:10px 18px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);opacity:0;transition:opacity .2s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+
+/* ── Footer ── */
+.footer{text-align:center;color:#484f58;font-size:.73rem;margin-top:24px;padding-top:16px;border-top:1px solid #21262d}
+</style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html"
+   style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;
+          padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;
+          color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;
+          text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)"
+   onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'"
+   onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'">
+  <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+  Back to Tracker
+</a>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="header-title">
+      <div class="sub">AI &amp; Automation Intelligence Programme</div>
+      <h1>Delivery Roadmap</h1>
+      <div class="author">Prepared by Malcolm Govender &middot; Head of AI &amp; Engineering &middot; May 2026</div>
+    </div>
+    <div class="header-actions">
+      <span class="save-indicator saved" id="saveInd">&#10003; All changes saved</span>
+      <button class="btn btn-green" onclick="addRow()">+ Add Use Case</button>
+      <button class="btn btn-ghost" onclick="exportCSV()">Export CSV</button>
+      <button class="btn btn-ghost" onclick="resetData()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE SUMMARY -->
+<div class="phase-strip" id="phaseStrip"></div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <input class="search-box" type="text" placeholder="Search use cases…" oninput="filterRows(this.value)" id="searchBox">
+  <select class="filter-select" onchange="filterOwner(this.value)" id="ownerFilter">
+    <option value="">All Owners</option>
+    <option>Anupam Sharma</option>
+    <option>Stan Sethoga</option>
+    <option>Herman Odame</option>
+    <option>Peter Onu</option>
+  </select>
+  <select class="filter-select" onchange="filterPhase(this.value)" id="phaseFilter">
+    <option value="">All Phases</option>
+    <option value="complete">Complete</option>
+    <option value="phase1">Phase 1</option>
+    <option value="phase2">Phase 2</option>
+    <option value="phase3">Phase 3</option>
+  </select>
+  <div class="toolbar-sep"></div>
+  <span style="font-size:.75rem;color:var(--text2)">Drag rows to reorder &middot; Click any cell to edit</span>
+</div>
+
+<!-- GANTT TABLE -->
+<div class="gantt-section">
+  <div class="gantt-section-header">
+    <h2>Programme Timeline &mdash; May to December 2026</h2>
+    <div style="font-size:.75rem;color:var(--text2)">&#9646; Current month highlighted</div>
+  </div>
+  <div class="legend" id="legend">
+    <div class="leg"><div class="leg-swatch" style="background:rgba(0,200,117,.75)"></div>Done</div>
+    <div class="leg"><div class="leg-swatch" style="background:#3b82f6"></div>Anupam Sharma</div>
+    <div class="leg"><div class="leg-swatch" style="background:#2dd4bf"></div>Stan Sethoga</div>
+    <div class="leg"><div class="leg-swatch" style="background:#fb923c"></div>Herman Odame</div>
+    <div class="leg"><div class="leg-swatch" style="background:#c084fc"></div>Peter Onu</div>
+  </div>
+  <div class="gantt-wrap">
+    <table class="gantt" id="ganttTable">
+      <thead>
+        <tr>
+          <th style="width:28px"></th>
+          <th>ID</th>
+          <th>Use Case</th>
+          <th class="col-resizable">Owner</th>
+          <th class="col-resizable" style="min-width:130px">Assignee</th>
+          <th>Pri</th>
+          <th>%</th>
+          <th>Phase</th>
+          <th>Start</th>
+          <th>Target</th>
+          <th class="month-h now-h">May</th>
+          <th class="month-h">Jun</th>
+          <th class="month-h">Jul</th>
+          <th class="month-h">Aug</th>
+          <th class="month-h">Sep</th>
+          <th class="month-h">Oct</th>
+          <th class="month-h">Nov</th>
+          <th class="month-h">Dec</th>
+          <th class="comment-h">Comments</th>
+          <th style="width:32px"></th>
+        </tr>
+      </thead>
+      <tbody id="ganttBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MILESTONES -->
+<div class="ms-section">
+  <div class="ms-header">
+    <h2>Key Milestones</h2>
+    <button class="btn btn-green" onclick="addMilestone()">+ Add Milestone</button>
+  </div>
+  <table class="ms-table">
+    <thead><tr><th style="width:32px"></th><th style="width:110px">Date</th><th>Milestone</th><th style="width:180px">Owner</th><th style="width:110px">Status</th><th style="width:32px"></th></tr></thead>
+    <tbody id="msBody"></tbody>
+  </table>
+</div>
+
+<div class="footer">AI &amp; Automation Intelligence Programme &middot; Delivery Roadmap &middot; Malcolm Govender, Head of AI &amp; Engineering &middot; May 2026 &middot; CONFIDENTIAL</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STORE_KEY = 'ai_roadmap_v2';
+const MONTHS = ['May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const OWNER_COLORS = {
+  'Anupam Sharma':'#3b82f6',
+  'Stan Sethoga':'#2dd4bf',
+  'Herman Odame':'#fb923c',
+  'Peter Onu':'#c084fc',
+};
+const PRI_COLORS = {'P1':'#f87171','P2':'#fdab3d','P3':'#60a5fa','P4':'#8b94c4'};
+const PHASE_LABELS = {complete:'Complete',phase1:'Phase 1',phase2:'Phase 2',phase3:'Phase 3'};
+const STATUS_STYLES = {
+  'Complete':'background:rgba(0,200,117,.15);color:#00c875',
+  'Upcoming':'background:rgba(253,171,61,.15);color:#fdab3d',
+  'Planned':'background:rgba(96,165,250,.15);color:#60a5fa'
+};
+
+let data, msData, saveTimer;
+let dragSrcIdx = null;
+let filterText = '', filterOwnerVal = '', filterPhaseVal = '';
+
+const DEFAULT_ROWS = [
+  {id:1,ucId:'UC-01',name:'AI-Based Test Case Generation',owner:'Anupam Sharma',priority:'P1',pct:100,phase:'complete',startMonth:'May',targetMonth:'May',assignee:'Malcolm Govender',comment:''},
+  {id:2,ucId:'UC-04',name:'AI Test Automation Script Generation',owner:'Anupam Sharma',priority:'P2',pct:100,phase:'complete',startMonth:'May',targetMonth:'May',assignee:'Malcolm Govender',comment:''},
+  {id:3,ucId:'UC-07',name:'Self-Healing Automation',owner:'Anupam Sharma',priority:'P1',pct:100,phase:'complete',startMonth:'May',targetMonth:'May',assignee:'Malcolm Govender',comment:''},
+  {id:4,ucId:'UC-08',name:'PR Intelligence & Merge Gating',owner:'Anupam Sharma',priority:'P1',pct:100,phase:'complete',startMonth:'May',targetMonth:'May',assignee:'Malcolm Govender',comment:''},
+  {id:5,ucId:'UC-09',name:'AI Copilot (Conversational QA)',owner:'Anupam Sharma',priority:'P2',pct:100,phase:'complete',startMonth:'May',targetMonth:'May',assignee:'Malcolm Govender',comment:''},
+  {id:6,ucId:'UC-10',name:'Governance, RBAC & Compliance',owner:'Anupam Sharma',priority:'P3',pct:100,phase:'complete',startMonth:'May',targetMonth:'May',assignee:'Malcolm Govender',comment:''},
+  {id:7,ucId:'UC-16',name:'Fraud Detection (PayGuard)',owner:'Peter Onu',priority:'P1',pct:75,phase:'phase1',startMonth:'May',targetMonth:'Jun',assignee:'Malcolm Govender',comment:''},
+  {id:8,ucId:'UC-13',name:'AI-Driven CI/CD Pipeline',owner:'Stan Sethoga',priority:'P1',pct:65,phase:'phase1',startMonth:'May',targetMonth:'Jul',assignee:'Malcolm Govender',comment:''},
+  {id:9,ucId:'UC-14',name:'AI Delivery Management',owner:'Herman Odame',priority:'P2',pct:55,phase:'phase1',startMonth:'May',targetMonth:'Jul',assignee:'Malcolm Govender',comment:''},
+  {id:10,ucId:'UC-11',name:'Figma → Test Generation',owner:'Anupam Sharma',priority:'P3',pct:35,phase:'phase2',startMonth:'Jun',targetMonth:'Aug',assignee:'Malcolm Govender',comment:''},
+  {id:11,ucId:'UC-03',name:'Intelligent Test Prioritization',owner:'Anupam Sharma',priority:'P2',pct:30,phase:'phase2',startMonth:'Jun',targetMonth:'Aug',assignee:'Malcolm Govender',comment:''},
+  {id:12,ucId:'UC-06',name:'AI/ML Quality Dashboards',owner:'Anupam Sharma',priority:'P3',pct:25,phase:'phase2',startMonth:'Jun',targetMonth:'Sep',assignee:'Malcolm Govender',comment:''},
+  {id:13,ucId:'UC-02',name:'Test Case Optimization (Smart Pruning)',owner:'Anupam Sharma',priority:'P2',pct:20,phase:'phase2',startMonth:'Jul',targetMonth:'Sep',assignee:'Malcolm Govender',comment:''},
+  {id:14,ucId:'UC-12',name:'Chaos Testing Agent',owner:'Anupam Sharma',priority:'P4',pct:15,phase:'phase2',startMonth:'Aug',targetMonth:'Oct',assignee:'Malcolm Govender',comment:''},
+  {id:15,ucId:'UC-05',name:'AI in Performance Testing',owner:'Anupam Sharma',priority:'P3',pct:0,phase:'phase3',startMonth:'Aug',targetMonth:'Nov',assignee:'Malcolm Govender',comment:''},
+  {id:16,ucId:'UC-15',name:'AI Engineering Copilot',owner:'Peter Onu',priority:'P1',pct:0,phase:'phase3',startMonth:'Sep',targetMonth:'Dec',assignee:'Malcolm Govender',comment:''},
+];
+
+const DEFAULT_MS = [
+  {id:1,date:'May 2026',text:'Programme baseline — all 16 requirements & readiness docs authored',owner:'Malcolm Govender',status:'Complete'},
+  {id:2,date:'Jun 2026',text:'PayGuard ML models (XGBoost/Isolation Forest) trained & wired — UC-16 production ready',owner:'Peter Onu',status:'Upcoming'},
+  {id:3,date:'Jun 2026',text:'Engineering Copilot design sprint — LLM & diagramming toolchain selected',owner:'Peter Onu',status:'Upcoming'},
+  {id:4,date:'Jul 2026',text:'Azure infra provisioned via Bicep, ADO configured — UC-13 live',owner:'Stan Sethoga',status:'Upcoming'},
+  {id:5,date:'Jul 2026',text:'Delivery forecast connected to live Azure DevOps API — UC-14 production',owner:'Herman Odame',status:'Upcoming'},
+  {id:6,date:'Sep 2026',text:'All SentinelQA Phase 2 use cases shipped — platform at 14/16 complete',owner:'Anupam Sharma',status:'Planned'},
+  {id:7,date:'Nov 2026',text:'Performance Testing agent live with k6/Gatling integration — SentinelQA full coverage',owner:'Anupam Sharma',status:'Planned'},
+  {id:8,date:'Dec 2026',text:'Engineering Copilot v1 shipped — all 16 use cases in production',owner:'Peter Onu',status:'Planned'},
+];
+
+let nextId = 17, nextMsId = 9;
+
+// ── Persistence ──────────────────────────────────────────────────
+function load() {
+  try {
+    const saved = localStorage.getItem(STORE_KEY);
+    if (saved) { const p = JSON.parse(saved); data = p.rows; msData = p.milestones; nextId = p.nextId||17; nextMsId = p.nextMsId||9; return; }
+  } catch(e){}
+  data = JSON.parse(JSON.stringify(DEFAULT_ROWS));
+  msData = JSON.parse(JSON.stringify(DEFAULT_MS));
+}
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(STORE_KEY, JSON.stringify({rows:data,milestones:msData,nextId,nextMsId}));
+    const ind = document.getElementById('saveInd');
+    ind.textContent = '✓ All changes saved'; ind.className = 'save-indicator saved';
+  }, 600);
+  const ind = document.getElementById('saveInd');
+  ind.textContent = 'Saving…'; ind.className = 'save-indicator';
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── Gantt bar logic ──────────────────────────────────────────────
+
+
+function ganttCells(row, rowIdx) {
+  const si = MONTHS.indexOf(row.startMonth);
+  const ti = MONTHS.indexOf(row.targetMonth);
+  const oc = OWNER_COLORS[row.owner] || '#6366f1';
+  const span = Math.max(1, ti - si + 1);
+  const isDone = row.pct === 100;
+  const isFuture = row.phase === 'phase3';
+  const barColor = isDone ? 'rgba(0,200,117,.85)' : oc;
+  const barOpacity = isFuture ? '0.55' : '1';
+
+  return MONTHS.map((m, i) => {
+    const isNow = i === 0;
+    const isSt = i === si;
+    // Only the START cell gets the bar div
+    let bar = '';
+    if (isSt) {
+      bar = `<div class="gbar-single${isDone?' is-done':''}${isFuture?' is-future':''}"
+        style="width:calc(${span} * var(--mcw) - 8px);background:${barColor};opacity:${barOpacity}"
+        data-rowidx="${rowIdx}" data-span="${span}"
+        draggable="false"
+        onmousedown="ganttBarMouseDown(event,${rowIdx},${si},${ti},'move')"
+        title="${row.startMonth}–${row.targetMonth} · drag to move, use edge handles to resize">
+        <div class="gbar-handle gbar-handle-l" onmousedown="ganttBarMouseDown(event,${rowIdx},${si},${ti},'start')"></div>
+        <div class="gbar-handle gbar-handle-r" onmousedown="ganttBarMouseDown(event,${rowIdx},${si},${ti},'end')"></div>
+      </div>`;
+    }
+    return `<td class="td-gantt${isNow?' now-col':''}" data-rowidx="${rowIdx}" data-monthidx="${i}">${bar}</td>`;
+  }).join('');
+}
+
+// ── Render Gantt ─────────────────────────────────────────────────
+function visible(row) {
+  if (filterText && !row.name.toLowerCase().includes(filterText) && !row.ucId.toLowerCase().includes(filterText)) return false;
+  if (filterOwnerVal && row.owner !== filterOwnerVal) return false;
+  if (filterPhaseVal && row.phase !== filterPhaseVal) return false;
+  return true;
+}
+
+function renderGantt() {
+  const phases = ['complete','phase1','phase2','phase3'];
+  const phaseNames = {complete:'✓ Complete — in Production',phase1:'Phase 1 — Complete & Stabilise (May–Jul 2026)',phase2:'Phase 2 — Build Out (Jul–Oct 2026)',phase3:'Phase 3 — Greenfield (Sep–Dec 2026)'};
+  let html = '';
+  phases.forEach(ph => {
+    const rows = data.filter(r => r.phase === ph && visible(r));
+    if (!rows.length) return;
+    html += `<tr class="phase-sep"><td colspan="20">${phaseNames[ph]}</td></tr>`;
+    rows.forEach(row => {
+      const idx = data.indexOf(row);
+      const oc = OWNER_COLORS[row.owner] || '#6366f1';
+      const pc = PRI_COLORS[row.priority] || '#8b94c4';
+      const pctColor = row.pct===100?'#00c875':row.pct>=60?'#fdab3d':'#60a5fa';
+      html += `<tr draggable="true" data-idx="${idx}" 
+        ondragstart="dragStart(event,${idx})" 
+        ondragover="dragOver(event,${idx})" 
+        ondrop="drop(event,${idx})"
+        ondragleave="dragLeave(event)"
+        ondragend="dragEnd(event)">
+        <td class="td-drag" title="Drag to reorder">&#8942;</td>
+        <td class="td-ucid">
+          <span contenteditable="true" onblur="updateField(${idx},'ucId',this.textContent.trim())">${esc(row.ucId)}</span>
+        </td>
+        <td class="td-name">
+          <span contenteditable="true" onblur="updateField(${idx},'name',this.textContent.trim())">${esc(row.name)}</span>
+        </td>
+        <td class="td-owner">
+          <select onchange="updateField(${idx},'owner',this.value)">
+            ${['Anupam Sharma','Stan Sethoga','Herman Odame','Peter Onu'].map(o=>`<option${o===row.owner?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </td>
+        <td class="td-assignee">
+          <input class="assignee-input" type="text"
+            value="${esc(row.assignee||'Malcolm Govender')}"
+            onblur="updateField(${idx},'assignee',this.value)"
+            onkeydown="if(event.key==='Enter')this.blur()"
+            placeholder="Assignee…">
+        </td>
+        <td class="td-pri">
+          <select style="color:${pc};font-weight:700" onchange="updateField(${idx},'priority',this.value)">
+            ${['P1','P2','P3','P4'].map(p=>`<option${p===row.priority?' selected':''}>${p}</option>`).join('')}
+          </select>
+        </td>
+        <td class="td-pct">
+          <div class="pct-wrap">
+            <input class="pct-input" type="number" min="0" max="100" value="${row.pct}" 
+              style="color:${pctColor}"
+              onchange="updateField(${idx},'pct',Math.min(100,Math.max(0,+this.value)))"
+              onblur="updateField(${idx},'pct',Math.min(100,Math.max(0,+this.value)))">
+            <div class="pct-bar"><div class="pct-bar-fill" style="width:${row.pct}%;background:${pctColor}"></div></div>
+          </div>
+        </td>
+        <td class="td-phase">
+          <select onchange="updateField(${idx},'phase',this.value)">
+            ${Object.entries(PHASE_LABELS).map(([v,l])=>`<option value="${v}"${v===row.phase?' selected':''}>${l}</option>`).join('')}
+          </select>
+        </td>
+        <td class="td-month">
+          <select onchange="updateField(${idx},'startMonth',this.value)">
+            ${MONTHS.map(m=>`<option${m===row.startMonth?' selected':''}>${m}</option>`).join('')}
+          </select>
+        </td>
+        <td class="td-month">
+          <select onchange="updateField(${idx},'targetMonth',this.value)">
+            ${MONTHS.map(m=>`<option${m===row.targetMonth?' selected':''}>${m}</option>`).join('')}
+          </select>
+        </td>
+        ${ganttCells(row, idx)}
+        <td class="td-comment">
+          <textarea class="comment-area" rows="1" placeholder="Add a comment…"
+            onblur="updateField(${idx},'comment',this.value)"
+            oninput="autoResize(this)">${esc(row.comment)}</textarea>
+        </td>
+        <td class="td-del"><button class="btn-del" onclick="deleteRow(${idx})" title="Delete">&#x2715;</button></td>
+      </tr>`;
+    });
+  });
+  document.getElementById('ganttBody').innerHTML = html;
+  // auto-resize existing textareas
+  document.querySelectorAll('.comment-area').forEach(t => autoResize(t));
+  syncMonthColWidth();
+  renderPhaseStrip();
+}
+
+// ── Phase strip ──────────────────────────────────────────────────
+function renderPhaseStrip() {
+  const done = data.filter(r=>r.phase==='complete');
+  const p1 = data.filter(r=>r.phase==='phase1');
+  const p2 = data.filter(r=>r.phase==='phase2');
+  const p3 = data.filter(r=>r.phase==='phase3');
+  const avg = rows => rows.length ? Math.round(rows.reduce((s,r)=>s+r.pct,0)/rows.length) : 0;
+  const cards = [
+    {cls:'c-done',label:'Complete',val:done.length,sub:'use cases in production',fill:'#00c875',pct:100},
+    {cls:'c-p1',label:'Phase 1 (May–Jul)',val:p1.length,sub:`use cases · avg ${avg(p1)}%`,fill:'#fdab3d',pct:avg(p1)},
+    {cls:'c-p2',label:'Phase 2 (Jul–Oct)',val:p2.length,sub:`use cases · avg ${avg(p2)}%`,fill:'#60a5fa',pct:avg(p2)},
+    {cls:'c-p3',label:'Phase 3 (Sep–Dec)',val:p3.length,sub:`use cases · avg ${avg(p3)}%`,fill:'#f87171',pct:avg(p3)},
+  ];
+  document.getElementById('phaseStrip').innerHTML = cards.map(c=>`
+    <div class="phase-card ${c.cls}">
+      <div class="pc-label">${c.label}</div>
+      <div class="pc-val">${c.val}</div>
+      <div class="pc-sub">${c.sub}</div>
+      <div class="pc-bar"><div class="pc-fill" style="width:${c.pct}%;background:${c.fill}"></div></div>
+    </div>`).join('');
+}
+
+// ── Milestones ───────────────────────────────────────────────────
+function renderMilestones() {
+  const html = msData.map((ms,i) => {
+    const st = ms.status;
+    const stStyle = STATUS_STYLES[st] || STATUS_STYLES['Planned'];
+    return `<tr draggable="true" data-ms-idx="${i}"
+      ondragstart="msDragStart(event,${i})"
+      ondragover="msDragOver(event,${i})"
+      ondrop="msDrop(event,${i})"
+      ondragleave="dragLeave(event)"
+      ondragend="dragEnd(event)">
+      <td class="td-drag">&#8942;</td>
+      <td style="padding:8px 14px">
+        <span contenteditable="true" style="font-size:.82rem" onblur="updateMs(${i},'date',this.textContent.trim())">${esc(ms.date)}</span>
+      </td>
+      <td style="padding:8px 14px">
+        <span contenteditable="true" style="font-size:.82rem" onblur="updateMs(${i},'text',this.textContent.trim())">${esc(ms.text)}</span>
+      </td>
+      <td style="padding:8px 14px">
+        <span contenteditable="true" style="font-size:.82rem" onblur="updateMs(${i},'owner',this.textContent.trim())">${esc(ms.owner)}</span>
+      </td>
+      <td style="padding:8px 14px">
+        <select class="ms-status-sel" style="${stStyle}" onchange="updateMs(${i},'status',this.value)">
+          ${['Complete','Upcoming','Planned'].map(s=>`<option${s===st?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td class="td-del"><button class="btn-del" onclick="deleteMs(${i})">&#x2715;</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('msBody').innerHTML = html;
+}
+
+// ── Field updates ─────────────────────────────────────────────────
+function updateField(idx, field, val) {
+  if (field === 'pct') val = Math.min(100, Math.max(0, +val || 0));
+  data[idx][field] = val;
+  save();
+  if (['phase','owner','pct','startMonth','targetMonth'].includes(field)) renderGantt();
+}
+function updateMs(i, field, val) { msData[i][field] = val; save(); if(field==='status') renderMilestones(); }
+
+// ── Add / Delete ──────────────────────────────────────────────────
+function addRow() {
+  data.push({id:nextId++,ucId:'UC-??',name:'New Use Case',owner:'Anupam Sharma',priority:'P3',pct:0,phase:'phase2',startMonth:'Jun',targetMonth:'Sep',assignee:'Malcolm Govender',comment:''});
+  save(); renderGantt(); toast('Use case added');
+}
+function deleteRow(idx) {
+  if (!confirm('Delete this use case?')) return;
+  data.splice(idx, 1); save(); renderGantt(); toast('Deleted');
+}
+function addMilestone() {
+  msData.push({id:nextMsId++,date:'2026',text:'New Milestone',owner:'Malcolm Govender',status:'Planned'});
+  save(); renderMilestones(); toast('Milestone added');
+}
+function deleteMs(i) { msData.splice(i,1); save(); renderMilestones(); }
+
+// ── Drag & Drop (Gantt rows) ──────────────────────────────────────
+function dragStart(e, idx) { dragSrcIdx = idx; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function dragOver(e, idx) { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('tr[data-idx]').forEach(r=>r.classList.remove('drag-over')); if(idx!==dragSrcIdx) e.currentTarget.classList.add('drag-over'); }
+function drop(e, idx) { e.preventDefault(); if(dragSrcIdx===null||dragSrcIdx===idx) return; const item=data.splice(dragSrcIdx,1)[0]; data.splice(idx,0,item); dragSrcIdx=null; save(); renderGantt(); }
+function dragEnd(e) { dragSrcIdx=null; document.querySelectorAll('.dragging,.drag-over').forEach(r=>r.classList.remove('dragging','drag-over')); }
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+
+// ── Drag & Drop (Milestones) ──────────────────────────────────────
+let msDragSrc = null;
+function msDragStart(e,i){msDragSrc=i;e.dataTransfer.effectAllowed='move';}
+function msDragOver(e,i){e.preventDefault();e.dataTransfer.dropEffect='move';}
+function msDrop(e,i){e.preventDefault();if(msDragSrc===null||msDragSrc===i)return;const item=msData.splice(msDragSrc,1)[0];msData.splice(i,0,item);msDragSrc=null;save();renderMilestones();}
+
+// ── Filters ───────────────────────────────────────────────────────
+function filterRows(v){filterText=v.toLowerCase();renderGantt();}
+function filterOwner(v){filterOwnerVal=v;renderGantt();}
+function filterPhase(v){filterPhaseVal=v;renderGantt();}
+
+// ── Helpers ───────────────────────────────────────────────────────
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function autoResize(ta){ta.style.height='auto';ta.style.height=(ta.scrollHeight)+'px';}
+
+// ── Export CSV ───────────────────────────────────────────────────
+function exportCSV() {
+  const hdr = ['ID','Use Case','Owner','Assignee','Priority','% Complete','Phase','Start Month','Target Month','Comment'];
+  const rows = data.map(r=>[r.ucId,r.name,r.owner,r.priority,r.pct,PHASE_LABELS[r.phase]||r.phase,r.startMonth,r.targetMonth,r.comment].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv = [hdr.join(','),...rows].join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'ai-roadmap-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ── Reset ─────────────────────────────────────────────────────────
+function resetData() {
+  if (!confirm('Reset all roadmap data to defaults?')) return;
+  data = JSON.parse(JSON.stringify(DEFAULT_ROWS));
+  msData = JSON.parse(JSON.stringify(DEFAULT_MS));
+  nextId=17; nextMsId=9;
+  save(); renderGantt(); renderMilestones(); toast('Reset to defaults');
+}
+
+
+// ── Column resize ──────────────────────────────────────────────────
+(function(){
+  function initResize(){
+    document.querySelectorAll('th.col-resizable').forEach(th => {
+      // avoid double-adding
+      if (th.querySelector('.col-resize-handle')) return;
+      const handle = document.createElement('div');
+      handle.className = 'col-resize-handle';
+      th.style.position = 'relative';
+      th.appendChild(handle);
+      let startX, startW;
+      handle.addEventListener('mousedown', e => {
+        startX = e.pageX;
+        startW = th.offsetWidth;
+        handle.classList.add('active');
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'col-resize';
+        function onMove(ev) {
+          const diff = ev.pageX - startX;
+          th.style.width = Math.max(40, startW + diff) + 'px';
+          th.style.minWidth = Math.max(40, startW + diff) + 'px';
+        }
+        function onUp() {
+          handle.classList.remove('active');
+          document.body.style.userSelect = '';
+          document.body.style.cursor = '';
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        e.preventDefault();
+      });
+    });
+    // Make ALL th resizable (add handle to all if not already present)
+    document.querySelectorAll('table.gantt thead th:not(.col-resizable)').forEach(th => {
+      if (th.querySelector('.col-resize-handle')) return;
+      if (th.style.width && parseInt(th.style.width) <= 40) return; // skip tiny icon cols
+      const handle = document.createElement('div');
+      handle.className = 'col-resize-handle';
+      th.style.position = 'relative';
+      th.appendChild(handle);
+      let startX, startW;
+      handle.addEventListener('mousedown', e => {
+        startX = e.pageX;
+        startW = th.offsetWidth;
+        handle.classList.add('active');
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'col-resize';
+        function onMove(ev) {
+          const diff = ev.pageX - startX;
+          th.style.width = Math.max(40, startW + diff) + 'px';
+          th.style.minWidth = Math.max(40, startW + diff) + 'px';
+        }
+        function onUp() {
+          handle.classList.remove('active');
+          document.body.style.userSelect = '';
+          document.body.style.cursor = '';
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+        e.preventDefault();
+      });
+    });
+  }
+  // run after render
+  const _rg = window.renderGantt;
+  window.renderGantt = function(){ _rg(); initResize(); };
+  window.addEventListener('DOMContentLoaded', () => setTimeout(initResize, 100));
+})();
+
+
+// ── Gantt bar drag (move + resize) ───────────────────────────────
+let _ganttDrag = null;
+
+function ganttBarMouseDown(e, rowIdx, origSi, origTi, mode) {
+  e.preventDefault();
+  e.stopPropagation(); // don't trigger row reorder drag
+  _ganttDrag = {rowIdx, origSi, origTi, span: origTi - origSi, mode, previewSi: origSi, previewTi: origTi};
+  document.body.style.cursor = mode === 'move' ? 'grabbing' : 'col-resize';
+  clearGanttPreview();
+  // hide bar so elementFromPoint sees the td underneath
+  const barEl = e.target.closest('.gbar-single');
+  if (barEl) barEl.style.pointerEvents = 'none';
+
+  function cellFromPoint(ev) {
+    const el = document.elementFromPoint(ev.clientX, ev.clientY);
+    if (!el) return null;
+    const td = el.closest ? el.closest('td.td-gantt[data-rowidx="' + rowIdx + '"]') : null;
+    return td ? parseInt(td.dataset.monthidx) : null;
+  }
+
+  function onMove(ev) {
+    if (!_ganttDrag) return;
+    const mi = cellFromPoint(ev);
+    if (mi === null) return;
+    let ns = _ganttDrag.previewSi, nt = _ganttDrag.previewTi;
+    if (mode === 'move') {
+      ns = mi;
+      nt = Math.min(MONTHS.length - 1, mi + _ganttDrag.span);
+    } else if (mode === 'start') {
+      ns = Math.min(mi, _ganttDrag.origTi);
+      nt = _ganttDrag.origTi;
+    } else if (mode === 'end') {
+      ns = _ganttDrag.origSi;
+      nt = Math.max(mi, _ganttDrag.origSi);
+    }
+    if (ns !== _ganttDrag.previewSi || nt !== _ganttDrag.previewTi) {
+      _ganttDrag.previewSi = ns;
+      _ganttDrag.previewTi = nt;
+      showGanttPreview(rowIdx, ns, nt);
+    }
+  }
+
+  function onUp(ev) {
+    document.body.style.cursor = '';
+    clearGanttPreview();
+    if (_ganttDrag) {
+      const mi = cellFromPoint(ev);
+      let ns = _ganttDrag.origSi, nt = _ganttDrag.origTi;
+      if (mi !== null) {
+        if (mode === 'move') {
+          ns = mi;
+          nt = Math.min(MONTHS.length - 1, mi + _ganttDrag.span);
+        } else if (mode === 'start') {
+          ns = Math.min(mi, _ganttDrag.origTi);
+          nt = _ganttDrag.origTi;
+        } else if (mode === 'end') {
+          ns = _ganttDrag.origSi;
+          nt = Math.max(mi, _ganttDrag.origSi);
+        }
+      }
+      data[rowIdx].startMonth = MONTHS[ns];
+      data[rowIdx].targetMonth = MONTHS[nt];
+      _ganttDrag = null;
+      save();
+      renderGantt();
+      toast('Bar updated: ' + MONTHS[ns] + (ns !== nt ? '–' + MONTHS[nt] : ''));
+    }
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  }
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function showGanttPreview(rowIdx, si, ti) {
+  clearGanttPreview();
+  const span = Math.max(1, ti - si + 1);
+  const startCell = document.querySelector('td.td-gantt[data-rowidx="' + rowIdx + '"][data-monthidx="' + si + '"]');
+  if (!startCell) return;
+  const prev = document.createElement('div');
+  prev.className = 'gbar-preview-bar';
+  prev.style.width = 'calc(' + span + ' * var(--mcw) - 8px)';
+  prev.id = 'ganttPreview';
+  startCell.appendChild(prev);
+}
+
+function clearGanttPreview() {
+  const p = document.getElementById('ganttPreview');
+  if (p) p.remove();
+}
+
+
+// ── Sync --mcw CSS var to actual column width ──────────────────────
+function syncMonthColWidth() {
+  const th = document.querySelector('th.month-h');
+  if (th) document.documentElement.style.setProperty('--mcw', th.offsetWidth + 'px');
+}
+window.addEventListener('resize', syncMonthColWidth);
+
+// ── Init ──────────────────────────────────────────────────────────
+load();
+renderGantt();
+renderMilestones();
+</script>
+</body>
+</html>

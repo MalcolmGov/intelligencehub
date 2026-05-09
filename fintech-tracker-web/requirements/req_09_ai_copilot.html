@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-09: AI Copilot (Conversational QA Assistant)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: #58a6ff;
+            font-size: 2.2em;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: #8b949e;
+            margin: 6px 0;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-priority-p2 {
+            background-color: #d29922;
+            color: #0d1117;
+        }
+
+        .badge-status {
+            background-color: #238636;
+            color: white;
+        }
+
+        .section {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #58a6ff;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        .section h3 {
+            color: #79c0ff;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .persona-card {
+            background-color: #0d1117;
+            border-left: 4px solid #58a6ff;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .persona-card strong {
+            color: #58a6ff;
+        }
+
+        .user-story {
+            background-color: #0d1117;
+            border-left: 4px solid #79c0ff;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .user-story-id {
+            color: #79c0ff;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .priority-high {
+            background-color: #da3633;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+
+        .priority-medium {
+            background-color: #9e6a03;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+
+        .requirement-item {
+            background-color: #0d1117;
+            border-left: 4px solid #238636;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .requirement-id {
+            color: #238636;
+            font-weight: 600;
+        }
+
+        .acceptance-criteria {
+            background-color: #0d1117;
+            border-left: 4px solid #d29922;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .criteria-item {
+            margin: 8px 0;
+            padding-left: 15px;
+        }
+
+        .criteria-item:before {
+            content: "• ";
+            color: #d29922;
+        }
+
+        .dependency-item {
+            background-color: #0d1117;
+            border-left: 4px solid #a371f7;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .assumption-item {
+            background-color: #0d1117;
+            border-left: 4px solid #79c0ff;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .out-of-scope-item {
+            background-color: #0d1117;
+            border-left: 4px solid #8b949e;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #238636;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <h1>UC-09: AI Copilot (Conversational QA Assistant)</h1>
+            <p><strong>Owner:</strong> Anupam Sharma<br><strong>Author:</strong> Malcolm Govender (Head of AI &amp; Engineering)</p>
+            <p><strong>Version:</strong> v1.0</p>
+            <p><strong>Date:</strong> May 2026</p>
+            <div class="badge-group">
+                <span class="badge badge-priority-p2">Priority: P2</span>
+                <span class="badge badge-status">Status: Done (100%)</span>
+            </div>
+                <div class="meta-item">
+                    <span class="meta-label">Author</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+        </header>
+
+        <div class="section">
+            <h2>Problem Statement</h2>
+            <p>
+                QA engineers and developers struggle with fragmented knowledge when testing automation frameworks, debugging test failures, and understanding test requirements. Knowledge about test patterns, automation best practices, and troubleshooting steps is scattered across documentation, wikis, Slack conversations, and individual experience. Engineers spend significant time searching for answers, context-switching between tools, and asking colleagues repetitive questions.
+            </p>
+            <p style="margin-top: 12px;">
+                An AI-powered Conversational QA Assistant (Copilot) would provide intelligent, context-aware responses to natural language questions about testing, automation, test cases, and QA workflows. The copilot would understand repository context, available test frameworks, and team conventions, enabling engineers to get instant answers without leaving their workflow or relying on human assistance.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Target Users & Personas</h2>
+
+            <h3>Personas</h3>
+
+            <div class="persona-card">
+                <strong>QA Automation Engineer</strong><br/>
+                Spends most of day writing and maintaining test automation. Frequently needs to reference documentation, test patterns, and framework APIs. Wants instant answers to technical questions without context-switching. Needs suggestions for test structure and optimization.
+            </div>
+
+            <div class="persona-card">
+                <strong>Junior QA/Test Developer</strong><br/>
+                New to the team and unfamiliar with conventions, frameworks, and codebases. Constantly asking questions to senior engineers. Benefits from instant, on-demand learning and guidance. Wants to reduce onboarding friction and become productive quickly.
+            </div>
+
+            <div class="persona-card">
+                <strong>Developer Contributing QA/Tests</strong><br/>
+                Software engineer writing unit tests or integration tests as part of feature work. Not a QA specialist and needs quick guidance on testing best practices, framework usage, and test conventions. Wants to write quality tests without becoming a testing expert.
+            </div>
+
+            <div class="persona-card">
+                <strong>QA Lead/Manager</strong><br/>
+                Oversees QA team and test automation strategy. Wants to improve team efficiency and reduce time spent on repetitive knowledge transfer. Interested in scaling team productivity through intelligent tooling.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>User Stories</h2>
+
+            <div class="user-story">
+                <span class="user-story-id">US-32:</span> As a QA Engineer, I want to ask the Copilot "How do I test async operations in this framework?" and receive specific code examples and best practices for the team's testing approach.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-33:</span> As a Junior QA Engineer, I want to ask "What's the convention for naming test files?" and get team-specific guidance based on the codebase conventions.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-34:</span> As a Developer, I want to ask "How do I write a unit test for this component?" and get a code template customized to the team's testing framework and patterns.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-35:</span> As a QA Engineer debugging a test failure, I want to ask "Why is this selector failing?" and get suggestions for debugging strategies and common causes.
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-36:</span> As a QA Engineer, I want to ask "Generate test cases for this user story" and receive structured test case suggestions based on the story content.
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-37:</span> As a Developer, I want Copilot to suggest test improvements when I show it my test code: "Consider using a data-driven approach here" with examples.
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-38:</span> As a QA Lead, I want to see Copilot usage analytics: which questions are most common, what topics need better documentation, and where team knowledge gaps exist.
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-01:</span> Support natural language questions about test frameworks, patterns, and conventions.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-02:</span> Access team's codebase to provide context-aware answers (test examples, naming conventions, existing patterns).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-03:</span> Generate code samples and test templates tailored to the team's framework (Playwright, Cypress, Jest, Pytest) and coding standards.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-04:</span> Analyze user stories and PRs to suggest test cases using Gherkin syntax (Given/When/Then).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-05:</span> Provide debugging assistance for failing tests, including suggestions for root causes and remediation.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-06:</span> Support code review mode: user pastes test code and Copilot provides optimization suggestions.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-07:</span> Integrate with team documentation, wikis, and internal knowledge bases to ground answers in official sources.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-08:</span> Track conversation history and allow users to reference previous answers or iterate on suggestions.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-09:</span> Provide confidence scores for answers and cite sources (docs, code examples, best practices).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-10:</span> Support integration with IDE plugins (VS Code) and Slack for frictionless access.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-11:</span> Generate analytics dashboard showing popular questions, common pain points, and knowledge gaps.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-12:</span> Allow admins to customize Copilot behavior: team conventions, approved frameworks, and knowledge sources.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-01:</span> Conversational responses must be generated in under 5 seconds for 95% of queries.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-02:</span> Code generation (templates, samples) must complete within 10 seconds.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-03:</span> Support concurrent usage by 50+ team members without performance degradation.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-04:</span> All conversations and code snippets handled by Copilot must be treated as confidential team data.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-05:</span> LLM model must be accurate for technical QA questions with 85%+ relevance rating from users.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-06:</span> Support multiple languages in future versions (currently English only).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-07:</span> Maintain audit logs of all Copilot interactions for compliance and improvement.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Acceptance Criteria</h2>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 1: Framework Question Answering</strong><br/>
+                <div class="criteria-item">Given a user asks "How do I handle browser dialogs in Playwright?", When Copilot responds, Then response should include code example, best practices, and link to official docs, with response time under 5 seconds.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 2: Test Case Generation</strong><br/>
+                <div class="criteria-item">Given a user story: "As a user, I want to log in with email and password", When user asks Copilot to generate test cases, Then Copilot should return 5+ structured test cases in Gherkin format with Given/When/Then statements.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 3: Code Review Suggestion</strong><br/>
+                <div class="criteria-item">Given a user pastes a test method with hardcoded values, When Copilot reviews it, Then Copilot should suggest parameterization, fixture usage, and team conventions with concrete examples.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 4: Context Awareness</strong><br/>
+                <div class="criteria-item">Given Copilot is integrated with the team's GitHub repo, When user asks "What test conventions do we follow?", Then Copilot should analyze existing test files and return team-specific patterns with examples.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 5: Confidence & Citations</strong><br/>
+                <div class="criteria-item">Given Copilot provides an answer, Then each response should include: (a) confidence score (0–100%), (b) source citations (documentation URL, code examples, principles), (c) "Ask for clarification" option if uncertain.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dependencies & Integrations</h2>
+
+            <div class="dependency-item">
+                <strong>GitHub API:</strong> Access to repositories, file content, and code examples for context.
+            </div>
+
+            <div class="dependency-item">
+                <strong>LLM Service:</strong> Claude API or equivalent for conversational QA and code generation.
+            </div>
+
+            <div class="dependency-item">
+                <strong>Documentation Platforms:</strong> Wiki, Confluence, or internal knowledge bases for sourcing answers.
+            </div>
+
+            <div class="dependency-item">
+                <strong>IDE Plugins:</strong> VS Code extension for in-editor access to Copilot.
+            </div>
+
+            <div class="dependency-item">
+                <strong>Slack Integration:</strong> Slack bot for asynchronous questions and answers in team channels.
+            </div>
+
+            <div class="dependency-item">
+                <strong>SentinelQA Platform:</strong> Test case and requirement data for context-aware suggestions.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Assumptions & Constraints</h2>
+
+            <div class="assumption-item">
+                Assumes team maintains reasonably comprehensive documentation and code examples for Copilot to reference.
+            </div>
+
+            <div class="assumption-item">
+                Assumes LLM model is updated regularly with new testing frameworks and best practices.
+            </div>
+
+            <div class="assumption-item">
+                Copilot recommendations are suggestions only; final decisions rest with QA engineers and developers.
+            </div>
+
+            <div class="assumption-item">
+                Conversation data is stored securely and subject to data retention policies.
+            </div>
+
+            <div class="assumption-item">
+                Constraint: Does not execute tests or code; only provides guidance and templates.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Out of Scope (v1)</h2>
+
+            <div class="out-of-scope-item">
+                Multi-language support (v1 is English-only; v2+ may add other languages)
+            </div>
+
+            <div class="out-of-scope-item">
+                Integration with all possible IDEs (v1 focuses on VS Code)
+            </div>
+
+            <div class="out-of-scope-item">
+                Real-time pair programming or live code editing assistance
+            </div>
+
+            <div class="out-of-scope-item">
+                Support for proprietary/custom testing frameworks not in initial scope
+            </div>
+
+            <div class="out-of-scope-item">
+                Automated test execution or validation within Copilot UI
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Definition of Done</h2>
+            <ul class="checklist">
+                <li>Conversational interface fully functional with LLM backend</li>
+                <li>Codebase context indexing implemented and tested</li>
+                <li>Natural language query understanding achieving 90%+ accuracy on test domain</li>
+                <li>Code generation templates created for all primary frameworks (Playwright, Cypress, Jest, Pytest)</li>
+                <li>Test case generation from user stories implemented with Gherkin output</li>
+                <li>Code review/suggestion feature complete and validated with team</li>
+                <li>GitHub integration deployed and tested</li>
+                <li>VS Code plugin completed and published to marketplace</li>
+                <li>Slack bot integration fully functional</li>
+                <li>Response time benchmarks met: 5s for queries, 10s for code generation</li>
+                <li>Analytics dashboard operational with usage insights</li>
+                <li>Security audit completed: data encryption, access controls, audit logging</li>
+                <li>Documentation completed: user guide, admin guide, API reference</li>
+                <li>Beta testing with 2+ engineering teams completed with feedback incorporated</li>
+                <li>Confidence scoring and citation system fully implemented</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

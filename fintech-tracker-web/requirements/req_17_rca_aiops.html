@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-17 Pulse AIOps: Root Cause Analysis — Requirements & User Stories</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { border-bottom: 2px solid #30363d; padding-bottom: 30px; margin-bottom: 40px; }
+        h1 { font-size: 2.5em; margin-bottom: 15px; color: #a371f7; }
+        .header-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .meta-item { background: #161b22; padding: 15px; border-left: 3px solid #a371f7; border-radius: 4px; }
+        .meta-label { font-size: 0.85em; color: #8b949e; text-transform: uppercase; margin-bottom: 5px; }
+        .meta-value { font-size: 1.1em; color: #e6edf3; font-weight: 500; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-right: 8px; margin-top: 10px; }
+        .badge-p2 { background: #f0883e; color: white; }
+        .badge-in-progress { background: #7c3aed; color: white; }
+        .badge-must { background: #da3633; color: white; }
+        .badge-should { background: #f0883e; color: white; }
+        .badge-nice { background: #3fb950; color: white; }
+        section { margin-bottom: 50px; background: #161b22; padding: 30px; border: 1px solid #30363d; border-radius: 6px; border-left: 4px solid #a371f7; }
+        h2 { font-size: 1.8em; color: #a371f7; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #30363d; }
+        h3 { font-size: 1.3em; color: #79c0ff; margin-top: 20px; margin-bottom: 10px; }
+        p { color: #c9d1d9; margin-bottom: 12px; }
+        .card { background: #0d1117; padding: 15px; margin: 15px 0; border: 1px solid #30363d; border-radius: 4px; border-left: 3px solid #a371f7; }
+        .card-title { font-weight: 600; color: #a371f7; margin-bottom: 8px; }
+        .card-content { font-size: 0.95em; line-height: 1.5; color: #c9d1d9; }
+        .user-story { background: #0d1117; padding: 15px; margin: 12px 0; border-left: 3px solid #1f6feb; border: 1px solid #30363d; border-radius: 4px; }
+        .story-id { font-weight: 700; color: #a371f7; font-size: 0.9em; }
+        .story-text { margin: 10px 0; font-style: italic; color: #c9d1d9; }
+        .requirement { padding: 12px 0; border-bottom: 1px solid #30363d; }
+        .requirement:last-child { border-bottom: none; }
+        .req-id { font-weight: 600; color: #a371f7; }
+        .req-text { margin: 5px 0; color: #c9d1d9; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: #0d1117; border: 1px solid #30363d; }
+        thead { background: #161b22; border-bottom: 2px solid #30363d; }
+        th { padding: 12px; text-align: left; color: #a371f7; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #30363d; color: #c9d1d9; }
+        tbody tr:hover { background: #161b22; }
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 10px 0; padding-left: 30px; position: relative; color: #c9d1d9; border-bottom: 1px solid #21262d; }
+        .checklist li:last-child { border-bottom: none; }
+        .checklist li:before { content: "✓"; position: absolute; left: 0; color: #3fb950; font-weight: bold; }
+        .dependency-item { padding: 10px; margin: 10px 0; background: #0d1117; border-left: 3px solid #a371f7; border: 1px solid #30363d; border-radius: 4px; }
+        .dependency-system { font-weight: 600; color: #a371f7; }
+        .dependency-detail { color: #8b949e; font-size: 0.9em; margin-top: 5px; }
+        .status-bar { background: #30363d; height: 8px; border-radius: 4px; overflow: hidden; margin: 10px 0; }
+        .status-fill { background: #a371f7; height: 100%; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #30363d; text-align: center; color: #8b949e; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+<div class="container">
+
+    <header>
+        <h1>Pulse AIOps: Root Cause Analysis Engine</h1>
+        <div class="header-meta">
+            <div class="meta-item">
+                <div class="meta-label">Use Case ID</div>
+                <div class="meta-value">UC-17</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Owner</div>
+                <div class="meta-value">Artemij Demidczyk</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Version</div>
+                <div class="meta-value">v1.0</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Document Date</div>
+                <div class="meta-value">May 2026</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Author</div>
+                <div class="meta-value" style="color:#60a5fa;font-weight:700;">Malcolm Govender</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Role</div>
+                <div class="meta-value" style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</div>
+            </div>
+        </div>
+        <div style="margin-top: 15px;">
+            <span class="badge badge-p2">PRIORITY: P2</span>
+            <span class="badge badge-in-progress">STATUS: In Progress (55%)</span>
+        </div>
+        <div style="margin-top: 15px; color: #8b949e; font-size: 0.95em;">
+            <strong>Platform:</strong> Pulse AIOps (observability-one.vercel.app) | <strong>Tech Stack:</strong> TypeScript, Next.js, Azure OpenAI, Prometheus, PagerDuty, OpenTelemetry
+        </div>
+    </header>
+
+    <!-- PROBLEM STATEMENT -->
+    <section>
+        <h2>Problem Statement</h2>
+        <p>When incidents occur in production, on-call engineers face an overwhelming flood of correlated alerts without clear diagnosis. They must manually sift through logs, metrics, traces, and recent deployments to identify root causes — a process that takes 20–60 minutes on average. This extended MTTR has direct financial impact (payment processing downtime costs thousands per minute), increases engineer burnout, and risks cascading failures.</p>
+        <p>Key pain points:</p>
+        <div class="card">
+            <div class="card-title">Alert Storm Overload</div>
+            <div class="card-content">A single infrastructure failure triggers 50–200 secondary alerts. Engineers struggle to identify the causal root alert from the noise, wasting critical time.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Manual Deployment Correlation</div>
+            <div class="card-content">Engineers must manually cross-reference incident timing with recent deployments from the CI/CD system. This correlation is the most common root cause but currently requires checking multiple systems.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Institutional Knowledge Loss</div>
+            <div class="card-content">Resolved incidents are documented in Confluence or PagerDuty postmortems but are rarely searched during active incidents. Tribal knowledge exists only in experienced engineers' heads.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">No Anomaly Baseline</div>
+            <div class="card-content">Without statistical baselines, teams cannot distinguish genuine anomalies from normal variance — resulting in both false-positive pages and missed real issues.</div>
+        </div>
+    </section>
+
+    <!-- PERSONAS & STAKEHOLDERS -->
+    <section>
+        <h2>Personas &amp; Stakeholders</h2>
+        <h3>Primary Users</h3>
+        <div class="card">
+            <div class="card-title">On-Call Engineer (Primary)</div>
+            <div class="card-content">Woken at 2am by a P1 alert. Needs to identify and resolve the root cause as fast as possible. Time-pressured, high-stress, may not have full system context. Wants clear, actionable RCA output — not a wall of logs.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Incident Commander</div>
+            <div class="card-content">Coordinates multi-team incident response. Needs a high-level AI ops brief they can share with stakeholders without deep technical knowledge. Communicates to leadership and customers.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">SRE / Platform Engineer</div>
+            <div class="card-content">Reviews incident patterns over time. Uses RCA history to identify systemic issues and drive reliability improvements. Needs corpus search and trend analytics.</div>
+        </div>
+        <h3>Secondary Stakeholders</h3>
+        <div class="card">
+            <div class="card-title">Head of Engineering / CTO</div>
+            <div class="card-content">Cares about MTTR reduction, SLA adherence, and incident volume trends. Reviews monthly reliability reports.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">CISO</div>
+            <div class="card-content">Needs audit trail of all incidents and RCA outputs. Concerned with data sovereignty — LLM calls must not leak production data outside approved boundaries.</div>
+        </div>
+    </section>
+
+    <!-- USER STORIES -->
+    <section>
+        <h2>User Stories</h2>
+
+        <h3>Epic 1: Real-Time RCA During Incidents</h3>
+
+        <div class="user-story">
+            <div class="story-id">US-17-01 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As an on-call engineer, I want the system to automatically correlate all active alerts into a single root cause hypothesis within 30 seconds of incident declaration, so I can start remediation immediately rather than spending 20 minutes on manual triage."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>RCA engine activates automatically on P1/P2 incident declaration in PagerDuty</li>
+                <li>Output includes: probable root cause, confidence %, affected services, recommended remediation steps</li>
+                <li>First RCA result delivered within 30 seconds of incident trigger</li>
+                <li>Results visible in Pulse incident command view</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-17-02 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As an on-call engineer, I want the RCA to automatically surface any deployments in the 2 hours before the incident, so I can quickly assess whether a code change caused the issue."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>System ingests deployment events from Azure DevOps / GitHub Actions via webhook</li>
+                <li>Recent deployments (last 2 hours) displayed in incident command view timeline</li>
+                <li>If deployment-to-incident correlation detected, prominently flagged in RCA output</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-17-03 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As an incident commander, I want a plain-English AI ops brief that summarises what is happening, what the likely cause is, and what teams are needed, so I can communicate status without needing to interpret raw telemetry."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>AI ops brief generated automatically; max 200 words, non-technical language</li>
+                <li>Includes: impact summary, probable cause, affected teams, recommended escalation path</li>
+                <li>Copyable to clipboard for Slack/email with one click</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-17-04 <span class="badge badge-should">SHOULD</span></div>
+            <div class="story-text">"As an on-call engineer, I want to see whether this incident pattern has occurred before, with links to the postmortem and the fix that resolved it, so I can apply the same fix immediately."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>Historical incident corpus queried using semantic similarity on alert signals</li>
+                <li>Top 3 similar past incidents surfaced with similarity score</li>
+                <li>Link to original postmortem / resolution notes included</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-17-05 <span class="badge badge-should">SHOULD</span></div>
+            <div class="story-text">"As an SRE, I want the system to alert me when a service metric deviates statistically from its baseline, before it triggers a user-facing incident, so we can intervene proactively."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>ML anomaly detection model trained on 30+ days of metric time-series</li>
+                <li>Anomaly score surfaced in Pulse dashboard with deviation magnitude</li>
+                <li>Early warning alert generated for anomalies above configurable threshold</li>
+                <li>False positive rate &lt; 5% on validation dataset</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-17-06 <span class="badge badge-nice">NICE TO HAVE</span></div>
+            <div class="story-text">"As an SRE, I want resolved incidents to automatically be embedded and added to the knowledge corpus, so the system gets smarter with every incident we resolve."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>On incident resolution, system extracts: root cause, resolution steps, duration, affected services</li>
+                <li>Embeds and stores in vector store automatically (no manual action)</li>
+                <li>New incident data available for similarity search within 5 minutes of resolution</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-17-07 <span class="badge badge-nice">NICE TO HAVE</span></div>
+            <div class="story-text">"As an on-call engineer, I want ITSM tickets (ServiceNow) to be automatically created and linked to the Pulse incident, so I don't need to context-switch during active triage."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>P1/P2 incidents auto-create ServiceNow tickets with AI-populated description</li>
+                <li>Ticket includes link back to Pulse incident command view</li>
+                <li>CMDB CI (configuration item) auto-populated from service registry</li>
+            </ul>
+        </div>
+
+        <h3>Epic 2: Post-Incident Learning</h3>
+
+        <div class="user-story">
+            <div class="story-id">US-17-08 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As an SRE, I want to rate the quality of each RCA output (thumbs up/down) so we can track accuracy over time and identify where the model needs improvement."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>RCA output has thumbs up/down rating in Pulse UI</li>
+                <li>Rating stored with incident record</li>
+                <li>Monthly RCA accuracy report available (% rated correct)</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>Functional Requirements</h2>
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="req-id">FR-17-01</td>
+                    <td>RCA engine shall correlate alert signals from PagerDuty and Prometheus into a single root cause hypothesis</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#3fb950;">✓ Built</td>
+                </tr>
+                <tr>
+                    <td class="req-id">FR-17-02</td>
+                    <td>Incident command view shall display alert timeline, RCA output, and AI ops brief in a single unified interface</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#3fb950;">✓ Built</td>
+                </tr>
+                <tr>
+                    <td class="req-id">FR-17-03</td>
+                    <td>System shall ingest deployment events from CI/CD pipelines via webhook within 60 seconds of deployment completion</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#f0883e;">⚠ Missing</td>
+                </tr>
+                <tr>
+                    <td class="req-id">FR-17-04</td>
+                    <td>Alert evaluator shall deduplicate and group related alerts within 5 seconds using fingerprinting algorithm</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#3fb950;">✓ Built</td>
+                </tr>
+                <tr>
+                    <td class="req-id">FR-17-05</td>
+                    <td>ML anomaly detection shall train on Prometheus time-series data and produce anomaly scores via REST API</td>
+                    <td><span class="badge badge-should" style="margin:0;">SHOULD</span></td>
+                    <td style="color:#f0883e;">⚠ Missing</td>
+                </tr>
+                <tr>
+                    <td class="req-id">FR-17-06</td>
+                    <td>Historical incident corpus shall support semantic search returning top-N similar past incidents with similarity scores</td>
+                    <td><span class="badge badge-should" style="margin:0;">SHOULD</span></td>
+                    <td style="color:#f0883e;">⚠ Missing</td>
+                </tr>
+                <tr>
+                    <td class="req-id">FR-17-07</td>
+                    <td>Resolved incidents shall be automatically embedded and stored in vector store without manual action</td>
+                    <td><span class="badge badge-should" style="margin:0;">SHOULD</span></td>
+                    <td style="color:#f0883e;">⚠ Missing</td>
+                </tr>
+                <tr>
+                    <td class="req-id">FR-17-08</td>
+                    <td>System shall integrate with ServiceNow to auto-create ITSM tickets for P1/P2 incidents</td>
+                    <td><span class="badge badge-nice" style="margin:0;">NICE</span></td>
+                    <td style="color:#f0883e;">⚠ Missing</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- NON-FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>Non-Functional Requirements</h2>
+        <table>
+            <thead>
+                <tr><th>Category</th><th>Requirement</th><th>Target</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Performance</strong></td>
+                    <td>Time from incident declaration to first RCA output</td>
+                    <td>&lt; 30 seconds</td>
+                </tr>
+                <tr>
+                    <td><strong>Performance</strong></td>
+                    <td>Alert correlation and deduplication latency</td>
+                    <td>&lt; 5 seconds</td>
+                </tr>
+                <tr>
+                    <td><strong>Accuracy</strong></td>
+                    <td>RCA engineer rating (thumbs up) rate</td>
+                    <td>&gt; 80%</td>
+                </tr>
+                <tr>
+                    <td><strong>Accuracy</strong></td>
+                    <td>ML anomaly detection false positive rate</td>
+                    <td>&lt; 5%</td>
+                </tr>
+                <tr>
+                    <td><strong>Availability</strong></td>
+                    <td>RCA service uptime SLA</td>
+                    <td>99.9%</td>
+                </tr>
+                <tr>
+                    <td><strong>Security</strong></td>
+                    <td>Production log/metric data must not leave South Africa or approved Azure regions</td>
+                    <td>Azure South Africa North only</td>
+                </tr>
+                <tr>
+                    <td><strong>Scalability</strong></td>
+                    <td>Concurrent incident handling without degradation</td>
+                    <td>≥ 10 simultaneous P1/P2 incidents</td>
+                </tr>
+                <tr>
+                    <td><strong>Auditability</strong></td>
+                    <td>All RCA calls and outputs logged with full traceability</td>
+                    <td>90-day retention</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- DEPENDENCIES -->
+    <section>
+        <h2>Technical Dependencies</h2>
+        <div class="dependency-item">
+            <div class="dependency-system">Azure OpenAI (GPT-4o)</div>
+            <div class="dependency-detail">Required for RCA reasoning and AI ops brief generation. Must be provisioned in Azure South Africa North. Requires CISO approval for production data processing.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">PagerDuty — Webhook Integration</div>
+            <div class="dependency-detail">Incident lifecycle events (triggered, acknowledged, resolved) must be forwarded to Pulse webhook endpoint. Requires PagerDuty admin access to configure webhooks.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Prometheus / Grafana</div>
+            <div class="dependency-detail">Metric time-series data required for anomaly detection and alert correlation. Pulse must be able to query Prometheus remote_write endpoint or use direct API query.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Azure DevOps / GitHub Actions — Deployment Webhooks</div>
+            <div class="dependency-detail">CI/CD pipelines must send deployment events (service, version, timestamp, environment) to Pulse ingestion endpoint on successful deployment. Required for deployment-incident correlation.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Azure AI Search (Vector Store)</div>
+            <div class="dependency-detail">Historical incident corpus requires a vector store supporting semantic similarity search. Azure AI Search (index with embedding field) is the recommended choice within the existing Azure footprint.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">ServiceNow — ITSM (Phase 2)</div>
+            <div class="dependency-detail">CMDB and ticket creation integration. Requires ServiceNow admin to provision OAuth client credentials and share CMDB service topology export. Phase 2 dependency.</div>
+        </div>
+    </section>
+
+    <!-- ACCEPTANCE CRITERIA SUMMARY -->
+    <section>
+        <h2>Definition of Done — Full Acceptance Criteria</h2>
+        <ul class="checklist">
+            <li>RCA engine correctly identifies root cause in ≥ 80% of test incident scenarios</li>
+            <li>First RCA output delivered within 30 seconds of P1 incident trigger</li>
+            <li>Incident command view shows alert timeline, RCA output, AI ops brief in single view</li>
+            <li>Deployment event ingestion live and tested end-to-end with Azure DevOps</li>
+            <li>ML anomaly detection model trained and validating at &lt; 5% false positive rate</li>
+            <li>Historical incident corpus seeded with ≥ 50 past incidents; semantic search returning relevant matches</li>
+            <li>On-call runbook published to Confluence covering: how to use Pulse RCA, how to rate RCA quality, how to escalate when RCA is wrong</li>
+            <li>Integration test suite passing with ≥ 90% coverage of critical signal paths</li>
+            <li>2-week shadow-mode run completed — RCA output compared against manual triage; accuracy report approved by Head of Engineering</li>
+            <li>CISO sign-off on data residency controls (no production PII to OpenAI US endpoints)</li>
+        </ul>
+    </section>
+
+    <footer>
+        <p>UC-17 Pulse AIOps: Root Cause Analysis Engine — Requirements &amp; User Stories v1.0</p>
+        <p style="margin-top:5px;">Owner: Artemij Demidczyk · Author: Malcolm Govender, Head of AI &amp; Engineering · May 2026</p>
+        <p style="margin-top:5px;">South African Fintech AI Transformation Programme</p>
+    </footer>
+
+</div>
+</body>
+</html>

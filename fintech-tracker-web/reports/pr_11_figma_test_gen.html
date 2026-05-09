@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Readiness Report - Figma to Test Generation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --accent: #0ea5e9;
+            --accent-dark: #0284c7;
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --purple: #8b5cf6;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border-bottom: 2px solid var(--accent);
+            padding: 3rem 2rem;
+            margin: -2rem -2rem 2rem -2rem;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .header-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .header-content p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .metadata-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .metadata-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        section {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: var(--surface);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--accent-dark);
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .summary-card {
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .summary-card strong {
+            color: var(--accent);
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #a8e6cf;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid var(--surface-light);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #a8e6cf;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .architecture {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border: 1px solid var(--purple);
+        }
+
+        .architecture h4 {
+            color: var(--purple);
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--surface-light);
+        }
+
+        th {
+            background: rgba(14, 165, 233, 0.15);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(14, 165, 233, 0.05);
+        }
+
+        .phase {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid var(--green);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .phase-title {
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--red);
+        }
+
+        .risk-medium {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--amber);
+        }
+
+        .risk-low {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid var(--green);
+        }
+
+        .success-metric {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--green);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.75rem 0;
+        }
+
+        .definition-item {
+            background: rgba(14, 165, 233, 0.08);
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+        }
+
+        .action-item {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--amber);
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border-radius: 4px;
+        }
+
+        .raci-matrix {
+            font-size: 0.9rem;
+        }
+
+        .effort-table {
+            margin: 1.5rem 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--surface-light);
+            margin-top: 3rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem 0.25rem 0.25rem 0;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Figma to Test Generation</h1>
+                <p>AI-Powered Automated UI Test Generation from Design Files</p>
+                <div class="metadata">
+                    <div class="metadata-item">
+                        <div class="metadata-label">Use Case ID</div>
+                        <div class="metadata-value">PR-11</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Baseline Completion</div>
+                        <div class="metadata-value">100% (Built from 35% baseline)</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Owned By</div>
+                        <div class="metadata-value">Anupam Sharma</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>Executive Summary</h2>
+            <p>The Figma to Test Generation system automates the creation of comprehensive UI test suites directly from design specifications. By parsing Figma design files, extracting component hierarchies, visual properties, and interaction flows, the system generates ready-to-run automated tests across Selenium WebDriver, Playwright, and Cypress frameworks. This eliminates the manual effort of test creation, ensures test coverage aligns with design intent, and maintains consistency as designs evolve.</p>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <strong>Current State:</strong> Manual test creation from design specs; test cases often lag behind design changes; high effort to maintain visual regression tests
+                </div>
+                <div class="summary-card">
+                    <strong>Target State:</strong> Automated test generation from Figma; tests regenerated within minutes of design changes; comprehensive coverage including visual assertions and interaction flows
+                </div>
+                <div class="summary-card">
+                    <strong>Key Value:</strong> 60% reduction in test creation time; improved design-test alignment; faster iteration cycles for UI teams
+                </div>
+                <div class="summary-card">
+                    <strong>Timeline:</strong> 40 days across 3 phases; full production deployment by end of Phase 3
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Current Implementation Gaps</h2>
+            <p>Analysis of the current 35% baseline implementation reveals the following gaps that must be addressed to reach production readiness:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gap Category</th>
+                        <th>Current State</th>
+                        <th>Required for Production</th>
+                        <th>Effort Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Design Parsing</td>
+                        <td>Basic component extraction</td>
+                        <td>Advanced hierarchy analysis, auto-layout parsing, variant detection</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Test Generation Engines</td>
+                        <td>Single-framework stubs</td>
+                        <td>Full Selenium, Playwright, Cypress implementations with framework selection</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Visual Assertions</td>
+                        <td>None</td>
+                        <td>Pixel-perfect comparisons, accessibility checks (WCAG), responsive design validation</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Interaction Simulation</td>
+                        <td>None</td>
+                        <td>Event detection, click paths, form filling, animation handling</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>CI/CD Integration</td>
+                        <td>None</td>
+                        <td>Webhook triggers on design changes, test execution pipelines, result reporting</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>ML-Based Test Optimization</td>
+                        <td>None</td>
+                        <td>Smart element identification, relevance scoring, flaky test detection</td>
+                        <td>Medium</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Technical Architecture</h2>
+            <p>The Figma to Test Generation system comprises six primary components orchestrated through a central API service:</p>
+            <div class="architecture">
+                <h4>Core Components</h4>
+                <p><strong>1. Figma Parser Service</strong> - Connects to Figma API, extracts design hierarchy, component definitions, constraints, and interaction specifications. Handles variant resolution and auto-layout parsing.</p>
+                <p><strong>2. Design Analyzer</strong> - Performs semantic analysis on design structure, identifies interactive elements (buttons, inputs, links), detects user flows from prototypes, generates element relationship maps.</p>
+                <p><strong>3. Test Generation Engines</strong> - Three independent test framework generators: Selenium WebDriver (cross-browser), Playwright (modern browsers with async), Cypress (E2E focused). Each generates framework-specific syntax.</p>
+                <p><strong>4. Visual Assertion Generator</strong> - Creates visual regression tests, accessibility assertions (WCAG compliance), responsive design breakpoint tests, animation timing assertions.</p>
+                <p><strong>5. ML Optimization Service</strong> - Scores element importance, predicts flaky tests, optimizes element selectors (XPath, CSS), suggests test consolidation opportunities.</p>
+                <p><strong>6. CI/CD Integration Service</strong> - Manages Figma webhooks, triggers test generation on design updates, executes tests, archives results, provides reporting.</p>
+            </div>
+            <p>The system uses PostgreSQL to store design metadata, test definitions, and execution history. Redis caches generated test code and design structure. Kafka streams design change events to trigger regeneration pipelines.</p>
+        </section>
+
+        <section>
+            <h2>Integration Points</h2>
+            <h3>Figma API Integration</h3>
+            <p>Authenticated API calls to retrieve design files, component definitions, and prototype specifications. Uses Figma webhooks for real-time design change notifications.</p>
+            <h3>Test Framework Integrations</h3>
+            <ul>
+                <li><strong>Selenium WebDriver</strong> - Generated test code uses Python/JavaScript WebDriver client; executed on Selenium Grid for parallel browser testing</li>
+                <li><strong>Playwright</strong> - Generated tests use Playwright API; supports multi-browser concurrent execution</li>
+                <li><strong>Cypress</strong> - Generated test code follows Cypress conventions; executed on Cypress Test Runner</li>
+            </ul>
+            <h3>CI/CD Pipeline Integration</h3>
+            <p>Jenkins pipelines triggered by Figma webhooks execute generated tests. GitHub Actions workflows store test code in version control. Test results published to artifact repository.</p>
+            <h3>Vision AI Integration</h3>
+            <p>OpenCV/PIL for visual assertion image processing. Pre-trained ML models for element classification (button, input, link, image, etc.).</p>
+        </section>
+
+        <section>
+            <h2>Production Requirements</h2>
+            <h3>Infrastructure Specifications</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>CPU</th>
+                        <th>Memory</th>
+                        <th>Storage</th>
+                        <th>Replicas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Figma Parser API</td>
+                        <td>4 cores</td>
+                        <td>8GB</td>
+                        <td>50GB</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Test Generation Service</td>
+                        <td>8 cores</td>
+                        <td>16GB</td>
+                        <td>100GB</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Visual Assertion Engine</td>
+                        <td>6 cores</td>
+                        <td>12GB</td>
+                        <td>200GB</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>ML Optimization Service</td>
+                        <td>8 cores</td>
+                        <td>16GB</td>
+                        <td>150GB</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL (Primary)</td>
+                        <td>16 cores</td>
+                        <td>32GB</td>
+                        <td>1TB SSD</td>
+                        <td>1 + 1 replica</td>
+                    </tr>
+                    <tr>
+                        <td>Redis Cache</td>
+                        <td>4 cores</td>
+                        <td>16GB</td>
+                        <td>100GB</td>
+                        <td>1 + 1 sentinel</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Security Requirements</h3>
+            <ul>
+                <li>OAuth 2.0 authentication for Figma API access; API keys encrypted with AES-256</li>
+                <li>RBAC for test generation permissions (design-only users cannot modify test code)</li>
+                <li>TLS 1.3 for all API communications</li>
+                <li>Test code sanitization to prevent injection attacks in generated Selenium/Playwright scripts</li>
+                <li>Audit logging for all design file access and test generation events</li>
+            </ul>
+            <h3>Performance SLAs</h3>
+            <ul>
+                <li>Design parsing: <30 seconds for large design files (>1000 components)</li>
+                <li>Test generation: <2 minutes for complete test suite generation</li>
+                <li>Test execution: Parallel execution across 10 browsers within 10 minutes</li>
+                <li>API response time: <500ms for design queries</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Detailed Implementation Guidelines</h2>
+
+            <h3>Phase 1: Foundation & Design Parsing (Days 1-15)</h3>
+            <div class="phase">
+                <div class="phase-title">Objectives</div>
+                <p>Establish core infrastructure, implement Figma API integration, and build design parsing engine</p>
+            </div>
+
+            <h4>Step 1.1: Database Schema & Infrastructure Setup (Days 1-3)</h4>
+            <pre><code>-- PostgreSQL Schema
+CREATE TABLE figma_designs (
+    id UUID PRIMARY KEY,
+    file_id VARCHAR(255) NOT NULL UNIQUE,
+    file_name VARCHAR(255),
+    team_id VARCHAR(255),
+    last_parsed TIMESTAMP,
+    component_count INTEGER,
+    design_hash VARCHAR(64),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE design_components (
+    id UUID PRIMARY KEY,
+    design_id UUID REFERENCES figma_designs(id) ON DELETE CASCADE,
+    component_id VARCHAR(255),
+    component_name VARCHAR(255),
+    component_type VARCHAR(50),
+    parent_id VARCHAR(255),
+    position_x FLOAT,
+    position_y FLOAT,
+    width FLOAT,
+    height FLOAT,
+    rotation FLOAT DEFAULT 0,
+    properties JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_design_components_design_id ON design_components(design_id);
+CREATE INDEX idx_design_components_component_id ON design_components(component_id);
+
+CREATE TABLE test_definitions (
+    id UUID PRIMARY KEY,
+    design_id UUID REFERENCES figma_designs(id),
+    test_type VARCHAR(50), -- 'functional', 'visual', 'accessibility'
+    framework VARCHAR(50), -- 'selenium', 'playwright', 'cypress'
+    test_code TEXT,
+    selectors JSONB,
+    assertions JSONB,
+    status VARCHAR(20),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE test_executions (
+    id UUID PRIMARY KEY,
+    test_id UUID REFERENCES test_definitions(id),
+    execution_time TIMESTAMP,
+    duration_ms INTEGER,
+    status VARCHAR(20),
+    result_summary JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_test_executions_test_id ON test_executions(test_id);
+CREATE INDEX idx_test_executions_execution_time ON test_executions(execution_time);</code></pre>
+
+            <h4>Step 1.2: Figma API Integration Service (Days 4-8)</h4>
+            <pre><code>import requests
+import asyncio
+from typing import Dict, List
+from dataclasses import dataclass
+
+@dataclass
+class FigmaComponent:
+    id: str
+    name: str
+    type: str
+    parent_id: str
+    bounds: Dict
+    properties: Dict
+
+class FigmaParserService:
+    def __init__(self, figma_api_token: str):
+        self.api_token = figma_api_token
+        self.base_url = "https://api.figma.com/v1"
+        self.headers = {"X-Figma-Token": figma_api_token}
+
+    async def parse_design_file(self, file_id: str) -> List[FigmaComponent]:
+        """Fetch and parse Figma design file structure"""
+        try:
+            response = requests.get(
+                f"{self.base_url}/files/{file_id}",
+                headers=self.headers
+            )
+            response.raise_for_status()
+            file_data = response.json()
+
+            components = []
+            self._extract_components(file_data['document'], None, components)
+            return components
+        except requests.RequestException as e:
+            raise Exception(f"Failed to parse design file: {e}")
+
+    def _extract_components(self, node, parent_id: str, components: List):
+        """Recursively extract components from design hierarchy"""
+        if 'children' not in node:
+            return
+
+        for child in node['children']:
+            if child['type'] in ['COMPONENT', 'COMPONENT_SET', 'INSTANCE']:
+                component = FigmaComponent(
+                    id=child['id'],
+                    name=child['name'],
+                    type=child['type'],
+                    parent_id=parent_id,
+                    bounds={
+                        'x': child.get('absoluteBoundingBox', {}).get('x'),
+                        'y': child.get('absoluteBoundingBox', {}).get('y'),
+                        'width': child.get('absoluteBoundingBox', {}).get('width'),
+                        'height': child.get('absoluteBoundingBox', {}).get('height')
+                    },
+                    properties=child.get('componentPropertyDefinitions', {})
+                )
+                components.append(component)
+
+            self._extract_components(child, child['id'], components)</code></pre>
+
+            <h3>Phase 2: Test Generation Engines (Days 16-28)</h3>
+            <div class="phase">
+                <div class="phase-title">Objectives</div>
+                <p>Implement test generation for Selenium, Playwright, and Cypress; add visual assertions</p>
+            </div>
+
+            <h4>Step 2.1: Selector Optimization Engine (Days 16-18)</h4>
+            <pre><code>from selenium.webdriver.common.by import By
+import re
+
+class SelectorOptimizer:
+    """Generate optimal selectors for UI elements"""
+
+    def generate_selectors(self, element: Dict) -> Dict[str, str]:
+        """Generate multiple selector strategies, ranked by stability"""
+        selectors = {
+            'css': self._generate_css_selector(element),
+            'xpath': self._generate_xpath_selector(element),
+            'data_id': self._generate_data_id_selector(element)
+        }
+
+        # Score and rank selectors by stability (preferred: data-id > CSS > XPath)
+        ranked = sorted(
+            selectors.items(),
+            key=lambda x: self._score_selector_stability(x[1]),
+            reverse=True
+        )
+        return dict(ranked)
+
+    def _generate_css_selector(self, element: Dict) -> str:
+        """Generate CSS selector using class names and element attributes"""
+        classes = element.get('classes', [])
+        selector = element.get('tag', 'div')
+
+        if 'id' in element:
+            return f"#{element['id']}"
+
+        if classes:
+            selector += '.' + '.'.join(classes)
+
+        if 'role' in element:
+            selector += f"[role='{element['role']}']"
+
+        return selector
+
+    def _generate_xpath_selector(self, element: Dict) -> str:
+        """Generate stable XPath using text content and attributes"""
+        text = element.get('text', '').strip()
+        element_type = element.get('tag', 'div')
+
+        if text:
+            return f"//{element_type}[contains(text(), '{text}')]"
+
+        aria_label = element.get('aria-label', '')
+        if aria_label:
+            return f"//{element_type}[@aria-label='{aria_label}']"
+
+        return f"//{element_type}[@data-testid='{element.get('data-testid', '')}']"
+
+    def _generate_data_id_selector(self, element: Dict) -> str:
+        """Preferred: data-testid based selector"""
+        if 'data-testid' in element:
+            return f"[data-testid='{element['data-testid']}']"
+        return None
+
+    def _score_selector_stability(self, selector: str) -> int:
+        """Score selector by stability (0-100)"""
+        if not selector:
+            return 0
+        if selector.startswith('[data-testid'):
+            return 100
+        if selector.startswith('#'):
+            return 85
+        if 'text()' in selector:
+            return 70
+        return 50</code></pre>
+
+            <h4>Step 2.2: Playwright Test Generator (Days 19-23)</h4>
+            <pre><code>class PlaywrightTestGenerator:
+    """Generate Playwright test code from design components"""
+
+    def generate_test(self, components: List[FigmaComponent],
+                      selectors: Dict) -> str:
+        """Generate complete Playwright test file"""
+        test_code = '''import { test, expect } from '@playwright/test';
+
+test.describe('UI Component Tests', () => {
+'''
+
+        for component in components:
+            if component.component_type in ['BUTTON', 'LINK', 'INPUT']:
+                test_func = self._generate_interaction_test(
+                    component,
+                    selectors.get(component.id)
+                )
+                test_code += test_func + '\n'
+
+        test_code += '});\n'
+        return test_code
+
+    def _generate_interaction_test(self, component: FigmaComponent,
+                                   selector: str) -> str:
+        """Generate interaction test for a single component"""
+        test_name = self._sanitize_name(component.name)
+
+        test_code = f'''  test('{test_name} interaction test', async ({{ page }}) => {{
+    await page.goto('/');
+
+    // Locate element
+    const element = await page.locator('{selector}');
+
+    // Verify visibility
+    await expect(element).toBeVisible();
+
+    // Interaction based on component type
+    if (element.getAttribute('role') === 'button') {{
+        await element.click();
+    }} else if (element.getAttribute('role') === 'textbox') {{
+        await element.fill('Test input');
+    }}
+
+    // Verify state change
+    const aria_busy = await element.getAttribute('aria-busy');
+    await expect(aria_busy).toBe('false');
+  }});'''
+
+        return test_code
+
+    def _sanitize_name(self, name: str) -> str:
+        """Convert component name to valid test name"""
+        return re.sub(r'[^a-zA-Z0-9_]', '_', name).lower()</code></pre>
+
+            <h3>Phase 3: Visual Assertions & Optimization (Days 29-40)</h3>
+            <div class="phase">
+                <div class="phase-title">Objectives</div>
+                <p>Implement visual regression testing, accessibility checks, ML-based optimization, and CI/CD integration</p>
+            </div>
+
+            <h4>Step 3.1: Visual Assertion Generator (Days 29-32)</h4>
+            <pre><code>from PIL import Image
+import io
+import hashlib
+
+class VisualAssertionGenerator:
+    """Generate visual regression and accessibility assertions"""
+
+    def generate_visual_tests(self, components: List[FigmaComponent]) -> str:
+        """Generate visual regression test code"""
+        test_code = '''import { test, expect } from '@playwright/test';
+
+test.describe('Visual Regression Tests', () => {
+'''
+
+        for component in components:
+            test_code += self._generate_screenshot_assertion(component)
+
+        test_code += '});\n'
+        return test_code
+
+    def _generate_screenshot_assertion(self, component: FigmaComponent) -> str:
+        """Generate screenshot-based visual test"""
+        test_name = self._sanitize_name(component.name)
+
+        test_code = f'''  test('{test_name} visual regression', async ({{ page }}) => {{
+    await page.goto('/');
+
+    const element = await page.locator('[data-testid="{component.id}"]');
+
+    // Capture screenshot
+    await expect(element).toHaveScreenshot('{test_name}.png', {{
+      maxDiffPixels: 100,
+      threshold: 0.2
+    }});
+  }});
+'''
+        return test_code
+
+    def generate_accessibility_tests(self, components: List) -> str:
+        """Generate WCAG accessibility assertion tests"""
+        test_code = '''import { test, expect } from '@playwright/test';
+import { injectAxe, getViolations } from 'axe-playwright';
+
+test.describe('Accessibility Tests', () => {
+'''
+
+        for component in components:
+            test_code += f'''  test('{component.name} accessibility', async ({{ page }}) => {{
+    await page.goto('/');
+    await injectAxe(page);
+
+    const violations = await getViolations(page, '[data-testid="{component.id}"]');
+    expect(violations).toHaveLength(0);
+  }});
+'''
+
+        test_code += '});\n'
+        return test_code
+
+    def _sanitize_name(self, name: str) -> str:
+        return re.sub(r'[^a-zA-Z0-9_]', '_', name).lower()</code></pre>
+
+            <h4>Step 3.2: ML-Based Test Optimization (Days 33-36)</h4>
+            <pre><code>from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+class TestOptimizer:
+    """ML-based optimization of generated tests"""
+
+    def __init__(self):
+        self.flakiness_model = RandomForestClassifier(n_estimators=100)
+        self.selector_optimizer = RandomForestClassifier(n_estimators=50)
+
+    def predict_flakiness(self, test_features: Dict) -> float:
+        """Predict likelihood test will be flaky (0-1)"""
+        features = np.array([[
+            test_features['selector_specificity'],
+            test_features['animation_count'],
+            test_features['external_api_calls'],
+            test_features['timing_dependencies'],
+            test_features['dom_mutation_depth']
+        ]])
+
+        return self.flakiness_model.predict_proba(features)[0][1]
+
+    def score_selector_quality(self, selector: str, element: Dict) -> float:
+        """Score selector by expected stability (0-100)"""
+        features = np.array([[
+            len(selector),
+            selector.count('['),
+            selector.count('::'),
+            self._contains_text_node(selector),
+            self._specificity_score(selector)
+        ]])
+
+        score = self.selector_optimizer.predict(features)[0]
+        return max(0, min(100, score * 100))
+
+    def suggest_test_consolidation(self, tests: List[Dict]) -> List[str]:
+        """Identify redundant tests that can be consolidated"""
+        similar_tests = {}
+
+        for i, test1 in enumerate(tests):
+            for j, test2 in enumerate(tests[i+1:], i+1):
+                similarity = self._calculate_test_similarity(test1, test2)
+                if similarity > 0.85:
+                    if test1['id'] not in similar_tests:
+                        similar_tests[test1['id']] = []
+                    similar_tests[test1['id']].append(test2['id'])
+
+        return similar_tests
+
+    def _contains_text_node(self, selector: str) -> int:
+        return 1 if 'text()' in selector else 0
+
+    def _specificity_score(self, selector: str) -> int:
+        score = 0
+        score += selector.count('#') * 100
+        score += selector.count('[') * 10
+        score += selector.count('.') * 5
+        return min(100, score)</code></pre>
+
+            <h4>Step 3.3: CI/CD Integration & Webhooks (Days 37-40)</h4>
+            <pre><code>from fastapi import FastAPI, HTTPException
+import hmac
+import hashlib
+
+app = FastAPI()
+
+class FigmaWebhookHandler:
+    def __init__(self, postgres_client, test_generator):
+        self.db = postgres_client
+        self.generator = test_generator
+        self.webhook_secret = os.getenv('FIGMA_WEBHOOK_SECRET')
+
+    def verify_figma_signature(self, body: str, signature: str) -> bool:
+        """Verify Figma webhook signature for security"""
+        expected = hmac.new(
+            self.webhook_secret.encode(),
+            body.encode(),
+            hashlib.sha256
+        ).hexdigest()
+        return hmac.compare_digest(expected, signature)
+
+    @app.post('/webhooks/figma')
+    async def handle_figma_change(self, request: Request):
+        """Webhook triggered on Figma design changes"""
+        body = await request.body()
+        signature = request.headers.get('x-figma-webhook-signature')
+
+        if not self.verify_figma_signature(body.decode(), signature):
+            raise HTTPException(status_code=401, detail='Invalid signature')
+
+        payload = json.loads(body)
+
+        # Trigger test regeneration
+        for file_change in payload['file_changes']:
+            await self._regenerate_tests(file_change['file_id'])
+
+        return {'status': 'processing'}
+
+    async def _regenerate_tests(self, file_id: str):
+        """Regenerate all tests for modified design file"""
+        # Parse updated design
+        components = await self.parser.parse_design_file(file_id)
+
+        # Generate new tests
+        for framework in ['selenium', 'playwright', 'cypress']:
+            test_code = await self.generator.generate_tests(
+                components, framework
+            )
+
+            # Store in database
+            await self.db.store_test_code(file_id, framework, test_code)
+
+            # Trigger Jenkins pipeline
+            await self._trigger_jenkins_pipeline(file_id, framework)</code></pre>
+        </section>
+
+        <section>
+            <h2>Gap Analysis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Impact</th>
+                        <th>Resolution</th>
+                        <th>Timeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>No advanced selector optimization</td>
+                        <td>High - Tests become flaky as UI evolves</td>
+                        <td>Implement ML-based selector scoring (Days 33-36)</td>
+                        <td>Phase 3</td>
+                    </tr>
+                    <tr>
+                        <td>Missing visual regression framework</td>
+                        <td>High - Cannot detect visual regressions automatically</td>
+                        <td>Implement screenshot assertions with diffing (Days 29-32)</td>
+                        <td>Phase 3</td>
+                    </tr>
+                    <tr>
+                        <td>No Figma webhook integration</td>
+                        <td>Medium - Must manually trigger regeneration</td>
+                        <td>Implement webhook handler (Days 37-40)</td>
+                        <td>Phase 3</td>
+                    </tr>
+                    <tr>
+                        <td>Limited framework coverage</td>
+                        <td>Medium - Only 1 of 3 planned frameworks implemented</td>
+                        <td>Complete Selenium and Cypress generators (Days 19-28)</td>
+                        <td>Phase 2</td>
+                    </tr>
+                    <tr>
+                        <td>No accessibility assertions</td>
+                        <td>Medium - Tests miss WCAG compliance issues</td>
+                        <td>Integrate axe-core, generate accessibility tests (Days 29-32)</td>
+                        <td>Phase 3</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>RACI Matrix</h2>
+            <table class="raci-matrix">
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Anupam</th>
+                        <th>ML Eng</th>
+                        <th>Backend</th>
+                        <th>QA</th>
+                        <th>DevOps</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Design parser implementation</td>
+                        <td>A</td>
+                        <td>-</td>
+                        <td>C</td>
+                        <td>C</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Test generation engine development</td>
+                        <td>R</td>
+                        <td>-</td>
+                        <td>A</td>
+                        <td>C</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>ML-based optimization (selector, flakiness)</td>
+                        <td>C</td>
+                        <td>A/R</td>
+                        <td>C</td>
+                        <td>I</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Visual assertion integration</td>
+                        <td>A</td>
+                        <td>-</td>
+                        <td>R</td>
+                        <td>C</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>CI/CD webhook integration</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>R</td>
+                        <td>A</td>
+                        <td>C</td>
+                    </tr>
+                    <tr>
+                        <td>Infrastructure setup</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>C</td>
+                        <td>-</td>
+                        <td>A/R</td>
+                    </tr>
+                    <tr>
+                        <td>Load testing & performance validation</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>C</td>
+                        <td>A/R</td>
+                        <td>C</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Risk Register</h2>
+            <div class="risk-high">
+                <h4>Risk 1: Figma API Rate Limiting</h4>
+                <p><strong>Probability:</strong> Medium | <strong>Impact:</strong> High</p>
+                <p><strong>Description:</strong> Figma API has rate limits; high-frequency test regeneration could hit limits and fail.</p>
+                <p><strong>Mitigation:</strong> Implement request queuing with exponential backoff; batch design file changes into single API call; cache design hierarchies for 5 minutes.</p>
+            </div>
+            <div class="risk-high">
+                <h4>Risk 2: Selector Brittleness</h4>
+                <p><strong>Probability:</strong> High | <strong>Impact:</strong> High</p>
+                <p><strong>Description:</strong> Generated selectors may become brittle if design structure changes frequently.</p>
+                <p><strong>Mitigation:</strong> Implement multi-strategy selector generation (CSS + XPath + data-testid); train ML model on historical selector failure patterns; add selector robustness scoring.</p>
+            </div>
+            <div class="risk-medium">
+                <h4>Risk 3: False Positive Visual Regressions</h4>
+                <p><strong>Probability:</strong> High | <strong>Impact:</strong> Medium</p>
+                <p><strong>Description:</strong> Visual regression tests may flag minor rendering differences as failures.</p>
+                <p><strong>Mitigation:</strong> Use pixel threshold (maxDiffPixels: 100); implement smart baseline comparison; apply morphological transforms to ignore anti-aliasing differences.</p>
+            </div>
+            <div class="risk-medium">
+                <h4>Risk 4: Test Code Quality Variance</h4>
+                <p><strong>Probability:</strong> Medium | <strong>Impact:</strong> Medium</p>
+                <p><strong>Description:</strong> Generated test code quality may be inconsistent across frameworks.</p>
+                <p><strong>Mitigation:</strong> Implement code generation templates for each framework; enforce style checking on generated code; establish test code quality baselines.</p>
+            </div>
+            <div class="risk-low">
+                <h4>Risk 5: Manual Test Maintenance Burden</h4>
+                <p><strong>Probability:</strong> Medium | <strong>Impact:</strong> Low</p>
+                <p><strong>Description:</strong> Teams may still need to manually maintain some generated tests.</p>
+                <p><strong>Mitigation:</strong> Provide clear documentation on test modification patterns; implement test merging strategies for manual additions; maintain version history of generated tests.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Effort Estimation</h2>
+            <table class="effort-table">
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Component</th>
+                        <th>Effort (Days)</th>
+                        <th>Team Size</th>
+                        <th>Key Deliverable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3">Phase 1</td>
+                        <td>Database Schema & Infra</td>
+                        <td>3</td>
+                        <td>1 Backend</td>
+                        <td>PostgreSQL schema, Redis setup</td>
+                    </tr>
+                    <tr>
+                        <td>Figma Parser Integration</td>
+                        <td>5</td>
+                        <td>1 Backend</td>
+                        <td>Working design file parser</td>
+                    </tr>
+                    <tr>
+                        <td>Component Extraction</td>
+                        <td>7</td>
+                        <td>2 Backend</td>
+                        <td>Hierarchical component extraction</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">Phase 2</td>
+                        <td>Selector Optimization</td>
+                        <td>3</td>
+                        <td>1 Backend + 1 ML</td>
+                        <td>Multi-strategy selector generation</td>
+                    </tr>
+                    <tr>
+                        <td>Playwright Generator</td>
+                        <td>5</td>
+                        <td>1 Backend</td>
+                        <td>Working Playwright test generation</td>
+                    </tr>
+                    <tr>
+                        <td>Selenium & Cypress Generators</td>
+                        <td>6</td>
+                        <td>2 Backend</td>
+                        <td>Multi-framework test generation</td>
+                    </tr>
+                    <tr>
+                        <td>Testing & Refinement</td>
+                        <td>4</td>
+                        <td>1 QA + 1 Backend</td>
+                        <td>Test validation across frameworks</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">Phase 3</td>
+                        <td>Visual Assertions</td>
+                        <td>4</td>
+                        <td>1 Backend + 1 QA</td>
+                        <td>Screenshot-based regression tests</td>
+                    </tr>
+                    <tr>
+                        <td>ML Optimization</td>
+                        <td>4</td>
+                        <td>1 ML + 1 Backend</td>
+                        <td>Flakiness prediction, selector scoring</td>
+                    </tr>
+                    <tr>
+                        <td>CI/CD Integration</td>
+                        <td>3</td>
+                        <td>1 DevOps + 1 Backend</td>
+                        <td>Webhook triggers, pipeline integration</td>
+                    </tr>
+                    <tr>
+                        <td>Documentation & Deployment</td>
+                        <td>4</td>
+                        <td>1 Tech Writer + 1 DevOps</td>
+                        <td>User guides, production deployment</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Total Effort:</strong> 48 person-days across 40 calendar days</p>
+            <p><strong>Team Composition:</strong> 3 Backend Engineers, 1 ML Engineer, 1 QA Engineer, 1 DevOps Engineer, 1 Tech Writer</p>
+        </section>
+
+        <section>
+            <h2>Definition of Done</h2>
+            <div class="definition-item">
+                <strong>Design Parser Component</strong>
+                <ul>
+                    <li>Figma API authentication and authorization implemented and tested</li>
+                    <li>Component extraction handles 100+ component nested hierarchy</li>
+                    <li>Test coverage >80% for parser module</li>
+                    <li>Performance: Parse 1000-component file in <30 seconds</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>Test Generation Engines</strong>
+                <ul>
+                    <li>Selenium WebDriver, Playwright, and Cypress generators all functional</li>
+                    <li>Generated tests execute without errors</li>
+                    <li>Support for common UI patterns (buttons, inputs, dropdowns, modals)</li>
+                    <li>Test code follows framework best practices and style guides</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>Visual Assertion System</strong>
+                <ul>
+                    <li>Visual regression tests generate baselines and detect differences</li>
+                    <li>Accessibility assertions integrated (axe-core for WCAG checks)</li>
+                    <li>False positive rate <5% on production test suites</li>
+                    <li>Screenshot comparison processing <2 seconds per image</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>ML Optimization Module</strong>
+                <ul>
+                    <li>Selector quality scoring implemented with >75% accuracy</li>
+                    <li>Flakiness prediction model trained on historical test data</li>
+                    <li>Test consolidation recommendations generated automatically</li>
+                    <li>Models retrained weekly with latest test execution data</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>CI/CD Integration</strong>
+                <ul>
+                    <li>Figma webhooks configured and triggering regeneration</li>
+                    <li>Jenkins/GitHub Actions pipelines execute generated tests</li>
+                    <li>Test results published to artifact repository and dashboards</li>
+                    <li>Webhook signature verification implemented (HMAC-SHA256)</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>Production Readiness</strong>
+                <ul>
+                    <li>System load tested to 100+ simultaneous design file parsings</li>
+                    <li>Database schema optimized with indices and partitioning</li>
+                    <li>Error handling and recovery procedures documented</li>
+                    <li>Security audit completed; OAuth 2.0 and TLS 1.3 enabled</li>
+                    <li>Runbooks created for common operational tasks</li>
+                    <li>SLA monitoring and alerting configured in Prometheus/Grafana</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Action Items</h2>
+            <div class="action-item">
+                <strong>[P0] Figma API Token Procurement</strong> - Owner: Anupam | Due: Day 1
+                <p>Obtain Figma API token and webhook secret from Figma app settings. Document in HashiCorp Vault.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P0] PostgreSQL Cluster Setup</strong> - Owner: DevOps | Due: Day 3
+                <p>Provision PostgreSQL instance with replication, backup, and monitoring enabled. Allocate 16 cores, 32GB memory, 1TB SSD.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P0] Kubernetes Namespace Creation</strong> - Owner: DevOps | Due: Day 3
+                <p>Create 'figma-to-tests' namespace in production Kubernetes cluster. Configure network policies and RBAC.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P1] Design Parser Implementation Sprint</strong> - Owner: Backend Team | Due: Day 8
+                <p>Complete Figma API integration and design component extraction engine with >80% test coverage.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P1] Test Generation Framework Implementation</strong> - Owner: Backend Team | Due: Day 28
+                <p>Complete Selenium, Playwright, and Cypress test generation engines. Validate generated tests execute successfully.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P2] ML Model Training</strong> - Owner: ML Engineer | Due: Day 36
+                <p>Train flakiness prediction and selector quality scoring models on historical test execution data.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P2] CI/CD Pipeline Integration</strong> - Owner: DevOps + Backend | Due: Day 40
+                <p>Implement Figma webhook handler, Jenkins pipeline triggers, and test result publishing. Load test to 100+ simultaneous regenerations.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P3] Production Readiness Review</strong> - Owner: Anupam | Due: Day 40
+                <p>Conduct security audit, SLA validation, documentation review. Obtain stakeholder approval for production deployment.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Success Metrics</h2>
+            <div class="success-metric">
+                <strong>Adoption Rate:</strong> ≥50% of design teams using Figma-to-Tests within 30 days of launch
+            </div>
+            <div class="success-metric">
+                <strong>Test Coverage:</strong> ≥90% of designed UI components have automated tests generated automatically
+            </div>
+            <div class="success-metric">
+                <strong>Time Reduction:</strong> 60% reduction in test creation time (from 4 hours per design to 1.5 hours including review)
+            </div>
+            <div class="success-metric">
+                <strong>Test Quality:</strong> Generated tests have <10% false failure rate; >85% real issue detection
+            </div>
+            <div class="success-metric">
+                <strong>Selector Stability:</strong> ≥95% selector pass rate even after design refactoring
+            </div>
+            <div class="success-metric">
+                <strong>ML Accuracy:</strong> Flakiness predictor achieves >80% precision; test consolidation suggestions reviewed 100% of time
+            </div>
+            <div class="success-metric">
+                <strong>Performance:</strong> Design parsing <30 sec; test generation <2 min; visual regression checks <5 sec per test
+            </div>
+            <div class="success-metric">
+                <strong>Cost Savings:</strong> 30% reduction in manual test maintenance hours (estimated 8 FTE hours/week saved)
+            </div>
+        </section>
+
+        <footer>
+            <p>Production Readiness Report - Figma to Test Generation</p>
+            <p>For Anupam Sharma, Head of QA Automation/AI QA Engineering</p>
+            <p>Generated for AI Transformation Initiative | May 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-02 Test Case Optimization (Smart Pruning) - Requirements</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #0d1117;
+            color: #e6edf3;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            background: linear-gradient(135deg, #1f6feb 0%, #388bfd 100%);
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 5px solid #58a6ff;
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .header-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .meta-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.75rem;
+            border-radius: 4px;
+        }
+        .meta-label {
+            font-weight: 600;
+            color: #79c0ff;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .badge-p2 {
+            background-color: #ffa657;
+            color: #0d1117;
+        }
+        .badge-in-progress {
+            background-color: #3fb950;
+            color: #fff;
+        }
+        .section {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            font-size: 1.6rem;
+            color: #79c0ff;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #30363d;
+            padding-bottom: 0.75rem;
+        }
+        h3 {
+            font-size: 1.1rem;
+            color: #58a6ff;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .persona-card {
+            background-color: #0d1117;
+            border-left: 4px solid #58a6ff;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+        }
+        .persona-name {
+            font-weight: 600;
+            color: #79c0ff;
+            font-size: 1.1rem;
+        }
+        .persona-role {
+            color: #8b949e;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .story-card {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 4px;
+            border-left: 4px solid #58a6ff;
+        }
+        .story-id {
+            color: #79c0ff;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .story-text {
+            margin: 0.5rem 0;
+            color: #e6edf3;
+        }
+        .priority-tag {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .priority-must {
+            background-color: #da3633;
+            color: #fff;
+        }
+        .priority-should {
+            background-color: #ffa657;
+            color: #0d1117;
+        }
+        .priority-nice {
+            background-color: #8b949e;
+            color: #fff;
+        }
+        .requirement-item {
+            background-color: #0d1117;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid #79c0ff;
+            border-radius: 4px;
+        }
+        .req-id {
+            color: #79c0ff;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+        .req-text {
+            color: #e6edf3;
+        }
+        .nfr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .nfr-card {
+            background-color: #0d1117;
+            padding: 1rem;
+            border-left: 4px solid #79c0ff;
+            border-radius: 4px;
+        }
+        .nfr-title {
+            color: #79c0ff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .acceptance-item {
+            background-color: #0d1117;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 4px;
+            border-left: 4px solid #3fb950;
+        }
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+        .definition-checklist {
+            background-color: #0d1117;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border-left: 4px solid #3fb950;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+        }
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #30363d;
+            border-radius: 3px;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            background-color: #161b22;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <h1>Test Case Optimization (Smart Pruning)</h1>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Use Case ID</span>
+                    <strong>UC-02</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Owner</span>
+                    <strong>Anupam Sharma</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Priority</span>
+                    <span class="badge badge-p2">P2</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Status</span>
+                    <span class="badge badge-in-progress">In Progress (20%)</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Version</span>
+                    <strong>v1.0</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Date</span>
+                    <strong>May 2026</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Author</span>
+                    <strong style="color:#60a5fa;font-weight:700;">Malcolm Govender</strong>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <strong style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</strong>
+                </div>
+            </div>
+        </header>
+
+        <section class="section">
+            <h2>Problem Statement</h2>
+            <p>Modern test suites often become bloated with hundreds or thousands of test cases accumulated over years of development. Many organizations face critical pain points:</p>
+            <ul>
+                <li><strong>Redundant Coverage:</strong> Multiple tests verify identical code paths, consuming CI/CD resources without adding value</li>
+                <li><strong>Low-Value Regression Tests:</strong> Tests that rarely fail or cover rarely-modified code consume pipeline time</li>
+                <li><strong>Overlapping Coverage:</strong> Tests duplicate assertions, making maintenance harder and feedback cycles slower</li>
+                <li><strong>Pipeline Bottlenecks:</strong> Bloated test suites extend CI time, slowing developer feedback loops by 2-4 hours per cycle</li>
+                <li><strong>Manual Effort:</strong> Teams spend weeks manually analyzing test coverage to identify candidates for removal</li>
+            </ul>
+            <p><strong>Why It Matters:</strong> Test suite optimization directly impacts delivery velocity, infrastructure costs, and developer productivity. Organizations with streamlined test suites achieve 40-60% faster CI cycles while maintaining or improving code quality.</p>
+        </section>
+
+        <section class="section">
+            <h2>Target Users & Personas</h2>
+
+            <div class="persona-card">
+                <div class="persona-name">Sam — QA Automation Lead</div>
+                <div class="persona-role">Senior QA Engineer, 8 years in test automation</div>
+                <p><strong>Goals:</strong> Maintain comprehensive test coverage while cutting test execution time in half. Identify and remove obsolete tests without introducing regressions. Empower the QA team to focus on new test design rather than maintenance.</p>
+                <p><strong>Frustrations:</strong> Manually reviewing 1500+ tests to find redundant ones takes weeks. Lacks visibility into which tests are truly valuable. Risk of accidentally removing critical tests due to incomplete coverage analysis.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Priya — Engineering Manager</div>
+                <div class="persona-role">Engineering Manager, Platform Team</div>
+                <p><strong>Goals:</strong> Reduce CI/CD pipeline runtime to improve developer experience. Lower infrastructure costs associated with test execution. Demonstrate test quality improvements to stakeholders.</p>
+                <p><strong>Frustrations:</strong> Cannot easily justify test investment ROI. Pipeline slowdowns blamed on test expansion. Lacks data-driven approach to testing strategy decisions.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Dev — Software Developer</div>
+                <div class="persona-role">Full-Stack Developer, 4 years experience</div>
+                <p><strong>Goals:</strong> Get rapid feedback from CI pipeline (target: <5 min). Understand which tests are relevant to code changes. Confidently refactor without breaking critical tests.</p>
+                <p><strong>Frustrations:</strong> Waits 15-20 minutes for full test suite to complete. No visibility into which tests are redundant or low-value. Runs full suite even when changing a single function.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Alex — DevOps/Platform Engineer</div>
+                <div class="persona-role">Senior DevOps Engineer</div>
+                <p><strong>Goals:</strong> Reduce compute infrastructure costs. Optimize resource allocation. Maintain high test reliability and repeatability.</p>
+                <p><strong>Frustrations:</strong> Infrastructure costs grow with test suite expansion. Difficult to forecast or control CI/CD costs. No automatic insights into redundant test execution.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>User Stories</h2>
+
+            <div class="story-card">
+                <div class="story-id">US-01</div>
+                <div class="story-text"><strong>As a</strong> QA Automation Lead, <strong>I want</strong> to run AI-powered analysis on my entire test suite to identify redundant tests, <strong>so that</strong> I can prioritize removal candidates without manual review.</div>
+                <span class="priority-tag priority-must">Must Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-02</div>
+                <div class="story-text"><strong>As a</strong> QA Automation Lead, <strong>I want</strong> to see a ranked list of test cases with redundancy scores and coverage overlap percentages, <strong>so that</strong> I can systematically evaluate removal impact.</div>
+                <span class="priority-tag priority-must">Must Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-03</div>
+                <div class="story-text"><strong>As a</strong> Software Developer, <strong>I want</strong> to see which tests are low-value based on code churn and failure history, <strong>so that</strong> I understand which tests actively protect against regression.</div>
+                <span class="priority-tag priority-must">Must Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-04</div>
+                <div class="story-text"><strong>As a</strong> Engineering Manager, <strong>I want</strong> to view a dashboard showing test optimization opportunity (time savings, cost reduction), <strong>so that</strong> I can justify test refactoring efforts to leadership.</div>
+                <span class="priority-tag priority-should">Should Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-05</div>
+                <div class="story-text"><strong>As a</strong> QA Automation Lead, <strong>I want</strong> to see the rationale behind each redundancy detection (e.g., "tests verify identical code paths"), <strong>so that</strong> I can make confident removal decisions.</div>
+                <span class="priority-tag priority-should">Should Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-06</div>
+                <div class="story-text"><strong>As a</strong> DevOps Engineer, <strong>I want</strong> to track CI time reduction metrics after test suite optimization, <strong>so that</strong> I can quantify infrastructure cost savings.</div>
+                <span class="priority-tag priority-should">Should Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-07</div>
+                <div class="story-text"><strong>As a</strong> Software Developer, <strong>I want</strong> to run targeted test subsets (by module or component) instead of the full suite, <strong>so that</strong> I get feedback in <5 minutes for feature branches.</div>
+                <span class="priority-tag priority-nice">Nice to Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-08</div>
+                <div class="story-text"><strong>As a</strong> QA Automation Lead, <strong>I want</strong> to consolidate overlapping tests with a merge recommendation engine, <strong>so that</strong> I reduce duplication while preserving coverage.</div>
+                <span class="priority-tag priority-nice">Nice to Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-09</div>
+                <div class="story-text"><strong>As a</strong> Engineering Manager, <strong>I want</strong> to set organizational optimization targets (e.g., reduce suite to 80% current size), <strong>so that</strong> I can align team efforts to business goals.</div>
+                <span class="priority-tag priority-nice">Nice to Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-10</div>
+                <div class="story-text"><strong>As a</strong> QA Automation Lead, <strong>I want</strong> AI to suggest test removal candidates while maintaining safety thresholds, <strong>so that</strong> I can approve bulk removal with confidence.</div>
+                <span class="priority-tag priority-should">Should Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-11</div>
+                <div class="story-text"><strong>As a</strong> Software Developer, <strong>I want</strong> to understand which tests protect specific code changes, <strong>so that</strong> I know which tests to verify before refactoring.</div>
+                <span class="priority-tag priority-should">Should Have</span>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-12</div>
+                <div class="story-text"><strong>As a</strong> DevOps Engineer, <strong>I want</strong> historical analytics on test performance trends (execution time, flakiness) per test, <strong>so that</strong> I can identify candidates for removal based on degraded reliability.</div>
+                <span class="priority-tag priority-should">Should Have</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-01: Test Suite Ingestion</span>
+                <span class="req-text">System shall accept test execution results in multiple formats (JUnit XML, Cypress JSON, pytest reports). Ingest test metadata including test name, duration, assertions, failure history, and code coverage correlation.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-02: Coverage Data Integration</span>
+                <span class="req-text">System shall integrate with coverage tools (Istanbul, Cobertura, llvm-cov) to map test cases to code coverage at the statement, branch, and function level. Calculate coverage percentage per test.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-03: Code Churn Analysis</span>
+                <span class="req-text">System shall analyze Git history to extract code churn (lines modified, files touched, commit frequency) per module. Correlate with test performance metrics to identify low-value tests covering stable code.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-04: Redundancy Scoring Algorithm</span>
+                <span class="req-text">System shall implement AI-powered scoring algorithm computing redundancy score (0-100) per test based on: coverage overlap with other tests, identical assertion patterns, same code path coverage, and execution history. Validate algorithm against SentinelQA's regression_optimiser.py stub.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-05: Ranked Candidate List</span>
+                <span class="req-text">System shall generate ranked list of test removal candidates sorted by redundancy score. Include metadata: redundancy score, coverage overlap %, estimated execution time savings, risk assessment (high/medium/low), and justification text.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-06: Smart Pruning UI</span>
+                <span class="req-text">System shall provide intuitive web interface for browsing, filtering, and approving test removal recommendations. Support filtering by redundancy score range, module, test type, risk level. Show before/after metrics.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-07: Test Consolidation Engine</span>
+                <span class="req-text">System shall identify overlapping tests with similar coverage patterns and suggest consolidation. Provide merge recommendations to combine assertions, reduce test count while preserving coverage.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-08: Validation Gate</span>
+                <span class="req-text">System shall enforce safety validation before removal: verify removal maintains coverage threshold (user-configurable), alert on removal of high-defect-density tests, prevent removal of recently-modified tests.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-09: Execution Time Forecasting</span>
+                <span class="req-text">System shall predict CI execution time impact per removal candidate. Display estimated time savings (in minutes) and cost impact (if infrastructure costs provided).</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-10: Coverage Report Generation</span>
+                <span class="req-text">System shall generate comprehensive coverage reports showing: current coverage %, coverage per module, test-to-code mapping, gaps analysis, and impact of proposed removals on coverage metrics.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-11: Historical Tracking</span>
+                <span class="req-text">System shall maintain historical database of test performance metrics (execution time, pass/fail rates, flakiness trends). Store test execution timelines and link to code change history.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-12: API Integration Layer</span>
+                <span class="req-text">System shall expose REST API for: uploading test results, querying redundancy scores, retrieving removal recommendations, and approving pruning decisions. Enable CI/CD pipeline integration.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-13: Notification & Alerting</span>
+                <span class="req-text">System shall notify relevant stakeholders (QA leads, engineering managers) of high-impact optimization opportunities. Support Slack, email, and webhook integrations for notifications.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-14: Removal Auditing</span>
+                <span class="req-text">System shall log all test removal decisions with approval metadata (who approved, when, rationale). Support rollback of removals if regressions detected post-pruning.</span>
+            </div>
+
+            <div class="requirement-item">
+                <span class="req-id">FR-15: Dashboard Analytics</span>
+                <span class="req-text">System shall display real-time dashboard showing: total tests analyzed, removal candidates identified, estimated time/cost savings, coverage preservation %, and pruning progress (% of queue processed).</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="nfr-grid">
+                <div class="nfr-card">
+                    <div class="nfr-title">Performance</div>
+                    <p>Analyze test suites with up to 5000 test cases in <2 minutes. Generate ranked candidate list within 30 seconds. API endpoint response time <500ms p95.</p>
+                </div>
+                <div class="nfr-card">
+                    <div class="nfr-title">Scalability</div>
+                    <p>Support organizations with 100+ test suites, millions of historical test execution records. Scale to process 10M+ test executions/day. Handle parallel analysis requests.</p>
+                </div>
+                <div class="nfr-card">
+                    <div class="nfr-title">Security</div>
+                    <p>Encrypt test data in transit (TLS) and at rest. Implement role-based access control (RBAC) for approval workflows. Audit log all removal decisions. PII redaction in test names/assertions.</p>
+                </div>
+                <div class="nfr-card">
+                    <div class="nfr-title">Reliability</div>
+                    <p>99.5% uptime SLA. Graceful handling of incomplete/malformed test data. Incremental analysis (resume from interruption). Data backup and disaster recovery (RTO <1hr).</p>
+                </div>
+                <div class="nfr-card">
+                    <div class="nfr-title">Observability</div>
+                    <p>Export metrics (Prometheus format) for test optimization pipeline performance. Debug logs for algorithm decisions. Alert on anomalies (e.g., sudden coverage drops post-removal).</p>
+                </div>
+                <div class="nfr-card">
+                    <div class="nfr-title">Usability</div>
+                    <p>Mobile-responsive UI. Dark theme support. Keyboard navigation for accessibility. Onboarding wizard for first-time users. Contextual help/tooltips throughout.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Acceptance Criteria</h2>
+
+            <div class="acceptance-item">
+                <strong>AC-1: Redundancy Scoring Algorithm Validation</strong>
+                <p><strong>Given</strong> a test suite with 100 known-redundant test pairs (manually identified), <strong>When</strong> the algorithm runs, <strong>Then</strong> it shall identify >90% of the pairs with overlap scores >70.</p>
+            </div>
+
+            <div class="acceptance-item">
+                <strong>AC-2: Coverage Preservation</strong>
+                <p><strong>Given</strong> a removal recommendation list, <strong>When</strong> tests are removed, <strong>Then</strong> code coverage shall not drop below user-configured threshold (default 85%). If threshold would be breached, system prevents removal or auto-consolidates tests.</p>
+            </div>
+
+            <div class="acceptance-item">
+                <strong>AC-3: UI Responsiveness</strong>
+                <p><strong>Given</strong> 1000+ candidate tests loaded in UI, <strong>When</strong> user filters/sorts, <strong>Then</strong> response time <500ms. Pagination or virtualization prevents UI lag.</p>
+            </div>
+
+            <div class="acceptance-item">
+                <strong>AC-4: API Contract Validation</strong>
+                <p><strong>Given</strong> test results uploaded via API, <strong>When</strong> formatting is invalid, <strong>Then</strong> system returns descriptive 400 error. Valid formats (JUnit, Cypress) are parsed and processed without error.</p>
+            </div>
+
+            <div class="acceptance-item">
+                <strong>AC-5: Audit Trail Completeness</strong>
+                <p><strong>Given</strong> a test removal approval workflow, <strong>When</strong> tests are removed, <strong>Then</strong> audit log contains: who approved, timestamp, original redundancy score, coverage impact, and removal rationale.</p>
+            </div>
+
+            <div class="acceptance-item">
+                <strong>AC-6: Performance Under Load</strong>
+                <p><strong>Given</strong> 5000 test cases with 2-year execution history, <strong>When</strong> analysis runs, <strong>Then</strong> scoring algorithm completes in <2 minutes with <80% CPU utilization.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>Dependencies & Integrations</h2>
+            <ul>
+                <li><strong>SentinelQA regression_optimiser.py:</strong> Core scoring algorithm stub (23 lines). Must be expanded to full implementation.</li>
+                <li><strong>CI/CD Systems:</strong> Jenkins, GitHub Actions, GitLab CI. Integration for test data ingestion and triggering optimizations.</li>
+                <li><strong>Coverage Tools:</strong> Istanbul (JavaScript), Cobertura (Java), llvm-cov (C/C++), pytest-cov (Python). Data normalization layer required.</li>
+                <li><strong>VCS Integration:</strong> Git API for code churn analysis. Commit history correlation with test performance.</li>
+                <li><strong>Notification Platforms:</strong> Slack, PagerDuty, email for alerts and recommendations.</li>
+                <li><strong>Data Storage:</strong> PostgreSQL or ClickHouse for historical time-series data. S3/GCS for test result archives.</li>
+                <li><strong>Reporting:</strong> Integration with BI tools (Grafana, Tableau) for dashboard visualization.</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>Assumptions & Constraints</h2>
+            <ul>
+                <li>Test suites have mature CI/CD integration producing consistent, reliable test results.</li>
+                <li>Coverage data is available for correlation with test cases (not all organizations track this).</li>
+                <li>Code churn data (Git history) is accessible and reliable.</li>
+                <li>Organizations are willing to iterate on removal decisions (v1 may have false positives in redundancy detection).</li>
+                <li>Minimum test suite size: 50 test cases. Maximum supported: 10,000 (constraint based on analysis time).</li>
+                <li>Test execution history availability: minimum 3 months recommended for accurate trending.</li>
+                <li>Constraint: v1 focuses on functional/unit tests. Contract testing and integration test optimization deferred to v2.</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>Out of Scope (v1.0)</h2>
+            <ul>
+                <li>Test flakiness root-cause analysis (v2 feature)</li>
+                <li>Contract/API testing optimization (deferred to v2)</li>
+                <li>Mutation testing integration (future enhancement)</li>
+                <li>Test prioritization for CI/CD (separate UC-03 use case)</li>
+                <li>Performance/load test optimization (separate UC-05 use case)</li>
+                <li>Cross-project test suite analysis (multi-repo deferred to v2)</li>
+                <li>Machine learning model retraining pipelines (v2+)</li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h2>Definition of Done</h2>
+            <div class="definition-checklist">
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>Redundancy scoring algorithm implemented and validated against 100+ known-redundant test pairs with >90% accuracy</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>Web UI for browsing, filtering, and approving test removal candidates completed and tested on Chrome, Firefox, Safari</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>Integration with Jenkins and GitHub Actions CI/CD systems for test result ingestion validated</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>Coverage data integration with 3+ tools (Istanbul, Cobertura, pytest-cov) tested and working</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>API endpoints for test result upload, recommendation retrieval, and approval documented and tested</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>Audit logging for all removal decisions implemented and queryable</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>Performance benchmarks met: <2 min analysis time, <500ms API response p95</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>Security review passed: TLS encryption, RBAC, PII redaction verified</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>End-to-end testing with 3 external alpha customers completed and feedback incorporated</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>User documentation (quick start, API guide, troubleshooting) published</span>
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    <span>Product sign-off from Anupam Sharma and 2 key stakeholders</span>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

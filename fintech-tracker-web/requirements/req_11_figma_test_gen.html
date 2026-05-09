@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-11: Figma → Test Generation - Requirements</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #ffa657;
+            --accent-purple: #6e40aa;
+            --accent-light-blue: #79c0ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .meta-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .meta-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-p3 {
+            background-color: var(--accent-light-blue);
+            color: #0d1117;
+        }
+
+        .badge-in-progress {
+            background-color: var(--accent-green);
+            color: #0d1117;
+        }
+
+        section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: var(--accent-light-blue);
+        }
+
+        .persona-card {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-blue);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .persona-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .persona-role {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .user-story {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-purple);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .story-id {
+            font-weight: 700;
+            color: var(--accent-light-blue);
+            margin-bottom: 5px;
+        }
+
+        .story-text {
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .story-priority {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        .requirement {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-green);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .req-id {
+            font-weight: 700;
+            color: var(--accent-light-blue);
+            margin-bottom: 5px;
+        }
+
+        .nfr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nfr-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-orange);
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .nfr-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent-orange);
+        }
+
+        .acceptance-criteria {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-green);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .criteria-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--accent-light-blue);
+        }
+
+        .given-when-then {
+            margin-left: 15px;
+            font-size: 0.95em;
+        }
+
+        .given-when-then > div {
+            margin-bottom: 6px;
+        }
+
+        .given {
+            color: var(--accent-light-blue);
+        }
+
+        .when {
+            color: var(--accent-green);
+        }
+
+        .then {
+            color: var(--accent-orange);
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        code {
+            background: var(--bg-primary);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: var(--accent-light-blue);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 700;
+            color: var(--accent-light-blue);
+        }
+
+        tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+            }
+
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nfr-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div>
+                    <h1>Figma → Test Generation</h1>
+                    <p style="color: var(--text-secondary); margin-top: 5px;">AI-powered test case generation from design files and component libraries</p>
+                </div>
+                <div style="text-align: right;">
+                    <span class="badge badge-p3">P3: Medium</span>
+                    <span class="badge badge-in-progress">In Progress (35%)</span>
+                </div>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">Use Case ID</div>
+                    <div class="meta-value">UC-11</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Owner</div>
+                    <div class="meta-value">Anupam Sharma</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Version</div>
+                    <div class="meta-value">v1.0</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Last Updated</div>
+                    <div class="meta-value">May 2026</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Author</div>
+                    <div class="meta-value" style="color:#60a5fa;font-weight:700;">Malcolm Govender</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Role</div>
+                    <div class="meta-value" style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</div>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>Problem Statement</h2>
+            <p>Test case creation is a manual, time-consuming process where QA engineers manually review design files, component documentation, and user flows to create test scenarios. This approach is error-prone, doesn't scale with rapid design iterations, and misses edge cases in complex UI interactions. There is also a significant gap between design intent and test coverage—designers specify accessibility requirements, interaction states, and responsive breakpoints that QA often doesn't implement tests for. We need an automated system that parses Figma design files, extracts components, states, interactions, and accessibility metadata, then generates comprehensive test cases (both functional and visual regression tests) to ensure designs are tested as intended.</p>
+        </section>
+
+        <section>
+            <h2>Target Users & Personas</h2>
+            
+            <div class="persona-card">
+                <div class="persona-name">Elena Vasquez</div>
+                <div class="persona-role">QA Engineer / Test Automation</div>
+                <p><strong>Goals:</strong> Quickly generate comprehensive test scenarios from design files, maintain coverage as designs evolve, reduce manual test case writing time, ensure visual regression tests cover all component states.</p>
+                <p><strong>Frustrations:</strong> Manually maps Figma components to test cases, misses interaction states (hover, focus, disabled). Designs change faster than tests can be updated. No traceability between design intent and test coverage.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">David Lin</div>
+                <div class="persona-role">QA Lead / Test Strategy</div>
+                <p><strong>Goals:</strong> Ensure design changes trigger appropriate test regeneration, maintain test-to-design mappings, measure coverage of design elements, reduce test maintenance overhead.</p>
+                <p><strong>Frustrations:</strong> Cannot easily track which components are tested. Design changes sometimes miss corresponding test updates. No metrics on coverage of Figma components vs. actual tests.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Sophia Rodriguez</div>
+                <div class="persona-role">Product Designer / Design System Manager</div>
+                <p><strong>Goals:</strong> Have high confidence that designs are tested completely, validate that component specs are enforceable through tests, identify design specs that lack test coverage.</p>
+                <p><strong>Frustrations:</strong> Unsure if design states (dark mode, RTL, accessibility) are tested. Cannot see which components have test coverage from design perspective. Manual handoff between design and QA is lossy.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Marcus Chen</div>
+                <div class="persona-role">DevOps / CI-CD Engineer</div>
+                <p><strong>Goals:</strong> Integrate generated tests into CI/CD pipelines, trigger Figma-based visual regression tests on design changes, track test execution metrics from design perspective.</p>
+                <p><strong>Frustrations:</strong> No easy way to detect when Figma file changes should trigger specific tests. Manual test trigger setup is tedious and error-prone.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>User Stories</h2>
+
+            <div class="user-story">
+                <div class="story-id">US-01</div>
+                <div class="story-text">As a QA Engineer, I want to connect a Figma file URL and automatically generate test cases for all components and their variants, so that I can quickly create test coverage for new designs without manual mapping.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-02</div>
+                <div class="story-text">As a QA Engineer, I want generated tests to cover component interaction states (hover, active, focus, disabled, loading), so that I can ensure all user-facing states are visually tested.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-03</div>
+                <div class="story-text">As a QA Engineer, I want to generate visual regression test scripts (Cypress, Playwright snapshots) from Figma artboards, so that I can validate that UI matches design specifications.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-04</div>
+                <div class="story-text">As a Designer, I want to document component specifications (required props, valid value ranges, accessibility attributes) in Figma design tokens and have them converted to test assertions, so that tests enforce design intent.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-05</div>
+                <div class="story-text">As a QA Lead, I want to see which Figma components have test coverage and identify gaps, so that I can prioritize test creation efforts and track completeness.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-06</div>
+                <div class="story-text">As a QA Engineer, I want to generate functional test scenarios (user flows, interaction sequences) from Figma prototype flows, so that I can create comprehensive end-to-end test scenarios from design specifications.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-07</div>
+                <div class="story-text">As a QA Engineer, I want generated tests to include accessibility checks (ARIA labels, color contrast, keyboard navigation), so that accessibility requirements are tested alongside visual specs.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-08</div>
+                <div class="story-text">As a DevOps Engineer, I want to trigger test generation and execution automatically when a Figma file is published, so that design changes are tested in CI/CD without manual intervention.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-09</div>
+                <div class="story-text">As a QA Engineer, I want to customize generated tests (add assertions, skip components, modify timeouts) and have changes persist across regenerations, so that I can tailor tests to specific needs without losing customizations.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-10</div>
+                <div class="story-text">As a Designer, I want to see which generated tests are failing and why (e.g., design spec mismatch, implementation bug), so that I can quickly identify and remediate design-related issues.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-11</div>
+                <div class="story-text">As a QA Lead, I want to generate tests for responsive breakpoints (mobile, tablet, desktop) based on Figma artboard sizes, so that responsive design is validated across all device sizes.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-12</div>
+                <div class="story-text">As a QA Engineer, I want to export generated test suites in multiple formats (Cypress, Playwright, Selenium), so that tests can be integrated into different automation frameworks.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Functional Requirements</h2>
+
+            <div class="requirement">
+                <div class="req-id">FR-01: Figma API Integration</div>
+                <p>Integrate with Figma REST API to fetch design files, components, layers, properties, and variants. Support authentication via Figma API token. Handle pagination and large file hierarchies (1000+ components).</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-02: Component Extraction</div>
+                <p>Parse Figma component sets and identify main components vs. variants. Extract component names, descriptions, property definitions (boolean, enum, string), design tokens (colors, spacing, typography), and nested component relationships.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-03: Variant State Mapping</div>
+                <p>Automatically map component variants to interaction states (default, hover, active, focus, disabled, loading, error). Generate test scenarios for each state combination. Support multi-property variants (size + variant type).</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-04: Visual Regression Test Generation</div>
+                <p>Generate Cypress or Playwright visual regression test scripts. For each component/variant, create: render test, capture baseline screenshot, setup assertion. Include responsive breakpoints if specified in Figma.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-05: Functional Test Scenario Generation</div>
+                <p>Extract user flows and prototype interactions from Figma. Generate functional test scenarios (Given/When/Then format) for interaction patterns (click, drag, form submission, navigation). Include assertion generation based on expected outcomes.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-06: Design Token Parsing</div>
+                <p>Parse Figma design tokens (color definitions, spacing, typography, shadows) and convert to test assertions. Generate tests that validate: color values match token specs, spacing conforms to grid, text styles match typography rules.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-07: Accessibility Metadata Extraction</div>
+                <p>Extract accessibility annotations from Figma (ARIA labels, roles, required attributes, color contrast specs). Generate accessibility test scenarios: keyboard navigation, screen reader validation, color contrast checks.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-08: Responsive Breakpoint Testing</div>
+                <p>Identify responsive variants or artboards at different sizes in Figma. Generate visual regression tests for each breakpoint (mobile: 375px, tablet: 768px, desktop: 1440px). Include responsive layout assertions.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-09: Figma Change Detection</div>
+                <p>Monitor Figma files for changes (via webhooks or polling). Detect: component additions, property changes, variant modifications, design token updates. Trigger automatic test regeneration and CI/CD pipeline execution.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-10: Component Coverage Dashboard</div>
+                <p>Display metrics: total Figma components, components with generated tests, coverage percentage. Show component-level details: test count, last regeneration date, test execution status, failure list.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-11: Test Customization & Preservation</div>
+                <p>Allow users to customize generated tests (add assertions, modify timeouts, skip components, adjust selectors). Store customizations separately from generated code. Preserve customizations during test regeneration.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-12: Multi-Framework Export</div>
+                <p>Generate test code in multiple formats: Cypress JavaScript, Playwright TypeScript, Selenium Python, WebDriver Java. Include framework-specific selectors and assertions. Maintain parity across frameworks.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-13: Dark Mode & Theme Testing</div>
+                <p>Detect dark mode variants or design tokens in Figma. Generate visual regression tests for both light and dark themes. Support custom theme variants (high contrast, etc.).</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-14: Component Mapping to Implementation</div>
+                <p>Map Figma components to implementation selectors (CSS classes, data-testid, ARIA labels). Support custom mapping rules and selector strategies. Validate that selectors exist in actual implementation.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-15: Test Result Visualization in Figma</div>
+                <p>Display test execution results as annotations in Figma (pass/fail badges on components). Link test failures to Figma components so designers can quickly identify design-related issues.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="nfr-grid">
+                <div class="nfr-card">
+                    <div class="nfr-title">Performance</div>
+                    <ul style="margin: 0;">
+                        <li>Figma file parsing: <30 seconds for files with 500+ components</li>
+                        <li>Test generation: <2 seconds per component variant</li>
+                        <li>Test suite export: <10 seconds for 1000+ tests</li>
+                        <li>Change detection webhook response: <5 seconds</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Scalability</div>
+                    <ul style="margin: 0;">
+                        <li>Handle Figma files with 1000+ components and 5000+ variants</li>
+                        <li>Generate test suites with 10000+ test cases</li>
+                        <li>Support 100+ concurrent Figma file synchronizations</li>
+                        <li>Maintain component metadata for 500+ projects</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Security & Integration</div>
+                    <ul style="margin: 0;">
+                        <li>Secure storage of Figma API tokens (encrypted, rotated regularly)</li>
+                        <li>OAuth 2.0 integration with Figma for token management</li>
+                        <li>RBAC: control who can regenerate tests and sync Figma files</li>
+                        <li>Audit logging: track all Figma syncs and test generations</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Reliability & Accuracy</div>
+                    <ul style="margin: 0;">
+                        <li>Test generation accuracy: >90% of tests runnable without manual fixes</li>
+                        <li>Selector accuracy: >85% of generated selectors work on first run</li>
+                        <li>Graceful degradation: handle unsupported Figma features without errors</li>
+                        <li>Backup/restore: maintain 7-day history of Figma syncs</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Observability</div>
+                    <ul style="margin: 0;">
+                        <li>Metrics: components processed, tests generated, regeneration duration</li>
+                        <li>Logs: detailed trace of Figma parsing, component extraction, test generation steps</li>
+                        <li>Error alerting: webhook failures, API quota exhaustion, parsing errors</li>
+                        <li>Coverage reporting: component-level coverage dashboards</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Usability</div>
+                    <ul style="margin: 0;">
+                        <li>One-click Figma file connection (OAuth flow)</li>
+                        <li>Visual representation of component hierarchy and test mappings</li>
+                        <li>Inline test editor with preview and validation</li>
+                        <li>Dark theme UI, mobile-responsive dashboard</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Acceptance Criteria</h2>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-01: Component Extraction Completeness</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a Figma file with 500+ components and variants</div>
+                    <div><span class="when">When</span> I connect the file and run extraction</div>
+                    <div><span class="then">Then</span> >99% of components are extracted with correct names, properties, and variant mappings within 30 seconds</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-02: Visual Regression Test Executability</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> generated visual regression tests for 100 component variants</div>
+                    <div><span class="when">When</span> I execute tests in a matching implementation (same components)</div>
+                    <div><span class="then">Then</span> >90% of tests execute without selector errors and produce baseline screenshots</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-03: Design Token Test Assertions</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> Figma design tokens (colors, spacing, typography)</div>
+                    <div><span class="when">When</span> I generate tests for components using those tokens</div>
+                    <div><span class="then">Then</span> assertions validate: colors match RGB specs, spacing matches grid values, typography matches font/size specs</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-04: Accessibility Test Coverage</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> Figma components with accessibility annotations (ARIA labels, roles)</div>
+                    <div><span class="when">When</span> I generate tests</div>
+                    <div><span class="then">Then</span> tests include: keyboard navigation validation, screen reader attribute checks, color contrast validation for all annotated components</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-05: Change Detection & Regeneration</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a connected Figma file with generated tests</div>
+                    <div><span class="when">When</span> a component is modified in Figma and published</div>
+                    <div><span class="then">Then</span> tests are regenerated within 5 seconds with updated component properties and preserved customizations</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-06: Multi-Framework Export Parity</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a test scenario for a component interaction</div>
+                    <div><span class="when">When</span> I export to Cypress, Playwright, and Selenium formats</div>
+                    <div><span class="then">Then</span> all three implementations are logically equivalent, pass on the same implementation, and execute without framework-specific errors</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Dependencies & Integrations</h2>
+
+            <h3>External Services</h3>
+            <ul>
+                <li><strong>Figma API:</strong> REST API for file access, component extraction, webhook events</li>
+                <li><strong>Implementation Framework:</strong> React, Vue, Angular (selector strategies vary)</li>
+                <li><strong>Test Frameworks:</strong> Cypress, Playwright, Selenium (supported export targets)</li>
+                <li><strong>CI/CD Systems:</strong> GitHub Actions, GitLab CI, Jenkins (webhook integration)</li>
+            </ul>
+
+            <h3>Internal Systems</h3>
+            <ul>
+                <li><strong>Figma Parser:</strong> AST-based parser for Figma JSON structure and component tree</li>
+                <li><strong>Test Template Engine:</strong> Jinja2 or EJS for test code generation</li>
+                <li><strong>Selector Strategy Engine:</strong> Rule-based system for generating component selectors from Figma metadata</li>
+                <li><strong>Webhook Receiver:</strong> Handle Figma publish events, trigger regeneration pipelines</li>
+                <li><strong>Database:</strong> Store component metadata, test mappings, customization rules (PostgreSQL recommended)</li>
+            </ul>
+
+            <h3>Optional Integrations</h3>
+            <ul>
+                <li>Jira: auto-create issues for components with low test coverage</li>
+                <li>Slack: notify teams of new test generation, failures, coverage metrics</li>
+                <li>Design system repositories: sync design tokens from Figma to code repos</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Assumptions & Constraints</h2>
+
+            <h3>Assumptions</h3>
+            <ul>
+                <li>Figma files are organized with clear component structure (main components + variants)</li>
+                <li>Design tokens are defined in Figma and follow consistent naming conventions</li>
+                <li>Components in implementation match Figma component names or have mapping rules available</li>
+                <li>Selectors can be reliably generated from CSS classes, data-testid, or ARIA labels in implementation</li>
+                <li>Implementation uses semantic HTML with ARIA annotations when accessibility is important</li>
+            </ul>
+
+            <h3>Constraints</h3>
+            <ul>
+                <li><strong>Figma API Quota:</strong> Standard tier has rate limits; large-scale deployments require Team tier</li>
+                <li><strong>Test Framework Support:</strong> v1 supports Cypress, Playwright, Selenium; other frameworks in v2.0</li>
+                <li><strong>Selector Fragility:</strong> Generated selectors can become stale if component DOM structure changes; requires maintenance</li>
+                <li><strong>Complex Interactions:</strong> Figma prototypes have limited interaction expressiveness; complex animations/gestures require manual specification</li>
+                <li><strong>Implementation Sync:</strong> Generated tests assume implementation matches Figma design; design drift breaks tests</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Out of Scope (v1.0)</h2>
+
+            <ul>
+                <li><strong>Figma Comments & Feedback:</strong> Parsing design review comments as test scenarios (v2.0)</li>
+                <li><strong>Animation Testing:</strong> Validating complex animations and transitions (requires additional tooling, v2.0)</li>
+                <li><strong>Advanced Gesture Testing:</strong> Drag-drop, swipe, pinch interactions (Appium/native testing, v2.0)</li>
+                <li><strong>Localization Testing:</strong> RTL text, translation validation from Figma assets (v2.0)</li>
+                <li><strong>Live Design System Sync:</strong> Bi-directional sync between Figma and code repos (future feature)</li>
+                <li><strong>Advanced ML Component Classification:</strong> Auto-identify component types without manual categorization (v2.0)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Definition of Done</h2>
+
+            <ul class="checklist">
+                <li>Figma API integration complete with OAuth authentication flow</li>
+                <li>Component and variant extraction working on test Figma files with 500+ components</li>
+                <li>Visual regression test generation for Cypress and Playwright with >90% selector accuracy</li>
+                <li>Design token parsing and assertion generation validated with sample design system</li>
+                <li>Accessibility metadata extraction and test generation (ARIA, keyboard navigation, contrast) functional</li>
+                <li>Figma webhook integration receiving publish events and triggering regeneration</li>
+                <li>Component coverage dashboard showing metrics and test mappings</li>
+                <li>Test customization system allowing preservation across regenerations</li>
+                <li>Selenium export tested and validated; multi-framework parity confirmed</li>
+                <li>Responsive breakpoint testing for mobile/tablet/desktop variants</li>
+                <li>Error handling and graceful degradation for unsupported Figma features</li>
+                <li>Beta testing with 3 customer teams; feedback incorporated, issues resolved</li>
+                <li>Security review completed: API token encryption, RBAC, audit logging implemented</li>
+                <li>Documentation: Figma setup guide, test customization guide, API reference, troubleshooting guide completed</li>
+                <li>Product owner and engineering sign-off obtained</li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>

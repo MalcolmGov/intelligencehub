@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARIA - Architecture & Technical Specification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f5f7fa;
+        }
+
+        .document {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+
+        /* Cover Page */
+        .cover {
+            background: linear-gradient(135deg, #1E3A5F 0%, #0078D4 100%);
+            color: white;
+            padding: 120px 60px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cover h1 {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .cover .subtitle {
+            font-size: 1.8em;
+            font-weight: 300;
+            margin-bottom: 60px;
+            opacity: 0.95;
+        }
+
+        .cover-meta {
+            margin-top: 80px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 40px;
+            font-size: 1.1em;
+        }
+
+        .cover-meta p {
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        /* Header/Navigation */
+        header {
+            background: white;
+            border-bottom: 2px solid #0078D4;
+            padding: 20px 60px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            color: #1E3A5F;
+            font-size: 1.5em;
+        }
+
+        /* Main Content */
+        .content {
+            padding: 60px;
+        }
+
+        section {
+            margin-bottom: 60px;
+        }
+
+        h2 {
+            color: #1E3A5F;
+            font-size: 2em;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #0078D4;
+            padding-bottom: 15px;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            color: #0078D4;
+            font-size: 1.4em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #1E3A5F;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #1E3A5F;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #e8f0ff;
+        }
+
+        /* SVG Diagrams */
+        .diagram {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Lists */
+        ol, ul {
+            margin: 20px 0 20px 30px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        /* Code/Technical */
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        pre {
+            background: #1E3A5F;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        /* Callout Boxes */
+        .callout {
+            border-left: 4px solid #0078D4;
+            background: #e8f0ff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .callout strong {
+            color: #1E3A5F;
+        }
+
+        /* Footer */
+        footer {
+            background: #1E3A5F;
+            color: white;
+            padding: 40px 60px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            .document {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            .cover {
+                page-break-after: always;
+            }
+            header {
+                display: none;
+            }
+            section {
+                page-break-inside: avoid;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .cover {
+                padding: 60px 30px;
+            }
+            .cover h1 {
+                font-size: 2.5em;
+            }
+            .content {
+                padding: 30px;
+            }
+            h2 {
+                font-size: 1.6em;
+            }
+            table {
+                font-size: 0.9em;
+            }
+            th, td {
+                padding: 10px;
+            }
+        }
+
+        /* Section Numbering */
+        .section-number {
+            color: #0078D4;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        /* Grid for two-column layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="document">
+        <!-- Cover Page -->
+        <section class="cover">
+            <h1>ARIA</h1>
+            <div class="subtitle">AI Response & Incident Agent</div>
+            <div style="font-size: 1.3em; margin-top: 40px;">Architecture & Technical Specification</div>
+            <div class="cover-meta">
+                <p><strong>Version:</strong> 1.0</p>
+                <p><strong>Date:</strong> May 2026</p>
+                <p><strong>Organization:</strong> South African Fintech & Banking</p>
+                <p><strong>Classification:</strong> Internal Technical Documentation</p>
+            </div>
+        </section>
+
+        <!-- Main Header -->
+        <header>
+            <h1>ARIA Technical Specification v1.0</h1>
+        </header>
+
+        <!-- Content Sections -->
+        <div class="content">
+
+            <!-- Section 1: Executive Summary -->
+            <section>
+                <h2><span class="section-number">1</span>Executive Summary</h2>
+                
+                <h3>1.1 Overview</h3>
+                <p>ARIA (AI Response & Incident Agent) is a voice-first AI support agent designed to empower front-office staff at South African fintech and banking institutions. ARIA intelligently routes inquiries across two core domains: IT/technical support and product/banking operations. By combining Claude's advanced natural language understanding with real-time voice processing via ElevenLabs, ARIA delivers immediate, contextually-aware responses while maintaining full audit compliance and POPIA data protection standards.</p>
+
+                <p>The system serves diverse user personas—from front-line tellers and relationship managers to compliance officers—reducing response times from minutes to seconds and improving first-contact resolution rates significantly. When human expertise is required, ARIA seamlessly escalates to L1/L2 support teams with full incident context and conversation history.</p>
+
+                <h3>1.2 Architectural Rationale</h3>
+                <p>This architecture was designed to meet four critical objectives:</p>
+                <ol>
+                    <li><strong>Voice-First Interaction:</strong> ElevenLabs STT/TTS provides low-latency multilingual speech processing, reducing user friction compared to text-based interfaces in a fast-paced banking environment.</li>
+                    <li><strong>Knowledge Grounding:</strong> A Retrieval-Augmented Generation (RAG) pipeline ensures ARIA responses are rooted in internal knowledge bases, reducing hallucinations and maintaining institutional control over information quality.</li>
+                    <li><strong>Regulatory Compliance:</strong> Native PostgreSQL audit logging, POPIA-aligned data retention, and role-based access controls are built into the core architecture rather than bolted on.</li>
+                    <li><strong>Operational Reliability:</strong> Stateless microservices, horizontal scaling via containerization, and graceful escalation paths ensure 99.9% uptime and <3-second response latency under peak load.</li>
+                </ol>
+
+                <h3>1.3 Success Criteria</h3>
+                <p>ARIA's success is measured against: (a) voice interaction latency <3 seconds end-to-end, (b) STT accuracy >95%, (c) first-contact resolution >70% for tier-1 queries, (d) zero POPIA violations, and (e) support of 500+ concurrent users during business hours.</p>
+            </section>
+
+            <!-- Section 2: System Architecture -->
+            <section>
+                <h2><span class="section-number">2</span>System Architecture Overview</h2>
+
+                <p>ARIA operates across six interconnected layers, each with specific responsibilities and technology choices designed for resilience and compliance.</p>
+
+                <div class="diagram">
+                    <svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Background -->
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f8f9fa;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#e8eef5;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <rect width="1000" height="700" fill="url(#grad1)"/>
+
+                        <!-- Layer 1: User Layer -->
+                        <rect x="50" y="20" width="900" height="90" fill="#1E3A5F" rx="5"/>
+                        <text x="500" y="50" font-size="18" font-weight="bold" fill="white" text-anchor="middle">1. USER LAYER</text>
+                        <rect x="100" y="65" width="180" height="35" fill="#0078D4" rx="3"/>
+                        <text x="190" y="87" font-size="13" fill="white" text-anchor="middle">Web Browser</text>
+                        <rect x="350" y="65" width="180" height="35" fill="#0078D4" rx="3"/>
+                        <text x="440" y="87" font-size="13" fill="white" text-anchor="middle">Mobile App (iOS/Android)</text>
+                        <rect x="600" y="65" width="280" height="35" fill="#0078D4" rx="3"/>
+                        <text x="740" y="87" font-size="13" fill="white" text-anchor="middle">Microsoft Teams Integration</text>
+
+                        <!-- Layer 2: Voice Layer -->
+                        <rect x="50" y="130" width="900" height="110" fill="#1E3A5F" rx="5"/>
+                        <text x="500" y="160" font-size="18" font-weight="bold" fill="white" text-anchor="middle">2. VOICE PROCESSING LAYER</text>
+                        <rect x="80" y="175" width="150" height="50" fill="#0078D4" rx="3"/>
+                        <text x="155" y="195" font-size="12" fill="white" text-anchor="middle">Audio Capture</text>
+                        <text x="155" y="213" font-size="10" fill="white" text-anchor="middle">(Browser/Mobile)</text>
+                        
+                        <path d="M 240 200 L 280 200" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="290" y="175" width="150" height="50" fill="#0078D4" rx="3"/>
+                        <text x="365" y="195" font-size="12" fill="white" text-anchor="middle">ElevenLabs STT</text>
+                        <text x="365" y="213" font-size="10" fill="white" text-anchor="middle">(Speech-to-Text)</text>
+                        
+                        <path d="M 450 200 L 490 200" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="500" y="175" width="150" height="50" fill="#0078D4" rx="3"/>
+                        <text x="575" y="195" font-size="12" fill="white" text-anchor="middle">Transcript</text>
+                        <text x="575" y="213" font-size="10" fill="white" text-anchor="middle">Normalization</text>
+                        
+                        <path d="M 660 200 L 700 200" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="710" y="175" width="150" height="50" fill="#0078D4" rx="3"/>
+                        <text x="785" y="195" font-size="12" fill="white" text-anchor="middle">ElevenLabs TTS</text>
+                        <text x="785" y="213" font-size="10" fill="white" text-anchor="middle">(Text-to-Speech)</text>
+
+                        <!-- Arrows down -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#0078D4" />
+                            </marker>
+                        </defs>
+
+                        <!-- Layer 3: AI/NLP Layer -->
+                        <rect x="50" y="260" width="900" height="110" fill="#1E3A5F" rx="5"/>
+                        <text x="500" y="290" font-size="18" font-weight="bold" fill="white" text-anchor="middle">3. AI/NLP LAYER</text>
+                        <rect x="80" y="305" width="180" height="50" fill="#0078D4" rx="3"/>
+                        <text x="170" y="325" font-size="12" fill="white" text-anchor="middle">Intent Classification</text>
+                        <text x="170" y="343" font-size="10" fill="white" text-anchor="middle">&amp; Entity Extraction</text>
+                        
+                        <path d="M 270 330 L 310 330" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="320" y="305" width="180" height="50" fill="#0078D4" rx="3"/>
+                        <text x="410" y="325" font-size="12" fill="white" text-anchor="middle">Claude Sonnet</text>
+                        <text x="410" y="343" font-size="10" fill="white" text-anchor="middle">API (Orchestrator)</text>
+                        
+                        <path d="M 510 330 L 550 330" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="560" y="305" width="180" height="50" fill="#0078D4" rx="3"/>
+                        <text x="650" y="325" font-size="12" fill="white" text-anchor="middle">Context Manager</text>
+                        <text x="650" y="343" font-size="10" fill="white" text-anchor="middle">(Session Memory)</text>
+                        
+                        <path d="M 750 330 L 790 330" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="800" y="305" width="120" height="50" fill="#0078D4" rx="3"/>
+                        <text x="860" y="330" font-size="12" fill="white" text-anchor="middle">Response</text>
+                        <text x="860" y="348" font-size="10" fill="white" text-anchor="middle">Generation</text>
+
+                        <!-- Layer 4: Knowledge Layer -->
+                        <rect x="50" y="390" width="900" height="110" fill="#1E3A5F" rx="5"/>
+                        <text x="500" y="420" font-size="18" font-weight="bold" fill="white" text-anchor="middle">4. KNOWLEDGE LAYER (RAG PIPELINE)</text>
+                        <rect x="80" y="435" width="180" height="50" fill="#0078D4" rx="3"/>
+                        <text x="170" y="455" font-size="12" fill="white" text-anchor="middle">Document</text>
+                        <text x="170" y="473" font-size="10" fill="white" text-anchor="middle">Ingestion &amp; Chunking</text>
+                        
+                        <path d="M 270 460 L 310 460" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="320" y="435" width="180" height="50" fill="#0078D4" rx="3"/>
+                        <text x="410" y="455" font-size="12" fill="white" text-anchor="middle">Vector Embedding</text>
+                        <text x="410" y="473" font-size="10" fill="white" text-anchor="middle">(OpenAI Embeddings)</text>
+                        
+                        <path d="M 510 460 L 550 460" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="560" y="435" width="180" height="50" fill="#0078D4" rx="3"/>
+                        <text x="650" y="455" font-size="12" fill="white" text-anchor="middle">Vector DB Retrieval</text>
+                        <text x="650" y="473" font-size="10" fill="white" text-anchor="middle">(Pinecone/pgvector)</text>
+                        
+                        <path d="M 750 460 L 790 460" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <rect x="800" y="435" width="120" height="50" fill="#0078D4" rx="3"/>
+                        <text x="860" y="460" font-size="12" fill="white" text-anchor="middle">Context</text>
+                        <text x="860" y="478" font-size="10" fill="white" text-anchor="middle">Augmentation</text>
+
+                        <!-- Layer 5: Integration Layer -->
+                        <rect x="50" y="520" width="900" height="100" fill="#1E3A5F" rx="5"/>
+                        <text x="500" y="550" font-size="18" font-weight="bold" fill="white" text-anchor="middle">5. INTEGRATION LAYER</text>
+                        <rect x="100" y="565" width="160" height="40" fill="#0078D4" rx="3"/>
+                        <text x="180" y="591" font-size="11" fill="white" text-anchor="middle">ServiceNow (Tickets)</text>
+                        <rect x="320" y="565" width="160" height="40" fill="#0078D4" rx="3"/>
+                        <text x="400" y="591" font-size="11" fill="white" text-anchor="middle">Active Directory</text>
+                        <rect x="540" y="565" width="160" height="40" fill="#0078D4" rx="3"/>
+                        <text x="620" y="591" font-size="11" fill="white" text-anchor="middle">Microsoft Teams</text>
+                        <rect x="760" y="565" width="140" height="40" fill="#0078D4" rx="3"/>
+                        <text x="830" y="591" font-size="11" fill="white" text-anchor="middle">Slack (Optional)</text>
+
+                        <!-- Layer 6: Data Layer -->
+                        <rect x="50" y="640" width="900" height="50" fill="#1E3A5F" rx="5"/>
+                        <text x="500" y="670" font-size="18" font-weight="bold" fill="white" text-anchor="middle">6. DATA LAYER: PostgreSQL (Audit/Session) | Redis (Cache) | S3 (Voice Recordings)</text>
+
+                        <!-- Connecting arrows between layers -->
+                        <path d="M 500 110 L 500 130" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 500 240 L 500 260" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 500 370 L 500 390" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 500 500 L 500 520" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        <path d="M 500 620 L 500 640" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                    </svg>
+                </div>
+
+                <h3>2.1 Layered Architecture</h3>
+                <p><strong>Layer 1 - User Interface:</strong> Web and mobile clients with browser-based audio capture, providing accessibility across devices.</p>
+                <p><strong>Layer 2 - Voice Processing:</strong> ElevenLabs integration for real-time STT (inbound) and TTS (outbound), with optional transcript normalization for dialect/accent handling.</p>
+                <p><strong>Layer 3 - AI/NLP Orchestration:</strong> Claude Sonnet API as the central intelligence engine, with intent classification, entity extraction, and context management.</p>
+                <p><strong>Layer 4 - Knowledge Retrieval:</strong> RAG pipeline combining vector embeddings with document retrieval, ensuring responses are grounded in institutional knowledge.</p>
+                <p><strong>Layer 5 - Integrations:</strong> Connectors to ServiceNow (incident creation), Active Directory (authentication), Teams (escalations), and optional Slack integration.</p>
+                <p><strong>Layer 6 - Persistence:</strong> PostgreSQL for audit logs and session data, Redis for caching and rate limiting, S3 for compliant voice recording storage.</p>
+            </section>
+
+            <!-- Section 3: Component Breakdown -->
+            <section>
+                <h2><span class="section-number">3</span>Component Breakdown</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Technology</th>
+                            <th>Purpose</th>
+                            <th>Owner Team</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Voice Interface</td>
+                            <td>React/React Native + WebRTC</td>
+                            <td>Audio capture, playback, UI interactions</td>
+                            <td>Frontend Engineering</td>
+                        </tr>
+                        <tr>
+                            <td>STT Engine</td>
+                            <td>ElevenLabs API (Speech-to-Text)</td>
+                            <td>Convert voice to text transcripts</td>
+                            <td>AI/Voice Team</td>
+                        </tr>
+                        <tr>
+                            <td>TTS Engine</td>
+                            <td>ElevenLabs API (Text-to-Speech)</td>
+                            <td>Convert responses to natural-sounding speech</td>
+                            <td>AI/Voice Team</td>
+                        </tr>
+                        <tr>
+                            <td>NLP Orchestrator</td>
+                            <td>Claude Sonnet API + Prompt Engineering</td>
+                            <td>Intent recognition, response generation, escalation routing</td>
+                            <td>AI Platform Team</td>
+                        </tr>
+                        <tr>
+                            <td>RAG Pipeline</td>
+                            <td>LangChain + OpenAI Embeddings</td>
+                            <td>Document retrieval and context augmentation</td>
+                            <td>Data Engineering</td>
+                        </tr>
+                        <tr>
+                            <td>Vector Store</td>
+                            <td>Pinecone or pgvector (PostgreSQL)</td>
+                            <td>Store and retrieve document embeddings</td>
+                            <td>Data Engineering</td>
+                        </tr>
+                        <tr>
+                            <td>Knowledge Base</td>
+                            <td>PostgreSQL + S3 (documents)</td>
+                            <td>Central repository for policies, FAQs, procedures</td>
+                            <td>Knowledge Management</td>
+                        </tr>
+                        <tr>
+                            <td>Ticket Integration</td>
+                            <td>ServiceNow REST API</td>
+                            <td>Auto-create incidents, pull status, escalate tickets</td>
+                            <td>Integration Team</td>
+                        </tr>
+                        <tr>
+                            <td>Auth Service</td>
+                            <td>Active Directory (LDAP/OAuth)</td>
+                            <td>User authentication, role-based access control</td>
+                            <td>Security Team</td>
+                        </tr>
+                        <tr>
+                            <td>Audit Logger</td>
+                            <td>PostgreSQL + Elasticsearch (optional)</td>
+                            <td>Full conversation logging for compliance and debugging</td>
+                            <td>Compliance & Security</td>
+                        </tr>
+                        <tr>
+                            <td>Admin Dashboard</td>
+                            <td>React + GraphQL</td>
+                            <td>System monitoring, analytics, knowledge base management</td>
+                            <td>Frontend Engineering</td>
+                        </tr>
+                        <tr>
+                            <td>API Gateway</td>
+                            <td>Node.js Express / FastAPI</td>
+                            <td>Route requests, enforce rate limiting, logging</td>
+                            <td>Backend Engineering</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 4: Technology Stack -->
+            <section>
+                <h2><span class="section-number">4</span>Technology Stack</h2>
+
+                <h3>4.1 Frontend</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Layer</th>
+                            <th>Technology</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Web Framework</td>
+                            <td>React.js</td>
+                            <td>18.2+</td>
+                        </tr>
+                        <tr>
+                            <td>Mobile</td>
+                            <td>React Native (Expo)</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>UI Components</td>
+                            <td>Material-UI + Tailwind CSS</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>State Management</td>
+                            <td>Redux Toolkit / Zustand</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Audio Processing</td>
+                            <td>Web Audio API + wavesurfer.js</td>
+                            <td>Latest</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4.2 Backend</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Technology</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>API Runtime</td>
+                            <td>Node.js (Express) or Python (FastAPI)</td>
+                            <td>18+ / 3.10+</td>
+                        </tr>
+                        <tr>
+                            <td>API Specification</td>
+                            <td>GraphQL + REST</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Async Tasks</td>
+                            <td>Bull (Redis) or Celery (Python)</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Logging</td>
+                            <td>Winston or Python logging + ELK Stack</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Rate Limiting</td>
+                            <td>Redis-based (express-rate-limit)</td>
+                            <td>Latest</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4.3 AI/ML</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Provider</th>
+                            <th>Model/Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>LLM</td>
+                            <td>Anthropic</td>
+                            <td>Claude Sonnet 3.5</td>
+                        </tr>
+                        <tr>
+                            <td>Speech-to-Text</td>
+                            <td>ElevenLabs</td>
+                            <td>Latest STT Model</td>
+                        </tr>
+                        <tr>
+                            <td>Text-to-Speech</td>
+                            <td>ElevenLabs</td>
+                            <td>Multilingual v2</td>
+                        </tr>
+                        <tr>
+                            <td>Embeddings</td>
+                            <td>OpenAI</td>
+                            <td>text-embedding-3-small</td>
+                        </tr>
+                        <tr>
+                            <td>RAG Framework</td>
+                            <td>LangChain Community</td>
+                            <td>0.1+</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4.4 Data & Storage</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Type</th>
+                            <th>Technology</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Relational DB</td>
+                            <td>PostgreSQL</td>
+                            <td>15.x</td>
+                        </tr>
+                        <tr>
+                            <td>Cache/Session</td>
+                            <td>Redis</td>
+                            <td>7.x</td>
+                        </tr>
+                        <tr>
+                            <td>Vector DB</td>
+                            <td>Pinecone (cloud) OR pgvector (self-hosted)</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>File Storage</td>
+                            <td>AWS S3 or R2 (Cloudflare)</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Search (Optional)</td>
+                            <td>Elasticsearch</td>
+                            <td>8.x</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4.5 DevOps & Infrastructure</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Technology</th>
+                            <th>Version</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Frontend Hosting</td>
+                            <td>Vercel</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Backend Hosting</td>
+                            <td>Railway.app or Render</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Database Hosting</td>
+                            <td>Neon (PostgreSQL SaaS)</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Containerization</td>
+                            <td>Docker</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>CI/CD Pipeline</td>
+                            <td>GitHub Actions</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Monitoring</td>
+                            <td>DataDog / New Relic</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td>Error Tracking</td>
+                            <td>Sentry</td>
+                            <td>Latest</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 5: Voice Pipeline Flow -->
+            <section>
+                <h2><span class="section-number">5</span>Voice Pipeline Flow</h2>
+
+                <p>The voice interaction pipeline is optimized for sub-3-second total latency, critical for a conversational experience in a banking environment.</p>
+
+                <div class="diagram">
+                    <svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Title -->
+                        <text x="600" y="30" font-size="16" font-weight="bold" fill="#1E3A5F" text-anchor="middle">Voice Interaction Pipeline</text>
+
+                        <!-- Step 1 -->
+                        <circle cx="80" cy="120" r="30" fill="#0078D4"/>
+                        <text x="80" y="128" font-size="20" font-weight="bold" fill="white" text-anchor="middle">1</text>
+                        <text x="80" y="180" font-size="12" fill="#1E3A5F" text-anchor="middle">User Speaks</text>
+                        <text x="80" y="200" font-size="10" fill="#666" text-anchor="middle">(0-30s)</text>
+
+                        <!-- Arrow -->
+                        <path d="M 115 120 L 155 120" stroke="#0078D4" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Step 2 -->
+                        <circle cx="200" cy="120" r="30" fill="#0078D4"/>
+                        <text x="200" y="128" font-size="20" font-weight="bold" fill="white" text-anchor="middle">2</text>
+                        <text x="200" y="180" font-size="12" fill="#1E3A5F" text-anchor="middle">Browser Capture</text>
+                        <text x="200" y="200" font-size="10" fill="#666" text-anchor="middle">(&lt;100ms)</text>
+
+                        <!-- Arrow -->
+                        <path d="M 235 120 L 275 120" stroke="#0078D4" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Step 3 -->
+                        <circle cx="320" cy="120" r="30" fill="#0078D4"/>
+                        <text x="320" y="128" font-size="20" font-weight="bold" fill="white" text-anchor="middle">3</text>
+                        <text x="320" y="180" font-size="12" fill="#1E3A5F" text-anchor="middle">ElevenLabs STT</text>
+                        <text x="320" y="200" font-size="10" fill="#666" text-anchor="middle">(&lt;1.5s)</text>
+
+                        <!-- Arrow -->
+                        <path d="M 355 120 L 395 120" stroke="#0078D4" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Step 4 -->
+                        <circle cx="440" cy="120" r="30" fill="#0078D4"/>
+                        <text x="440" y="128" font-size="20" font-weight="bold" fill="white" text-anchor="middle">4</text>
+                        <text x="440" y="180" font-size="12" fill="#1E3A5F" text-anchor="middle">Claude API + RAG</text>
+                        <text x="440" y="200" font-size="10" fill="#666" text-anchor="middle">(&lt;1s)</text>
+
+                        <!-- Arrow -->
+                        <path d="M 475 120 L 515 120" stroke="#0078D4" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Step 5 -->
+                        <circle cx="560" cy="120" r="30" fill="#0078D4"/>
+                        <text x="560" y="128" font-size="20" font-weight="bold" fill="white" text-anchor="middle">5</text>
+                        <text x="560" y="180" font-size="12" fill="#1E3A5F" text-anchor="middle">Response Text</text>
+                        <text x="560" y="200" font-size="10" fill="#666" text-anchor="middle">(&lt;500ms)</text>
+
+                        <!-- Arrow -->
+                        <path d="M 595 120 L 635 120" stroke="#0078D4" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Step 6 -->
+                        <circle cx="680" cy="120" r="30" fill="#0078D4"/>
+                        <text x="680" y="128" font-size="20" font-weight="bold" fill="white" text-anchor="middle">6</text>
+                        <text x="680" y="180" font-size="12" fill="#1E3A5F" text-anchor="middle">ElevenLabs TTS</text>
+                        <text x="680" y="200" font-size="10" fill="#666" text-anchor="middle">(&lt;800ms)</text>
+
+                        <!-- Arrow -->
+                        <path d="M 715 120 L 755 120" stroke="#0078D4" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Step 7 -->
+                        <circle cx="800" cy="120" r="30" fill="#0078D4"/>
+                        <text x="800" y="128" font-size="20" font-weight="bold" fill="white" text-anchor="middle">7</text>
+                        <text x="800" y="180" font-size="12" fill="#1E3A5F" text-anchor="middle">Play Audio</text>
+                        <text x="800" y="200" font-size="10" fill="#666" text-anchor="middle">(&lt;100ms)</text>
+
+                        <!-- Bottom metrics -->
+                        <rect x="100" y="280" width="1000" height="100" fill="#f8f9fa" stroke="#0078D4" stroke-width="2" rx="5"/>
+                        <text x="600" y="310" font-size="14" font-weight="bold" fill="#1E3A5F" text-anchor="middle">Total Pipeline Latency Targets</text>
+                        <text x="150" y="340" font-size="12" fill="#1E3A5F">Audio Capture: &lt;100ms</text>
+                        <text x="150" y="360" font-size="12" fill="#1E3A5F">STT: &lt;1.5s | AI Processing: &lt;1s | TTS: &lt;800ms | Playback: &lt;100ms</text>
+                        <text x="150" y="380" font-size="13" font-weight="bold" fill="#0078D4">END-TO-END TARGET: &lt;3.5 seconds</text>
+                    </svg>
+                </div>
+
+                <h3>5.1 Step-by-Step Flow</h3>
+                <ol>
+                    <li><strong>User Speech (0-30s):</strong> User speaks their question or request naturally into the interface.</li>
+                    <li><strong>Audio Capture (&lt;100ms):</strong> Browser's Web Audio API captures raw audio stream with high fidelity.</li>
+                    <li><strong>Speech-to-Text (&lt;1.5s):</strong> Audio is sent to ElevenLabs STT API, returning a text transcript.</li>
+                    <li><strong>AI Processing with RAG (&lt;1s):</strong> Transcript is passed to Claude Sonnet, which enriches the prompt with relevant context from the vector database, performs intent classification, and generates a response.</li>
+                    <li><strong>Response Text Generation (&lt;500ms):</strong> Claude returns structured response text with escalation flags if needed.</li>
+                    <li><strong>Text-to-Speech (&lt;800ms):</strong> Response is sent to ElevenLabs TTS API, producing natural-sounding voice output in the user's preferred language.</li>
+                    <li><strong>Audio Playback (&lt;100ms):</strong> Audio is streamed to the user's speaker or headset.</li>
+                </ol>
+
+                <div class="callout">
+                    <strong>Latency Optimization:</strong> ElevenLabs calls can be parallelized with Claude API calls where possible. Context retrieval from the vector database is optimized with caching; results for the same query within 15 minutes are served from Redis (sub-50ms).
+                </div>
+            </section>
+
+            <!-- Section 6: Data Architecture -->
+            <section>
+                <h2><span class="section-number">6</span>Data Architecture</h2>
+
+                <h3>6.1 Core Data Stores</h3>
+                <p><strong>PostgreSQL (Relational):</strong> Primary store for user sessions, conversation history, audit logs, incident escalations, and admin metadata. Tables include: <code>users</code>, <code>sessions</code>, <code>conversations</code>, <code>audit_logs</code>, <code>incidents</code>, <code>knowledge_articles</code>.</p>
+                <p><strong>Redis (In-Memory):</strong> Cache layer for session tokens, vector search results, rate limiting counters, and temporary conversation context. TTL policies ensure no persistent sensitive data is stored.</p>
+                <p><strong>S3 / Object Storage:</strong> Encrypted storage for voice recordings, document backups, and conversation transcripts (for compliance audits). Lifecycle policies ensure deletion after 90 days.</p>
+                <p><strong>Vector Database (Pinecone/pgvector):</strong> Stores document embeddings indexed by semantic similarity, enabling fast RAG retrieval. Namespace separation by domain (IT vs. Banking).</p>
+
+                <h3>6.2 Data Schemas (High-Level)</h3>
+                <pre>-- Sessions & Conversations
+CREATE TABLE sessions (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    started_at TIMESTAMP,
+    ended_at TIMESTAMP,
+    status ENUM ('active', 'closed', 'escalated')
+);
+
+CREATE TABLE conversations (
+    id UUID PRIMARY KEY,
+    session_id UUID REFERENCES sessions(id),
+    user_message TEXT,
+    ai_response TEXT,
+    intent VARCHAR(100),
+    escalated BOOLEAN,
+    created_at TIMESTAMP
+);
+
+-- Audit Logging
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY,
+    user_id UUID,
+    action VARCHAR(100),
+    resource_type VARCHAR(50),
+    resource_id UUID,
+    timestamp TIMESTAMP,
+    ip_address INET,
+    details JSONB
+);
+
+-- Incidents
+CREATE TABLE incidents (
+    id UUID PRIMARY KEY,
+    ticket_id VARCHAR(50),
+    priority ENUM ('P1', 'P2', 'P3', 'P4'),
+    status VARCHAR(50),
+    created_from_session_id UUID REFERENCES sessions(id),
+    assigned_to UUID,
+    created_at TIMESTAMP
+);</pre>
+
+                <h3>6.3 Data Retention & POPIA Compliance</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data Type</th>
+                            <th>Retention Period</th>
+                            <th>Storage Location</th>
+                            <th>POPIA Justification</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Conversation Transcripts</td>
+                            <td>90 days</td>
+                            <td>PostgreSQL + S3 (encrypted)</td>
+                            <td>Audit trail for support quality assurance</td>
+                        </tr>
+                        <tr>
+                            <td>Voice Recordings</td>
+                            <td>30 days</td>
+                            <td>S3 with KMS encryption</td>
+                            <td>Regulatory compliance; auto-delete after expiry</td>
+                        </tr>
+                        <tr>
+                            <td>Session Metadata (tokens, IPs)</td>
+                            <td>7 days</td>
+                            <td>Redis (encrypted)</td>
+                            <td>Security event investigation window</td>
+                        </tr>
+                        <tr>
+                            <td>Audit Logs</td>
+                            <td>1 year</td>
+                            <td>PostgreSQL (immutable)</td>
+                            <td>Financial regulatory requirement</td>
+                        </tr>
+                        <tr>
+                            <td>PII (user names, contact info)</td>
+                            <td>Until account deletion</td>
+                            <td>PostgreSQL</td>
+                            <td>Operational necessity; user can request deletion</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>6.4 POPIA Compliance Measures</h3>
+                <ul>
+                    <li><strong>Data Minimisation:</strong> ARIA collects only user ID, role, and query content—no personal identity numbers, bank account details, or biometric data.</li>
+                    <li><strong>Purpose Limitation:</strong> Data is used solely for support delivery and compliance auditing. Third-party sharing (e.g., ElevenLabs) is strictly contractual and minimal (e.g., audio + transcript only).</li>
+                    <li><strong>Encryption:</strong> All data at rest is encrypted with AES-256. Data in transit uses TLS 1.3. Voice recordings in S3 use AWS KMS.</li>
+                    <li><strong>Access Controls:</strong> Role-based access via Active Directory; only authorized support staff can view conversation history. Admin access is logged and audited.</li>
+                    <li><strong>User Rights:</strong> Users can request data export, deletion, or correction via a self-service portal. Requests are processed within 30 days.</li>
+                    <li><strong>Data Breach Protocol:</strong> Any unauthorized access triggers immediate notification to compliance team and affected users within 24 hours.</li>
+                </ul>
+            </section>
+
+            <!-- Section 7: Integration Specifications -->
+            <section>
+                <h2><span class="section-number">7</span>Integration Specifications</h2>
+
+                <h3>7.1 ServiceNow Integration (Incident Ticketing)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Authentication</td>
+                            <td>OAuth 2.0 (Service Principal) with JWT bearer token</td>
+                        </tr>
+                        <tr>
+                            <td>API Version</td>
+                            <td>ServiceNow REST API v2 (Tokyo release or later)</td>
+                        </tr>
+                        <tr>
+                            <td>Endpoints</td>
+                            <td><code>/api/now/table/incident</code> (create/update) | <code>/api/now/table/incident?sysparm_query=</code> (search)</td>
+                        </tr>
+                        <tr>
+                            <td>Data Exchanged</td>
+                            <td>Short Description | Description | Urgency | Impact | Caller ID | Assignment Group | Work Notes</td>
+                        </tr>
+                        <tr>
+                            <td>Rate Limiting</td>
+                            <td>100 requests/minute per API user</td>
+                        </tr>
+                        <tr>
+                            <td>Failure Handling</td>
+                            <td>Retry up to 3 times with exponential backoff; log failure to audit table; notify ops team if persistent</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>7.2 Active Directory Integration (Authentication)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Authentication</td>
+                            <td>LDAP + SAML 2.0 (single sign-on)</td>
+                        </tr>
+                        <tr>
+                            <td>Protocol</td>
+                            <td>LDAP v3 (secure, port 636 with TLS)</td>
+                        </tr>
+                        <tr>
+                            <td>Directory Attributes</td>
+                            <td>userPrincipalName | sAMAccountName | mail | displayName | memberOf (groups)</td>
+                        </tr>
+                        <tr>
+                            <td>Role Mapping</td>
+                            <td>AD groups map to ARIA roles: [IT-Support] → tier-1-support | [Banking-Ops] → banking-specialist | [Compliance] → compliance-officer</td>
+                        </tr>
+                        <tr>
+                            <td>Session Token</td>
+                            <td>JWT (HS256, 8-hour expiry); refresh tokens valid 30 days</td>
+                        </tr>
+                        <tr>
+                            <td>Failure Handling</td>
+                            <td>If AD unavailable, fall back to cached group membership (max 1 hour stale). Alert ops immediately.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>7.3 Microsoft Teams Integration (Escalation)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Authentication</td>
+                            <td>Incoming Webhook (Teams-provisioned URL)</td>
+                        </tr>
+                        <tr>
+                            <td>API Version</td>
+                            <td>Microsoft Teams Webhook v1.0</td>
+                        </tr>
+                        <tr>
+                            <td>Payload</td>
+                            <td>Adaptive Card (title, description, session transcript excerpt, escalation reason, action buttons)</td>
+                        </tr>
+                        <tr>
+                            <td>Target Channel</td>
+                            <td>#aria-escalations (L1-support team)</td>
+                        </tr>
+                        <tr>
+                            <td>Trigger Conditions</td>
+                            <td>P1 incidents (immediate) | P2 after 5 min | User requests escalation</td>
+                        </tr>
+                        <tr>
+                            <td>Failure Handling</td>
+                            <td>If webhook fails, escalate to ops email and PagerDuty alert</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>7.4 ElevenLabs Integration (Voice Processing)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Authentication</td>
+                            <td>API Key (Bearer token in Authorization header)</td>
+                        </tr>
+                        <tr>
+                            <td>STT Endpoint</td>
+                            <td>POST /v1/speech-to-text</td>
+                        </tr>
+                        <tr>
+                            <td>TTS Endpoint</td>
+                            <td>POST /v1/text-to-speech/{voice_id}</td>
+                        </tr>
+                        <tr>
+                            <td>Audio Format</td>
+                            <td>Input: WAV, MP3, FLAC (16kHz mono). Output: MP3 or WAV configurable.</td>
+                        </tr>
+                        <tr>
+                            <td>Supported Languages</td>
+                            <td>English, Afrikaans, Zulu, Xhosa, Sotho (primary for ARIA)</td>
+                        </tr>
+                        <tr>
+                            <td>Rate Limiting</td>
+                            <td>100 requests/minute per API key</td>
+                        </tr>
+                        <tr>
+                            <td>Failure Handling</td>
+                            <td>Retry with exponential backoff (2x, 4x, 8x). If unavailable >30s, fall back to text input mode.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 8: Security & Compliance -->
+            <section>
+                <h2><span class="section-number">8</span>Security & Compliance</h2>
+
+                <h3>8.1 POPIA (Protection of Personal Information Act) Requirements</h3>
+                <p>ARIA operates under South African data protection law. Key obligations:</p>
+                <ul>
+                    <li><strong>Lawfulness:</strong> Data processing must have a clear lawful basis (e.g., contract, consent, legal obligation). ARIA's basis is customer service delivery.</li>
+                    <li><strong>Transparency:</strong> Users receive clear, upfront notification that conversations are recorded and may be escalated to humans.</li>
+                    <li><strong>Data Subject Rights:</strong> Users can exercise rights to access, correct, delete, or port their data within 30 days of request.</li>
+                    <li><strong>Accountability:</strong> A dedicated Data Protection Officer oversees compliance; audit logs prove adherence to POPIA principles.</li>
+                </ul>
+
+                <h3>8.2 Encryption</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data in Transit</th>
+                            <th>Data at Rest</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TLS 1.3 for all HTTP/API calls</td>
+                            <td>AES-256-GCM for databases (PostgreSQL transparent encryption)</td>
+                        </tr>
+                        <tr>
+                            <td>HTTPS everywhere (HSTS enabled)</td>
+                            <td>AWS KMS for S3 object encryption</td>
+                        </tr>
+                        <tr>
+                            <td>JWT tokens signed with RS256</td>
+                            <td>Redis encrypted at rest (optional, depends on deployment)</td>
+                        </tr>
+                        <tr>
+                            <td>Pinecone encrypted vectors (default)</td>
+                            <td>Database backups encrypted before storage</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>8.3 Access Control</h3>
+                <ul>
+                    <li><strong>Authentication:</strong> All users authenticate via Active Directory. SSO enforces MFA for sensitive roles (compliance, admin).</li>
+                    <li><strong>Authorization:</strong> Role-based access control (RBAC) implemented at API level. Roles: Tier-1 Support, Banking Specialist, Compliance Officer, Admin.</li>
+                    <li><strong>Data Access:</strong> Conversation data is visible only to the assigned support agent and compliance officers. Audit logs are immutable and admin-only.</li>
+                    <li><strong>Least Privilege:</strong> Service accounts run with minimal permissions. ElevenLabs API key is rotated quarterly.</li>
+                </ul>
+
+                <h3>8.4 Audit Trail Requirements</h3>
+                <p>Every interaction with ARIA is logged immutably in PostgreSQL audit table:</p>
+                <ul>
+                    <li>User ID, timestamp, action type (query, escalation, data access)</li>
+                    <li>Source IP, user agent, session ID</li>
+                    <li>For sensitive actions: detailed before/after snapshots</li>
+                    <li>Retention: 1 year for financial compliance; 90 days for general data</li>
+                </ul>
+
+                <h3>8.5 Incident Response & Breach Protocol</h3>
+                <ul>
+                    <li><strong>Detection:</strong> Automated alerts on suspicious activity (failed login attempts, bulk data export, unusual API calls).</li>
+                    <li><strong>Response:</strong> On suspected breach, isolate affected systems, preserve logs, notify DPFO within 24 hours.</li>
+                    <li><strong>User Notification:</strong> Affected users notified within 30 days with details of breach, data types, and remediation steps.</li>
+                </ul>
+            </section>
+
+            <!-- Section 9: Deployment Architecture -->
+            <section>
+                <h2><span class="section-number">9</span>Deployment Architecture</h2>
+
+                <h3>9.1 Infrastructure & Hosting</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Hosting Platform</th>
+                            <th>Configuration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Frontend (React SPA)</td>
+                            <td>Vercel</td>
+                            <td>Automatic deployments from main branch; global CDN; preview deployments per PR</td>
+                        </tr>
+                        <tr>
+                            <td>Backend API</td>
+                            <td>Railway.app or Render</td>
+                            <td>Node.js/Python container; auto-scaling (1-10 instances); health checks every 30s</td>
+                        </tr>
+                        <tr>
+                            <td>PostgreSQL Database</td>
+                            <td>Neon (managed SaaS)</td>
+                            <td>Multi-tenant with dedicated schema; automated backups hourly; point-in-time recovery</td>
+                        </tr>
+                        <tr>
+                            <td>Redis Cache</td>
+                            <td>Upstash (managed Redis SaaS)</td>
+                            <td>Shared cluster; TTL policies enforced; persistence disabled for session cache</td>
+                        </tr>
+                        <tr>
+                            <td>Vector Database</td>
+                            <td>Pinecone (managed) OR pgvector (embedded in Neon)</td>
+                            <td>Serverless indexes; auto-scaling based on query throughput</td>
+                        </tr>
+                        <tr>
+                            <td>File Storage (S3)</td>
+                            <td>AWS S3 or Cloudflare R2</td>
+                            <td>Encrypted at rest; lifecycle policy deletes voice recordings after 30 days</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>9.2 CI/CD Pipeline (GitHub Actions)</h3>
+                <pre>Trigger: On push to main / PR merge
+├─ Build & Test
+│  ├─ Run unit tests (Jest, pytest)
+│  ├─ Lint (ESLint, Black/Flake8)
+│  └─ Build Docker image (backend)
+├─ Security Scan
+│  ├─ Dependency scan (Snyk)
+│  └─ Container scan (Trivy)
+├─ Deploy to Staging
+│  ├─ Backend to Render (staging instance)
+│  ├─ Run integration tests
+│  └─ Smoke tests against staging DB
+└─ Deploy to Production
+   ├─ Frontend to Vercel
+   ├─ Backend to Railway (rolling deployment)
+   ├─ Database migrations (if any)
+   └─ Notify #deployments on Slack</pre>
+
+                <h3>9.3 Environments</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Environment</th>
+                            <th>Purpose</th>
+                            <th>Data</th>
+                            <th>Access</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Development</td>
+                            <td>Local development + feature testing</td>
+                            <td>Synthetic/mock data only</td>
+                            <td>Developers</td>
+                        </tr>
+                        <tr>
+                            <td>Staging</td>
+                            <td>Pre-production testing, integration tests</td>
+                            <td>Anonymized copy of production (weekly refresh)</td>
+                            <td>QA + DevOps</td>
+                        </tr>
+                        <tr>
+                            <td>Production</td>
+                            <td>Live user-facing system</td>
+                            <td>Real user data (encrypted, POPIA-compliant)</td>
+                            <td>Support team + on-call rotation</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>9.4 Disaster Recovery & High Availability</h3>
+                <ul>
+                    <li><strong>Database Backups:</strong> Hourly automated backups with 7-day retention; point-in-time recovery available.</li>
+                    <li><strong>Geographic Redundancy:</strong> Frontend on Vercel (multi-region). Backend can quickly be re-deployed to alternate region.</li>
+                    <li><strong>Failover Strategy:</strong> If primary backend region fails, traffic is automatically rerouted via load balancer to secondary instance.</li>
+                    <li><strong>RTO/RPO:</strong> Recovery Time Objective: 15 minutes. Recovery Point Objective: <1 hour.</li>
+                </ul>
+            </section>
+
+            <!-- Section 10: Non-Functional Requirements -->
+            <section>
+                <h2><span class="section-number">10</span>Non-Functional Requirements</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Requirement</th>
+                            <th>Target</th>
+                            <th>Measurement Method</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Availability</td>
+                            <td>99.9% uptime (SLA)</td>
+                            <td>Synthetic monitoring; alert on <99.9% rolling 30-day availability</td>
+                        </tr>
+                        <tr>
+                            <td>Voice Roundtrip Latency</td>
+                            <td>&lt;3 seconds end-to-end</td>
+                            <td>Client-side timing measurement; dashboard tracking p95 latency</td>
+                        </tr>
+                        <tr>
+                            <td>STT Accuracy</td>
+                            <td>&gt;95% word error rate</td>
+                            <td>Monthly evaluation on test corpus; adjust ElevenLabs parameters if below threshold</td>
+                        </tr>
+                        <tr>
+                            <td>Concurrent Users</td>
+                            <td>500+ during business hours (9am-5pm)</td>
+                            <td>Load testing (k6/JMeter); auto-scaling configured to handle 2x peak</td>
+                        </tr>
+                        <tr>
+                            <td>API Response Time (p95)</td>
+                            <td>&lt;500ms</td>
+                            <td>Application Performance Monitoring (APM) via DataDog</td>
+                        </tr>
+                        <tr>
+                            <td>Database Query Time (p95)</td>
+                            <td>&lt;100ms</td>
+                            <td>PostgreSQL slow-query log; index optimization if threshold exceeded</td>
+                        </tr>
+                        <tr>
+                            <td>Cache Hit Ratio</td>
+                            <td>&gt;85%</td>
+                            <td>Redis metrics; cache strategy reviewed quarterly</td>
+                        </tr>
+                        <tr>
+                            <td>First Contact Resolution Rate</td>
+                            <td>&gt;70% (tier-1 queries)</td>
+                            <td>Manual review of closed sessions; percentage of sessions not escalated</td>
+                        </tr>
+                        <tr>
+                            <td>Escalation Response Time</td>
+                            <td>&lt;2 minutes (Teams notification to human pickup)</td>
+                            <td>Ticket timestamps in ServiceNow</td>
+                        </tr>
+                        <tr>
+                            <td>Security Scan Coverage</td>
+                            <td>100% of code merged</td>
+                            <td>GitHub Actions CI; no merge without passing security scan</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Section 11: Phased Rollout Plan -->
+            <section>
+                <h2><span class="section-number">11</span>Phased Rollout Plan</h2>
+
+                <h3>11.1 Phase 1: MVP - IT Support (Weeks 1-8)</h3>
+                <p><strong>Scope:</strong> ARIA handles IT/technical support queries from front-line tellers and staff.</p>
+                <ul>
+                    <li><strong>Knowledge Base:</strong> 200+ IT FAQ articles, troubleshooting guides, password reset procedures</li>
+                    <li><strong>User Base:</strong> 50 internal testers (IT department + selected support staff)</li>
+                    <li><strong>Features:</strong> Voice input/output, ticket auto-creation in ServiceNow, escalation to L1</li>
+                    <li><strong>Testing:</strong> Closed beta, feedback loop weekly</li>
+                    <li><strong>Success Metrics:</strong> 90%+ user satisfaction, <3s latency, >85% queries resolved without escalation</li>
+                </ul>
+
+                <h3>11.2 Phase 2: Extended Scope - Banking & Product Queries (Weeks 9-20)</h3>
+                <p><strong>Scope:</strong> ARIA expands to handle product inquiries, account queries, transaction assistance.</p>
+                <ul>
+                    <li><strong>Knowledge Base:</strong> Add 500+ banking FAQs, product guides, regulatory info</li>
+                    <li><strong>User Base:</strong> Expand to 200 internal users across all branches</li>
+                    <li><strong>New Features:</strong> Multi-intent handling (IT + Banking), context switching, account lookup (read-only)</li>
+                    <li><strong>Integration:</strong> Read-only connection to core banking system for balance/transaction info</li>
+                    <li><strong>Testing:</strong> Extended beta with banking ops and relationship managers</li>
+                    <li><strong>Success Metrics:</strong> 70%+ FCR for banking queries, <4s latency with account lookups</li>
+                </ul>
+
+                <h3>11.3 Phase 3: Full Production - Self-Service + Analytics (Weeks 21-32)</h3>
+                <p><strong>Scope:</strong> ARIA fully productionized for all users; added analytics and manager dashboards.</p>
+                <ul>
+                    <li><strong>Rollout:</strong> Full production deployment; available during business hours (9am-5pm weekdays)</li>
+                    <li><strong>New Features:</strong> Compliance officer role for regulatory queries, admin dashboard with usage analytics, knowledge article suggestions based on gaps</li>
+                    <li><strong>Manager Portal:</strong> Branch managers see team ARIA interactions, escalation trends, performance metrics</li>
+                    <li><strong>Continuous Learning:</strong> Feedback loop: user corrections → knowledge base improvements → retraining</li>
+                    <li><strong>Success Metrics:</strong> 500+ concurrent users supported, 99.9% uptime, <3s latency maintained</li>
+                </ul>
+
+                <h3>11.4 Rollout Timeline Summary</h3>
+                <div class="diagram">
+                    <svg viewBox="0 0 1100 300" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Title -->
+                        <text x="550" y="30" font-size="16" font-weight="bold" fill="#1E3A5F" text-anchor="middle">ARIA Phased Rollout Timeline</text>
+
+                        <!-- Timeline line -->
+                        <line x1="100" y1="100" x2="1050" y2="100" stroke="#0078D4" stroke-width="3"/>
+
+                        <!-- Phase 1 -->
+                        <circle cx="250" cy="100" r="12" fill="#0078D4"/>
+                        <text x="250" y="140" font-size="13" font-weight="bold" fill="#1E3A5F" text-anchor="middle">Phase 1</text>
+                        <text x="250" y="160" font-size="12" fill="#666" text-anchor="middle">MVP: IT Support</text>
+                        <text x="250" y="180" font-size="11" fill="#666" text-anchor="middle">Weeks 1-8</text>
+                        <text x="250" y="200" font-size="11" fill="#666" text-anchor="middle">50 testers</text>
+
+                        <!-- Arrow -->
+                        <path d="M 320 100 L 380 100" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Phase 2 -->
+                        <circle cx="550" cy="100" r="12" fill="#0078D4"/>
+                        <text x="550" y="140" font-size="13" font-weight="bold" fill="#1E3A5F" text-anchor="middle">Phase 2</text>
+                        <text x="550" y="160" font-size="12" fill="#666" text-anchor="middle">Expand: Banking Queries</text>
+                        <text x="550" y="180" font-size="11" fill="#666" text-anchor="middle">Weeks 9-20</text>
+                        <text x="550" y="200" font-size="11" fill="#666" text-anchor="middle">200 users</text>
+
+                        <!-- Arrow -->
+                        <path d="M 620 100 L 680 100" stroke="#0078D4" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+                        <!-- Phase 3 -->
+                        <circle cx="850" cy="100" r="12" fill="#0078D4"/>
+                        <text x="850" y="140" font-size="13" font-weight="bold" fill="#1E3A5F" text-anchor="middle">Phase 3</text>
+                        <text x="850" y="160" font-size="12" fill="#666" text-anchor="middle">Production: Full Rollout</text>
+                        <text x="850" y="180" font-size="11" fill="#666" text-anchor="middle">Weeks 21-32</text>
+                        <text x="850" y="200" font-size="11" fill="#666" text-anchor="middle">500+ concurrent</text>
+
+                        <!-- Legend -->
+                        <rect x="100" y="240" width="900" height="50" fill="#f8f9fa" stroke="#0078D4" stroke-width="1" rx="3"/>
+                        <text x="110" y="265" font-size="12" font-weight="bold" fill="#1E3A5F">Key Milestones:</text>
+                        <text x="400" y="265" font-size="11" fill="#666">Week 8: Phase 1 Approval | Week 20: Phase 2 Approval | Week 32: Phase 3 Complete</text>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Section 12: Conclusion -->
+            <section>
+                <h2><span class="section-number">12</span>Conclusion</h2>
+
+                <p>ARIA represents a strategic investment in voice-first AI support infrastructure, combining state-of-the-art language models, secure data handling, and operational reliability. The architecture balances innovation (ElevenLabs voice processing, Claude's reasoning) with rigor (POPIA compliance, audit logging, graceful escalation).</p>
+
+                <p>The phased rollout ensures risk mitigation and iterative improvement, while the technology stack leverages proven cloud platforms (Vercel, Railway, Neon) for cost efficiency and operational simplicity.</p>
+
+                <p>By the end of Phase 3 (Week 32), ARIA will serve 500+ concurrent users, resolve 70%+ of queries without human intervention, and maintain <3-second voice interaction latency—delivering tangible business value to the organization.</p>
+
+                <div class="callout">
+                    <strong>Next Steps:</strong> This specification should be reviewed by stakeholders (IT, Compliance, Finance) and approved before development commences. A detailed project plan with resource allocation and milestones will follow.
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2026 South African Fintech & Banking. ARIA Technical Specification v1.0.</p>
+            <p>This document is confidential and for internal use only. Unauthorized distribution is prohibited.</p>
+            <p>Last updated: May 8, 2026 | Document ID: ARIA-TechSpec-v1.0</p>
+        </footer>
+
+    </div>
+</body>
+</html>

@@ -99,7 +99,7 @@ button:active { transform: scale(.98); }
 /* ── Stats ──────────────────────────────────────────────── */
 .stats {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 10px;
   margin-bottom: 1.25rem;
 }
@@ -113,13 +113,6 @@ button:active { transform: scale(.98); }
   display: flex; align-items: flex-start; gap: 10px;
   transition: box-shadow .2s, border-color .2s, transform .15s;
   position: relative;
-}
-.stat.stat-filter { cursor: pointer; }
-.stat.stat-filter:hover { transform: translateY(-2px); }
-.stat.stat-filter:focus { outline: 2px solid rgba(0, 115, 234, .45); outline-offset: 2px; }
-.stat.stat-filter.stat-active {
-  border-color: var(--stat-color, var(--border));
-  box-shadow: var(--shadow-m), 0 0 24px -4px var(--stat-glow, transparent);
 }
 .stat::before {
   content: '';
@@ -192,7 +185,7 @@ table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 
 
 thead { position: sticky; top: 3px; z-index: 10; }
 thead th {
-  padding: 11px 12px; text-align: left;
+  padding: 10px 10px; text-align: left;
   font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em;
   color: #c0c6e8; background: var(--surface2);
   border-bottom: 1px solid var(--border);
@@ -328,13 +321,6 @@ td { padding: 0 0; vertical-align: middle; }
 .editable:hover { background: var(--surface3); }
 .editable:focus { background: var(--accent-s); box-shadow: 0 0 0 2px rgba(0,115,234,.3); color: var(--text-1); }
 .cell-owner   { font-weight: 600; min-width: 80px; display: inline-block; font-size: 12px; color: var(--text-1); }
-.badge-new {
-  display: inline-block; margin-left: 5px; padding: 1px 6px;
-  background: linear-gradient(135deg, rgba(52,211,153,.2), rgba(16,185,129,.15));
-  border: 1px solid rgba(52,211,153,.4); border-radius: 4px;
-  font-size: 9px; font-weight: 800; color: #34d399; letter-spacing: .06em;
-  text-transform: uppercase; vertical-align: middle; white-space: nowrap;
-}
 .cell-project { font-weight: 600; min-width: 80px; display: inline-block; font-size: 12px; color: var(--text-1); }
 .cell-desc    {
   color: #c4caf0; font-size: 11px; line-height: 1.55;
@@ -451,7 +437,6 @@ td { padding: 0 0; vertical-align: middle; }
 .art-pdf    { background: rgba(248,113,113,.18); color: #f87171; }
 .art-gh     { background: rgba(255,255,255,.10); color: #e8eaff; border: 1px solid rgba(255,255,255,.12); }
 .art-github { background: rgba(255,255,255,.10); color: #e8eaff; }
-.art-doc   { background: rgba(52,211,153,.18);  color: #34d399; border: 1px solid rgba(52,211,153,.22); }
 
 /* ── Row actions ────────────────────────────────────────── */
 .row-actions { display: flex; gap: 2px; opacity: 0; transition: opacity .1s; padding: 9px 6px; }
@@ -721,16 +706,6 @@ td:hover .demo-edit-icon { opacity:1; }
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 20px; padding: 3px 10px;
 }
-.header-kpi-item.header-kpi-filter { cursor: pointer; transition: background .15s, border-color .15s; }
-.header-kpi-item.header-kpi-filter:hover {
-  background: rgba(255,255,255,.08);
-  border-color: rgba(255,255,255,.16);
-}
-.header-kpi-item.header-kpi-filter:focus { outline: 2px solid rgba(0, 240, 255, .35); outline-offset: 2px; }
-.header-kpi-item.header-kpi-filter.kpi-active {
-  background: rgba(255,255,255,.1);
-  border-color: rgba(0, 240, 255, .35);
-}
 .header-kpi-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .header-kpi-val { color: var(--text-1); font-variant-numeric: tabular-nums; }
 .header-kpi-lbl { color: var(--text-3); font-weight: 500; }
@@ -840,7 +815,7 @@ thead th {
   letter-spacing: .08em;
 }
 tbody tr.data-row {
-  border-bottom: 1px solid rgba(55,60,95,.65);
+  border-bottom: 1px solid var(--row-color, rgba(46,51,88,.5));
   border-left: 3px solid transparent;
   transition: background .1s, border-left-color .15s, box-shadow .12s;
 }
@@ -895,7 +870,6 @@ tbody tr.data-row:hover {
   display: inline-flex; align-items: center; gap: 3px;
 }
 .art-chip:hover { transform: translateY(-1px); opacity: .9; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
-.art-doc  { border-color: rgba(52,211,153,.22); }
 .art-gh   { border-color: rgba(255,255,255,.14); }
 .art-html { border-color: rgba(251,146,60,.18); }
 .art-md   { border-color: rgba(167,139,250,.18); }
@@ -1734,151 +1708,6 @@ tbody tr.data-row td a { cursor: auto; }
 .zcp-back-btn { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:#94a3b8; }
 .zcp-key-status { font-size:11px; margin-top:8px; color:#4ade80; min-height:16px; }
 @media(max-width:480px){ #zaraCopilotPanel{width:100vw;} }
-
-/* ── Engineering metrics modal ───────────────────────────── */
-.metrics-overlay {
-  display: none;
-  position: fixed; inset: 0; z-index: 10050;
-  background: #0f1424;
-  flex-direction: column;
-}
-.metrics-overlay.open { display: flex; }
-.metrics-panel {
-  width: 100%; height: 100%;
-  background: linear-gradient(165deg, #141a2e 0%, #0f1424 100%);
-  display: flex; flex-direction: column; overflow: hidden;
-}
-.metrics-head {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 14px 20px 12px; border-bottom: 1px solid rgba(255,255,255,.08);
-  flex-shrink: 0;
-}
-.metrics-head-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.metrics-head h2 { margin: 0; font-size: 16px; font-weight: 800; color: #e2e8f0; letter-spacing: -.02em; white-space: nowrap; }
-.metrics-head p { margin: 4px 0 0; font-size: 11px; color: #64748b; line-height: 1.45; }
-.metrics-back {
-  flex-shrink: 0; border: none; cursor: pointer; font-size: 12px; font-weight: 700;
-  padding: 7px 14px; border-radius: 8px; line-height: 1;
-  background: rgba(255,255,255,.07); color: #94a3b8;
-  display: flex; align-items: center; gap: 6px; white-space: nowrap;
-  transition: background .15s, color .15s;
-}
-.metrics-back:hover { background: rgba(99,102,241,.2); color: #a5b4fc; }
-.metrics-close {
-  flex-shrink: 0; border: none; background: rgba(255,255,255,.06); color: #94a3b8;
-  width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 18px; line-height: 1;
-}
-.metrics-close:hover { background: rgba(248,113,113,.15); color: #fca5a5; }
-.metrics-toolbar {
-  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-  padding: 10px 20px; border-bottom: 1px solid rgba(255,255,255,.06); background: rgba(0,0,0,.15);
-  flex-shrink: 0;
-}
-.metrics-toolbar button {
-  font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 7px;
-  border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); color: #cbd5e1; cursor: pointer;
-}
-.metrics-toolbar button:hover { border-color: rgba(0,240,255,.35); color: #e2e8f0; }
-.metrics-scroll { overflow: auto; flex: 1; padding: 0; }
-.metrics-table {
-  width: max-content; min-width: 100%;
-  border-collapse: separate; border-spacing: 0;
-  font-size: 12px;
-}
-.metrics-table th, .metrics-table td {
-  padding: 10px 14px; text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-  vertical-align: middle; white-space: nowrap;
-}
-.metrics-table tr:nth-child(even) td { background: rgba(255,255,255,.02); }
-.metrics-table tbody tr:hover td { background: rgba(0,240,255,.05) !important; }
-/* Sticky UC + Use Case columns */
-.metrics-table th:nth-child(1),
-.metrics-table td:nth-child(1) {
-  position: sticky; left: 0; z-index: 2;
-  background: #141a2e; border-right: 1px solid rgba(255,255,255,.08);
-  min-width: 52px;
-}
-.metrics-table th:nth-child(2),
-.metrics-table td:nth-child(2) {
-  position: sticky; left: 52px; z-index: 2;
-  background: #141a2e; border-right: 1px solid rgba(255,255,255,.08);
-  min-width: 220px; max-width: 260px;
-  overflow: hidden; text-overflow: ellipsis;
-}
-.metrics-table tbody tr:nth-child(even) td:nth-child(1),
-.metrics-table tbody tr:nth-child(even) td:nth-child(2) { background: #161c30; }
-.metrics-table tbody tr:hover td:nth-child(1),
-.metrics-table tbody tr:hover td:nth-child(2) { background: rgba(0,240,255,.08) !important; }
-.metrics-table th {
-  position: sticky; top: 0; z-index: 3;
-  background: #1a2036; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; font-size: 9px;
-}
-.metrics-table td { color: #e2e8f0; }
-.metrics-table tr:hover td { background: rgba(0,240,255,.04); }
-.metrics-table .num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-/* ── Executive summary banner ─────────────────────────────────────── */
-.metrics-exec-banner {
-  padding: 20px 28px 16px;
-  background: linear-gradient(135deg, rgba(99,102,241,.08) 0%, rgba(0,115,234,.06) 50%, rgba(52,211,153,.06) 100%);
-  border-bottom: 1px solid rgba(255,255,255,.06);
-  display: none; flex-shrink: 0;
-}
-.exec-kpi-row { display: flex; gap: 0; flex-wrap: wrap; margin-bottom: 14px; }
-.exec-kpi {
-  flex: 1; min-width: 130px; padding: 12px 20px;
-  border-right: 1px solid rgba(255,255,255,.07);
-}
-.exec-kpi:last-child { border-right: none; }
-.exec-kpi-value {
-  font-size: 30px; font-weight: 900; letter-spacing: -1px; line-height: 1;
-  background: linear-gradient(135deg, var(--kc, #e2e8f0), var(--kc2, #94a3b8));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-.exec-kpi-label {
-  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: #64748b; margin-top: 5px;
-}
-.exec-kpi-sub { font-size: 11px; color: #475569; margin-top: 2px; }
-.exec-vs-bar {
-  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-  padding: 8px 0 10px; border-top: 1px solid rgba(255,255,255,.05);
-}
-.exec-vs-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #64748b; white-space: nowrap; }
-.exec-bar-wrap { flex: 1; min-width: 200px; max-width: 480px; display: flex; flex-direction: column; gap: 5px; }
-.exec-bar-row { display: flex; align-items: center; gap: 8px; }
-.exec-bar-track { flex: 1; height: 7px; border-radius: 4px; background: rgba(255,255,255,.06); overflow: hidden; }
-.exec-bar-fill { height: 100%; border-radius: 4px; }
-.exec-bar-text { font-size: 11px; font-weight: 700; white-space: nowrap; min-width: 82px; }
-.exec-badge-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; }
-.exec-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
-  border: 1px solid; white-space: nowrap;
-}
-/* ─────────────────────────────────────────────────────────────────── */
-.metrics-totals {
-  margin: 8px 20px; padding: 10px 14px; border-radius: 8px;
-  background: rgba(255,255,255,.02);
-  border: 1px solid rgba(255,255,255,.06);
-  font-size: 11px; color: #64748b; line-height: 1.7;
-  flex-shrink: 0;
-}
-.btn-metrics { color: #fbbf24 !important; }
-.btn-metrics:hover { background: rgba(251,191,36,.12) !important; }
-
-/* ── Cell content clamping — keep rows compact ─────────────────── */
-.cell-desc-inner {
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  overflow: hidden; line-height: 1.5;
-}
-.cell-nxt-inner {
-  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-  overflow: hidden; line-height: 1.5;
-}
-
-.bv-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.bv-value { font-size: 11px; font-weight: 700; color: #4ade80; margin-top: 3px; display: block; }
 </style>
 </head>
 <body>
@@ -1919,10 +1748,6 @@ tbody tr.data-row td a { cursor: auto; }
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="3" r="1.5"/><circle cx="12" cy="13" r="1.5"/><circle cx="4" cy="8" r="1.5"/><path d="M10.5 3.75L5.5 7.25M10.5 12.25L5.5 8.75"/></svg>
           Share
         </button>
-        <button class="btn-ghost btn-metrics" type="button" onclick="openMetricsModal()" title="Estimated size & complexity from tracker text and artifacts">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z"/><path d="M6 6h4M6 9h2"/></svg>
-          Metrics
-        </button>
       </div>
       <button class="btn-danger" onclick="resetData()" title="Reset to defaults">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8a6 6 0 1 0 1-3.3"/><path d="M2 2v4h4"/></svg>
@@ -1935,15 +1760,15 @@ tbody tr.data-row td a { cursor: auto; }
   <!-- Programme Docs -->
   <div class="prog-nav">
     <span class="prog-nav-label">Programme Docs</span>
-    <a class="btn-doc btn-exec" href="./artifacts/ai-programme-executive-summary.html" target="_blank">
+    <a class="btn-doc btn-exec" href="file:///Users/malcolmgovender/Desktop/AI-Programme/ai-programme-executive-summary.html" target="_blank">
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="1" width="12" height="14" rx="1.5"/><path d="M5 5h6M5 8h6M5 11h4"/></svg>
       Executive Summary
     </a>
-    <a class="btn-doc btn-road" href="./artifacts/ai-programme-roadmap.html" target="_blank">
+    <a class="btn-doc btn-road" href="file:///Users/malcolmgovender/Desktop/AI-Programme/ai-programme-roadmap.html" target="_blank">
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 13L6 3l4 6 4-8"/></svg>
       Delivery Roadmap
     </a>
-    <a class="btn-doc" href="./artifacts/artemij-portfolio-delivery-plan.html" target="_blank" style="color:#38bdf8;border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.08)">
+    <a class="btn-doc" href="file:///Users/malcolmgovender/Desktop/AI-Programme/artemij-portfolio-delivery-plan.html" target="_blank" style="color:#38bdf8;border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.08)">
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
       Artemij Portfolio Plan
     </a>
@@ -1996,7 +1821,6 @@ tbody tr.data-row td a { cursor: auto; }
     <select id="selStatus" onchange="renderTable()">
       <option value="">All statuses</option>
       <option>Not started</option><option>In progress</option><option>In review</option><option>Done</option>
-      <option value="__pending__">Not started + In review</option>
     </select>
     <select id="selPri" onchange="renderTable()">
       <option value="">All priorities</option>
@@ -2031,7 +1855,7 @@ tbody tr.data-row td a { cursor: auto; }
   </div>
 
   <!-- Table -->
-  <div class="table-wrap" id="table-anchor">
+  <div class="table-wrap">
     <table>
       <thead>
         <tr>
@@ -2058,35 +1882,8 @@ tbody tr.data-row td a { cursor: auto; }
 
 <div class="toast" id="toast"></div>
 
-<div class="metrics-overlay" id="metricsOverlay" aria-hidden="true">
-  <div class="metrics-panel" role="dialog" aria-labelledby="metricsTitle">
-    <div class="metrics-head">
-      <div class="metrics-head-left">
-        <button type="button" class="metrics-back" onclick="closeMetricsModal()" aria-label="Back to tracker">
-          ← Back
-        </button>
-        <div>
-          <h2 id="metricsTitle">Engineering metrics &amp; AI acceleration</h2>
-          <p><strong>Source LOC ✓</strong> measured via <code>wc -l</code> from actual repos. <strong>Trad. Effort</strong> based on 10 LOC/dev/day effective rate (Capers Jones, CMU SEI) × overhead multiplier — team size × calendar months without AI. <strong>AI Delivered</strong> = 1 dev + AI tools. <strong>Accel.</strong> = traditional dev-months ÷ AI dev-months.</p>
-        </div>
-      </div>
-      <button type="button" class="metrics-close" onclick="closeMetricsModal()" aria-label="Close">×</button>
-    </div>
-    <div class="metrics-toolbar">
-      <button type="button" onclick="copyMetricsTsv()">Copy table (TSV)</button>
-      <button type="button" onclick="renderMetricsTable(document.getElementById('metricsSearch').value)">Refresh</button>
-      <input type="search" id="metricsSearch" placeholder="Filter rows…" style="flex:1;min-width:140px;max-width:260px;padding:6px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:#e2e8f0;font-size:11px;" oninput="renderMetricsTable(this.value)" />
-    </div>
-    <div class="metrics-exec-banner" id="metricsExecBanner"></div>
-    <div class="metrics-totals" id="metricsTotals"></div>
-    <div class="metrics-scroll">
-      <table class="metrics-table" id="metricsTable" aria-describedby="metricsTitle"></table>
-    </div>
-  </div>
-</div>
-
 <script>
-const STORE_KEY = 'fintech_projects_v62';
+const STORE_KEY = 'fintech_projects_v40';
 
 const DEFAULT_DATA = [
   { id:1,  priority:1, owner:'Anupam Sharma', project:'AI-Based Test Case Generation',              sq:'built',
@@ -2094,166 +1891,142 @@ const DEFAULT_DATA = [
     artifacts:[
       {t:'github',l:'Test Studio',   u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/studio/page.tsx'},
       {t:'py',    l:'test_author',   u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/api/agents/test_author.py'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_01_test_case_generation.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_01_test_case_generation.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_01_test_case_generation.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_01_test_case_generation.html'},
     ],
     nextSteps:'✅ Complete — no outstanding items.',
     bv:{ tier:'High', driver:'Efficiency Gain', impact:['Eliminates manual test case authoring — cuts QA cycle time by 60–70%','Frees 2–3 engineer-days per sprint for higher-value work','Accelerates time-to-test for new features by ~80%'], value:'$180k–$240k/yr' },
-    codeMetrics:{srcLoc:1240,testLoc:210,files:5,langs:'TypeScript, Python',complexity:'Medium',deps:8,integrations:3,compliance:[]},
-    traditionalEst:{devs:3,months:2,aiWeeks:2},
-    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:7,  priority:1, owner:'Anupam Sharma', project:'Self-Healing Automation',                     sq:'built',
     desc:'Autonomous selector repair — semantic/CV/ARIA methods, auto-fix or approval queue. [SentinelQA: self_healing.py 95 lines + healing/page.tsx 345 lines]',
     artifacts:[
       {t:'github',l:'Healing UI',    u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/healing/page.tsx'},
       {t:'py',    l:'self_healing',  u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/api/agents/self_healing.py'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_07_self_healing.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_07_self_healing.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_07_self_healing.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_07_self_healing.html'},
     ],
     nextSteps:'✅ Complete — no outstanding items.',
     bv:{ tier:'High', driver:'Efficiency Gain', impact:['Autonomous selector repair eliminates test maintenance overhead — typically 30–40% of QA time','Reduces flaky test rate from industry avg of 20% to below 2%','Keeps automation suites green and trusted without manual intervention'], value:'$160k–$250k/yr' },
-    codeMetrics:{srcLoc:480,testLoc:90,files:3,langs:'TypeScript, Python',complexity:'Medium',deps:7,integrations:2,compliance:[]},
-    traditionalEst:{devs:2,months:2,aiWeeks:2},
-    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:8,  priority:1, owner:'Anupam Sharma', project:'PR Intelligence & Merge Gating',              sq:'built',
     desc:'Per-PR risk scoring, merge gating, auto test generation per PR. [SentinelQA: pr_review.py + pr/page.tsx 318 lines — end-to-end]',
     artifacts:[
       {t:'github',l:'PR Dashboard',  u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/pr/page.tsx'},
       {t:'py',    l:'pr_review',     u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/api/agents/pr_review.py'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_08_pr_intelligence.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_08_pr_intelligence.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_08_pr_intelligence.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_08_pr_intelligence.html'},
     ],
     nextSteps:'✅ Complete — no outstanding items.',
     bv:{ tier:'High', driver:'Risk Mitigation', impact:['Blocks high-risk PRs before merge — prevents defect-carrying code reaching staging','Per-PR risk scoring reduces code review time by ~25%','Auto test generation ensures new code paths are immediately covered on every PR'], value:'$100k–$180k/yr' },
-    codeMetrics:{srcLoc:640,testLoc:110,files:3,langs:'TypeScript, Python',complexity:'Medium',deps:6,integrations:3,compliance:[]},
-    traditionalEst:{devs:2,months:2,aiWeeks:1},
-    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:2,  priority:2, owner:'Anupam Sharma', project:'Test Case Optimization (Smart Pruning)',      sq:'partial',
     desc:'AI identifies redundant test cases, low-value regression tests, and overlapping coverage. [SentinelQA: regression_optimiser.py stub — 23 lines only]',
     artifacts:[
       {t:'py',    l:'regression_optimiser', u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/api/agents/regression_optimiser.py'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_02_smart_pruning.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_02_smart_pruning.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_02_smart_pruning.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_02_smart_pruning.html'},
       {t:'py',l:'Full Pruning Engine',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/SentinelQA-Hardening/uc02_regression_optimiser_full.py'},
       {t:'py',l:'Coverage Reporter',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/SentinelQA-Hardening/uc02_coverage_reporter.py'},
       {t:'py',l:'SentinelQA API Bridge',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/SentinelQA-Hardening/uc02_sentinelqa_api.py'},
     ],
     nextSteps:'✅ Delivered:\n• Full TestCasePruner scoring engine (coverage / recency / failure-rate / execution-time)\n• TF-IDF duplicate detection & coverage overlap detection\n• FastAPI /optimise endpoint, CLI, 24 tests passing\n• uc02_sentinelqa_api.py — FastAPI bridge with /optimise and /coverage/upload endpoints\n• Coverage parser supports both Cobertura XML and lcov.info (pytest-cov + Istanbul)\n\n⏳ Remaining:\n• Deploy uc02_sentinelqa_api.py to shared SentinelQA infra (uvicorn port 8002)\n• Configure CI to POST coverage.xml to /coverage/upload after each test run',
     bv:{ tier:'Medium', driver:'Efficiency Gain', impact:['Cuts regression suite run time by 30–50% by eliminating redundant tests','Reduces CI/CD cloud compute spend on unnecessary test execution','Faster pipeline feedback improves developer throughput and release cadence'], value:'$60k–$100k/yr' },
-    codeMetrics:{srcLoc:1566,testLoc:330,files:3,langs:'Python',complexity:'Medium',deps:3,integrations:2,compliance:[]},
-    traditionalEst:{devs:3,months:2,aiWeeks:2},
-    status:'In progress', pct:92, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'In progress', pct:92, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:3,  priority:2, owner:'Anupam Sharma', project:'Intelligent Test Execution & Prioritization', sq:'partial',
     desc:'Prioritize tests by code churn, past defects, and business criticality. [SentinelQA: defect_risk.py advisory only — no runtime engine wired]',
     artifacts:[
       {t:'py',    l:'defect_risk',   u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/api/agents/defect_risk.py'},
       {t:'py',l:'CI Runner Integration',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/SentinelQA-Hardening/uc03_live_runner_integration.py'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_03_test_prioritization.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_03_test_prioritization.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_03_test_prioritization.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_03_test_prioritization.html'},
     ],
     nextSteps:'✅ Delivered:\n• Runtime execution engine (TestExecutionEngine)\n• CI/CD integration layer (PipelineOptimiser)\n• uc03_live_runner_integration.py — live subprocess runner + DefectRiskClient\n• GitHub PR comment posting + Azure DevOps ##vso summary output\n• git-churn fallback scorer when risk API unavailable\n\n⏳ Remaining:\n• Deploy SENTINELQA_API_URL env var pointing to live defect_risk.py endpoint\n• Wire GITHUB_TOKEN + GITHUB_REPOSITORY in CI for PR comment posting',
     bv:{ tier:'High', driver:'Risk Mitigation', impact:['Surfaces highest-risk tests first — catches critical defects earlier in the pipeline','Reduces escaped defects to production by an estimated 40%','Shortens mean time to detection (MTTD) for regression failures across sprints'], value:'$120k–$200k/yr' },
-    codeMetrics:{srcLoc:1879,testLoc:329,files:3,langs:'Python',complexity:'Medium',deps:3,integrations:3,compliance:[]},
-    traditionalEst:{devs:3,months:3,aiWeeks:2},
-    status:'In progress', pct:88, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'In progress', pct:88, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:4,  priority:2, owner:'Anupam Sharma', project:'AI-Based Test Automation Script Generation',  sq:'built',
     desc:'Convert plain English to Playwright/Cypress/Jest/Pytest scripts. [SentinelQA: Test Studio — pushes scripts as GitHub draft PRs]',
     artifacts:[
       {t:'github',l:'Test Studio',   u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/studio/page.tsx'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_04_script_generation.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_04_script_generation.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_04_script_generation.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_04_script_generation.html'},
     ],
     nextSteps:'✅ Complete — no outstanding items.',
     bv:{ tier:'High', driver:'Efficiency Gain', impact:['Converts plain English to Playwright/Cypress/Jest/Pytest scripts in under 60 seconds','Reduces automation script authoring from hours to minutes per test case','Enables non-technical QA staff to contribute meaningfully to automation coverage'], value:'$150k–$220k/yr' },
-    codeMetrics:{srcLoc:1580,testLoc:160,files:6,langs:'TypeScript, Python',complexity:'Medium',deps:9,integrations:3,compliance:[]},
-    traditionalEst:{devs:3,months:2,aiWeeks:2},
-    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:9,  priority:2, owner:'Anupam Sharma', project:'AI Copilot (Conversational QA Assistant)',    sq:'built',
     desc:'Chat interface with full platform context — query results, failures, trigger test gen. [SentinelQA: copilot/page.tsx wired to FastAPI]',
     artifacts:[
       {t:'github',l:'Copilot UI',    u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/copilot/page.tsx'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_09_ai_copilot.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_09_ai_copilot.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_09_ai_copilot.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_09_ai_copilot.html'},
     ],
     nextSteps:'✅ Complete — no outstanding items.',
     bv:{ tier:'Medium', driver:'Efficiency Gain', impact:['Conversational QA assistant reduces context-switching for engineers during test analysis','Accelerates root cause investigation by surfacing relevant failures and patterns instantly','Lowers new team member onboarding time by an estimated 30%'], value:'$60k–$100k/yr' },
-    codeMetrics:{srcLoc:820,testLoc:120,files:4,langs:'TypeScript, Python',complexity:'Medium',deps:7,integrations:2,compliance:[]},
-    traditionalEst:{devs:2,months:2,aiWeeks:1},
-    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:5,  priority:3, owner:'Anupam Sharma', project:'AI in Performance Testing',                   sq:'missing',
     desc:'Anomaly detection for response time spikes, memory leaks, and workload modelling. [SentinelQA: Not built — no agent, no page, no k6/JMeter/Gatling]',
-    artifacts:[{t:'html',l:'Readiness Report',u:'./reports/pr_05_performance_testing.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_05_performance_testing.html'},
+    artifacts:[{t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_05_performance_testing.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_05_performance_testing.html'},
       {t:'py',l:'Prometheus/InfluxDB Integration',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC05-Performance-Testing/prometheus_influxdb_integration.py'}],
     nextSteps:'✅ Delivered:\n• PerformanceTestAgent (k6 + Gatling script gen, 6 anomaly detectors)\n• Fourier workload modeller with 6 scenario generators\n• 3 k6 templates incl. SA payment example and 4-hour soak test\n• prometheus_influxdb_integration.py — FastAPI with /performance/run, /metrics/live, /anomalies\n• PrometheusClient + InfluxDB Flux query layer\n• k6 subprocess runner with InfluxDB --out flag\n\n⏳ Remaining:\n• Set PROMETHEUS_URL + INFLUXDB_URL env vars\n• Deploy FastAPI to shared infra (port 8003) and wire SentinelQA frontend nav',
     bv:{ tier:'High', driver:'Risk Mitigation', impact:['Detects response time spikes and memory leaks before they reach production','Prevents performance incidents — each avoided outage saves $10k–$50k in fintech','Enables proactive capacity planning ahead of high-volume payment periods'], value:'$200k–$400k/yr' },
-    codeMetrics:{srcLoc:3034,testLoc:713,files:7,langs:'Python, JavaScript',complexity:'Medium',deps:5,integrations:4,compliance:[]},
-    traditionalEst:{devs:4,months:3,aiWeeks:3},
-    status:'In progress', pct:68, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'In progress', pct:68, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:6,  priority:3, owner:'Anupam Sharma', project:'AI/ML-Powered Quality Dashboards using BI',   sq:'partial',
     desc:'Centralised automation intelligence, failure analysis, predictive quality scoring. [SentinelQA: Command Center 355 lines — ClickHouse not wired, no ROI views]',
     artifacts:[
       {t:'github',l:'Command Center',u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/command-center/page.tsx'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_06_quality_dashboards.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_06_quality_dashboards.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_06_quality_dashboards.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_06_quality_dashboards.html'},
       {t:'py',l:'ClickHouse Client',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC06-Quality-Dashboards/clickhouse_client.py'},
       {t:'py',l:'Quality Predictor',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC06-Quality-Dashboards/quality_predictor.py'},
     ],
     nextSteps:'✅ Delivered:\n• clickhouse_client.py — async ClickHouse client with pass_rate_trend, top_flaky_tests, roi_summary\n• quality_predictor.py — ML quality scoring with failure probability + risk tier\n• Schema initialization (test_runs, test_results, quality_scores tables)\n• ROI estimator (failures caught × engineer time × hourly rate)\n\n⏳ Remaining:\n• Wire ClickHouse client into Command Center page.tsx\n• Set CLICKHOUSE_HOST env var and initialize schema\n• Build dashboard chart components consuming the API endpoints',
     bv:{ tier:'Medium', driver:'Efficiency Gain', impact:['Eliminates manual quality report compilation — saves 4–8 hrs/week per QA lead','Provides predictive quality scores to inform release go/no-go decisions','Enables data-driven ROI tracking of QA investment across the portfolio'], value:'$40k–$80k/yr' },
-    codeMetrics:{srcLoc:2820,testLoc:380,files:9,langs:'TypeScript, Python, SQL',complexity:'High',deps:12,integrations:4,compliance:[]},
-    traditionalEst:{devs:3,months:4,aiWeeks:2},
-    status:'In progress', pct:75, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'In progress', pct:75, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:10, priority:3, owner:'Anupam Sharma', project:'Governance, RBAC & Compliance',               sq:'built',
     desc:'RBAC, audit trails, compliance evidence packs for FICA/PCI-DSS/POPIA. [SentinelQA: governance/page.tsx + audit_log DB table]',
     artifacts:[
       {t:'github',l:'Governance UI', u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/governance/page.tsx'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_10_governance.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_10_governance.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_10_governance.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_10_governance.html'},
     ],
     nextSteps:'Build compliance evidence pack export (V2 roadmap); add POPIA data residency controls.',
     bv:{ tier:'High', driver:'Compliance', impact:['Automated FICA/PCI-DSS/POPIA evidence packs cut audit prep from weeks to hours','RBAC enforcement prevents unauthorized access to test environments containing PII','Compliance audit trail provides legal defensibility and reduces regulatory fine risk'], value:'$80k–$150k/yr' },
-    codeMetrics:{srcLoc:1450,testLoc:310,files:6,langs:'TypeScript, Python',complexity:'High',deps:10,integrations:3,compliance:["FICA","PCI-DSS","POPIA"]},
-    traditionalEst:{devs:3,months:3,aiWeeks:2},
-    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'Done', pct:100, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:11, priority:3, owner:'Anupam Sharma', project:'Figma → Test Generation',                     sq:'partial',
     desc:'Generate test cases from Figma design files — map UI components to test scenarios. [SentinelQA: figma/page.tsx exists, backend integration unconfirmed — V2]',
     artifacts:[
       {t:'github',l:'Figma UI',      u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/figma/page.tsx'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_11_figma_test_gen.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_11_figma_test_gen.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_11_figma_test_gen.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_11_figma_test_gen.html'},
       {t:'py',l:'Figma Agent',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC11-Figma-Test-Gen/figma_agent.py'},
     ],
     nextSteps:'✅ Delivered:\n• figma_agent.py — full Figma REST API client (files, nodes, components, variables)\n• FigmaNodeParser — recursive component tree parser\n• TestScenarioGenerator — generates button/input/nav/modal/dialog test scenarios\n• AccessibilityAnalyser — detects missing alt text, unlabelled inputs, icon buttons\n• PlaywrightScriptGenerator — outputs .spec.ts ready for review\n• FastAPI /figma/generate + /figma/file/{id} endpoints\n\n⏳ Remaining:\n• Set FIGMA_ACCESS_TOKEN env var\n• Wire /figma/generate into SentinelQA figma/page.tsx\n• Deploy FastAPI to shared infra (port 8011)',
     bv:{ tier:'Medium', driver:'Efficiency Gain', impact:['Shifts testing left to design phase — catches UI/UX defects before a line of code is written','Eliminates manual translation of Figma design specs into test cases','Reduces late-stage rework from design-to-implementation mismatches'], value:'$50k–$90k/yr' },
-    codeMetrics:{srcLoc:1120,testLoc:190,files:5,langs:'TypeScript, Python',complexity:'Medium',deps:7,integrations:3,compliance:[]},
-    traditionalEst:{devs:3,months:2,aiWeeks:2},
-    status:'In progress', pct:65, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'In progress', pct:65, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:12, priority:4, owner:'Anupam Sharma', project:'Chaos Testing Agent',                         sq:'partial',
     desc:'Controlled failure injection to validate system resilience. [SentinelQA: chaos.py + chaos/page.tsx — early stage, V3 roadmap]',
     artifacts:[
       {t:'github',l:'Chaos UI',      u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/web/src/app/(dashboard)/chaos/page.tsx'},
       {t:'py',    l:'chaos',         u:'https://github.com/MalcolmGov/Automation-tool/blob/main/sentinelqa/apps/api/agents/chaos.py'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_12_chaos_testing.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_12_chaos_testing.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_12_chaos_testing.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_12_chaos_testing.html'},
       {t:'py',l:'Chaos Engine',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC12-Chaos-Testing/chaos_engine.py'},
     ],
     nextSteps:'✅ Delivered:\n• chaos_engine.py — 5 fully implemented injectors (network_latency, service_kill, cpu_stress, memory_pressure, dependency_timeout)\n• SteadyStateVerifier — pre/post Prometheus checks\n• Safety controls: environment whitelist, blast-radius limiting, auto-rollback\n• toxiproxy + tc netem + kubectl + stress-ng adapters\n• ChaosOrchestrator with pre/post steady-state validation\n\n⏳ Remaining (V3 roadmap):\n• Install toxiproxy in staging environment\n• Run against payments-api and fraud-engine targets\n• Wire chaos results into SentinelQA Command Center',
     bv:{ tier:'Medium', driver:'Risk Mitigation', impact:['Validates system resilience under failure — critical for always-on fintech services','Identifies single points of failure before they cause production incidents','Supports SLA/uptime commitments to banking partners and regulators'], value:'$100k–$200k/yr' },
-    codeMetrics:{srcLoc:2250,testLoc:480,files:9,langs:'Python, YAML',complexity:'High',deps:9,integrations:4,compliance:[]},
-    traditionalEst:{devs:3,months:3,aiWeeks:3},
-    status:'In progress', pct:45, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/sentinelqa-demo.html' },
+    status:'In progress', pct:45, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/sentinelqa-demo.html' },
 
   { id:13, priority:1, owner:'Stan Sethoga',  project:'AI-Driven CI/CD Pipeline',                    sq:'none',
     desc:'AI-enabled CI/CD pipeline automating build, security scanning, quality validation, deployment and continuous monitoring. [Built: 10-stage azure-pipelines.yml, anomaly-detection.py (322L), intelligent-test-selector.py (305L), Bicep IaC (858L). Outstanding: 2 scripts missing; Azure infra + ADO config not done.]',
@@ -2262,12 +2035,12 @@ const DEFAULT_DATA = [
       {t:'py',    l:'Anomaly Detect',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/scripts/anomaly-detection.py'},
       {t:'py',    l:'Test Selector', u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/scripts/intelligent-test-selector.py'},
       {t:'md',    l:'Runbook',       u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/docs/IMPLEMENTATION_RUNBOOK.md'},
-      {t:'html',  l:'Infographic',   u:'./artifacts/AI_CICD_Pipeline_Infographic.html'},
+      {t:'html',  l:'Infographic',   u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/AI_CICD_Pipeline_Infographic.html'},
       {t:'docx',  l:'Architecture',  u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/AI_CICD_Architecture.docx'},
       {t:'bicep', l:'Bicep IaC',     u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/infra/main.bicep'},
-      {t:'html',  l:'Prod Report',   u:'./artifacts/Production_Readiness_Report.html'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_13_cicd_pipeline.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_13_cicd_pipeline.html'},
+      {t:'html',  l:'Prod Report',   u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/Production_Readiness_Report.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_13_cicd_pipeline.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_13_cicd_pipeline.html'},
       {t:'py',  l:'Vuln Prioritiser',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/scripts/ai-vuln-prioritiser.py'},
       {t:'py',  l:'Security Gate Summary',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/scripts/security-gate-summary.py'},
       {t:'md',  l:'Azure Config Guide',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI-CICD-Pipeline/docs/AZURE_CONFIGURATION_GUIDE.md'},
@@ -2275,45 +2048,39 @@ const DEFAULT_DATA = [
     ],
     nextSteps:'✅ Delivered:\n• ai-vuln-prioritiser.py — CVSS composite scoring, 4 parser formats, gate enforcement\n• security-gate-summary.py — 6-tool aggregation, HTML gate report, secrets auto-fail\n• AZURE_CONFIGURATION_GUIDE.md — Phase 2+3 guide, 15-item checklist\n• azure_bootstrap.py — automated Bicep deployment + ADO variable group configuration\n\n⏳ Remaining:\n• Run: python scripts/azure_bootstrap.py --env staging --subscription <sub-id>\n• Create ADO service connection \'azure-rm-staging\' manually\n• Collect 7-day perf baseline before enabling anomaly gating',
     bv:{ tier:'High', driver:'Efficiency Gain', impact:['10-stage intelligent pipeline reduces manual deployment steps by 80%','AI security scanning catches vulnerabilities pre-merge — prevents costly post-production fixes','Intelligent test selection cuts pipeline run time by 40–60% per build'], value:'$150k–$280k/yr' },
-    codeMetrics:{srcLoc:6208,testLoc:0,files:30,langs:'Python, YAML, Bicep, HTML',complexity:'High',deps:6,integrations:5,compliance:[]},
-    traditionalEst:{devs:5,months:6,aiWeeks:8},
-    status:'In progress', pct:92, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/AI_CICD_Pipeline_Infographic.html' },
+    status:'In progress', pct:92, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/AI_CICD_Pipeline_Infographic.html' },
 
-  { id:14, priority:2, owner:'Herman Odame',  project:'AI for Delivery / Development Management',    sq:'none', demoUrl:'./artifacts/intelligencehub_visual_port.html',
+  { id:14, priority:2, owner:'Herman Odame',  project:'AI for Delivery / Development Management',    sq:'none', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/intelligencehub-visual-port/index.html',
     desc:'AI-powered delivery intelligence: code review automation, sprint delivery forecasting, and technical risk scoring from git history and past trends. Foundation: AI & Automation Intelligence Centre portal (intelligencehub-visual-port) with SDLC 2.0 doc brain, project tracking and 24-item use case library. Two core AI agents built: delivery_forecast.py (git churn + velocity → timeline prediction) and code_review_agent.py (LLM PR analysis supporting GitHub, Azure DevOps and local diff).',
     artifacts:[
-      {t:'html', l:'Intelligence Centre',  u:'./artifacts/intelligencehub_visual_port.html'},
+      {t:'html', l:'Intelligence Centre',  u:'file:///Users/malcolmgovender/Desktop/AI-Programme/intelligencehub-visual-port/index.html'},
       {t:'py',   l:'Delivery Forecast',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/intelligencehub-sdlc20/agents/delivery_forecast.py'},
       {t:'py',   l:'Code Review Agent',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/intelligencehub-sdlc20/agents/code_review_agent.py'},
       {t:'py',   l:'Doc Brain Generator',  u:'file:///Users/malcolmgovender/Desktop/AI-Programme/intelligencehub-sdlc20/tools/generate_doc_brain.py'},
       {t:'md',   l:'SDLC 2.0 Strategy',   u:'file:///Users/malcolmgovender/Desktop/AI-Programme/intelligencehub-sdlc20/docs/01_Strategy_and_Vision/SDLC_2.0_Strategy.docx'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_14_delivery_management.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_14_delivery_management.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_14_delivery_management.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_14_delivery_management.html'},
       {t:'py',   l:'ADO/GitHub Connector',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/intelligencehub-sdlc20/agents/ado_github_connector.py'},
       {t:'py',   l:'Slack/Teams Notifier',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/intelligencehub-sdlc20/agents/slack_teams_notifier.py'},
     ],
     nextSteps:'✅ Delivered:\n• ado_github_connector.py — ADOConnector (work items, sprints, velocity) + GitHubConnector (PRs, cycle time, throughput)\n• DeliveryDataAggregator — normalised DeliverySnapshot with health score\n• slack_teams_notifier.py — risk alert Slack blocks + Teams Adaptive Cards\n• RiskNotifier — unified Slack + Teams facade with minimum risk threshold\n\n⏳ Remaining:\n• Set ADO_ORG, ADO_PROJECT, ADO_PAT + GITHUB_TOKEN, GITHUB_REPOSITORY env vars\n• Wire snapshot() output into Intelligence Centre dashboard\n• Set SLACK_WEBHOOK_URL or TEAMS_WEBHOOK_URL for notifications',
     bv:{ tier:'High', driver:'Efficiency Gain', impact:['AI delivery forecasting improves sprint predictability — reduces overcommitment and missed deadlines','Automated code review cuts PR review time by ~35% across engineering teams','Technical risk scoring enables data-driven prioritisation and resourcing decisions'], value:'$120k–$200k/yr' },
-    codeMetrics:{srcLoc:5783,testLoc:0,files:55,langs:'Python, TypeScript',complexity:'High',deps:5,integrations:4,compliance:[]},
-    traditionalEst:{devs:4,months:7,aiWeeks:8},
     status:'In progress', pct:55, assignedTo:'Malcolm Govender' },
 
   { id:15, priority:1, owner:'Peter Onu',     project:'AI Engineering Copilot for Product & Systems Design', sq:'none',
     desc:'Transform business requirements into process flows, sequence diagrams, API specs, acceptance criteria and test scenarios.',
     artifacts:[
-      {t:'html',l:'Readiness Report',u:'./reports/pr_15_engineering_copilot.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_15_engineering_copilot.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_15_engineering_copilot.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_15_engineering_copilot.html'},
       {t:'py',  l:'Engineering Copilot',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC15-Engineering-Copilot/engineering_copilot.py'},
       {t:'py',  l:'Diagram Renderer',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC15-Engineering-Copilot/diagram_renderer.py'},
-      {t:'html',l:'Interactive Demo',u:'./artifacts/uc15_interactive_demo.html'},
+      {t:'html',l:'Interactive Demo',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC15-Engineering-Copilot/interactive_demo.html'},
       {t:'docker',l:'Dockerfile',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC15-Engineering-Copilot/Dockerfile'},
       {t:'py',  l:'Confluence/Wiki Publisher',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC15-Engineering-Copilot/confluence_publisher.py'},
     ],
     nextSteps:'✅ Delivered:\n• EngineeringCopilot — BRD → process flow / sequence / ER / OpenAPI / Gherkin / test scenarios\n• MermaidRenderer (validate / HTML / Confluence output)\n• 3 SA fintech worked examples (PayShap / KYC / Loan)\n• Interactive demo HTML, FastAPI with 9 endpoints, 40+ tests\n• Dockerfile — multi-stage production build (python:3.12-slim, non-root user, healthcheck)\n• confluence_publisher.py — Confluence v2 API + ADO wiki upsert with full page lifecycle\n\n⏳ Remaining:\n• docker build + push to ACR, deploy to shared infra\n• Set CONFLUENCE_* or ADO_WIKI_* env vars\n• Collect feedback from Peter\'s team',
     bv:{ tier:'High', driver:'Efficiency Gain', impact:['Transforms BRDs into API specs, diagrams, and test scenarios in minutes vs days of manual work','Reduces requirements ambiguity — cuts rework from misunderstood specs by an estimated 30%','Accelerates the system design phase by ~50% for each new feature initiative'], value:'$140k–$220k/yr' },
-    codeMetrics:{srcLoc:4863,testLoc:1055,files:6,langs:'Python, HTML',complexity:'Medium',deps:5,integrations:2,compliance:[]},
-    traditionalEst:{devs:4,months:6,aiWeeks:6},
-    status:'In progress', pct:65, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/uc15_interactive_demo.html' },
+    status:'In progress', pct:65, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC15-Engineering-Copilot/interactive_demo.html' },
 
   { id:16, priority:1, owner:'Peter Onu',     project:'Intelligent Transaction Monitoring & Fraud Detection', sq:'none',
     desc:'ML-driven system continuously analyzing financial transactions to detect fraud, anomalies, and compliance risks in real time. PayGuard Fraud Shield (MalcolmGov/payguard-fraud-shield) covers the core platform: real-time Kafka pipeline, 26-rule scoring engine, Neo4j fraud ring detector, device binding, React analyst dashboard, POPIA/PCI-DSS compliance. Built for social engineering fraud across African fintech.',
@@ -2326,8 +2093,8 @@ const DEFAULT_DATA = [
       {t:'ts',   l:'Signal API',       u:'https://github.com/MalcolmGov/payguard-fraud-shield/blob/main/services/api/src/index.ts'},
       {t:'ts',   l:'Device Binding',   u:'https://github.com/MalcolmGov/payguard-fraud-shield/blob/main/services/device-binding/src/index.ts'},
       {t:'md',   l:'POPIA DPA',        u:'https://github.com/MalcolmGov/payguard-fraud-shield/blob/main/docs/PayGuard-DPA-POPIA.md'},
-      {t:'html',l:'Readiness Report',u:'./reports/pr_16_fraud_detection.html'},
-      {t:'html',l:'Requirements',u:'./requirements/req_16_fraud_detection.html'},
+      {t:'html',l:'Readiness Report',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_16_fraud_detection.html'},
+      {t:'html',l:'Requirements',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_16_fraud_detection.html'},
       {t:'py',  l:'ML Fraud Model',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC16-Fraud-ML/ml_fraud_model.py'},
       {t:'py',  l:'AML Connector',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC16-Fraud-ML/aml_connector.py'},
       {t:'py',  l:'Statistical Outlier Scorer',u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC16-Fraud-ML/statistical_outlier_scorer.py'},
@@ -2335,8 +2102,6 @@ const DEFAULT_DATA = [
     ],
     nextSteps:'✅ Delivered:\n• XGBoost + Isolation Forest ML pipeline (33 features, SHAP explanations, hot-reload)\n• AML connector — Rule 022 closed (4 providers + offline sanctions + PEP + Kafka)\n• 5-dimension statistical outlier scorer (CUSUM / KDE / KL)\n• Load test harness (p95/p99 latency), 35 tests passing\n• kafka_live_connector.py — full Confluent Kafka consumer/producer with SASL/SSL, idempotent delivery, POPIA-hashed alerts\n• Transactional delivery guarantees + dead-letter queue routing + RiskEngineClient with HTTP/fallback modes\n\n⏳ Remaining:\n• Set KAFKA_BOOTSTRAP_SERVERS + KAFKA_SASL_* env vars\n• Train on real ADL transaction dataset\n• POPIA compliance review of 33-feature vector (DPO sign-off required)',
     bv:{ tier:'High', driver:'Revenue Protection', impact:['ML-driven real-time detection catches fraud patterns invisible to rule-based systems','Estimated to prevent $2M–$5M in annual fraud losses for a mid-size SA fintech','POPIA/PCI-DSS compliance reduces regulatory fine exposure and reputational risk'], value:'$2M–$5M/yr' },
-    codeMetrics:{srcLoc:33578,testLoc:795,files:154,langs:'Python, TypeScript, React',complexity:'Very High',deps:71,integrations:8,compliance:["POPIA", "PCI-DSS", "FICA"]},
-    traditionalEst:{devs:10,months:18,aiWeeks:24},
     status:'In progress', pct:98, assignedTo:'Malcolm Govender', demoUrl:'https://payguard.africa/demo' },
 
   { id:17, priority:2, owner:'Artemij Demidczyk', project:'Root Cause Analysis (AIOps)', sq:'none',
@@ -2347,8 +2112,8 @@ const DEFAULT_DATA = [
       {t:'ts',    l:'Incident Command UI', u:'https://github.com/MalcolmGov/observability/blob/main/src/components/incident-command-view.tsx'},
       {t:'ts',    l:'Alert Evaluator',     u:'https://github.com/MalcolmGov/observability/blob/main/src/app/api/v1/alerts/evaluate/route.ts'},
       {t:'ts',    l:'AI Ops Brief',        u:'https://github.com/MalcolmGov/observability/blob/main/src/app/actions/ops-brief.ts'},
-      {t:'html',  l:'Readiness Report',    u:'./reports/pr_17_rca_aiops.html'},
-      {t:'html',  l:'Requirements',        u:'./requirements/req_17_rca_aiops.html'},
+      {t:'html',  l:'Readiness Report',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_17_rca_aiops.html'},
+      {t:'html',  l:'Requirements',        u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_17_rca_aiops.html'},
       {t:'py',    l:'Anomaly Detector',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC17-AIOps-Anomaly-Detection/anomaly_detector.py'},
       {t:'py',    l:'RCA Engine',          u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC17-AIOps-Anomaly-Detection/rca_engine.py'},
       {t:'py',    l:'RCA API',             u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC17-AIOps-Anomaly-Detection/rca_api.py'},
@@ -2365,16 +2130,14 @@ const DEFAULT_DATA = [
     ],
     nextSteps:'✅ Delivered:\n• ML anomaly detection engine (z-score, IQR, CUSUM, rolling window, ensemble)\n• Deployment event webhook handler (GitHub Actions + Azure DevOps)\n• FastAPI RCA API (/rca/analyse), 30+ unit tests\n• Prometheus exporter, PagerDuty / Slack alert sink with dedup\n• Grafana alert provisioning YAML and dashboard JSON\n• Historical incident corpus loader with embedding search\n• Pipeline integration tests + load test harness (79k pts/sec)\n• itsm_cmdb_bridge.py — ServiceNow + Jira ITSM adapters + ServiceNow/File CMDB adapters\n• ITSMCMDBBridge — blast-radius CI lookup + upstream dependency expansion\n\n⏳ Remaining:\n• Set ITSM_PROVIDER, SNOW_*/JIRA_* env vars\n• Collect 7-day baseline before enabling production alerting',
     bv:{ tier:'High', driver:'Risk Mitigation', impact:['Reduces mean time to resolution (MTTR) for production incidents by 60–70%','Predictive anomaly detection catches issues before outages — each prevented incident saves $10k–$50k','Eliminates manual cross-platform signal correlation — SRE teams get root cause in seconds'], value:'$300k–$600k/yr' },
-    codeMetrics:{srcLoc:5486,testLoc:1825,files:12,langs:'Python',complexity:'Very High',deps:17,integrations:5,compliance:[]},
-    traditionalEst:{devs:5,months:5,aiWeeks:16},
     status:'In progress', pct:96, assignedTo:'Malcolm Govender', demoUrl:'https://observability-one.vercel.app' },
 
   { id:18, priority:2, owner:'Artemij Demidczyk', project:'ARIA — AI Voice Support Agent (L1 Fintech & Banking)', sq:'none',
     desc:'Voice-first AI L1 support agent for South African fintech and banking staff and customers. Handles IT support, banking product queries, incident triage (P1–P4), and regulatory/compliance queries across English and French-speaking African markets. Built on ElevenLabs Conversational AI (Claude 3.5 Sonnet brain) with authentic African voice cloning. Includes multilingual support (English + French), P1–P4 escalation logic, and POPIA-compliant data handling.',
     artifacts:[
       {t:'docx', l:'Requirements & User Stories', u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ARIA-Requirements-UserStories.docx'},
-      {t:'html', l:'Architecture & Tech Spec',    u:'./artifacts/ARIA-Architecture-TechSpec.html'},
-      {t:'html', l:'Interactive Prototype',       u:'./artifacts/ARIA-Interactive-Prototype.html'},
+      {t:'html', l:'Architecture & Tech Spec',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ARIA-Architecture-TechSpec.html'},
+      {t:'html', l:'Interactive Prototype',       u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ARIA-Interactive-Prototype.html'},
       {t:'py',   l:'Twilio Handler',              u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC18-ARIA-Telephony/twilio_handler.py'},
       {t:'py',   l:'ElevenLabs Bridge',           u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC18-ARIA-Telephony/elevenlabs_bridge.py'},
       {t:'py',   l:'POPIA Compliance',            u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC18-ARIA-Telephony/popia_compliance.py'},
@@ -2393,22 +2156,20 @@ const DEFAULT_DATA = [
     ],
     nextSteps:'✅ Delivered:\n• Twilio TwiML handler — 4-option IVR routing (IT / Banking / French / P1)\n• ElevenLabs WebSocket bridge (mulaw ↔ PCM16, barge-in handling)\n• 40+ RAG knowledge base entries (English + French)\n• ITSM handler (ServiceNow / Jira) with P-level priority mapping\n• POPIA compliance module (SHA-256 hashing, transcript sanitisation)\n• Voice clone manager + ElevenLabs agent config generator\n• Multilingual KB RAG pipeline (sentence-transformers)\n• Twilio E2E test harness (9 async tests), POPIA audit report\n• elevenlabs_deploy.py — automated agent provisioning (4 personas, KB upload, Twilio binding)\n• telephony_uat.py — 12 UAT cases (routing, POPIA, resilience, compatibility)\n\n⏳ Remaining:\n• Source African English + French voice recordings for cloning\n• Run elevenlabs_deploy.py --env prod --voice-ids voice_ids.json',
     bv:{ tier:'High', driver:'Cost Reduction', impact:['Deflects 60–70% of L1 support calls to AI — reduces contact centre headcount requirements','Bilingual EN/FR coverage opens West African markets without hiring French-speaking agents','24/7 availability with P1 escalation logic eliminates after-hours support staffing costs'], value:'$400k–$800k/yr' },
-    codeMetrics:{srcLoc:10657,testLoc:0,files:15,langs:'Python, Shell, HTML',complexity:'Very High',deps:20,integrations:7,compliance:["POPIA"]},
-    traditionalEst:{devs:6,months:11,aiWeeks:20},
-    status:'In progress', pct:94, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/ARIA-Interactive-Prototype.html' },
+    status:'In progress', pct:94, assignedTo:'Malcolm Govender', demoUrl:'file:///Users/malcolmgovender/Desktop/AI-Programme/ARIA-Interactive-Prototype.html' },
 
   { id:19, priority:2, owner:'Artemij Demidczyk', project:'LNC and API Orchestration Agent', sq:'none',
     desc:'AI-powered orchestration agent that interacts with microservices, APIs, and Low-Code/No-Code components to automate workflows, execute service requests, and manage integrations. Understands natural-language commands and translates them into orchestrated API calls or multi-step system actions.',
     artifacts:[
       {t:'ts',   l:'Pulse API Surface',u:'https://github.com/MalcolmGov/observability/tree/main/src/app/api/v1'},
       {t:'ts',   l:'NL Query Handler', u:'https://github.com/MalcolmGov/observability/blob/main/src/lib/nl-query-handlers.ts'},
-      {t:'html', l:'Readiness Report', u:'./reports/pr_19_lnc_orchestration.html'},
-      {t:'html', l:'Requirements',     u:'./requirements/req_19_lnc_orchestration.html'},
+      {t:'html', l:'Readiness Report', u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-reports/pr_19_lnc_orchestration.html'},
+      {t:'html', l:'Requirements',     u:'file:///Users/malcolmgovender/Desktop/AI-Programme/ai-use-case-requirements/req_19_lnc_orchestration.html'},
       {t:'py',   l:'LangGraph Agent',  u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/graph.py'},
       {t:'py',   l:'Tool Registry',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/tools.py'},
       {t:'py',   l:'Approval Gate',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/approval_gate.py'},
-      {t:'html', l:'CISO Security Review', u:'./artifacts/SECURITY_REVIEW.html'},
-      {t:'html', l:'CISO Exec Summary',   u:'./artifacts/CISO-EXEC-SUMMARY.html'},
+      {t:'html', l:'CISO Security Review', u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/SECURITY_REVIEW.html'},
+      {t:'html', l:'CISO Exec Summary',   u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/CISO-EXEC-SUMMARY.html'},
       {t:'md',   l:'Sprint 1 README',     u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/README.md'},
       {t:'py',   l:'Resilience Layer',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/resilience.py'},
       {t:'py',   l:'Audit Logger',        u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/audit_logger.py'},
@@ -2416,89 +2177,15 @@ const DEFAULT_DATA = [
       {t:'py',   l:'NL Translator',       u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/nl_translator.py'},
       {t:'py',   l:'Service Registry',    u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/config/service_registry.py'},
       {t:'py',   l:'Observability',       u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/observability.py'},
-      {t:'html', l:'Admin Dashboard',     u:'./artifacts/admin-dashboard.html'},
+      {t:'html', l:'Admin Dashboard',     u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/admin-dashboard.html'},
       {t:'py',   l:'Production Wiring',     u:'file:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/production_wiring.py'},
     ],
     nextSteps:'✅ Delivered:\n• LangGraph agent (5 nodes: planner → executor → approval → rollback → responder)\n• 11 tool definitions with risk levels and reversibility metadata\n• Human-in-the-loop approval gate, rollback manager\n• Retry / circuit breaker (tenacity), structured JSON audit logging\n• FastAPI /orchestrate ingress, Dockerfile + docker-compose\n• NL→action translation layer (7-step pipeline)\n• Service registry (8 services, 30 capabilities, 10 HIGH-risk flagged)\n• OTEL-compatible observability tracing\n• Admin monitoring dashboard (5 tabs: KPIs / approvals / traces / circuit breakers / audit log)\n• CISO Security Review (10 STRIDE threats, 12 controls)\n• production_wiring.py — CISO-gated service registry with token-hash verification and live endpoint injection\n\n🚫 Blocked:\n• CISO sign-off required (set CISO_APPROVAL_TOKEN env var on approval)\n• Post-approval: set PAYMENTS_API_*, KYC_SERVICE_*, LEDGER_API_* env vars',
     bv:{ tier:'High', driver:'Efficiency Gain', impact:['Automates multi-step API workflows — eliminates manual coordination across microservices','Estimated 4–6 hours of manual integration work automated per orchestration flow','Enables non-technical staff to trigger complex system actions via natural language commands'], value:'$200k–$400k/yr' },
-    codeMetrics:{srcLoc:9736,testLoc:231,files:19,langs:'Python, YAML, HTML',complexity:'Very High',deps:9,integrations:8,compliance:[]},
-    traditionalEst:{devs:6,months:7,aiWeeks:16},
     status:'In progress', pct:65, assignedTo:'Malcolm Govender', demoUrl:'' },
-
-  { id:20, priority:1, owner:'Malcolm Govender', project:'AI POPIA Compliance Scanner', sq:'missing', isNew:true,
-    desc:'AI-powered POPIA compliance scanner embedded in the SDLC that detects PII exposure, missing consent flows and unlawful data retention across codebases, APIs, data flows and DB schemas — auto-classifying fields via ML, blocking non-compliant CI/CD merges and producing Article-by-Article compliance reports for the SA Information Regulator.',
-    artifacts:[
-      {t:'doc', l:'Requirements', u:'#'},
-      {t:'html',l:'Architecture Spec', u:'#'},
-      {t:'doc', l:'Threat Model', u:'#'},
-      {t:'doc', l:'Compliance Mapping', u:'#'},
-    ],
-    nextSteps:'⚠ Not started — Malcolm Govender to initiate. First: catalogue all PII touchpoints across APIs, DB schemas and services; define POPIA Condition 1–8 article mapping framework; establish CI/CD gate thresholds for critical violations.',
-    bv:{ tier:'High', driver:'Risk Reduction', impact:[
-      'Eliminates up to R5M in potential Information Regulator fines by continuously enforcing POPIA Conditions 1–8 across all SDLC stages before code reaches production',
-      'Reduces manual compliance audit effort by ~80%, saving ~1,200 consultant-hours/yr (R1,800/hr = R2.16M) through automated PII classification and Article-by-Article reporting',
-      'Cuts mean-time-to-remediate PII violations from 3–4 weeks to under 48 hours via automated ticket generation and CI/CD merge blocking, shrinking breach exposure for 2M+ customer records'
-    ], value:'R3.5M–R7M/yr' },
-    codeMetrics:{srcLoc:2400,testLoc:480,files:11,langs:'Python, TypeScript',complexity:'High',deps:12,integrations:4,compliance:["POPIA","GDPR-adjacent","FSCA","SARB"]},
-    traditionalEst:{devs:3,months:5,aiWeeks:8},
-    status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
-
-  { id:21, priority:1, owner:'Malcolm Govender', project:'AI Threat Modelling Agent', sq:'missing', isNew:true,
-    desc:'AI-powered threat modelling agent embedded in the SDLC that auto-generates STRIDE/DREAD/PASTA threat models from architecture diagrams, PRDs and API specs on every PR — producing a living CVSS-scored Threat Register, posting summaries as PR comments in GitHub/Azure DevOps, feeding findings into Jira/Linear and generating executive-ready risk heat maps against the organisation\'s risk appetite.',
-    artifacts:[
-      {t:'doc', l:'Requirements', u:'#'},
-      {t:'html',l:'Architecture Spec', u:'#'},
-      {t:'doc', l:'STRIDE Template', u:'#'},
-      {t:'doc', l:'Threat Register', u:'#'},
-    ],
-    nextSteps:'⚠ Not started — Malcolm Govender to initiate. First: standardise architecture diagram ingestion format (C4/Mermaid); define CVSS scoring thresholds vs organisational risk appetite; configure Jira/Linear backlog integration; run pilot on one high-risk service boundary.',
-    bv:{ tier:'High', driver:'Risk Reduction', impact:[
-      'Reduces time-to-threat-model per feature from ~3 days manual effort to under 2 hours, unblocking 20+ delivery teams across the fintech portfolio',
-      'Cuts cost of late-stage security remediation by ~60%, avoiding R1.2M–R2M/yr in post-production vulnerability rework typical in regulated SA financial services',
-      'Continuously maintains an auditable Threat Register and risk heat map — directly strengthening SARB, PCI-DSS and ISO 27001 audit posture'
-    ], value:'R1.8M–R3M/yr' },
-    codeMetrics:{srcLoc:1800,testLoc:360,files:9,langs:'Python',complexity:'High',deps:10,integrations:3,compliance:["PCI-DSS","ISO 27001"]},
-    traditionalEst:{devs:3,months:4,aiWeeks:6},
-    status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
-
-  { id:22, priority:1, owner:'Malcolm Govender', project:'Regulatory Change Impact Radar', sq:'missing', isNew:true,
-    desc:'AI-powered regulatory intelligence platform that monitors SARB, FSCA, POPIA Information Regulator, PCI-SSC and FICA amendment feeds in real-time using NLP — auto-mapping regulatory changes to affected system components, APIs and data models, generating impact assessments with effort estimates and compliance deadlines, and producing board-ready regulatory change reports for compliance, engineering and legal teams.',
-    artifacts:[
-      {t:'doc', l:'Requirements', u:'#'},
-      {t:'html',l:'Architecture Spec', u:'#'},
-      {t:'doc', l:'Regulatory Source Map', u:'#'},
-      {t:'doc', l:'Impact Assessment Template', u:'#'},
-    ],
-    nextSteps:'⚠ Not started — Malcolm Govender to initiate. First: audit regulatory feed availability across SARB, FSCA, POPIA Information Regulator, PCI-SSC and FICA; define internal system component registry schema; schedule cross-functional kick-off with compliance, engineering and legal.',
-    bv:{ tier:'High', driver:'Risk & Compliance', impact:[
-      'Reduces regulatory change detection-to-action lag from 3–4 weeks to under 48 hours across SARB and FSCA circulars — cutting exposure to FSR Act penalties reaching R10M per violation',
-      'Auto-mapped POPIA updates eliminate ~320 manual compliance-mapping hours per regulatory cycle, enabling the team to meet 72-hour breach notification timelines without additional headcount',
-      'Continuous FICA amendment monitoring with automated effort estimation gives engineering 6–8 weeks advance runway on average — reducing unplanned compliance rework cost by ~R1.8M/yr'
-    ], value:'R3.2M–R5M/yr' },
-    codeMetrics:{srcLoc:2800,testLoc:420,files:13,langs:'Python, TypeScript',complexity:'High',deps:14,integrations:5,compliance:["POPIA","FICA","PCI-DSS","SARB"]},
-    traditionalEst:{devs:3,months:6,aiWeeks:8},
-    status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
-
-  { id:23, priority:1, owner:'Malcolm Govender', project:'AI-Powered DevSecOps Security Gate', sq:'missing', isNew:true,
-    desc:'AI-powered security gate integrated into CI/CD pipelines (GitHub Actions / Azure DevOps) combining SAST with ML false-positive suppression, dependency CVE scanning with CVSS-based blocking, secret/credential detection, container image scanning, SBOM generation on every release and AI-driven triage — enforcing PCI-DSS Requirement 6 and POPIA security obligations, blocking deploys on policy violations and tracking security posture trends on a live dashboard.',
-    artifacts:[
-      {t:'doc', l:'Requirements', u:'#'},
-      {t:'html',l:'Architecture Spec', u:'#'},
-      {t:'doc', l:'Security Policy Config', u:'#'},
-      {t:'doc', l:'SBOM Template', u:'#'},
-    ],
-    nextSteps:'⚠ Not started — Malcolm Govender to initiate. First: define CVSS blocking thresholds (Critical ≥9.0, High ≥7.0); inventory UC13 CI/CD pipeline injection points; select toolchain (Semgrep/SAST, Trivy/CVE, Gitleaks/secrets, Syft/SBOM); configure ML false-positive baseline from last 90 days of scan history.',
-    bv:{ tier:'High', driver:'Risk Reduction', impact:[
-      'Reduces mean time to detect and remediate critical vulnerabilities by ~70% — cutting exposure windows from weeks to hours across all production services',
-      'Automated PCI-DSS Req 6 and POPIA compliance enforcement eliminates 90% of manual pre-release security reviews, saving ~R1.2M/yr in audit-preparation effort',
-      'Early-stage blocking of Critical/High CVEs and leaked credentials reduces material data breach probability by ~60%, avoiding POPIA fines of up to R10M per incident'
-    ], value:'R4M–R6M/yr' },
-    codeMetrics:{srcLoc:1600,testLoc:320,files:8,langs:'Python, YAML',complexity:'High',deps:9,integrations:5,compliance:["PCI-DSS","ISO 27001","POPIA"]},
-    traditionalEst:{devs:3,months:3,aiWeeks:6},
-    status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
 ];
 
-let data, nextId = 24, sortCol = 'priority', sortDir = 1, dragSrcId = null, saveTimer = null;
+let data, nextId = 20, sortCol = 'priority', sortDir = 1, dragSrcId = null, saveTimer = null;
 
 function load() {
   try {
@@ -2525,319 +2212,6 @@ function showToast(msg) {
   clearTimeout(t._t);
   t._t = setTimeout(() => t.classList.remove('show'), 2000);
 }
-
-/** Sum "909 lines", "(322L)", "858L"-style counts in narrative text (not a repo scan). */
-function sumCitedLinesInText(text) {
-  const s = String(text || '');
-  let sum = 0;
-  const seen = new Set();
-  const patterns = [
-    /(\d{1,6})\s*lines?\b/gi,
-    /\(\s*(\d{1,6})\s*L\s*\)/gi,
-    /\b(\d{1,6})\s*L\b/gi
-  ];
-  for (const re of patterns) {
-    re.lastIndex = 0;
-    let m;
-    while ((m = re.exec(s)) !== null) {
-      const n = parseInt(m[1], 10);
-      if (n > 0 && n < 500000) {
-        const key = m.index + ':' + m[0];
-        if (!seen.has(key)) { seen.add(key); sum += n; }
-      }
-    }
-  }
-  return sum;
-}
-
-function countPackageHints(text) {
-  const s = String(text || '').toLowerCase();
-  const needles = ['package.json','package-lock','pnpm-lock','yarn.lock','node_modules','npm ','pip install','poetry.lock','requirements.txt','go.mod','cargo.toml','dockerfile','maven','gradle'];
-  let c = 0;
-  for (const n of needles) {
-    let i = 0;
-    while ((i = s.indexOf(n, i)) !== -1) { c++; i += n.length; }
-  }
-  return c;
-}
-
-function artifactTypeSummary(arts) {
-  const m = {};
-  for (const a of (arts || [])) {
-    const k = a.t || '?';
-    m[k] = (m[k] || 0) + 1;
-  }
-  return Object.entries(m).map(([k, v]) => k + '×' + v).join(', ') || '—';
-}
-
-function computeUseCaseMetrics(r) {
-  const desc = r.desc || '';
-  const nxt = r.nextSteps || '';
-  const hay = desc + '\n' + nxt;
-  const arts = r.artifacts || [];
-  const citedLOC = sumCitedLinesInText(hay);
-  const chars = desc.length + nxt.length;
-  const pkgHints = countPackageHints(hay);
-  const artN = arts.length;
-  const types = artifactTypeSummary(arts);
-  // Prefer real measured codeMetrics over heuristic text parsing
-  const cm = r.codeMetrics || null;
-  const srcLoc     = cm ? cm.srcLoc      : citedLOC;
-  const testLoc    = cm ? cm.testLoc     : 0;
-  const files      = cm ? cm.files       : 0;
-  const langs      = cm ? cm.langs       : '—';
-  const complexity = cm ? cm.complexity  : '—';
-  const deps       = cm ? cm.deps        : 0;
-  const integrations = cm ? cm.integrations : 0;
-  const compliance = cm ? (cm.compliance || []) : [];
-  const hasReal    = !!cm;
-  const score = Math.round(srcLoc + chars / 100 + artN * 35 + pkgHints * 45 + deps * 8 + integrations * 20 + compliance.length * 30);
-  // Traditional vs AI delivery estimates
-  const te = r.traditionalEst || null;
-  const tradDevs   = te ? te.devs   : null;
-  const tradMonths = te ? te.months : null;
-  const aiWeeks    = te ? te.aiWeeks : null;
-  const tradDevMonths = (tradDevs && tradMonths) ? tradDevs * tradMonths : null;
-  // Acceleration: (traditional dev-months) / (1 dev × aiHours/173)  [aiWeeks field = hours]
-  const accel = (tradDevMonths && aiWeeks) ? Math.round(tradDevMonths / (aiWeeks / 173)) : null;
-  return { srcLoc, testLoc, files, langs, complexity, deps, integrations, compliance, hasReal, citedLOC, chars, pkgHints, artN, types, score,
-           tradDevs, tradMonths, aiWeeks, tradDevMonths, accel };
-}
-
-function openMetricsModal() {
-  const el = document.getElementById('metricsOverlay');
-  if (!el) return;
-  el.classList.add('open');
-  el.setAttribute('aria-hidden', 'false');
-  const inp = document.getElementById('metricsSearch');
-  if (inp) inp.value = '';
-  renderMetricsTable('');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeMetricsModal() {
-  const el = document.getElementById('metricsOverlay');
-  if (!el) return;
-  el.classList.remove('open');
-  el.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = '';
-}
-
-function getMetricsRows() {
-  return data.map(r => ({ r, m: computeUseCaseMetrics(r) })).sort((a, b) => b.m.score - a.m.score);
-}
-
-function renderMetricsTable(filterQ) {
-  const q = (filterQ || '').toLowerCase().trim();
-  const rows = getMetricsRows().filter(({ r }) => {
-    if (!q) return true;
-    return (r.project || '').toLowerCase().includes(q) || String(r.id).includes(q) || (r.owner || '').toLowerCase().includes(q);
-  });
-  let sumSrc = 0, sumTest = 0, sumArt = 0, sumScore = 0, realCount = 0;
-  let sumDeps = 0, sumIntegrations = 0;
-  let sumTradDevMonths = 0, sumAiWeeks = 0, tradCount = 0;
-  const compUCs = new Set();
-  for (const { r, m } of rows) {
-    sumSrc += m.srcLoc; sumTest += m.testLoc; sumArt += m.artN; sumScore += m.score;
-    if (m.hasReal) realCount++;
-    sumDeps += (m.deps || 0);
-    sumIntegrations += (m.integrations || 0);
-    if ((m.compliance || []).length > 0) compUCs.add(r.id);
-    if (m.tradDevMonths) { sumTradDevMonths += m.tradDevMonths; tradCount++; }
-    if (m.aiWeeks) sumAiWeeks += m.aiWeeks;
-  }
-  // AI dev-months: 1 person across all aiWeeks
-  const sumAiDevMonths = parseFloat((sumAiWeeks / 173).toFixed(1));
-  const savedDevMonths = sumTradDevMonths - sumAiDevMonths;
-  // Cost at blended ZAR rate: R850k/dev/year = R70.8k/dev/month
-  const savedZAR = Math.round(savedDevMonths * 70833);
-  const overallAccel = sumAiDevMonths > 0 ? Math.round(sumTradDevMonths / sumAiDevMonths) : null;
-  const domBytes = new Blob([document.documentElement.outerHTML]).size;
-
-  const CPLX_COLOR = { 'Very High':'#f87171', 'High':'#fb923c', 'Medium':'#facc15', 'Low':'#4ade80' };
-  const COMP_COLOR = { 'POPIA':'#a78bfa', 'PCI-DSS':'#f87171', 'FICA':'#fb923c' };
-  const th = '<tr>' +
-    '<th style="min-width:56px;text-align:center">UC</th>' +
-    '<th style="min-width:240px">Use Case</th>' +
-    '<th title="Source lines of code measured from repo" style="text-align:right">Src LOC</th>' +
-    '<th title="Lines in test files" style="text-align:right">Test LOC</th>' +
-    '<th title="Number of files" style="text-align:right">Files</th>' +
-    '<th title="Languages used">Languages</th>' +
-    '<th title="Complexity rating">Complexity</th>' +
-    '<th title="External packages" style="text-align:right">Deps</th>' +
-    '<th title="External APIs/services integrated" style="text-align:right">Integrations</th>' +
-    '<th title="Regulatory standards in scope">Compliance</th>' +
-    '<th title="Traditional team estimate (without AI)">Trad. Effort</th>' +
-    '<th title="1 developer with AI assistance — actual hours">AI Delivered (actual)</th>' +
-    '<th title="Speed multiplier vs traditional approach" style="text-align:center">Accel.</th>' +
-    '<th title="Number of linked artifacts" style="text-align:right">Artifacts</th>' +
-    '<th title="Composite complexity score" style="text-align:right">Score</th></tr>';
-  const tb = rows.map(({ r, m }) => {
-    const srcCell = m.hasReal
-      ? '<td class="num" style="color:#4ade80;font-weight:600">' + m.srcLoc.toLocaleString() + '</td>'
-      : '<td class="num" style="color:#94a3b8;font-style:italic" title="Estimated from text">' + m.srcLoc.toLocaleString() + '~</td>';
-    const testCell = m.testLoc > 0
-      ? '<td class="num">' + m.testLoc.toLocaleString() + '</td>'
-      : '<td class="num" style="color:#4b5563">—</td>';
-    const filesCell = m.files > 0
-      ? '<td class="num">' + m.files + '</td>'
-      : '<td class="num" style="color:#4b5563">—</td>';
-    const langsCell = '<td style="font-size:10px;color:#94a3b8;white-space:nowrap">' + esc(m.langs) + '</td>';
-    const cplxColor = CPLX_COLOR[m.complexity] || '#94a3b8';
-    const cplxCell = m.complexity !== '—'
-      ? '<td><span style="display:inline-block;background:' + cplxColor + '18;color:' + cplxColor + ';border:1px solid ' + cplxColor + '44;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">' + esc(m.complexity) + '</span></td>'
-      : '<td style="color:#4b5563">—</td>';
-    const depsCell = m.deps > 0
-      ? '<td class="num" style="color:#60a5fa">' + m.deps + '</td>'
-      : '<td class="num" style="color:#4b5563">—</td>';
-    const intCell = m.integrations > 0
-      ? '<td class="num" style="color:#34d399">' + m.integrations + '</td>'
-      : '<td class="num" style="color:#4b5563">—</td>';
-    const compBadges = (m.compliance || []).map(c => {
-      const col = COMP_COLOR[c] || '#94a3b8';
-      return '<span style="display:inline-block;margin:1px 2px;padding:1px 5px;border-radius:4px;font-size:9px;font-weight:700;background:' + col + '22;color:' + col + ';border:1px solid ' + col + '44">' + c + '</span>';
-    }).join('');
-    const compCell = compBadges
-      ? '<td style="white-space:nowrap">' + compBadges + '</td>'
-      : '<td style="color:#4b5563;font-size:10px">—</td>';
-    // Traditional vs AI delivery cells
-    const tradEffortCell = m.tradDevs
-      ? '<td style="white-space:nowrap;color:#f87171;font-size:11px;font-weight:600">' + m.tradDevs + ' devs · ' + m.tradMonths + ' mo</td>'
-      : '<td style="color:#4b5563">—</td>';
-    const aiDelivCell = m.aiWeeks
-      ? '<td style="white-space:nowrap;color:#34d399;font-size:11px;font-weight:600">1 dev · ' + m.aiWeeks + 'h</td>'
-      : '<td style="color:#4b5563">—</td>';
-    const accelColor = m.accel >= 20 ? '#a78bfa' : m.accel >= 10 ? '#60a5fa' : m.accel >= 5 ? '#34d399' : '#facc15';
-    const accelCell = m.accel
-      ? '<td style="text-align:center"><span style="display:inline-block;background:' + accelColor + '1a;color:' + accelColor + ';border:1px solid ' + accelColor + '44;border-radius:6px;padding:3px 10px;font-size:13px;font-weight:800">~' + m.accel + '×</span></td>'
-      : '<td style="color:#4b5563">—</td>';
-    const ucBadge = '<td style="text-align:center">' +
-      '<span style="display:inline-block;background:rgba(99,102,241,.18);color:#818cf8;border:1px solid rgba(99,102,241,.3);' +
-      'border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;white-space:nowrap">UC' + String(r.id).padStart(2,'0') + '</span></td>';
-    const newBadge = r.isNew ? '<span style="display:inline-block;margin-left:5px;padding:1px 5px;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.35);border-radius:4px;font-size:9px;font-weight:800;color:#34d399;letter-spacing:.06em;text-transform:uppercase;vertical-align:middle">New</span>' : '';
-    const nameCell = '<td style="font-weight:600;color:#e2e8f0;max-width:260px;overflow:hidden;text-overflow:ellipsis" title="' + esc(r.project||'') + '">' + esc(r.project||'') + newBadge + '</td>';
-    const artColor = m.artN >= 4 ? '#4ade80' : m.artN >= 2 ? '#facc15' : '#94a3b8';
-    const scoreColor = m.score >= 5000 ? '#f87171' : m.score >= 2000 ? '#fb923c' : m.score >= 500 ? '#facc15' : '#94a3b8';
-    return '<tr>' + ucBadge + nameCell +
-      srcCell + testCell + filesCell + langsCell + cplxCell + depsCell + intCell + compCell +
-      tradEffortCell + aiDelivCell + accelCell +
-      '<td class="num" style="color:' + artColor + ';font-weight:600">' + m.artN + '</td>' +
-      '<td class="num" style="color:' + scoreColor + ';font-weight:600">' + m.score.toLocaleString() + '</td></tr>';
-  }).join('');
-
-  const mt = document.getElementById('metricsTable');
-  const tot = document.getElementById('metricsTotals');
-  const banner = document.getElementById('metricsExecBanner');
-  if (mt) mt.innerHTML = th + tb;
-
-  // ── Executive hero banner ────────────────────────────────────────────────
-  if (banner) {
-    const fmtZAR = v => 'R' + (v >= 1e6 ? (v/1e6).toFixed(1) + 'M' : (v/1e3).toFixed(0) + 'k');
-    const totalLOC = (sumSrc + sumTest).toLocaleString();
-    const pctAiBar = sumTradDevMonths > 0 ? Math.max(3, Math.round((sumAiDevMonths / sumTradDevMonths) * 100)) : 0;
-    banner.style.display = 'block';
-    banner.innerHTML =
-      // ── KPI strip ──
-      '<div class="exec-kpi-row">' +
-        '<div class="exec-kpi">' +
-          '<div class="exec-kpi-value" style="--kc:#818cf8;--kc2:#a78bfa">' + rows.length + '</div>' +
-          '<div class="exec-kpi-label">Use Cases Delivered</div>' +
-          '<div class="exec-kpi-sub">across all SDLC layers</div>' +
-        '</div>' +
-        '<div class="exec-kpi">' +
-          '<div class="exec-kpi-value" style="--kc:#34d399;--kc2:#4ade80">' + totalLOC + '</div>' +
-          '<div class="exec-kpi-label">Lines of Code</div>' +
-          '<div class="exec-kpi-sub">src + test combined</div>' +
-        '</div>' +
-        '<div class="exec-kpi">' +
-          '<div class="exec-kpi-value" style="--kc:#60a5fa;--kc2:#38bdf8">3</div>' +
-          '<div class="exec-kpi-label">Days · 1 Developer</div>' +
-          '<div class="exec-kpi-sub">actual end-to-end (excl. PayGuard)</div>' +
-        '</div>' +
-        '<div class="exec-kpi">' +
-          '<div class="exec-kpi-value" style="--kc:#a78bfa;--kc2:#f472b6">~' + overallAccel + '×</div>' +
-          '<div class="exec-kpi-label">Avg Acceleration</div>' +
-          '<div class="exec-kpi-sub">vs traditional team estimate</div>' +
-        '</div>' +
-        '<div class="exec-kpi">' +
-          '<div class="exec-kpi-value" style="--kc:#4ade80;--kc2:#34d399">' + fmtZAR(savedZAR) + '</div>' +
-          '<div class="exec-kpi-label">Estimated Cost Saved</div>' +
-          '<div class="exec-kpi-sub">R850k/dev/yr market rate</div>' +
-        '</div>' +
-      '</div>' +
-      // ── Effort comparison bar ──
-      '<div class="exec-vs-bar">' +
-        '<div class="exec-vs-label">Effort<br>comparison</div>' +
-        '<div class="exec-bar-wrap">' +
-          '<div class="exec-bar-row">' +
-            '<span class="exec-bar-text" style="color:#f87171">Traditional</span>' +
-            '<div class="exec-bar-track">' +
-              '<div class="exec-bar-fill" style="width:100%;background:linear-gradient(90deg,#f87171,#fb923c)"></div>' +
-            '</div>' +
-            '<span style="font-size:11px;color:#f87171;font-weight:700;min-width:88px">' + sumTradDevMonths + ' dev-months</span>' +
-          '</div>' +
-          '<div class="exec-bar-row">' +
-            '<span class="exec-bar-text" style="color:#34d399">AI-assisted</span>' +
-            '<div class="exec-bar-track">' +
-              '<div class="exec-bar-fill" style="width:' + pctAiBar + '%;background:linear-gradient(90deg,#34d399,#4ade80)"></div>' +
-            '</div>' +
-            '<span style="font-size:11px;color:#34d399;font-weight:700;min-width:88px">' + sumAiDevMonths + ' dev-months</span>' +
-          '</div>' +
-        '</div>' +
-        '<div style="text-align:right;flex-shrink:0;padding-left:8px">' +
-          '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b">Dev-months saved</div>' +
-          '<div style="font-size:26px;font-weight:900;color:#facc15;line-height:1.1">' + savedDevMonths + '</div>' +
-          '<div style="font-size:10px;color:#475569">(' + fmtZAR(savedZAR) + ' est.)</div>' +
-        '</div>' +
-      '</div>' +
-      // ── Badge row ──
-      '<div class="exec-badge-row">' +
-        '<span class="exec-badge" style="background:rgba(99,102,241,.12);color:#818cf8;border-color:rgba(99,102,241,.3)">⬡ ' + sumDeps + ' dependencies</span>' +
-        '<span class="exec-badge" style="background:rgba(52,211,153,.1);color:#34d399;border-color:rgba(52,211,153,.25)">⇄ ' + sumIntegrations + ' integrations</span>' +
-        '<span class="exec-badge" style="background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.25)">⚖ ' + compUCs.size + ' compliance-scoped UCs</span>' +
-        '<span class="exec-badge" style="background:rgba(74,222,128,.1);color:#4ade80;border-color:rgba(74,222,128,.25)">✓ ' + realCount + ' repo-measured</span>' +
-        '<span class="exec-badge" style="background:rgba(251,191,36,.1);color:#fbbf24;border-color:rgba(251,191,36,.25)">📎 ' + sumArt + ' artifacts linked</span>' +
-      '</div>';
-  }
-
-  // ── Slim detail strip ────────────────────────────────────────────────────
-  if (tot) {
-    const fmtZAR = v => 'R' + (v >= 1e6 ? (v/1e6).toFixed(1) + 'M' : (v/1e3).toFixed(0) + 'k');
-    tot.innerHTML =
-      'Showing <strong>' + rows.length + ' of ' + data.length + '</strong> use cases · ' +
-      'Src LOC <strong>' + sumSrc.toLocaleString() + '</strong> · ' +
-      'Test LOC <strong>' + sumTest.toLocaleString() + '</strong> · ' +
-      'Score Σ <strong>' + sumScore.toLocaleString() + '</strong> · ' +
-      '<span style="color:#4ade80">Green = repo-measured via wc -l</span> · ' +
-      'Italic~ = estimated · Trad. rate R850k/dev/yr · AI = 1 dev + AI tools';
-  }
-}
-
-function copyMetricsTsv() {
-  const rows = getMetricsRows();
-  const lines = [['UC', 'Use case', 'Owner', 'Source LOC', 'Test LOC', 'Files', 'Languages', 'Complexity', 'Deps', 'Integrations', 'Compliance', 'Trad. Effort (dev-mo)', 'AI Delivered (wks)', 'Acceleration', 'Measured?', 'Artifacts', 'Score'].join('\t')];
-  for (const { r, m } of rows) {
-    const compStr = (m.compliance || []).join(', ');
-    const tradStr = m.tradDevs ? m.tradDevs + ' devs × ' + m.tradMonths + ' mo (' + m.tradDevMonths + ' dev-mo)' : '—';
-    const aiStr = m.aiWeeks ? '1 dev × ' + m.aiWeeks + 'h' : '—';
-    const accelStr = m.accel ? '~' + m.accel + 'x' : '—';
-    lines.push(['UC' + String(r.id).padStart(2, '0'), (r.project || '').replace(/\t/g, ' '), (r.owner || '').replace(/\t/g, ' '),
-      m.srcLoc, m.testLoc, m.files, m.langs, m.complexity,
-      m.deps || 0, m.integrations || 0, compStr,
-      tradStr, aiStr, accelStr,
-      m.hasReal ? 'Yes' : 'Estimated', m.artN, m.score].join('\t'));
-  }
-  const text = lines.join('\n');
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => showToast('Metrics copied (TSV)')).catch(() => showToast('Copy failed'));
-  }
-}
-
-document.addEventListener('keydown', function (e) {
-  if (e.key !== 'Escape') return;
-  const mo = document.getElementById('metricsOverlay');
-  if (mo && mo.classList.contains('open')) closeMetricsModal();
-});
 
 const sqLabel = { built:'Built ✓', partial:'Partial ⚠', missing:'Not built ✗' };
 const sqCls   = { built:'sq-built', partial:'sq-partial', missing:'sq-missing' };
@@ -2874,7 +2248,7 @@ function getFiltered() {
     (!q  || r.owner.toLowerCase().includes(q) || r.project.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q) || (r.nextSteps||'').toLowerCase().includes(q) || (r.bv&&r.bv.impact&&r.bv.impact.join(' ').toLowerCase().includes(q))) &&
     (!ow || r.owner === ow) &&
     (!ti || (r.bv && r.bv.tier === ti)) &&
-    (!st || r.status === st || (st === '__pending__' && (r.status === 'Not started' || r.status === 'In review'))) &&
+    (!st || r.status === st) &&
     (!pr || String(r.priority) === pr) &&
     (!sq || r.sq === sq)
   );
@@ -2912,47 +2286,12 @@ const ART_ICONS = {
   'ts':'<svg viewBox="0 0 16 16" fill="currentColor"><path d="M0 0h16v16H0V0zm8.5 11.5v1.25c.42.21.92.32 1.5.32 1.38 0 2.25-.7 2.25-1.88 0-.88-.5-1.44-1.63-1.88-.75-.3-1-.5-1-.88 0-.3.25-.5.69-.5.5 0 .94.19 1.31.56V7.25C11.25 7.09 10.82 7 10.25 7c-1.31 0-2.19.69-2.19 1.75 0 .88.5 1.44 1.56 1.81.81.31 1.06.5 1.06.94 0 .31-.25.56-.75.56-.56 0-1.06-.25-1.44-.56zm-3.25-4.25v1.5H7v4.75h1.5V8.75H10.25V7.25H5.25z"/></svg>',
 };
 
-function copyArtPath(url, label, e) {
-  e && e.stopPropagation();
-  const path = url.replace('file://', '');
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(path).then(() => showArtToast('Copied: ' + label));
-  } else {
-    const ta = document.createElement('textarea');
-    ta.value = path; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    showArtToast('Copied: ' + label);
-  }
-}
-function showArtToast(msg) {
-  let t = document.getElementById('art-toast');
-  if (!t) {
-    t = document.createElement('div'); t.id = 'art-toast';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#e2e8f0;padding:10px 20px;border-radius:8px;font-size:13px;z-index:9999;border:1px solid rgba(255,255,255,.12);box-shadow:0 4px 20px rgba(0,0,0,.5);transition:opacity .3s;pointer-events:none';
-    document.body.appendChild(t);
-  }
-  t.textContent = msg; t.style.opacity = '1';
-  clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 2500);
-}
-
 function renderArtifacts(arts, rowId) {
   if (!arts || !arts.length) return '<span class="art-none">—</span>';
   const SHOW = 3; // chips visible when collapsed
-  const onHttps = location.protocol === 'https:';
-  const copyIcon = '<svg style="width:8px;height:8px;margin-left:2px;opacity:.55" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h7l3 3v9H4V2zm1 1v10h8V6H9V3H5zm5 .7L11.3 5H10V3.7z"/></svg>';
   const chips = arts.map((a, i) => {
     const icon = ART_ICONS[a.t] || '';
     const hidden = (rowId && i >= SHOW) ? ' art-chip-hidden' : '';
-    const isPlaceholder = !a.u || a.u === '#';
-    if (isPlaceholder) {
-      return `<span class="art-chip art-${a.t}${hidden}" style="opacity:.5;cursor:default" title="${a.l} — Coming soon">${icon}${a.l}</span>`;
-    }
-    const isFile = a.u.startsWith('file://');
-    if (isFile && onHttps) {
-      const safe = a.u.replace(/'/g, "\'").replace(/"/g, '&quot;');
-      const lbl  = a.l.replace(/'/g, "\'").replace(/"/g, '&quot;');
-      return `<span class="art-chip art-${a.t}${hidden}" onclick="copyArtPath('${safe}','${lbl}',event)" title="Local file — click to copy path\n${a.u.replace('file://','')}">${icon}${a.l}${copyIcon}</span>`;
-    }
     return `<a class="art-chip art-${a.t}${hidden}" href="${a.u}" target="_blank" title="${a.l}">${icon}${a.l}</a>`;
   }).join('');
   const extra = arts.length - SHOW;
@@ -2972,55 +2311,24 @@ function toggleArts(rowId, btn) {
   el.classList.toggle('collapsed');
 }
 
-/** Stat / KPI click → status filter (matches card counts). Second click clears that filter. */
-function filterFromStatCard(mode) {
-  const sel = document.getElementById('selStatus');
-  if (!sel) return;
-  if (mode === 'total' || mode === 'avg') {
-    sel.value = '';
-  } else if (mode === 'done') {
-    sel.value = sel.value === 'Done' ? '' : 'Done';
-  } else if (mode === 'inprog') {
-    sel.value = sel.value === 'In progress' ? '' : 'In progress';
-  } else if (mode === 'pending') {
-    sel.value = sel.value === '__pending__' ? '' : '__pending__';
-  }
-  renderTable();
-  const anchor = document.getElementById('table-anchor');
-  if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function statCardKeydown(e, mode) {
-  if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();
-    filterFromStatCard(mode);
-  }
-}
-
 function renderStats() {
   const tot    = data.length;
   const done   = data.filter(r=>r.status==='Done').length;
   const inprog = data.filter(r=>r.status==='In progress').length;
   const ns     = data.filter(r=>r.status==='Not started' || r.status==='In review').length;
   const avg    = tot ? Math.round(data.reduce((a,r)=>a+r.pct,0)/tot) : 0;
-  const stNow = (document.getElementById('selStatus') && document.getElementById('selStatus').value) || '';
   const cards = [
-    { icon:'📋', bg:'rgba(139,147,196,.18)', val:tot,      lbl:'Total use cases',     color:'var(--text-1)', filter:'total' },
-    { icon:'✅', bg:'rgba(0,200,117,.18)',   val:done,     lbl:'Done',                color:'#00c875',       filter:'done' },
-    { icon:'🚀', bg:'rgba(253,171,61,.18)',  val:inprog,   lbl:'In progress',         color:'#fdab3d',     filter:'inprog' },
-    { icon:'⏳', bg:'rgba(139,147,196,.18)', val:ns,       lbl:'Not started',         color:'#8b93c4',     filter:'pending' },
-    { icon:'📊', bg:'rgba(0,115,234,.18)',   val:avg+'%',  lbl:'Avg completion',      color:'#60a5fa',     filter:'avg' },
+    { icon:'📋', bg:'rgba(139,147,196,.18)', val:tot,      lbl:'Total use cases',     color:'var(--text-1)' },
+    { icon:'✅', bg:'rgba(0,200,117,.18)',   val:done,     lbl:'Done',                color:'#00c875' },
+    { icon:'🚀', bg:'rgba(253,171,61,.18)',  val:inprog,   lbl:'In progress',         color:'#fdab3d' },
+    { icon:'⏳', bg:'rgba(139,147,196,.18)', val:ns,       lbl:'Not started',         color:'#8b93c4' },
+    { icon:'📊', bg:'rgba(0,115,234,.18)',   val:avg+'%',  lbl:'Avg completion',      color:'#60a5fa' },
   ];
   document.getElementById('stats').innerHTML = cards.map(c=>{
     const raw = c.color.startsWith('var') ? '' : c.color;
     const glow = raw ? raw.replace(')',',0.35)').replace('rgb(','rgba(').replace('#', '') : '';
     const glowVal = raw.startsWith('#') ? raw+'55' : raw;
-    let active = '';
-    if (c.filter === 'done' && stNow === 'Done') active = ' stat-active';
-    if (c.filter === 'inprog' && stNow === 'In progress') active = ' stat-active';
-    if (c.filter === 'pending' && stNow === '__pending__') active = ' stat-active';
-    return `<div class="stat stat-filter${active}" style="--stat-color:${raw||'#2e3358'};--stat-glow:${glowVal||'transparent'}" role="button" tabindex="0" data-stat-filter="${c.filter}" aria-label="Show use cases: ${c.lbl}"
-      onclick="filterFromStatCard(this.dataset.statFilter)" onkeydown="statCardKeydown(event,this.dataset.statFilter)">
+    return `<div class="stat" style="--stat-color:${raw||'#2e3358'};--stat-glow:${glowVal||'transparent'}">
       <div class="stat-icon" style="background:${c.bg}">${c.icon}</div>
       <div class="stat-body">
         <div class="stat-val" style="color:${c.color}">${c.val}</div>
@@ -3035,31 +2343,25 @@ function renderStats() {
 function renderHeaderKPI() {
   const el = document.getElementById('header-kpi');
   if (!el) return;
-  const stNow = (document.getElementById('selStatus') && document.getElementById('selStatus').value) || '';
   const tot    = data.length;
   const done   = data.filter(r=>r.status==='Done').length;
   const inprog = data.filter(r=>r.status==='In progress').length;
   const ns     = data.filter(r=>r.status==='Not started'||r.status==='In review').length;
   const avg    = tot ? Math.round(data.reduce((s,r)=>s+r.pct,0)/tot) : 0;
   const kpis = [
-    { dot:'#8b93c4', val:tot,       lbl:'use cases',   filter:'total' },
-    { dot:'#00c875', val:done,      lbl:'done',        filter:'done' },
-    { dot:'#fdab3d', val:inprog,    lbl:'in progress', filter:'inprog' },
-    { dot:'#676b8a', val:ns,        lbl:'not started', filter:'pending' },
-    { dot:'#60a5fa', val:avg+'%',   lbl:'avg complete', filter:'avg' },
+    { dot:'#8b93c4', val:tot,       lbl:'use cases'   },
+    { dot:'#00c875', val:done,      lbl:'done'         },
+    { dot:'#fdab3d', val:inprog,    lbl:'in progress'  },
+    { dot:'#676b8a', val:ns,        lbl:'not started'  },
+    { dot:'#60a5fa', val:avg+'%',   lbl:'avg complete' },
   ];
-  el.innerHTML = kpis.map(k => {
-    let kpiAct = '';
-    if (k.filter === 'done' && stNow === 'Done') kpiAct = ' kpi-active';
-    if (k.filter === 'inprog' && stNow === 'In progress') kpiAct = ' kpi-active';
-    if (k.filter === 'pending' && stNow === '__pending__') kpiAct = ' kpi-active';
-    return `<span class="header-kpi-item header-kpi-filter${kpiAct}" role="button" tabindex="0" data-stat-filter="${k.filter}" aria-label="Filter table: ${k.lbl}"
-      onclick="filterFromStatCard(this.dataset.statFilter)" onkeydown="statCardKeydown(event,this.dataset.statFilter)">
+  el.innerHTML = kpis.map(k =>
+    `<span class="header-kpi-item">
       <span class="header-kpi-dot" style="background:${k.dot}"></span>
       <span class="header-kpi-val">${k.val}</span>
       <span class="header-kpi-lbl">${k.lbl}</span>
-    </span>`;
-  }).join('');
+    </span>`
+  ).join('');
 }
 
 let _chartsVisible = true;
@@ -3343,7 +2645,7 @@ function renderTable() {
           >${esc(a||'Unassigned')}</span>
         </span>`;
       })()}</div></td>
-      <td class="col-prj"><div class="td-pad"><span class="editable cell-project" contenteditable="true" onblur="updateField(${r.id},'project',this.textContent.trim())" onkeydown="blurOnEnter(event)">${esc(r.project)}</span>${r.isNew ? '<span class=\"badge-new\">New</span>' : ''}</div></td>
+      <td class="col-prj"><div class="td-pad"><span class="editable cell-project" contenteditable="true" onblur="updateField(${r.id},'project',this.textContent.trim())" onkeydown="blurOnEnter(event)">${esc(r.project)}</span></div></td>
       <td class="col-desc"><div class="td-pad"><span class="editable cell-desc" contenteditable="true" onblur="updateField(${r.id},'desc',this.textContent.trim())" onkeydown="blurOnEnter(event,true)" title="Click to expand">${esc(r.desc)}</span></div></td>
       <td class="col-art"><div class="td-pad">${renderArtifacts(r.artifacts, r.id)}</div></td>
       <td class="col-nxt"><div class="td-pad"><span class="editable cell-nxt${isComplete?' complete':''}" contenteditable="true" onblur="updateField(${r.id},'nextSteps',this.textContent.trim())" onkeydown="blurOnEnter(event,true)">${esc(r.nextSteps||'')}</span></div></td>
@@ -3380,7 +2682,6 @@ function renderTable() {
   html += `<tr><td colspan="13" style="padding:0"><button class="btn-add-row" onclick="addRow()">+ Add project</button></td></tr>`;
   tbody.innerHTML = html;
   renderFilterChips();
-  renderStats();
   setTimeout(fixStickyCol, 0);
 }
 
@@ -3409,14 +2710,14 @@ function updateSlider(input, id) {
 
 function addRow() {
   const r = { id:nextId++, priority:3, owner:'', project:'New use case', desc:'', sq:'none', artifacts:[], nextSteps:'', status:'Not started', pct:0, assignedTo:'Malcolm Govender', demoUrl:'' };
-  data.push(r); refreshOwnerFilter(); renderTable(); save(true);
+  data.push(r); refreshOwnerFilter(); renderStats(); renderTable(); save(true);
   setTimeout(() => { const cells = document.querySelectorAll('.cell-project'); const last = cells[cells.length-1]; if(last){last.focus();document.execCommand('selectAll',false,null);} }, 50);
 }
 
 function deleteRow(id) {
   if (data.length<=1) { showToast('Cannot delete last row'); return; }
   data = data.filter(r=>r.id!==id);
-  refreshOwnerFilter(); renderTable(); save(true); showToast('Deleted');
+  refreshOwnerFilter(); renderStats(); renderTable(); save(true); showToast('Deleted');
 }
 
 function toggleSort(col) {
@@ -3636,11 +2937,12 @@ function resetData() {
   if (!confirm('Reset all data to defaults? This cannot be undone.')) return;
   localStorage.removeItem(STORE_KEY);
   data = JSON.parse(JSON.stringify(DEFAULT_DATA)); nextId = 20;
-  refreshOwnerFilter(); renderTable(); showToast('Reset to defaults');
+  refreshOwnerFilter(); renderStats(); renderTable(); showToast('Reset to defaults');
 }
 
 load();
 refreshOwnerFilter();
+renderStats();
 toggleSort('priority');
 
 
@@ -3892,7 +3194,7 @@ function renderFilterChips() {
   const filters = [
     { el: 'search',    label: v => `Search: "${v}"`,       clear: () => { document.getElementById('search').value = ''; } },
     { el: 'selOwner',  label: v => `Owner: ${v}`,          clear: () => { document.getElementById('selOwner').value = ''; } },
-    { el: 'selStatus', label: v => `Status: ${v === '__pending__' ? 'Not started + In review' : v}`,         clear: () => { document.getElementById('selStatus').value = ''; } },
+    { el: 'selStatus', label: v => `Status: ${v}`,         clear: () => { document.getElementById('selStatus').value = ''; } },
     { el: 'selPri',    label: v => `Priority: P${v}`,      clear: () => { document.getElementById('selPri').value = ''; } },
     { el: 'selTier',   label: v => `Value: ${v}`,          clear: () => { document.getElementById('selTier').value = ''; } },
     { el: 'selSQ',     label: v => `Build: ${v}`,          clear: () => { document.getElementById('selSQ').value = ''; } },
@@ -4847,19 +4149,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const intents = [
-      { re: /engineering metrics|code metrics|cited\s*loc|lines?\s+of\s+code.*(portfolio|total|each)|complexity.*(portfolio|use case)/i, fn: () => {
-        const rows = typeof getMetricsRows === 'function' ? getMetricsRows() : [];
-        let totalLOC = 0, totalChars = 0;
-        for (const { m } of rows) { totalLOC += m.citedLOC; totalChars += m.chars; }
-        const top = rows.slice(0, 5).map(({ r, m }) =>
-          `• UC${String(r.id).padStart(2, '0')} **${r.project}**: ~${m.citedLOC.toLocaleString()} cited LOC, score ${m.score.toLocaleString()}`
-        ).join('\n');
-        return '**Portfolio engineering estimates** (parsed from description + next steps — not a full repo scan):\n\n' +
-          `• **Cited LOC (Σ):** ~${totalLOC.toLocaleString()}\n` +
-          `• **Narrative characters (Σ):** ${totalChars.toLocaleString()}\n\n` +
-          '**Top 5 by composite score:**\n' + top + '\n\n' +
-          'Use the **Metrics** button in the header for the full table, filters, and **Copy table (TSV)**.';
-      }},
       { re: /scenario|simulate|simulation|what if|fund|prioriti[sz]e|investment slate/i, fn: (q) => {
         return simulateInvestmentScenario(q);
       }},

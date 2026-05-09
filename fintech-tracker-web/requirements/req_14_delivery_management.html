@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-14: AI for Delivery Management - Requirements & User Stories</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117;
+            color: #e6edf3;
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1c2128 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .header-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #79c0ff;
+            margin-bottom: 1rem;
+        }
+
+        .header-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .meta-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .meta-label {
+            color: #8b949e;
+            font-weight: 600;
+        }
+
+        .meta-value {
+            color: #79c0ff;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .badge-p2 {
+            background-color: rgba(248, 161, 33, 0.2);
+            color: #f8a121;
+            border: 1px solid #f8a121;
+        }
+
+        .badge-in-progress {
+            background-color: rgba(121, 192, 255, 0.2);
+            color: #79c0ff;
+            border: 1px solid #79c0ff;
+        }
+
+        .badge-must {
+            background-color: rgba(248, 81, 114, 0.2);
+            color: #f85172;
+            border: 1px solid #f85172;
+        }
+
+        .badge-should {
+            background-color: rgba(248, 161, 33, 0.2);
+            color: #f8a121;
+            border: 1px solid #f8a121;
+        }
+
+        .badge-nice {
+            background-color: rgba(121, 192, 255, 0.2);
+            color: #79c0ff;
+            border: 1px solid #79c0ff;
+        }
+
+        section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            color: #79c0ff;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #30363d;
+        }
+
+        .subsection-title {
+            font-size: 1.05rem;
+            color: #58a6ff;
+            font-weight: 600;
+            margin-top: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .persona-card {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #58a6ff;
+        }
+
+        .persona-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #79c0ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .persona-role {
+            color: #8b949e;
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .persona-content {
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .story-item {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #58a6ff;
+        }
+
+        .story-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+        }
+
+        .story-id {
+            font-weight: 700;
+            color: #79c0ff;
+            font-size: 0.9rem;
+        }
+
+        .story-text {
+            color: #e6edf3;
+            font-size: 0.95rem;
+            font-style: italic;
+            margin-bottom: 0.8rem;
+        }
+
+        .story-benefit {
+            color: #8b949e;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .requirement-item {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border-left: 4px solid #58a6ff;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .requirement-id {
+            font-weight: 700;
+            color: #79c0ff;
+        }
+
+        .acceptance-criteria {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .criteria-header {
+            font-weight: 700;
+            color: #79c0ff;
+            margin-bottom: 0.5rem;
+        }
+
+        .criteria-item {
+            color: #e6edf3;
+            margin-left: 1.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: #e6edf3;
+        }
+
+        .done-checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.8rem;
+            border: 2px solid #58a6ff;
+            border-radius: 4px;
+            background: transparent;
+            flex-shrink: 0;
+        }
+
+        .footer {
+            text-align: center;
+            color: #8b949e;
+            font-size: 0.85rem;
+            padding: 2rem 0;
+            border-top: 1px solid #30363d;
+            margin-top: 2rem;
+        }
+
+        .accent-yellow { color: #f8a121; }
+        .accent-red { color: #f85172; }
+        .accent-blue { color: #79c0ff; }
+        .accent-green { color: #3fb950; }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <div class="header-title">
+                UC-14: AI for Delivery Management
+                <span class="badge badge-p2">P2</span>
+                <span class="badge badge-in-progress">55% Complete</span>
+            </div>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <span class="meta-label">ID:</span>
+                    <span class="meta-value">UC-14</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Owner:</span>
+                    <span class="meta-value">Herman Odame</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Status:</span>
+                    <span class="meta-value">In Progress (55%)</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Priority:</span>
+                    <span class="meta-value">P2 - High</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Version:</span>
+                    <span class="meta-value">v1.0</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Date:</span>
+                    <span class="meta-value">May 2026</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Author</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2 class="section-title">Problem Statement</h2>
+            <p>Engineering teams lack real-time visibility into delivery health and technical quality metrics. Sprint completion forecasts are based on manual estimation and tribal knowledge. Code review processes are inconsistent, leading to delayed quality feedback and increased technical debt accumulation. Risk signals (velocity degradation, churn hotspots, architecture violations) are detected too late, after teams have already committed to unsustainable timelines.</p>
+            <p style="margin-top: 1rem;">The Intelligence Hub portal provides project tracking visibility, but without connected AI agents and live data, teams cannot leverage predictive delivery forecasting or automated code quality insights. This gap prevents engineering leaders from making data-driven decisions about sprint capacity, resource allocation, and quality investment.</p>
+        </section>
+
+        <section>
+            <h2 class="section-title">Target Users & Personas</h2>
+
+            <div class="persona-card">
+                <div class="persona-name">🎯 Sarah Chen - Engineering Manager</div>
+                <div class="persona-role">Team lead, 8 engineers, running 2-week sprints</div>
+                <div class="persona-content">
+                    <strong>Goals:</strong> Deliver predictable sprint velocity, identify at-risk features early, reduce post-release defects, allocate code review bandwidth effectively.
+                </div>
+                <div class="persona-content">
+                    <strong>Frustrations:</strong> Manual sprint planning with incomplete data; surprises on Friday that tickets won't finish; no early warning for blocked dependencies; code reviews become bottlenecks at sprint end.
+                </div>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">👨‍💻 Marcus Rodriguez - Senior Developer</div>
+                <div class="persona-role">IC/tech lead, 5 years tenure, owns critical platform services</div>
+                <div class="persona-content">
+                    <strong>Goals:</strong> Receive actionable code review feedback quickly; understand architectural impact of changes; mentor junior devs through automated quality insights; reduce manual review overhead.
+                </div>
+                <div class="persona-content">
+                    <strong>Frustrations:</strong> Code reviews take 2–3 days; security/architecture concerns caught in production; inconsistent feedback quality; no time to mentor due to review backlog; quality metrics are manual/invisible.
+                </div>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">📊 Priya Patel - Engineering Director</div>
+                <div class="persona-role">Director of engineering, 30+ engineers, multi-team roadmap</div>
+                <div class="persona-content">
+                    <strong>Goals:</strong> Forecast delivery confidence for product roadmap commitments; identify teams trending toward burnout; track technical debt impact on velocity; allocate engineering capacity strategically across priorities.
+                </div>
+                <div class="persona-content">
+                    <strong>Frustrations:</strong> No unified view of delivery health across teams; surprises at planning windows; unable to quantify technical debt impact; resourcing decisions based on politics, not data.
+                </div>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">🔒 Devon Kumar - Security/Compliance Lead</div>
+                <div class="persona-role">Security architect, audit/compliance responsibility</div>
+                <div class="persona-content">
+                    <strong>Goals:</strong> Catch security anti-patterns before merge; ensure architecture compliance with standards; reduce post-deploy security findings; provide confidence reports for audits.
+                </div>
+                <div class="persona-content">
+                    <strong>Frustrations:</strong> Security reviews are manual/reactive; no automated pattern detection for OWASP/CWE; architecture violations discovered months later; difficulty proving compliance to auditors.
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">User Stories</h2>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-01</span>
+                    <span class="badge badge-must">Must Have</span>
+                </div>
+                <div class="story-text">As an Engineering Manager, I want to see a real-time sprint forecast dashboard showing predicted completion date and at-risk ticket count, so that I can make informed scope decisions before Friday surprises.</div>
+                <div class="story-benefit">Benefit: Enable proactive scope management and realistic stakeholder communication.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-02</span>
+                    <span class="badge badge-must">Must Have</span>
+                </div>
+                <div class="story-text">As a Senior Developer, I want to receive AI-generated code review feedback within 15 minutes of PR submission, including security patterns and quality score, so that I can iterate faster and reduce review cycle time.</div>
+                <div class="story-benefit">Benefit: Accelerate code review turnaround and enable faster learning loop.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-03</span>
+                    <span class="badge badge-must">Must Have</span>
+                </div>
+                <div class="story-text">As an Engineering Director, I want to view delivery forecasts across all teams with velocity trends and technical debt impact, so that I can make resource allocation decisions backed by data.</div>
+                <div class="story-benefit">Benefit: Enable data-driven engineering strategy and cross-team planning.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-04</span>
+                    <span class="badge badge-must">Must Have</span>
+                </div>
+                <div class="story-text">As an Engineering Manager, I want to receive Slack/Teams alerts when a sprint is trending at-risk (e.g., 3+ tickets behind velocity), so that I can intervene early with blockers or scope cuts.</div>
+                <div class="story-benefit">Benefit: Enable rapid response to delivery threats before they escalate.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-05</span>
+                    <span class="badge badge-must">Must Have</span>
+                </div>
+                <div class="story-text">As a Senior Developer, I want the code review agent to flag potential security vulnerabilities (SQL injection, auth bypasses, credential exposure) before merge, so that I can fix issues in PR rather than post-production.</div>
+                <div class="story-benefit">Benefit: Reduce security incident risk and shift-left vulnerability detection.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-06</span>
+                    <span class="badge badge-should">Should Have</span>
+                </div>
+                <div class="story-text">As a Security Architect, I want automated architecture smell detection that flags violations against our standards (REST contracts, dependency inversion, coupling thresholds), so that I can enforce design patterns without manual review.</div>
+                <div class="story-benefit">Benefit: Maintain architecture consistency and reduce technical debt accumulation.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-07</span>
+                    <span class="badge badge-should">Should Have</span>
+                </div>
+                <div class="story-text">As an Engineering Manager, I want to see historical sprint velocity data with trend lines and variance analysis, so that I can improve forecasting accuracy and understand team productivity patterns.</div>
+                <div class="story-benefit">Benefit: Improve sprint planning accuracy and identify productivity bottlenecks.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-08</span>
+                    <span class="badge badge-should">Should Have</span>
+                </div>
+                <div class="story-text">As an Engineering Director, I want the delivery forecast to include confidence intervals (e.g., "70% likely to complete by Friday"), so that I can communicate risk to product leadership with precise language.</div>
+                <div class="story-benefit">Benefit: Improve stakeholder communication and set realistic expectations.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-09</span>
+                    <span class="badge badge-should">Should Have</span>
+                </div>
+                <div class="story-text">As a Senior Developer, I want the code review agent to provide suggested fixes or code snippets for common issues (import ordering, test coverage, lint violations), so that I can iterate faster without waiting for human feedback.</div>
+                <div class="story-benefit">Benefit: Reduce review friction and enable self-service improvement.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-10</span>
+                    <span class="badge badge-should">Should Have</span>
+                </div>
+                <div class="story-text">As an Engineering Manager, I want to export sprint forecast and delivery health reports to PDF/Slack, so that I can share status with executives and stakeholders in their preferred format.</div>
+                <div class="story-benefit">Benefit: Enable transparent communication and executive visibility.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-11</span>
+                    <span class="badge badge-nice">Nice to Have</span>
+                </div>
+                <div class="story-text">As a Senior Developer, I want the code review agent to suggest refactoring opportunities based on duplication and complexity metrics, so that I can proactively improve code quality and reduce maintenance burden.</div>
+                <div class="story-benefit">Benefit: Enable continuous improvement culture and reduce technical debt.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-12</span>
+                    <span class="badge badge-nice">Nice to Have</span>
+                </div>
+                <div class="story-text">As an Engineering Director, I want to compare delivery forecasts across multiple sprints/releases and identify seasonal patterns (e.g., Q4 slowdown), so that I can optimize roadmap planning and resource allocation.</div>
+                <div class="story-benefit">Benefit: Enable strategic planning with historical pattern awareness.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-13</span>
+                    <span class="badge badge-nice">Nice to Have</span>
+                </div>
+                <div class="story-text">As a Senior Developer, I want the code review agent to explain its findings in natural language with examples from the codebase, so that I can understand context and learn best practices.</div>
+                <div class="story-benefit">Benefit: Improve code review as a learning/mentoring tool.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-14</span>
+                    <span class="badge badge-nice">Nice to Have</span>
+                </div>
+                <div class="story-text">As an Engineering Manager, I want to set custom alerts (e.g., when sprint velocity drops below threshold or code review cycle time exceeds 24h), so that I can monitor team health against custom metrics.</div>
+                <div class="story-benefit">Benefit: Enable proactive management of custom SLOs.</div>
+            </div>
+
+            <div class="story-item">
+                <div class="story-header">
+                    <span class="story-id">US-15</span>
+                    <span class="badge badge-nice">Nice to Have</span>
+                </div>
+                <div class="story-text">As a Security Architect, I want to generate compliance audit reports showing code review coverage, security finding trends, and architecture compliance status, so that I can provide evidence for regulatory/audit requirements.</div>
+                <div class="story-benefit">Benefit: Simplify compliance reporting and demonstrate security governance.</div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-01:</span> Sprint Delivery Forecast — Analyze git commit history, issue resolution rate, and velocity trends to predict sprint completion date; update forecast in real-time as tickets move through states.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-02:</span> At-Risk Detection — Identify sprints/tickets trending below velocity baseline; flag when completion confidence falls below configurable threshold (default 75%).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-03:</span> AI Code Review Agent — Analyze pull requests from GitHub, Azure DevOps, and local diffs; generate quality score (0–100), list issues, and provide remediation suggestions.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-04:</span> Security Pattern Detection — Detect OWASP/CWE patterns: SQL injection, authentication bypasses, credential exposure, insecure deserialization, CORS misconfig, dependency vulnerabilities.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-05:</span> Architecture Smell Detection — Flag violations: REST contract breaks, inverted dependencies, cyclic imports, coupling above threshold, missing abstractions.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-06:</span> Intelligence Hub Dashboard — Real-time display of sprint forecast cards, velocity trends, code review status, technical debt metrics; replace static project cards with live data.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-07:</span> Slack/Teams Notifications — Send alerts for at-risk sprints, PR review ready, security findings; link back to dashboard for details; support custom alert rules.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-08:</span> Azure DevOps API Integration — Authenticate via PAT, fetch sprints/work items/commits; stream real-time updates; support branch/release queries.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-09:</span> GitHub API Integration — Authenticate via OAuth/PAT, fetch PRs/commits/branches; support multiple org/repo scope; real-time webhook for PR/commit events.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-10:</span> Historical Data Ingestion — Import sprint/velocity data from Jira/ADO; train ML model on multi-quarter trends; support backfill from API exports.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-11:</span> Code Review Quality Scoring — Metrics include: test coverage %, complexity (cyclomatic/cognitive), duplication %, linting pass rate, security finding count, architecture violation count.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-12:</span> Forecast Confidence Intervals — Calculate 50th/70th/90th percentile completion dates based on variance in historical velocity; explain assumptions in UI tooltip.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-13:</span> Trend Analysis — Compare sprint velocity over time; detect degradation; correlate with code churn/PR cycle time; surface insights in director dashboard.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-14:</span> Report Export — Generate PDF/CSV snapshots of sprint forecasts, delivery health, and compliance audit reports; schedule recurring email delivery.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-15:</span> Custom Alert Rules — Allow managers to define thresholds: velocity drop %, cycle time limit, code review SLA, security finding escalation; route to appropriate Slack channels.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-16:</span> Searchable Knowledge Base — SDLC 2.0 doc brain indexed for policy lookup; code review agent references policies when flagging violations.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-17:</span> Performance Benchmarking Dashboard — Track forecast accuracy (% within ±1 day), code review agent precision/recall, alert latency, API response times.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-18:</span> Multi-Project Support — Scale to 20+ projects; aggregate forecasts at portfolio/team level; support hierarchical team structures (squads → chapters → division).
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Non-Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-01:</span> <strong>Performance:</strong> Sprint forecast must update within 10 seconds of ticket state change; code review feedback within 15 minutes of PR submission; dashboard load in &lt;2 seconds.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-02:</span> <strong>Availability:</strong> 99.5% uptime SLA; async job processing for long-running forecasts; graceful degradation if APIs unavailable (show cached data, disable real-time features).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-03:</span> <strong>Security:</strong> All credentials (PAT, API tokens, webhooks) encrypted at rest; OAuth 2.0 for GitHub/Azure; rate-limit protection against API quota exhaustion; audit log for all alerts/actions.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-04:</span> <strong>Scalability:</strong> Support 50,000+ sprints/projects; forecast models must train on 100+ quarters of historical data; handle 1000+ concurrent dashboard users; async processing for bulk data imports.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-05:</span> <strong>Data Retention:</strong> Retain sprint/velocity data for 5 years; code review findings for 2 years; audit logs for 1 year; allow GDPR/compliance deletion on request.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-06:</span> <strong>Accuracy:</strong> Forecast model must achieve &gt;80% accuracy within ±1 day for 70% of sprints; code review agent precision &gt;85% on security findings; validate against multi-team baseline.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-07:</span> <strong>Reliability:</strong> All APIs must retry transient failures automatically; circuit breaker for external service outages; fallback to cached data if forecast model unavailable; zero data loss on crashes.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-08:</span> <strong>Usability:</strong> Dashboard must be mobile-responsive; keyboard navigation for accessibility (WCAG 2.1 AA); dark theme to reduce eye strain; tooltips for all ML-generated metrics.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-09:</span> <strong>Observability:</strong> Structured logging for all API calls, forecast calculations, alerts; metrics exported to Prometheus; alerts in DataDog for degraded forecast accuracy, failed integrations, high error rates.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-10:</span> <strong>Maintainability:</strong> Code modular with clear separation: forecast engine, code review agent, dashboard, integrations; unit test coverage &gt;80%; integration tests for each API endpoint.
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Acceptance Criteria</h2>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-header">US-01: Sprint Forecast Dashboard</div>
+                <div class="criteria-item">✓ Dashboard displays forecast completion date with ±1 day confidence interval</div>
+                <div class="criteria-item">✓ At-risk ticket count and blocked dependencies are visible above the fold</div>
+                <div class="criteria-item">✓ Forecast updates within 10 seconds of work item state change</div>
+                <div class="criteria-item">✓ Historical forecast accuracy tracked and displayed (% within ±1 day)</div>
+                <div class="criteria-item">✓ Works with 5+ concurrent sprints without performance degradation</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-header">US-02: AI Code Review Agent</div>
+                <div class="criteria-item">✓ PR analysis completes within 15 minutes of submission</div>
+                <div class="criteria-item">✓ Quality score (0–100) provided with explanation of top 3 findings</div>
+                <div class="criteria-item">✓ All security/architecture findings cited with code line numbers</div>
+                <div class="criteria-item">✓ Suggested fixes provided for &gt;70% of non-security findings</div>
+                <div class="criteria-item">✓ False positive rate &lt;15% on security findings (validated against human review)</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-header">US-04: At-Risk Sprint Alerts</div>
+                <div class="criteria-item">✓ Slack/Teams alert sent within 5 minutes of velocity trending below 75% confidence</div>
+                <div class="criteria-item">✓ Alert includes sprint name, blocked count, and link to dashboard</div>
+                <div class="criteria-item">✓ Manager can configure alert threshold (default 75% confidence)</div>
+                <div class="criteria-item">✓ No false positive alerts (validated against sprint outcome)</div>
+                <div class="criteria-item">✓ Alert history retained for audit trail</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-header">US-05: Security Pattern Detection</div>
+                <div class="criteria-item">✓ Detects 8+ OWASP/CWE patterns: SQL injection, auth bypass, credential exposure, insecure deserialize, CORS, dependency vulnerabilities, hardcoded secrets, XXE</div>
+                <div class="criteria-item">✓ Precision &gt;85% on security findings (false positive &lt;15%)</div>
+                <div class="criteria-item">✓ Each finding includes CWE/OWASP reference and remediation guidance</div>
+                <div class="criteria-item">✓ Tested against OWASP Top 10 samples</div>
+                <div class="criteria-item">✓ Works with languages: Python, JavaScript/TypeScript, Java, C#, Go</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-header">US-08: Forecast Confidence Intervals</div>
+                <div class="criteria-item">✓ Forecast displays 50th, 70th, 90th percentile completion dates</div>
+                <div class="criteria-item">✓ Confidence intervals calculated from variance in historical velocity (min 8 quarters)</div>
+                <div class="criteria-item">✓ Tooltip explains calculation and dependencies (e.g., team size, churn)</div>
+                <div class="criteria-item">✓ 70th percentile matches 70% historical accuracy rate across validation set</div>
+                <div class="criteria-item">✓ Works with sprints as short as 1 week and as long as 4 weeks</div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title">Dependencies & Integrations</h2>
+
+            <div class="subsection-title">External APIs & Systems</div>
+            <ul>
+                <li><strong>Azure DevOps REST API:</strong> Authentication (PAT), fetch work items, sprints, commits, branches. Required for sprint/velocity data.</li>
+                <li><strong>GitHub API v3:</strong> Authentication (OAuth/PAT), fetch PRs, commits, code content, webhook events. Required for code review agent and commit history analysis.</li>
+                <li><strong>Slack API:</strong> Post messages to channels, create alerts, attach interactive buttons. Required for at-risk notifications.</li>
+                <li><strong>Microsoft Teams API:</strong> Send adaptive cards, alerts, link back to dashboard. Required for Teams-based alert routing.</li>
+                <li><strong>Historical Data Export:</strong> Jira/Azure DevOps sprint velocity CSV export or API bulk read. Required for ML model training on 5+ quarters baseline.</li>
+            </ul>
+
+            <div class="subsection-title">Internal Systems</div>
+            <ul>
+                <li><strong>Intelligence Centre Portal:</strong> React frontend for dashboard; integration point for live forecast cards and metric widgets.</li>
+                <li><strong>SDLC 2.0 Doc Brain:</strong> Searchable knowledge base indexed from policy docs; code review agent queries for standard violation references.</li>
+                <li><strong>ML Forecast Model Training:</strong> Python/scikit-learn or similar for velocity prediction; runs nightly on historical data; deployed as REST microservice.</li>
+                <li><strong>Code Review Agent Runtime:</strong> Python/LLM-based agent; supports GitHub, Azure DevOps, local diff inputs; returns JSON with findings and quality metrics.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="section-title">Assumptions & Constraints</h2>
+
+            <div class="subsection-title">Assumptions</div>
+            <ul>
+                <li>Teams use standardized sprint cadence (1–4 week sprints) and track velocity consistently.</li>
+                <li>Git history and issue tracking systems contain sufficiently detailed commit/state-change records for analysis.</li>
+                <li>At least 8 quarters (6+ months) of historical sprint/velocity data available for ML model baseline.</li>
+                <li>Azure DevOps and GitHub APIs are accessible from Intelligence Centre network; no air-gapped restrictions.</li>
+                <li>Code review agent will be run against managed languages (Python, JS/TS, Java, C#, Go); support for additional languages deferred to v2.</li>
+                <li>Teams will adopt AI code review feedback as supplementary input; human review remains required for merge approval.</li>
+            </ul>
+
+            <div class="subsection-title">Constraints</div>
+            <ul>
+                <li>Forecast accuracy limited by data quality; garbage in = garbage out (incomplete issue tracking degrades forecast).</li>
+                <li>Code review agent cannot review binary/image files; text-based source code only.</li>
+                <li>Security pattern detection is pattern-based heuristic + LLM; cannot guarantee zero false negatives (no taint analysis or formal verification).</li>
+                <li>Historical data import is one-time or manual process; no continuous sync from legacy Jira instances.</li>
+                <li>External API rate limits may delay processing (GitHub: 5,000 req/hr; Azure DevOps: custom limits); queued async processing required.</li>
+                <li>Dashboard performance degrades beyond 50,000 concurrent data points; aggregation/sampling required for large portfolios.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="section-title">Out of Scope (v1.0)</h2>
+            <ul>
+                <li><strong>Resource Leveling:</strong> Automatic task allocation or schedule optimization across team members (v2).</li>
+                <li><strong>Budget Forecasting:</strong> Burn-down cost prediction or invoice estimation (v2).</li>
+                <li><strong>Requirement Change Impact:</strong> Analyzing scope change impact on forecast (deferred pending ML model maturity).</li>
+                <li><strong>Cross-Project Dependencies:</strong> Tracking and forecasting multi-project release timelines (v2).</li>
+                <li><strong>Language Support Expansion:</strong> Languages beyond Python, JavaScript/TypeScript, Java, C#, Go (v2).</li>
+                <li><strong>On-Premise Deployment:</strong> Air-gapped or self-hosted version (v2 or later).</li>
+                <li><strong>Formal Verification:</strong> Security proof-of-correctness or taint analysis (architectural constraint).</li>
+                <li><strong>Legacy System Migration:</strong> Support for Jira on-premise or SVN/Mercurial (v2).</li>
+                <li><strong>Predictive Defect Detection:</strong> ML model to predict pre-merge defect likelihood (v2, requires bug database).</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2 class="section-title">Definition of Done</h2>
+            <div class="done-checklist">
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    All functional requirements (FR-01 to FR-18) implemented and tested
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Non-functional requirements validated (NFR-01 to NFR-10)
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Acceptance criteria met for critical user stories (US-01, US-02, US-04, US-05)
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Azure DevOps and GitHub APIs connected; live data flowing to dashboard
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Slack/Teams notifications tested and deployed; alerts firing correctly
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    ML forecast model trained on 5+ quarters historical data; accuracy &gt;80% validated
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Code review agent security pattern detection precision &gt;85%
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Intelligence Centre dashboard updated with live project cards and metrics
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Unit test coverage &gt;80%; integration tests for API endpoints
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Performance benchmarking dashboard deployed and baseline metrics captured
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    User documentation and API docs completed; team trained on features
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Security audit completed (credential handling, API auth, data encryption)
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    UAT with pilot team (Engineering Manager, dev team); feedback incorporated
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Monitoring/observability in place; alerts configured for degradation
+                </div>
+                <div class="checklist-item">
+                    <div class="checkbox"></div>
+                    Sign-off from Herman Odame (Owner) and Priya Patel (Director sponsor)
+                </div>
+            </div>
+        </section>
+
+        <div class="footer">
+            <p>UC-14 AI for Delivery Management | Version 1.0 | May 2026</p>
+            <p>Owner: Herman Odame | Status: In Progress (55%) | Priority: P2</p>
+        </div>
+    </div>
+</body>
+</html>

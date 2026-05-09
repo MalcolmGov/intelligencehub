@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-01: AI-Based Test Case Generation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background-color: #0d1117;
+            color: #e6edf3;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #1c2128 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            color: #58a6ff;
+        }
+        .meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            font-size: 0.95em;
+            margin-top: 20px;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .meta-label {
+            color: #8b949e;
+            font-weight: 600;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        .badge-success {
+            background-color: rgba(3, 102, 71, 0.3);
+            color: #3fb950;
+            border: 1px solid #238636;
+        }
+        .badge-p1 {
+            background-color: rgba(248, 81, 73, 0.15);
+            color: #f85149;
+            border: 1px solid #da3633;
+        }
+        .section {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .section h2 {
+            color: #58a6ff;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+        .section h3 {
+            color: #79c0ff;
+            font-size: 1.1em;
+            margin: 20px 0 12px 0;
+            margin-top: 25px;
+        }
+        .section h3:first-child {
+            margin-top: 0;
+        }
+        p, li {
+            color: #e6edf3;
+            margin-bottom: 12px;
+        }
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .persona-card {
+            background: #0d1117;
+            border-left: 4px solid #58a6ff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .persona-card strong {
+            color: #79c0ff;
+        }
+        .user-story {
+            background: #0d1117;
+            border-left: 4px solid #3fb950;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .user-story.must-have {
+            border-left-color: #f85149;
+        }
+        .user-story.should-have {
+            border-left-color: #d29922;
+        }
+        .user-story.nice-to-have {
+            border-left-color: #58a6ff;
+        }
+        .story-id {
+            color: #8b949e;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .story-text {
+            color: #e6edf3;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+        .story-priority {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 0.75em;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        .priority-must {
+            background: rgba(248, 81, 73, 0.2);
+            color: #f85149;
+        }
+        .priority-should {
+            background: rgba(210, 153, 34, 0.2);
+            color: #d29922;
+        }
+        .priority-nice {
+            background: rgba(88, 166, 255, 0.2);
+            color: #58a6ff;
+        }
+        .req-item {
+            background: #0d1117;
+            border-left: 4px solid #1f6feb;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        .req-id {
+            color: #79c0ff;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .acceptance-item {
+            background: #0d1117;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #238636;
+            border-radius: 4px;
+        }
+        .dependency-item {
+            background: #0d1117;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #9e6a03;
+            border-radius: 4px;
+        }
+        .assumption-item {
+            background: #0d1117;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #8957e5;
+            border-radius: 4px;
+        }
+        .exclusion-item {
+            background: #0d1117;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #d1242f;
+            border-radius: 4px;
+        }
+        .checklist {
+            list-style: none;
+        }
+        .checklist li {
+            padding-left: 25px;
+            position: relative;
+        }
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: #3fb950;
+        }
+        .note {
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 4px solid #58a6ff;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        strong {
+            color: #79c0ff;
+        }
+        .version-date {
+            color: #8b949e;
+            font-size: 0.9em;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #30363d;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>AI-Based Test Case Generation</h1>
+            <div class="meta">
+                <div class="meta-item">
+                    <span class="meta-label">ID:</span>
+                    <span>UC-01</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Owner:</span>
+                    <span>Anupam Sharma</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Status:</span>
+                    <span class="badge badge-success">Done (100%)</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Priority:</span>
+                    <span class="badge badge-p1">P1</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Version:</span>
+                    <span>v1.0</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Date:</span>
+                    <span>May 2026</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Author:</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role:</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Problem Statement</h2>
+            <p>Manual test case creation from user stories, business requirements documents (BRDs), and API specifications is time-consuming, error-prone, and difficult to scale across multiple projects. QA engineers spend 40-60% of their time translating requirements into structured test steps rather than executing tests or analyzing results.</p>
+            <p>Current workflows require:</p>
+            <ul>
+                <li>Manual parsing of natural language requirements to extract testable scenarios</li>
+                <li>Duplicate effort when similar features or APIs are tested across projects</li>
+                <li>Limited traceability between requirements and test cases, making compliance audits challenging</li>
+                <li>No automated connection between API documentation (Swagger/OpenAPI) and test coverage</li>
+            </ul>
+            <p>For SentinelQA and fintech QA, this inefficiency translates to slower release cycles, incomplete test coverage for regulatory-critical features, and missed edge cases in payment processing and compliance workflows.</p>
+        </div>
+
+        <div class="section">
+            <h2>Target Users & Personas</h2>
+
+            <div class="persona-card">
+                <strong>1. Sarah Chen – QA Automation Engineer</strong><br>
+                <strong>Role:</strong> Mid-level QA engineer responsible for test suite maintenance<br>
+                <strong>Goals:</strong> Generate test cases quickly from requirements, maintain high test coverage, reduce manual test writing time by 50%<br>
+                <strong>Frustrations:</strong> Spends 8+ hours per sprint on manual test case creation; struggles with API coverage; duplicate work on similar features
+            </div>
+
+            <div class="persona-card">
+                <strong>2. Marcus Johnson – QA Lead</strong><br>
+                <strong>Role:</strong> Team lead overseeing test strategy and quality metrics<br>
+                <strong>Goals:</strong> Improve team velocity, ensure comprehensive test coverage, maintain audit trails for compliance, scale testing to new projects<br>
+                <strong>Frustrations:</strong> Gaps in coverage for edge cases; inconsistent test case naming and structure; difficulty tracking which requirements are tested; onboarding new engineers takes weeks
+            </div>
+
+            <div class="persona-card">
+                <strong>3. Dr. Priya Patel – Product Manager</strong><br>
+                <strong>Role:</strong> PM writing complex feature requirements and BRDs<br>
+                <strong>Goals:</strong> See requirements instantly converted to test cases, ensure feature intent is captured in tests, reduce back-and-forth with QA<br>
+                <strong>Frustrations:</strong> QA asks clarifying questions on requirements; hand-written test cases miss edge cases; no immediate feedback on test coverage from her specs
+            </div>
+
+            <div class="persona-card">
+                <strong>4. Dev Integration Lead – Fintech Backend Team</strong><br>
+                <strong>Role:</strong> Responsible for payment processing APIs and integrations<br>
+                <strong>Goals:</strong> Auto-generate tests from OpenAPI specs, ensure payment flows are tested end-to-end, reduce test creation bottleneck for API changes<br>
+                <strong>Frustrations:</strong> API docs lag behind implementation; tests don't reflect actual API behavior; difficult to test new endpoints quickly; compliance tests require manual verification
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>User Stories</h2>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-01</div>
+                <div class="story-text">As a QA engineer, I want to upload a user story in plain English and have the system generate 5-10 structured test cases with steps, expected results, and data requirements, so that I can reduce manual test case creation time from 2 hours to 15 minutes per story.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-02</div>
+                <div class="story-text">As a dev integration lead, I want to upload an OpenAPI/Swagger spec and have the system generate test cases for all endpoints (GET, POST, PUT, DELETE) with valid/invalid payloads, authentication tests, and error scenarios, so that API coverage increases from 60% to 95%.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-03</div>
+                <div class="story-text">As a QA lead, I want generated test cases to include traceability links back to source requirements (story ID, BRD section), so that I can audit which requirements are covered in tests for compliance sign-offs.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-04</div>
+                <div class="story-text">As a QA engineer, I want generated test cases to be pushed to GitHub as draft pull requests with clear commit messages, so that I can review, edit, and merge them into my test suite without manual file creation.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-05</div>
+                <div class="story-text">As a QA engineer, I want the system to detect and flag duplicate test cases (same scenario, different wording) and suggest merging them, so that test suite remains lean and maintainable.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-06</div>
+                <div class="story-text">As a product manager, I want to view generated test cases grouped by feature and see coverage percentage per requirement, so that I understand test completeness before handoff to QA.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-07</div>
+                <div class="story-text">As a QA engineer, I want the system to suggest test data fixtures (sample payment amounts, user IDs, timestamps) based on API schemas and domain context, so that tests run immediately without manual fixture creation.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+
+            <div class="user-story nice-to-have">
+                <div class="story-id">US-08</div>
+                <div class="story-text">As a QA lead, I want to define reusable test templates for common scenarios (login flow, payment processing, error handling), so that generated test cases follow consistent patterns across projects.</div>
+                <span class="story-priority priority-nice">Nice to Have</span>
+            </div>
+
+            <div class="user-story nice-to-have">
+                <div class="story-id">US-09</div>
+                <div class="story-text">As a QA engineer, I want the system to analyze requirements for potential edge cases (boundary values, null inputs, race conditions) and auto-generate test cases for them, so that test coverage improves beyond happy-path scenarios.</div>
+                <span class="story-priority priority-nice">Nice to Have</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Functional Requirements</h2>
+
+            <div class="req-item"><span class="req-id">FR-01</span>Accept plain-English user stories (free text, up to 2000 chars) and parse them into structured test scenarios with pre/post conditions and edge case detection.</div>
+
+            <div class="req-item"><span class="req-id">FR-02</span>Accept OpenAPI 3.0 / Swagger 2.0 specifications and auto-generate test cases for all operations, covering request/response validation, authentication, rate limits, and error codes.</div>
+
+            <div class="req-item"><span class="req-id">FR-03</span>Generate test cases in industry-standard format: Gherkin (BDD), Test Case ID, Steps, Expected Results, Pre-conditions, Post-conditions, Data Requirements.</div>
+
+            <div class="req-item"><span class="req-id">FR-04</span>Link generated test cases to source requirements via unique IDs, with bidirectional traceability matrix export (CSV/JSON).</div>
+
+            <div class="req-item"><span class="req-id">FR-05</span>Create GitHub draft pull requests with generated test cases, allowing QA to review, edit comments, and merge into target branch (feature branch or main).</div>
+
+            <div class="req-item"><span class="req-id">FR-06</span>Detect semantic duplicates in generated test cases using NLP, highlight them to QA for manual merge decision.</div>
+
+            <div class="req-item"><span class="req-id">FR-07</span>Support multi-language requirements input (English, Spanish, French) with automatic translation to English for processing.</div>
+
+            <div class="req-item"><span class="req-id">FR-08</span>Generate parameterised test data fixtures with realistic values (payment amounts 0.01–9999.99, valid IBAN/BIC, valid email formats, timestamp ranges).</div>
+
+            <div class="req-item"><span class="req-id">FR-09</span>Expose coverage dashboard: % of requirements with generated test cases, test count per feature, high-risk untested areas flagged in red.</div>
+
+            <div class="req-item"><span class="req-id">FR-10</span>Support batch import: accept ZIP of 50+ BRD files (PDF/Word) and generate test cases for all in one job (async, with email notification on completion).</div>
+
+            <div class="req-item"><span class="req-id">FR-11</span>Allow QA engineers to edit AI-generated test case steps, mark as approved/rejected, and use feedback to improve future generations.</div>
+
+            <div class="req-item"><span class="req-id">FR-12</span>Export generated test cases in Playwright, Cypress, Jest, and Pytest formats with syntax-ready structure.</div>
+
+            <div class="req-item"><span class="req-id">FR-13</span>Maintain version history of generated test cases, tracking changes and allowing rollback to previous versions.</div>
+
+            <div class="req-item"><span class="req-id">FR-14</span>Integrate with SentinelQA Test Studio: generated test cases appear in test inventory with origin metadata and status.</div>
+
+            <div class="req-item"><span class="req-id">FR-15</span>Support customizable test case templates per project with pre-defined mandatory fields, naming conventions, and assertion styles.</div>
+        </div>
+
+        <div class="section">
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="req-item"><span class="req-id">NFR-01</span><strong>Performance:</strong> Generate 10 test cases from a user story in <2 seconds; process OpenAPI spec with 50+ endpoints in <5 seconds.</div>
+
+            <div class="req-item"><span class="req-id">NFR-02</span><strong>Scalability:</strong> Support concurrent generation jobs for 100+ users; handle batch imports of 500+ requirements without degradation.</div>
+
+            <div class="req-item"><span class="req-id">NFR-03</span><strong>Security:</strong> Encrypt all requirements data in transit and at rest; sanitise output to prevent injection attacks in generated test code; enforce RBAC for viewing sensitive requirements.</div>
+
+            <div class="req-item"><span class="req-id">NFR-04</span><strong>Reliability:</strong> 99.5% uptime SLA; automatic retry on API timeouts; graceful degradation if GitHub API is unavailable (queue PRs for later submission).</div>
+
+            <div class="req-item"><span class="req-id">NFR-05</span><strong>Observability:</strong> Log all generation requests with input/output tokens, latency, model version; export metrics to CloudWatch; surface errors to QA dashboard.</div>
+
+            <div class="req-item"><span class="req-id">NFR-06</span><strong>Compliance:</strong> Maintain audit logs of all test case generation (who, when, source requirement, output); support GDPR data deletion of sensitive inputs.</div>
+
+            <div class="req-item"><span class="req-id">NFR-07</span><strong>Usability:</strong> Test case generation interface must be self-explanatory; support drag-drop file upload and progress tracking; no CLI required for QA engineers.</div>
+
+            <div class="req-item"><span class="req-id">NFR-08</span><strong>Maintainability:</strong> AI model updates should not break existing test case structure; semantic versioning for API responses; rollback capability for model changes.</div>
+        </div>
+
+        <div class="section">
+            <h2>Acceptance Criteria</h2>
+
+            <h3>Feature: User Story → Test Case Generation</h3>
+            <div class="acceptance-item">Given a valid user story input, when the QA engineer submits it, then the system generates 5-10 test cases within 2 seconds with Gherkin format, unique test IDs, and pre/post conditions.</div>
+            <div class="acceptance-item">Given a user story with ambiguous language, when processed, then the system flags uncertainty and asks clarifying questions before finalising test cases (e.g., "Which login method: password or SSO?").</div>
+            <div class="acceptance-item">Given a user story with edge case mentions (e.g., "handle invalid input"), when processed, then test cases include explicit negative test cases for the mentioned edge cases.</div>
+
+            <h3>Feature: OpenAPI → Test Case Generation</h3>
+            <div class="acceptance-item">Given a valid OpenAPI 3.0 spec with 20 endpoints, when uploaded, then the system generates at least 2 test cases per endpoint (happy path + error path) within 5 seconds.</div>
+            <div class="acceptance-item">Given an endpoint with authentication (Bearer token, OAuth), when processed, then generated test cases include both authenticated and unauthenticated requests with expected 401/403 responses.</div>
+            <div class="acceptance-item">Given a request schema with required vs optional fields, when processed, then test cases validate both required field presence and optional field omission.</div>
+
+            <h3>Feature: GitHub PR Creation</h3>
+            <div class="acceptance-item">Given generated test cases, when the QA engineer selects "Create PR", then a draft PR is created on the specified GitHub branch with test cases as .spec files, a clear commit message, and PR description linking to source requirement.</div>
+            <div class="acceptance-item">Given a batch of 50 test cases, when pushed to GitHub, then all cases are in a single PR with organised folder structure matching project conventions.</div>
+
+            <h3>Feature: Traceability</h3>
+            <div class="acceptance-item">Given a requirement ID (e.g., STORY-123), when exported, then traceability matrix shows all test cases linking to that requirement with coverage percentage.</div>
+            <div class="acceptance-item">Given a test case, when viewed, then it displays the source requirement, user story text, generation timestamp, and approval status.</div>
+        </div>
+
+        <div class="section">
+            <h2>Dependencies & Integrations</h2>
+
+            <div class="dependency-item"><strong>SentinelQA Test Studio (Internal):</strong> Generated test cases are stored in Test Studio database; requires REST API integration for CRUD operations on test_case table. Status: Existing integration.</div>
+
+            <div class="dependency-item"><strong>GitHub API:</strong> For draft PR creation, branch listing, commit operations. Uses GitHub App authentication (OAuth). Status: Existing integration.</div>
+
+            <div class="dependency-item"><strong>OpenAPI Parser Library:</strong> To validate and parse OpenAPI 3.0/Swagger 2.0 specs. Recommendation: use 'openapi3' npm package or Python 'openapi-spec-validator'. Status: To be integrated.</div>
+
+            <div class="dependency-item"><strong>AI Language Model (Claude 3.5 Sonnet or GPT-4):</strong> For requirement parsing, test case generation, edge case detection. Requires token-based API calls with retry logic. Status: Existing integration (Test Studio already uses Claude).</div>
+
+            <div class="dependency-item"><strong>NLP Duplicate Detection:</strong> To identify semantic duplicates. Recommendation: use 'sentence-transformers' library for embeddings + cosine similarity. Status: To be integrated.</div>
+
+            <div class="dependency-item"><strong>Gherkin/BDD Formatter:</strong> To convert AI-generated test descriptions to Gherkin syntax. Recommendation: 'gherkin-formatter' or custom Handlebars templates. Status: To be integrated.</div>
+
+            <div class="dependency-item"><strong>PDF/Word Parser (for BRD batch import):</strong> To extract text from uploaded BRD files. Recommendation: 'pdf-parse' (Node.js) and 'mammoth' (Word docs). Status: To be integrated.</div>
+
+            <div class="dependency-item"><strong>CloudWatch / DataDog:</strong> For logging, metrics, and alert thresholds on generation failures. Status: Existing infrastructure.</div>
+        </div>
+
+        <div class="section">
+            <h2>Assumptions & Constraints</h2>
+
+            <h3>Assumptions</h3>
+            <ul>
+                <li>Requirements are written in clear, moderately-detailed English (minimum 50 words); vague 1-line stories will produce lower-quality test cases.</li>
+                <li>QA engineers have GitHub access and familiarity with pull request workflows.</li>
+                <li>OpenAPI specs are well-formed and describe actual API behaviour (not aspirational specs).</li>
+                <li>Generated test cases will be reviewed and refined by humans; AI output is a starting point, not production-ready without QA approval.</li>
+                <li>Fintech domain context is provided via project templates and custom rules, not inferred from requirements alone.</li>
+            </ul>
+
+            <h3>Constraints</h3>
+            <ul>
+                <li><strong>Regulation (PCI-DSS, FICA):</strong> Generated test cases must not include actual payment card numbers, customer PII, or sensitive financial data; fixtures use synthetic/masked data only.</li>
+                <li><strong>AI Model Cost:</strong> Each generation request consumes tokens; must implement caching and rate limiting to control costs.</li>
+                <li><strong>Latency:</strong> Real-time generation is acceptable up to 5 seconds; batch jobs (500+ cases) will be async with email notification.</li>
+                <li><strong>Test Coverage Gap:</strong> AI-generated test cases supplement human-written tests; edge cases and domain-specific logic still require manual test case creation.</li>
+                <li><strong>GitHub API Rate Limit:</strong> 5000 requests/hour per GitHub App; batch PR creation must respect this limit with queuing.</li>
+                <li><strong>Supported Languages:</strong> v1 supports English requirements only; multi-language support planned for v1.1.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Out of Scope (v1.0)</h2>
+
+            <div class="exclusion-item">Test case execution / test result analysis (handled by Test Runner, not this module).</div>
+
+            <div class="exclusion-item">Automatic merge of generated test cases into main branch (QA must review and approve via PR).</div>
+
+            <div class="exclusion-item">Code coverage analysis or mutation testing.</div>
+
+            <div class="exclusion-item">Conversion of existing manual test cases to AI-generated format (data migration tool planned for v1.1).</div>
+
+            <div class="exclusion-item">Custom test frameworks beyond Playwright, Cypress, Jest, Pytest (e.g., Selenium, TestCafe).</div>
+
+            <div class="exclusion-item">Real-time bi-directional sync between requirements documents and generated test cases (one-way generation only in v1).</div>
+
+            <div class="exclusion-item">Support for requirements in non-English languages (v1.0 only accepts English input).</div>
+
+            <div class="exclusion-item">Integration with enterprise ALM tools (Azure DevOps, Jira) beyond basic traceability links.</div>
+        </div>
+
+        <div class="section">
+            <h2>Definition of Done</h2>
+
+            <ul class="checklist">
+                <li>User stories from all 3 personas tested and validated in UAT environment</li>
+                <li>All functional requirements (FR-01 to FR-15) implemented and unit-tested with >90% code coverage</li>
+                <li>All non-functional requirements (NFR-01 to NFR-08) verified via load testing, security audit, and chaos engineering tests</li>
+                <li>Integration tests confirm end-to-end flow: BRD upload → test case generation → GitHub PR creation → SentinelQA ingestion</li>
+                <li>API documentation (OpenAPI spec) for test case generation endpoints published</li>
+                <li>User documentation (screenshots, video walkthrough) created for QA engineers and PMs</li>
+                <li>Error handling for all edge cases: invalid file formats, API timeouts, GitHub auth failures, quota limits</li>
+                <li>Security review completed: no PII/payment data leakage, input sanitisation verified, RBAC enforced</li>
+                <li>Performance testing: 2s generation time for 10 test cases, <5s for 50-endpoint OpenAPI specs validated</li>
+                <li>Accessibility audit: dark theme meets WCAG 2.1 AA contrast ratios; keyboard navigation functional</li>
+                <li>Cost analysis: token usage per operation documented; cost optimisation recommendations provided</li>
+                <li>Production deployment checklist: database migrations, feature flags, monitoring alerts, rollback plan</li>
+                <li>Stakeholder sign-off: Malcolm Govender (Head of AI &amp; Engineering), product manager, and QA lead approval recorded</li>
+            </ul>
+
+            <div class="version-date">
+                <strong>Document Version:</strong> v1.0<br>
+                <strong>Last Updated:</strong> May 2026<br>
+                <strong>Owner:</strong> Anupam Sharma<br><strong>Author:</strong> Malcolm Govender (Head of AI &amp; Engineering)
+            </div>
+        </div>
+    </div>
+</body>
+</html>

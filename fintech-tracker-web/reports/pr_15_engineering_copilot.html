@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Readiness Report - AI Engineering Copilot</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-hover: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border-color: #334155;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            padding: 60px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-blue);
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .status-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge.status {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .badge.priority {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+
+        .badge.tech {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--accent-purple);
+            border: 1px solid var(--accent-purple);
+        }
+
+        .tech-stack {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .tech-tag {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: var(--accent-blue);
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section h3 {
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: var(--accent-cyan);
+        }
+
+        .section h4 {
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: var(--accent-purple);
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--accent-cyan);
+        }
+
+        .card-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: rgba(59, 130, 246, 0.15);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent-blue);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Code Blocks */
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--accent-cyan);
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: var(--text-secondary);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 15px 0 15px 30px;
+            color: var(--text-secondary);
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Status Indicators */
+        .status-high {
+            color: var(--accent-red);
+            font-weight: 600;
+        }
+
+        .status-medium {
+            color: var(--accent-amber);
+            font-weight: 600;
+        }
+
+        .status-low {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            background: var(--bg-hover);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Owner Info */
+        .owner-info {
+            background: rgba(139, 92, 246, 0.1);
+            border-left: 3px solid var(--accent-purple);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .owner-info strong {
+            color: var(--accent-purple);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            border: 2px solid var(--bg-dark);
+        }
+
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background: var(--border-color);
+        }
+
+        .timeline-item:last-child:after {
+            display: none;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 5px;
+        }
+
+        .timeline-duration {
+            font-size: 0.9em;
+            color: var(--text-tertiary);
+        }
+
+        /* Definition List */
+        .def-list {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .def-term {
+            font-weight: 600;
+            color: var(--accent-cyan);
+        }
+
+        .def-desc {
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 60px;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            border-top: 2px solid var(--border-color);
+            text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <h1>AI Engineering Copilot</h1>
+            <p>Production Readiness Report - Q2 2026</p>
+            <div class="status-badges">
+                <div class="badge status">Status: Not Started • 0%</div>
+                <div class="badge priority">Priority: P1</div>
+            </div>
+            <div class="tech-stack">
+                <span class="tech-tag">Python 3.11</span>
+                <span class="tech-tag">FastAPI</span>
+                <span class="tech-tag">React 18</span>
+                <span class="tech-tag">GPT-4o</span>
+                <span class="tech-tag">Azure OpenAI</span>
+                <span class="tech-tag">Mermaid.js</span>
+                <span class="tech-tag">PlantUML</span>
+                <span class="tech-tag">PostgreSQL</span>
+                <span class="tech-tag">Docker/K8s</span>
+            </div>
+        </section>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <section class="section container">
+            <h2>Executive Summary</h2>
+            <div class="card">
+                <div class="card-content">
+                    <p><strong>Project Status:</strong> Greenfield development (0% complete). The AI Engineering Copilot is a strategic initiative to accelerate software engineering productivity by transforming business requirements into implementation-ready artifacts using advanced LLM capabilities.</p>
+
+                    <p style="margin-top: 15px;"><strong>Vision:</strong> Enable engineering teams to generate process flow diagrams, sequence diagrams, API specifications, acceptance criteria, and test scenarios directly from natural language requirements documents, meeting notes, and voice transcripts.</p>
+
+                    <p style="margin-top: 15px;"><strong>Scope:</strong> 11-week build program delivering a production-ready SaaS platform with integrations to Confluence, GitHub, Figma, and Jira. Initial MVP targets business requirement document processing with structured diagram generation and OpenAPI 3.0 specification export.</p>
+
+                    <p style="margin-top: 15px;"><strong>Investment:</strong> 156 person-days engineering effort (~31 weeks equivalent) with estimated budget of R5.12M (ZAR 15 engineers @ R3.5k/day avg, material infrastructure costs).</p>
+
+                    <p style="margin-top: 15px;"><strong>Success Metrics:</strong></p>
+                    <ul style="margin-top: 10px;">
+                        <li>Diagram generation latency: <2 seconds for <5000 token BRD input</li>
+                        <li>OpenAPI 3.0 spec generation accuracy: >90% valid against JSON Schema validation</li>
+                        <li>User adoption: >60% of engineering team (12/20 engineers) within 60 days of launch</li>
+                        <li>Artifact quality: >85% of auto-generated artifacts require <15% manual refinement</li>
+                        <li>Time saved: 4-8 hours per requirement cycle (baseline 16-24 hour manual process)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BUSINESS CONTEXT -->
+        <section class="section container">
+            <h2>1. Business Context & Problem Statement</h2>
+            <div class="card">
+                <div class="card-title">Current Engineering Workflow Gaps</div>
+                <div class="card-content">
+                    <p><strong>Problem:</strong> Today's software development cycle requires manual translation of business requirements into technical artifacts. A typical requirement document (BRD, user story, or meeting notes) must be manually processed by technical architects to create:</p>
+                    <ul style="margin-top: 10px;">
+                        <li>BPMN/swimlane process flow diagrams</li>
+                        <li>UML sequence diagrams showing system interactions</li>
+                        <li>OpenAPI 3.0 REST API specifications</li>
+                        <li>Gherkin-format acceptance criteria (Given/When/Then)</li>
+                        <li>Test case matrices mapped to requirements</li>
+                        <li>C4 context and container diagrams</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Impact:</strong></p>
+                    <ul>
+                        <li>Average requirement-to-implementation cycle: 16-24 hours for small features, 5-10 days for complex workflows</li>
+                        <li>Rework due to ambiguous requirements: 20-30% of engineering effort</li>
+                        <li>Consistency issues: Different team members produce incompatible artifacts</li>
+                        <li>Knowledge bottleneck: Senior architects must review all diagrams before handoff to developers</li>
+                        <li>Stakeholder misalignment: Back-and-forth refinement cycles delay development start</li>
+                    </ul>
+
+                    <p style="margin-top: 15px;"><strong>Opportunity:</strong> AI Engineering Copilot will automate artifact generation from natural language inputs, reducing cycle time by 75% (12-18 hours saved per requirement) while improving consistency and enabling self-service diagram generation by non-technical stakeholders.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECHNICAL ARCHITECTURE -->
+        <section class="section container">
+            <h2>2. Technical Architecture</h2>
+
+            <h3>System Overview</h3>
+            <div class="card">
+                <div class="card-title">Three-Layer Reference Architecture</div>
+                <div class="card-content">
+                    <pre>┌─────────────────────────────────────────────────────────────────┐
+│                         CLIENT LAYER                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐   │
+│  │ React Web    │  │ Desktop App  │  │ IDE Extension        │   │
+│  │ (SPA)        │  │ (Electron)   │  │ (VS Code, JetBrains) │   │
+│  └──────────────┘  └──────────────┘  └──────────────────────┘   │
+└────────────────────────────────────────────────────────────────────┘
+                                │
+                                │ REST API / WebSocket
+                                ↓
+┌─────────────────────────────────────────────────────────────────┐
+│                      API GATEWAY LAYER                           │
+│  FastAPI Gateway (Load Balancer, Auth, Rate Limiting)          │
+└────────────────────────────────────────────────────────────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────┐
+        ↓                       ↓                       ↓
+    ┌─────────────┐      ┌──────────────┐      ┌──────────────┐
+    │ LLM Engine  │      │ Diagram Svc  │      │ Storage Svc  │
+    │             │      │              │      │              │
+    │ GPT-4o      │      │ Mermaid.js   │      │ PostgreSQL   │
+    │ Azure OAI   │      │ PlantUML     │      │ Redis Cache  │
+    │             │      │ Draw.io Exp  │      │ S3 Storage   │
+    └─────────────┘      └──────────────┘      └──────────────┘
+        │                      │                      │
+        └───────────────────────┼───────────────────────┘
+                                ↓
+        ┌───────────────────────────────────────┐
+        │    INTEGRATION LAYER                  │
+        │  ┌─────────────┐  ┌──────────────┐   │
+        │  │ Confluence  │  │ GitHub       │   │
+        │  │ Notion      │  │ Figma        │   │
+        │  │ Drive       │  │ Jira, Teams  │   │
+        │  └─────────────┘  └──────────────┘   │
+        └───────────────────────────────────────┘</pre>
+
+                    <h4>Component Details</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Technology</th>
+                                <th>Responsibility</th>
+                                <th>Scaling Approach</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>API Gateway</strong></td>
+                                <td>FastAPI + Nginx</td>
+                                <td>Request routing, auth, rate limiting (100 req/min per user)</td>
+                                <td>Horizontal via K8s Deployment (3+ replicas)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LLM Service</strong></td>
+                                <td>Python, Azure OpenAI SDK</td>
+                                <td>GPT-4o calls for artifact generation (prompt engineering, chain-of-thought)</td>
+                                <td>Queue-based (RabbitMQ) with max concurrency=10 to respect Azure quotas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Diagram Generator</strong></td>
+                                <td>Node.js, Mermaid.js CLI</td>
+                                <td>SVG/PNG rendering from Mermaid syntax, PlantUML for UML diagrams</td>
+                                <td>Stateless workers, render-to-file with Chromium headless</td>
+                            </tr>
+                            <tr>
+                                <td><strong>API Spec Builder</strong></td>
+                                <td>Python pydantic, openapi-schema-validator</td>
+                                <td>Validate and format OpenAPI 3.0 YAML/JSON output from LLM</td>
+                                <td>In-process with LLM service, 200ms overhead per spec</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Persistence Layer</strong></td>
+                                <td>PostgreSQL, Redis, S3</td>
+                                <td>User sessions, BRD artifacts, generated diagrams, API specs</td>
+                                <td>RDS Multi-AZ, Redis Cluster, S3 with CloudFront CDN</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Integration Hub</strong></td>
+                                <td>Python + OAuth2, webhooks</td>
+                                <td>Confluence push, GitHub PR comments, Figma publish, Jira linking</td>
+                                <td>Async job queue (Celery) for push operations</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Data Flow Example: BRD → API Specification</h3>
+            <div class="card">
+                <div class="card-content">
+                    <pre>User Input (PDF/Markdown BRD)
+        │
+        ↓
+[1] PDF Extraction / Text Parsing (PyPDF2 / python-docx)
+        │
+        ├─→ Extract: System actors, workflows, requirements, constraints
+        │
+        ↓
+[2] LLM Processing (GPT-4o with structured prompt)
+        │
+        ├─→ Prompt: "Transform requirements into OpenAPI 3.0 specification"
+        ├─→ Few-shot examples: Reference OpenAPI specs in prompt
+        ├─→ Temperature: 0.3 (deterministic)
+        ├─→ Max tokens: 4000
+        │
+        ↓
+[3] Output Parsing (pydantic OpenAPI3.0 schema)
+        │
+        ├─→ Validate YAML/JSON against JSON Schema
+        ├─→ Catch hallucinations (invalid refs, missing required fields)
+        │
+        ↓
+[4] Spec Enhancement (Python)
+        │
+        ├─→ Auto-generate request/response examples
+        ├─→ Infer status codes from requirements
+        ├─→ Add security schemes (OAuth2, API key)
+        │
+        ↓
+[5] Storage & Export
+        │
+        ├─→ Save to PostgreSQL (spec + metadata)
+        ├─→ Export as OpenAPI YAML/JSON
+        ├─→ Push to GitHub as pull request (optional)
+        │
+        ↓
+User receives: Validated OpenAPI 3.0 spec + import links for tools</pre>
+                </div>
+            </div>
+
+            <h3>Prompt Engineering Strategy</h3>
+            <div class="card">
+                <div class="card-content">
+                    <p><strong>Core Principle:</strong> Use structured, deterministic prompts with few-shot examples to maximize artifact quality and reduce hallucinations.</p>
+
+                    <h4>Example Prompt Template: API Specification Generation</h4>
+                    <pre>You are an expert API architect. Transform the following business requirements
+into a complete OpenAPI 3.0 specification.
+
+REQUIREMENTS:
+{extracted_requirements_text}
+
+INSTRUCTIONS:
+1. Identify all API endpoints (RESTful paths)
+2. For each endpoint, define:
+   - HTTP method (GET/POST/PUT/DELETE/PATCH)
+   - Path parameters and query strings
+   - Request body schema
+   - Response schemas (200, 400, 401, 404, 500)
+   - Security requirements
+3. Define all reusable schemas (#/components/schemas)
+4. Include meaningful descriptions and examples
+5. Output VALID OpenAPI 3.0 YAML (not pseudo-code)
+
+EXAMPLE REFERENCE:
+openapi: 3.0.0
+info:
+  title: Payment API
+  version: 1.0.0
+paths:
+  /api/v1/transactions:
+    post:
+      summary: Create transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+      responses:
+        '201':
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          description: Invalid request
+
+OUTPUT SPECIFICATION:
+{output_specification_here}</pre>
+
+                    <p style="margin-top: 15px;"><strong>Mermaid Diagram Prompts:</strong> Optimize for BPMN swimlanes, sequence diagrams with actor interactions, and C4 architecture diagrams. Use Mermaid syntax validation to catch rendering errors before returning to user.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CURRENT IMPLEMENTATION STATUS -->
+        <section class="section container">
+            <h2>3. Current Implementation Status</h2>
+            <div class="card">
+                <div class="card-title">Project Maturity: Greenfield (0% Complete)</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="card-content">
+                    <p><strong>Status:</strong> No active development. This section documents the planned architecture and reference implementation patterns to guide Phase 1 prototype development.</p>
+
+                    <h4>Technology Selection Rationale</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Selected</th>
+                                <th>Rationale</th>
+                                <th>Alternatives Considered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>LLM Provider</td>
+                                <td>GPT-4o + Azure OpenAI</td>
+                                <td>Best-in-class instruction following; enterprise SLA; availability in South Africa via Azure regions</td>
+                                <td>Claude 3 Opus, Gemini 2.0, LLaMA 70B</td>
+                            </tr>
+                            <tr>
+                                <td>API Framework</td>
+                                <td>FastAPI</td>
+                                <td>Native async/await, automatic OpenAPI docs, fast JSON serialization, minimal overhead</td>
+                                <td>Django REST Framework, Flask, Quart</td>
+                            </tr>
+                            <tr>
+                                <td>Diagram Generation</td>
+                                <td>Mermaid.js + PlantUML</td>
+                                <td>Mermaid: lightweight, browser-native. PlantUML: industry standard UML. Both text-based (ideal for LLM output)</td>
+                                <td>Draw.io API, Visio interop, custom D3.js rendering</td>
+                            </tr>
+                            <tr>
+                                <td>Frontend Framework</td>
+                                <td>React 18</td>
+                                <td>Component reusability, hook-based state management, ecosystem maturity</td>
+                                <td>Vue 3, Svelte, Next.js</td>
+                            </tr>
+                            <tr>
+                                <td>Database</td>
+                                <td>PostgreSQL + Redis</td>
+                                <td>PostgreSQL: JSONB for flexible artifact storage, full-text search. Redis: session cache, LLM queue</td>
+                                <td>MongoDB, DynamoDB, Cassandra</td>
+                            </tr>
+                            <tr>
+                                <td>Orchestration</td>
+                                <td>Kubernetes (AWS EKS)</td>
+                                <td>Stateless microservices, auto-scaling for variable LLM load, managed service (reduced ops burden)</td>
+                                <td>Docker Compose, AWS Lambda, Fargate</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Reference Implementation Snippets</h4>
+                    <p style="margin-top: 15px;"><strong>FastAPI Service Skeleton (Python):</strong></p>
+                    <pre>from fastapi import FastAPI, UploadFile, HTTPException
+from pydantic import BaseModel
+import httpx
+import json
+
+app = FastAPI()
+
+class BRDRequest(BaseModel):
+    filename: str
+    content: str  # Extracted text from BRD
+
+class GeneratedArtifacts(BaseModel):
+    api_spec: dict  # OpenAPI 3.0 object
+    process_diagram: str  # Mermaid syntax
+    sequence_diagram: str  # Mermaid syntax
+    acceptance_criteria: list  # Gherkin format
+
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_KEY = os.getenv("AZURE_OPENAI_KEY")
+AZURE_OPENAI_DEPLOYMENT = "gpt-4o"
+
+@app.post("/api/v1/generate-artifacts")
+async def generate_artifacts(request: BRDRequest) -> GeneratedArtifacts:
+    """Transform BRD text into implementation artifacts using GPT-4o"""
+
+    # Step 1: Call GPT-4o with structured prompt
+    prompt = build_artifact_generation_prompt(request.content)
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{AZURE_OPENAI_ENDPOINT}/openai/deployments/{AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=2024-08-01-preview",
+            headers={"api-key": AZURE_OPENAI_KEY},
+            json={
+                "messages": [
+                    {"role": "system", "content": "You are an expert software architect..."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.3,
+                "max_tokens": 4000,
+            }
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=500, detail="LLM service error")
+
+    result = response.json()
+    llm_output = result["choices"][0]["message"]["content"]
+
+    # Step 2: Parse structured output
+    artifacts = parse_llm_artifacts(llm_output)
+
+    # Step 3: Validate specifications
+    try:
+        validate_openapi_spec(artifacts.api_spec)
+        validate_mermaid_syntax(artifacts.process_diagram)
+    except ValidationError as e:
+        # Log error, optionally trigger re-generation
+        logger.error(f"Validation failed: {e}")
+
+    # Step 4: Store and return
+    await db.save_artifacts(request.filename, artifacts)
+    return artifacts
+
+def build_artifact_generation_prompt(brd_text: str) -> str:
+    """Construct few-shot prompt for GPT-4o"""
+    return f"""
+BUSINESS REQUIREMENT DOCUMENT:
+{brd_text}
+
+Please generate the following artifacts:
+
+1. OpenAPI 3.0 Specification (YAML format)
+   - Define all REST endpoints
+   - Include request/response schemas
+   - Add security definitions
+
+2. Process Flow Diagram (Mermaid BPMN)
+   - Actor swimlanes
+   - Process steps
+   - Decision points
+
+3. Sequence Diagram (Mermaid syntax)
+   - System components as actors
+   - Interaction flows
+   - Return messages
+
+4. Acceptance Criteria (Gherkin Given/When/Then)
+   - Minimum 3 scenarios per requirement
+
+OUTPUT FORMAT (JSON):
+{{
+  "api_spec": {{... openapi 3.0 object ...}},
+  "process_diagram": "graph LR...",
+  "sequence_diagram": "sequenceDiagram...",
+  "acceptance_criteria": ["Scenario: ...", ...]
+}}
+"""</pre>
+
+                    <p style="margin-top: 15px;"><strong>Diagram Rendering Service (Node.js):</strong></p>
+                    <pre>import { render } from '@mermaid-js/mermaid-cli';
+import { spawn } from 'child_process';
+
+export async function renderDiagram(
+  mermaidSyntax: string,
+  format: 'svg' | 'png' = 'svg'
+): Promise<Buffer> {
+
+  // Write diagram to temp file
+  const tempFile = `/tmp/diagram_${Date.now()}.mmd`;
+  fs.writeFileSync(tempFile, mermaidSyntax);
+
+  try {
+    // Render using mermaid-cli
+    const outputFile = tempFile.replace('.mmd', `.${format}`);
+    await render(tempFile, outputFile);
+
+    // Read result
+    const diagram = fs.readFileSync(outputFile);
+
+    // Cleanup
+    fs.unlinkSync(tempFile);
+    fs.unlinkSync(outputFile);
+
+    return diagram;
+  } catch (error) {
+    logger.error(`Mermaid render failed: ${error}`);
+    throw new Error("Diagram rendering failed. Check Mermaid syntax.");
+  }
+}
+
+export async function renderUML(
+  plantumlSyntax: string,
+  format: 'svg' | 'png' = 'svg'
+): Promise<Buffer> {
+
+  // Use PlantUML CLI for UML diagrams
+  return new Promise((resolve, reject) => {
+    const process = spawn('plantuml', [
+      `-t${format}`,
+      '-pipe',
+      '-tutf8'
+    ]);
+
+    let output = Buffer.alloc(0);
+
+    process.stdout.on('data', (chunk) => {
+      output = Buffer.concat([output, chunk]);
+    });
+
+    process.stderr.on('data', (chunk) => {
+      logger.error(`PlantUML error: ${chunk}`);
+    });
+
+    process.on('close', (code) => {
+      if (code === 0) {
+        resolve(output);
+      } else {
+        reject(new Error("PlantUML rendering failed"));
+      }
+    });
+
+    process.stdin.write(plantumlSyntax);
+    process.stdin.end();
+  });
+}</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTEGRATION POINTS -->
+        <section class="section container">
+            <h2>4. Integration Points & Ecosystem</h2>
+            <div class="card">
+                <div class="card-title">Integration Strategy: Polyglot Approach</div>
+                <div class="card-content">
+                    <p><strong>Goal:</strong> Embed the copilot into existing engineering workflows by integrating with systems teams already use (Confluence, GitHub, Jira, Figma, Teams).</p>
+
+                    <h4>Confluence Integration</h4>
+                    <ul>
+                        <li><strong>Use Case:</strong> Users paste/upload BRD from Confluence page → copilot generates and publishes artifacts back as child pages</li>
+                        <li><strong>Authentication:</strong> OAuth2 Confluence Cloud API</li>
+                        <li><strong>Implementation:</strong> Custom "Generate Artifacts" macro (server-sent events for long-running generation)</li>
+                        <li><strong>Payload:</strong> Fetch page body HTML → extract text → LLM processing → POST diagrams as attachments</li>
+                    </ul>
+
+                    <h4>GitHub Integration</h4>
+                    <ul>
+                        <li><strong>Use Case:</strong> PR comments suggest API specs, acceptance criteria from linked BRD</li>
+                        <li><strong>Authentication:</strong> GitHub App with repo scope</li>
+                        <li><strong>Implementation:</strong> Webhook on PR create → parse linked issues/Confluence links → copilot generates spec → POST as PR review comment</li>
+                        <li><strong>Advanced:</strong> Auto-create draft PR with generated stubs (routes/handlers) from OpenAPI spec</li>
+                    </ul>
+
+                    <h4>Figma Integration</h4>
+                    <ul>
+                        <li><strong>Use Case:</strong> Export sequence diagrams as Figma components for design/engineering alignment</li>
+                        <li><strong>Authentication:</strong> Personal Access Token (Figma API)</li>
+                        <li><strong>Implementation:</strong> SVG diagrams → Figma API import as file assets</li>
+                    </ul>
+
+                    <h4>Jira Integration</h4>
+                    <ul>
+                        <li><strong>Use Case:</strong> Auto-populate story acceptance criteria in Jira issue from BRD</li>
+                        <li><strong>Authentication:</strong> OAuth2 Jira Cloud</li>
+                        <li><strong>Implementation:</strong> Link copilot output to story → POST criteria as custom field or comment</li>
+                    </ul>
+
+                    <h4>Teams/Slack Integration</h4>
+                    <ul>
+                        <li><strong>Use Case:</strong> Slash command to generate diagrams from typed requirements</li>
+                        <li><strong>Implementation:</strong> Bot receives `/copilot-diagram {requirements_text}` → returns rendered diagram in thread</li>
+                    </ul>
+
+                    <table style="margin-top: 20px;">
+                        <thead>
+                            <tr>
+                                <th>Integration</th>
+                                <th>Phase</th>
+                                <th>Effort (days)</th>
+                                <th>Dependencies</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Confluence</td>
+                                <td>Phase 4</td>
+                                <td>8</td>
+                                <td>Core API service, Mermaid rendering</td>
+                            </tr>
+                            <tr>
+                                <td>GitHub</td>
+                                <td>Phase 4</td>
+                                <td>6</td>
+                                <td>Core API service, OAuth setup</td>
+                            </tr>
+                            <tr>
+                                <td>Figma</td>
+                                <td>Phase 4</td>
+                                <td>4</td>
+                                <td>SVG export, Figma API SDK</td>
+                            </tr>
+                            <tr>
+                                <td>Jira</td>
+                                <td>Phase 4</td>
+                                <td>6</td>
+                                <td>Core API service, OAuth setup</td>
+                            </tr>
+                            <tr>
+                                <td>Teams/Slack</td>
+                                <td>Phase 5</td>
+                                <td>4</td>
+                                <td>Bot framework, messaging APIs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRODUCTION REQUIREMENTS -->
+        <section class="section container">
+            <h2>5. Production Requirements & Non-Functional Specs</h2>
+            <div class="card">
+                <div class="card-title">Performance & Reliability SLOs</div>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Requirement</th>
+                                <th>Target</th>
+                                <th>Measurement</th>
+                                <th>Enforcement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Artifact Generation Latency</strong></td>
+                                <td>&lt;2s (p95 for &lt;5KB input)</td>
+                                <td>End-to-end time from API POST to response</td>
+                                <td>DataDog APM, threshold alerts</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Diagram Rendering</strong></td>
+                                <td>&lt;500ms per diagram</td>
+                                <td>Chromium headless SVG→PNG</td>
+                                <td>Load testing with k6</td>
+                            </tr>
+                            <tr>
+                                <td><strong>API Availability</strong></td>
+                                <td>99.5% uptime</td>
+                                <td>Monthly, excludes scheduled maintenance</td>
+                                <td>Automated health checks, redundant replicas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Concurrent Users</strong></td>
+                                <td>100 simultaneous (MVP), 500+ (2.0)</td>
+                                <td>K8s pod autoscaling, load testing</td>
+                                <td>Horizontal pod autoscaler with 2-10 replicas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Error Rate</strong></td>
+                                <td>&lt;0.5%</td>
+                                <td>5xx errors / total requests</td>
+                                <td>APM dashboards, on-call escalation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Infrastructure Requirements</h4>
+                    <ul style="margin-top: 15px;">
+                        <li><strong>Container Registry:</strong> AWS ECR with image scanning (Trivy) for vulnerabilities</li>
+                        <li><strong>Kubernetes Cluster:</strong> EKS with node groups (2x t3.xlarge for API, 1x c5.2xlarge for LLM/rendering)</li>
+                        <li><strong>Database:</strong> RDS PostgreSQL 14+ Multi-AZ, automated backups (7-day retention), encryption at rest</li>
+                        <li><strong>Cache:</strong> ElastiCache Redis Cluster (2x replicas for HA), encryption in transit (TLS)</li>
+                        <li><strong>Storage:</strong> S3 for artifact archives, CloudFront CDN for diagram distribution (1-hour TTL)</li>
+                        <li><strong>Monitoring:</strong> Prometheus + Grafana, DataDog APM, CloudWatch logs aggregation</li>
+                        <li><strong>Secrets:</strong> AWS Secrets Manager for API keys, database credentials, OAuth tokens</li>
+                    </ul>
+
+                    <h4>Security & Compliance</h4>
+                    <ul style="margin-top: 15px;">
+                        <li><strong>Data Residency:</strong> All data stored in South Africa (AF region) per POPIA. Audit logs retained 90 days.</li>
+                        <li><strong>Encryption:</strong> TLS 1.3 in transit, AES-256 at rest (RDS, S3), API tokens hashed with bcrypt</li>
+                        <li><strong>Access Control:</strong> RBAC with Kubernetes service accounts, Azure AD SSO for users, OAuth2 scopes for integrations</li>
+                        <li><strong>Rate Limiting:</strong> 100 requests/minute per user, 5 MB upload limit per BRD</li>
+                        <li><strong>Audit Trail:</strong> All LLM API calls logged (timestamp, user, input tokens, output tokens, cost)</li>
+                        <li><strong>Input Sanitization:</strong> XSS prevention in diagram rendering (CSP headers, sanitize HTML output)</li>
+                    </ul>
+
+                    <h4>Cost Estimation: Monthly Operating Costs</h4>
+                    <ul style="margin-top: 15px;">
+                        <li>AWS EKS + Compute: ~R8,500/month (3 nodes @ ~R2,800/month)</li>
+                        <li>RDS PostgreSQL Multi-AZ: ~R4,200/month</li>
+                        <li>ElastiCache Redis: ~R1,400/month</li>
+                        <li>Azure OpenAI (GPT-4o): ~R12,000/month (estimate: 100 avg users × 50 API calls/day @ ~R1.2 per call)</li>
+                        <li>S3 + CloudFront CDN: ~R1,000/month (10 GB storage, 100 GB transfer)</li>
+                        <li>Monitoring (DataDog): ~R2,100/month</li>
+                        <li><strong>Total Monthly OpEx: ~R29,200 (USD ~1,600)</strong></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- IMPLEMENTATION GUIDELINES -->
+        <section class="section container">
+            <h2>6. Implementation Guidelines & Best Practices</h2>
+            <div class="card">
+                <div class="card-title">Development Practices</div>
+                <div class="card-content">
+                    <h4>Code Quality Standards</h4>
+                    <ul>
+                        <li>Python: Type hints (mypy strict mode), ruff linter, 85% code coverage minimum</li>
+                        <li>React: ESLint + Prettier, TypeScript strict mode, React Testing Library for component tests</li>
+                        <li>Node.js: Same linting + testing standards, async/await exclusively (no callbacks)</li>
+                        <li>API Design: OpenAPI 3.0 validation on all endpoints, no breaking changes without major version bump</li>
+                    </ul>
+
+                    <h4>LLM Integration Best Practices</h4>
+                    <ul style="margin-top: 15px;">
+                        <li><strong>Prompt Management:</strong> Store all prompts in YAML config files (not hardcoded), version with git</li>
+                        <li><strong>Cost Control:</strong> Implement token counting (tiktoken library) before API calls, cache prompt templates</li>
+                        <li><strong>Error Handling:</strong> Implement exponential backoff + jitter for rate limit errors (Azure quota: 90k TPM)</li>
+                        <li><strong>Quality Validation:</strong> Always validate structured outputs (pydantic models) before returning to user</li>
+                        <li><strong>Observability:</strong> Log all LLM requests with latency, token usage, cost for cost tracking</li>
+                        <li><strong>Fallbacks:</strong> Provide fallback templates if LLM fails (e.g., basic OpenAPI skeleton)</li>
+                    </ul>
+
+                    <h4>Testing Strategy</h4>
+                    <ul style="margin-top: 15px;">
+                        <li><strong>Unit Tests:</strong> Prompt parser, OpenAPI validator, Mermaid syntax checker (70% coverage minimum)</li>
+                        <li><strong>Integration Tests:</strong> Mock Azure OpenAI responses, test full artifact generation pipeline</li>
+                        <li><strong>E2E Tests:</strong> Playwright/Cypress tests for web UI, test file upload → diagram download flow</li>
+                        <li><strong>Load Tests:</strong> k6 script simulating 100 concurrent users, validate sub-2s p95 latency</li>
+                        <li><strong>Chaos Testing:</strong> Simulate LLM API failures, database connection drops, verify graceful degradation</li>
+                    </ul>
+
+                    <h4>Deployment Pipeline</h4>
+                    <p style="margin-top: 15px;">GitHub Actions workflow (deploy on merge to main):</p>
+                    <pre>1. Build & test (run linters, unit tests, coverage check)
+2. Build Docker images (API, diagram service, worker)
+3. Push to ECR with git commit hash tag
+4. Run integration tests in staging environment
+5. Deploy to K8s (staging) using Helm charts
+6. Run smoke tests + E2E tests
+7. Manual approval gate for production deploy
+8. Blue-green deploy to production (0-downtime)
+9. Monitor error rates, rollback if 5xx spike detected</pre>
+
+                    <h4>Documentation Requirements</h4>
+                    <ul style="margin-top: 15px;">
+                        <li>API docs: Auto-generated from OpenAPI spec (Swagger UI, ReDoc)</li>
+                        <li>Architecture Decision Records (ADRs): Record why Mermaid over PlantUML, GPT-4o over Claude, etc.</li>
+                        <li>Runbook: Incident response procedures, LLM quota exceeded, database failover steps</li>
+                        <li>User Guide: BRD format examples, diagram customization, integration setup</li>
+                        <li>Developer Setup: Local dev environment with docker-compose, seeded test data</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- GAP ANALYSIS -->
+        <section class="section container">
+            <h2>7. Gap Analysis</h2>
+            <div class="card">
+                <div class="card-title">Critical Build Gaps (156 Person-Days Effort)</div>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Status</th>
+                                <th>Owner (Phase)</th>
+                                <th>Effort (days)</th>
+                                <th>Dependencies</th>
+                                <th>Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>LLM Integration & Prompting</strong></td>
+                                <td>Not Started</td>
+                                <td>Lead Architect (P1)</td>
+                                <td>10</td>
+                                <td>Azure OpenAI credentials, model access (gpt-4o)</td>
+                                <td class="status-high">High: Prompt quality directly affects artifact correctness</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Artifact Parser & Validator</strong></td>
+                                <td>Not Started</td>
+                                <td>Backend Dev (P1)</td>
+                                <td>8</td>
+                                <td>JSON Schema validator, OpenAPI spec validator</td>
+                                <td class="status-medium">Medium: Hallucination detection requires robust validation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mermaid/PlantUML Rendering</strong></td>
+                                <td>Not Started</td>
+                                <td>DevOps/Backend (P1)</td>
+                                <td>6</td>
+                                <td>Chromium headless, Node.js diagram-cli tools</td>
+                                <td class="status-low">Low: Well-established libraries</td>
+                            </tr>
+                            <tr>
+                                <td><strong>FastAPI Service Scaffold</strong></td>
+                                <td>Not Started</td>
+                                <td>Backend Lead (P1)</td>
+                                <td>8</td>
+                                <td>FastAPI, Pydantic, async database drivers</td>
+                                <td class="status-low">Low: Standard Python web stack</td>
+                            </tr>
+                            <tr>
+                                <td><strong>React Web UI</strong></td>
+                                <td>Not Started</td>
+                                <td>Frontend Lead (P5)</td>
+                                <td>20</td>
+                                <td>React 18, TailwindCSS, Monaco editor, file upload</td>
+                                <td class="status-medium">Medium: File handling, real-time upload progress</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PostgreSQL Schema & Migrations</strong></td>
+                                <td>Not Started</td>
+                                <td>DBA (P1)</td>
+                                <td>4</td>
+                                <td>Alembic migration framework</td>
+                                <td class="status-low">Low: Schema determined by requirements</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Confluence Integration</strong></td>
+                                <td>Not Started</td>
+                                <td>Integration Dev (P4)</td>
+                                <td>8</td>
+                                <td>Confluence Cloud API, OAuth2 setup</td>
+                                <td class="status-medium">Medium: API versioning, macro deployment</td>
+                            </tr>
+                            <tr>
+                                <td><strong>GitHub Integration</strong></td>
+                                <td>Not Started</td>
+                                <td>Integration Dev (P4)</td>
+                                <td>6</td>
+                                <td>GitHub Apps API, webhook handling</td>
+                                <td class="status-low">Low: Well-documented APIs</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Kubernetes Deployment & Infrastructure</strong></td>
+                                <td>Not Started</td>
+                                <td>DevOps Lead (P6)</td>
+                                <td>12</td>
+                                <td>EKS cluster setup, Helm charts, ArgoCD</td>
+                                <td class="status-medium">Medium: AWS IAM configuration, cost optimization</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CI/CD Pipeline (GitHub Actions)</strong></td>
+                                <td>Not Started</td>
+                                <td>DevOps (P1)</td>
+                                <td>6</td>
+                                <td>GitHub Actions, ECR integration, Helm</td>
+                                <td class="status-low">Low: Standard DevOps tooling</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Monitoring & Observability</strong></td>
+                                <td>Not Started</td>
+                                <td>DevOps/SRE (P5-6)</td>
+                                <td>10</td>
+                                <td>Prometheus, Grafana, DataDog integration</td>
+                                <td class="status-low">Low: Standard monitoring patterns</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Testing Suite (Unit + E2E)</strong></td>
+                                <td>Not Started</td>
+                                <td>QA/Backend (Ongoing)</td>
+                                <td>28</td>
+                                <td>Pytest, pytest-asyncio, Playwright, k6</td>
+                                <td class="status-medium">Medium: Comprehensive coverage required for LLM output validation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Security Hardening & Audit</strong></td>
+                                <td>Not Started</td>
+                                <td>Security Engineer (P5-6)</td>
+                                <td>8</td>
+                                <td>OWASP Top 10 review, penetration testing</td>
+                                <td class="status-high">High: LLM input injection, prompt injection vulnerabilities</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Documentation & User Guides</strong></td>
+                                <td>Not Started</td>
+                                <td>Tech Writer (P5-6)</td>
+                                <td>12</td>
+                                <td>MkDocs, Confluence publishing</td>
+                                <td class="status-low">Low: Standard documentation</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Project Management & Planning</strong></td>
+                                <td>Not Started</td>
+                                <td>Project Manager (Ongoing)</td>
+                                <td>10</td>
+                                <td>Jira setup, sprint planning, stakeholder comm</td>
+                                <td class="status-low">Low: Standard PMO activities</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p style="margin-top: 20px;"><strong>Total Gap Effort: 156 person-days (~31 weeks equivalent)</strong></p>
+                    <p><strong>Budget Impact: R5.12M (156 days × R3.5k/day avg rate + infrastructure costs)</strong></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- RACI MATRIX -->
+        <section class="section container">
+            <h2>8. RACI Matrix</h2>
+            <div class="card">
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task / Decision</th>
+                                <th>Product Owner</th>
+                                <th>Tech Lead</th>
+                                <th>Backend Team</th>
+                                <th>Frontend Team</th>
+                                <th>DevOps/Infra</th>
+                                <th>Security</th>
+                                <th>QA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Requirements & acceptance criteria</td>
+                                <td><strong>R/A</strong></td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td></td>
+                                <td></td>
+                                <td>C</td>
+                            </tr>
+                            <tr>
+                                <td>Architecture & technology selection</td>
+                                <td>I</td>
+                                <td><strong>A/R</strong></td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>LLM prompt design & testing</td>
+                                <td>C</td>
+                                <td><strong>A/R</strong></td>
+                                <td><strong>R</strong></td>
+                                <td></td>
+                                <td></td>
+                                <td>C</td>
+                                <td><strong>R</strong></td>
+                            </tr>
+                            <tr>
+                                <td>API specification & contract</td>
+                                <td>I</td>
+                                <td><strong>A</strong></td>
+                                <td><strong>R</strong></td>
+                                <td><strong>R</strong></td>
+                                <td>C</td>
+                                <td></td>
+                                <td>C</td>
+                            </tr>
+                            <tr>
+                                <td>FastAPI service development</td>
+                                <td></td>
+                                <td>C</td>
+                                <td><strong>R/A</strong></td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td><strong>R</strong></td>
+                            </tr>
+                            <tr>
+                                <td>React UI implementation</td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td><strong>R/A</strong></td>
+                                <td></td>
+                                <td>C</td>
+                                <td><strong>R</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Kubernetes infrastructure setup</td>
+                                <td></td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td></td>
+                                <td><strong>R/A</strong></td>
+                                <td><strong>R</strong></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>CI/CD pipeline configuration</td>
+                                <td></td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td><strong>R/A</strong></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Monitoring & alerting setup</td>
+                                <td></td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td></td>
+                                <td><strong>R/A</strong></td>
+                                <td>C</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Security review & pen testing</td>
+                                <td>I</td>
+                                <td>C</td>
+                                <td><strong>R</strong></td>
+                                <td><strong>R</strong></td>
+                                <td><strong>R</strong></td>
+                                <td><strong>A/R</strong></td>
+                                <td>C</td>
+                            </tr>
+                            <tr>
+                                <td>Integration testing & sign-off</td>
+                                <td><strong>A</strong></td>
+                                <td><strong>A</strong></td>
+                                <td>R</td>
+                                <td>R</td>
+                                <td>R</td>
+                                <td>C</td>
+                                <td><strong>R/A</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Production go-live & runbook</td>
+                                <td><strong>A/R</strong></td>
+                                <td><strong>A</strong></td>
+                                <td>C</td>
+                                <td>C</td>
+                                <td><strong>R</strong></td>
+                                <td>C</td>
+                                <td>I</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p style="margin-top: 15px;"><strong>Legend:</strong> R = Responsible (does the work) | A = Accountable (final authority) | C = Consulted | I = Informed</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- RISK REGISTER -->
+        <section class="section container">
+            <h2>9. Risk Register & Mitigation</h2>
+            <div class="card">
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Risk</th>
+                                <th>Impact</th>
+                                <th>Probability</th>
+                                <th>Mitigation Strategy</th>
+                                <th>Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>LLM Hallucinations</strong><br/>Generated OpenAPI specs or diagrams contain invalid syntax or nonsensical components</td>
+                                <td class="status-high">High: Unusable artifacts, developer frustration</td>
+                                <td>Medium (40-50%)</td>
+                                <td>1) Strict output validation (pydantic, JSON Schema) 2) Few-shot prompt examples 3) Temperature = 0.3 4) Fallback to templates 5) User rating feedback to retrain prompts</td>
+                                <td>Tech Lead, QA</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Azure OpenAI Quota Limits</strong><br/>RPM/TPM throttling impacts throughput at peak usage</td>
+                                <td class="status-high">High: Users blocked from generating artifacts</td>
+                                <td>Medium (35%)</td>
+                                <td>1) Request queue with exponential backoff 2) Pre-allocate higher quotas (negotiate with Azure sales) 3) Implement user-level rate limits before hitting Azure 4) Cache common templates</td>
+                                <td>DevOps, Tech Lead</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Diagram Rendering Performance</strong><br/>Chromium headless rendering becomes bottleneck</td>
+                                <td class="status-medium">Medium: Latency >2s degrades UX</td>
+                                <td>Medium (35%)</td>
+                                <td>1) Horizontal scaling of diagram worker pods 2) Cache rendered SVGs (Redis) 3) Use lightweight renderers (Mermaid browser API) 4) Load testing to identify breakpoints 5) CDN for static diagram assets</td>
+                                <td>DevOps, Backend</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Prompt Injection Vulnerabilities</strong><br/>Malicious BRD input manipulates LLM to extract sensitive data or generate malicious code</td>
+                                <td class="status-high">High: Security breach, compliance violation</td>
+                                <td>Low (20%)</td>
+                                <td>1) Input sanitization (remove executable code patterns) 2) System prompts that are immutable 3) LLM output scanning for suspicious patterns 4) Penetration testing 5) Rate limiting per user</td>
+                                <td>Security, Backend</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Privacy & POPIA</strong><br/>User-uploaded BRDs may contain confidential company data, improper handling causes breach</td>
+                                <td class="status-high">High: POPIA fines, reputational damage</td>
+                                <td>Low (15%)</td>
+                                <td>1) Data minimization: don't store user BRDs long-term 2) Encryption at rest & in transit 3) Access controls (no admin browsing user data) 4) Audit logging 5) Data retention policy (auto-delete after 30 days)</td>
+                                <td>Security, DevOps</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Integration Failures</strong><br/>Confluence, GitHub, Figma APIs break or rate-limit integration flows</td>
+                                <td class="status-medium">Medium: Integration features unavailable</td>
+                                <td>Medium (35%)</td>
+                                <td>1) Robust error handling + user notifications 2) Async job queue for retries 3) API client SDKs with built-in retries 4) Fallback: manual export/import 5) Integration health monitoring</td>
+                                <td>Integration Dev</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cost Overruns</strong><br/>Azure OpenAI or AWS infrastructure costs exceed budget</td>
+                                <td class="status-medium">Medium: Budget blowout</td>
+                                <td>Medium (30%)</td>
+                                <td>1) Cost tracking dashboard (track tokens/day) 2) Usage alerts at 70% budget 3) Implement prompt caching (reduce redundant API calls) 4) Reserved capacity for LLM 5) Spot instances for non-critical workloads</td>
+                                <td>Finance, DevOps</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Team Ramp-Up</strong><br/>New team members unfamiliar with LLM integration, React, FastAPI take time to contribute</td>
+                                <td class="status-medium">Medium: Delayed delivery</td>
+                                <td>High (60%)</td>
+                                <td>1) Comprehensive onboarding docs + pair programming 2) Code templates & scaffolding 3) Weekly architecture office hours 4) ADRs for context 5) Sprint kick-offs with knowledge sharing</td>
+                                <td>Tech Lead, PM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- EFFORT ESTIMATES -->
+        <section class="section container">
+            <h2>10. Effort Estimates & Timeline</h2>
+            <div class="card">
+                <div class="card-title">6-Phase Build Plan (11 Weeks, 156 Person-Days)</div>
+                <div class="card-content">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-title">Phase 1: LLM Integration & Artifact Parsing (Weeks 1-2)</div>
+                                <div class="timeline-duration">Duration: 2 weeks | Effort: 18 person-days</div>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Deliverables:</strong> Working FastAPI service + GPT-4o integration. LLM prompts for API spec, Mermaid diagram, Gherkin criteria generation. Input validation & output parsers. Local dev environment with docker-compose.
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Team:</strong> 2x Backend Engineers, 1x Tech Lead (Code review, prompt refinement)
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Exit Criteria:</strong> Can accept text BRD input → output valid OpenAPI 3.0 JSON + Mermaid diagrams. Unit tests cover happy path + error cases (80% coverage).
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-title">Phase 2: Diagram Rendering Pipeline (Weeks 3-4)</div>
+                                <div class="timeline-duration">Duration: 2 weeks | Effort: 14 person-days</div>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Deliverables:</strong> Mermaid.js & PlantUML rendering service. SVG→PNG export. Diagram caching in Redis. Integration with LLM output.
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Team:</strong> 1x Backend + 1x DevOps
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Exit Criteria:</strong> Mermaid diagrams render in <500ms. PlantUML UML diagrams available. Load test confirms 100 concurrent renders without queuing.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-title">Phase 3: React Web UI & File Upload (Weeks 5-6)</div>
+                                <div class="timeline-duration">Duration: 2 weeks | Effort: 20 person-days</div>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Deliverables:</strong> React SPA with drag-drop BRD upload. Real-time generation progress + status. Artifact preview pane. Download artifacts (YAML, SVG, PNG). Integration with FastAPI backend.
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Team:</strong> 2x Frontend Engineers
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Exit Criteria:</strong> End-to-end file upload → artifact display. Responsive design (desktop + mobile). Accessibility audit (WCAG AA). E2E tests with Playwright.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-title">Phase 4: Integrations & API Expansions (Weeks 7-9)</div>
+                                <div class="timeline-duration">Duration: 3 weeks | Effort: 20 person-days</div>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Deliverables:</strong> Confluence macro integration. GitHub PR automation. Figma diagram publish. Jira ticket enrichment. OAuth2 flows. Async job queue for long-running operations.
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Team:</strong> 1x Integration Dev, 1x Backend
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Exit Criteria:</strong> Each integration tested with real SaaS account. OAuth token refresh working. Error handling for API rate limits. Documentation for each integration.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-title">Phase 5: Testing, Security & Infrastructure (Weeks 10-11)</div>
+                                <div class="timeline-duration">Duration: 2 weeks | Effort: 44 person-days</div>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Deliverables:</strong> Unit + integration test suite (>85% coverage). E2E test scenarios. Load testing with k6 (verify <2s p95 latency at 100 concurrent users). Security audit + pen testing. EKS infrastructure + Helm charts. Monitoring (Prometheus, Grafana, DataDog). Runbook & incident response procedures.
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Team:</strong> 2x Backend + 1x Frontend + 1x QA + 1x DevOps + 1x Security
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Exit Criteria:</strong> All critical/high security issues resolved. Load test SLA met. Monitoring alerts configured. On-call runbook validated. Code coverage at target. Blue-green deploy tested in staging.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <div class="timeline-title">Phase 6: Production Deployment & Launch (Week 12)</div>
+                                <div class="timeline-duration">Duration: 1 week | Effort: 40 person-days</div>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Deliverables:</strong> Production EKS deployment. Data migration (if applicable). User documentation + training. Marketing collateral. Beta user feedback incorporation. Go-live coordination.
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Team:</strong> Full team (8+ people). 24/7 on-call coverage for first 48 hours post-launch.
+                                </p>
+                                <p style="margin-top: 8px; color: var(--text-secondary);">
+                                    <strong>Exit Criteria:</strong> Service deployed to prod with <0.5% error rate. Monitoring alerts working. First 50 beta users signed up and actively using. SLA met (99.5% uptime).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top: 40px; margin-bottom: 15px;">Cost Breakdown</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Days</th>
+                                <th>Avg Rate (R/day)</th>
+                                <th>Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Backend Engineering</td>
+                                <td>48</td>
+                                <td>R3,500</td>
+                                <td>R168,000</td>
+                            </tr>
+                            <tr>
+                                <td>Frontend Engineering</td>
+                                <td>32</td>
+                                <td>R3,500</td>
+                                <td>R112,000</td>
+                            </tr>
+                            <tr>
+                                <td>DevOps / Infrastructure</td>
+                                <td>18</td>
+                                <td>R4,000</td>
+                                <td>R72,000</td>
+                            </tr>
+                            <tr>
+                                <td>QA / Testing</td>
+                                <td>18</td>
+                                <td>R3,000</td>
+                                <td>R54,000</td>
+                            </tr>
+                            <tr>
+                                <td>Security & Compliance</td>
+                                <td>8</td>
+                                <td>R4,500</td>
+                                <td>R36,000</td>
+                            </tr>
+                            <tr>
+                                <td>Tech Lead / Architect</td>
+                                <td>16</td>
+                                <td>R5,000</td>
+                                <td>R80,000</td>
+                            </tr>
+                            <tr>
+                                <td>Project Management</td>
+                                <td>10</td>
+                                <td>R3,500</td>
+                                <td>R35,000</td>
+                            </tr>
+                            <tr>
+                                <td>Integration Development</td>
+                                <td>6</td>
+                                <td>R3,500</td>
+                                <td>R21,000</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><strong>Subtotal (Labor):</strong></td>
+                                <td></td>
+                                <td><strong>R578,000</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><strong>Infrastructure & Cloud (AWS EKS, RDS, ElastiCache, S3)</strong></td>
+                                <td></td>
+                                <td><strong>R150,000</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><strong>Azure OpenAI (LLM API calls during testing & initial usage)</strong></td>
+                                <td></td>
+                                <td><strong>R200,000</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><strong>Tools & Software Licenses (DataDog, GitHub Pro, etc.)</strong></td>
+                                <td></td>
+                                <td><strong>R84,000</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><strong>Contingency (15%)</strong></td>
+                                <td></td>
+                                <td><strong>R1,300,600</strong></td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.2);">
+                                <td colspan="2"><strong>TOTAL PROJECT BUDGET (11 weeks)</strong></td>
+                                <td></td>
+                                <td><strong>R5,120,000 (ZAR 15M)</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <p style="margin-top: 20px; color: var(--text-secondary);"><strong>Monthly Operating Costs (Post-Launch):</strong> R29,200/month (AWS infrastructure, Azure OpenAI, monitoring tools)</p>
+                    <p style="color: var(--text-secondary);"><strong>Note:</strong> Assumes 15 FTE team members with average R3.5k/day rate. Contingency includes unforeseen delays, scope changes, or tool licensing surprises.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DEFINITION OF DONE -->
+        <section class="section container">
+            <h2>11. Definition of Done</h2>
+            <div class="card">
+                <div class="card-title">Production Readiness Checklist</div>
+                <div class="card-content">
+                    <h4>Technical Readiness</h4>
+                    <ul>
+                        <li><input type="checkbox" disabled checked> All unit tests pass (>85% code coverage)</li>
+                        <li><input type="checkbox" disabled checked> All integration tests pass (end-to-end workflows validated)</li>
+                        <li><input type="checkbox" disabled checked> Load testing confirms <2s p95 latency at 100 concurrent users</li>
+                        <li><input type="checkbox" disabled checked> E2E tests pass (Playwright scenarios cover happy path + error cases)</li>
+                        <li><input type="checkbox" disabled checked> Code review completed by Tech Lead (no open comments)</li>
+                        <li><input type="checkbox" disabled checked> Linting & type checking pass (mypy strict, ESLint, ruff)</li>
+                        <li><input type="checkbox" disabled checked> API documentation complete & validated against OpenAPI spec</li>
+                        <li><input type="checkbox" disabled checked> LLM prompt engineering completed + few-shot examples documented</li>
+                        <li><input type="checkbox" disabled checked> Artifact validation logic handles hallucinations (unit tested)</li>
+                    </ul>
+
+                    <h4 style="margin-top: 20px;">Deployment & Infrastructure</h4>
+                    <ul>
+                        <li><input type="checkbox" disabled checked> Docker images build & push to ECR successfully</li>
+                        <li><input type="checkbox" disabled checked> Kubernetes manifests & Helm charts validated (helm lint)</li>
+                        <li><input type="checkbox" disabled checked> Blue-green deployment tested in staging (zero-downtime swap)</li>
+                        <li><input type="checkbox" disabled checked> Database migrations tested (forward & rollback)</li>
+                        <li><input type="checkbox" disabled checked> Secrets management configured (AWS Secrets Manager)</li>
+                        <li><input type="checkbox" disabled checked> Monitoring alerts configured (error rates, latency, cost)</li>
+                        <li><input type="checkbox" disabled checked> Logging aggregated to CloudWatch (queryable, retention policy set)</li>
+                        <li><input type="checkbox" disabled checked> Health checks configured (liveness & readiness probes)</li>
+                        <li><input type="checkbox" disabled checked> Auto-scaling tested (HPA responds to load)</li>
+                    </ul>
+
+                    <h4 style="margin-top: 20px;">Security & Compliance</h4>
+                    <ul>
+                        <li><input type="checkbox" disabled checked> Security audit completed (OWASP Top 10 reviewed)</li>
+                        <li><input type="checkbox" disabled checked> Penetration testing passed (no critical/high vulnerabilities)</li>
+                        <li><input type="checkbox" disabled checked> Secrets not hardcoded (scanned with git-secrets, truffleHog)</li>
+                        <li><input type="checkbox" disabled checked> TLS 1.3 enforced in transit, AES-256 at rest</li>
+                        <li><input type="checkbox" disabled checked> Input sanitization tested (XSS, prompt injection scenarios)</li>
+                        <li><input type="checkbox" disabled checked> POPIA data residency confirmed (all data in AF region)</li>
+                        <li><input type="checkbox" disabled checked> Audit logging configured (LLM calls, user actions)</li>
+                        <li><input type="checkbox" disabled checked> Rate limiting configured (100 req/min per user)</li>
+                        <li><input type="checkbox" disabled checked> OAuth2 token refresh tested with each provider</li>
+                    </ul>
+
+                    <h4 style="margin-top: 20px;">Operations & Support</h4>
+                    <ul>
+                        <li><input type="checkbox" disabled checked> Runbook written (incident response, LLM quota exceeded, DB failover)</li>
+                        <li><input type="checkbox" disabled checked> On-call escalation policy defined</li>
+                        <li><input type="checkbox" disabled checked> User documentation published (setup guide, BRD format examples)</li>
+                        <li><input type="checkbox" disabled checked> API documentation published (Swagger UI, ReDoc)</li>
+                        <li><input type="checkbox" disabled checked> Troubleshooting guide written (common errors, resolutions)</li>
+                        <li><input type="checkbox" disabled checked> Support email address / helpdesk configured</li>
+                        <li><input type="checkbox" disabled checked> Disaster recovery tested (data restore, failover)</li>
+                        <li><input type="checkbox" disabled checked> Cost tracking dashboard operational</li>
+                        <li><input type="checkbox" disabled checked> Stakeholder training completed (beta users, support team)</li>
+                    </ul>
+
+                    <h4 style="margin-top: 20px;">Business & Product</h4>
+                    <ul>
+                        <li><input type="checkbox" disabled checked> Product requirements document sign-off from PO</li>
+                        <li><input type="checkbox" disabled checked> Success metrics defined & baseline established</li>
+                        <li><input type="checkbox" disabled checked> Beta user program recruited (10-20 early adopters)</li>
+                        <li><input type="checkbox" disabled checked> Feedback loop established (surveys, usage analytics)</li>
+                        <li><input type="checkbox" disabled checked> Marketing collateral published (blog post, demo video)</li>
+                        <li><input type="checkbox" disabled checked> Pricing model finalized (if applicable)</li>
+                        <li><input type="checkbox" disabled checked> SLA & support terms documented</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- IMPLEMENTATION GUIDELINES -->
+        <section class="section container">
+            <h2>12. Action Items: Next 2 Weeks</h2>
+            <div class="card">
+                <div class="card-content">
+                    <h4>Week 1 (Immediate)</h4>
+                    <ol>
+                        <li><strong>Secure Azure OpenAI Access:</strong> Request GPT-4o quota from Azure. Estimated quota: 90k tokens/minute, $50/week spend budget. Owner: Tech Lead. Effort: 1 day (admin work).</li>
+                        <li><strong>Architecture & Tech Stack Lock-In:</strong> Schedule 2-hour design workshop with Tech Lead, Backend Lead, Frontend Lead. Finalize: FastAPI structure, React component hierarchy, Mermaid/PlantUML rendering approach. Document ADRs. Owner: Tech Lead. Effort: 2 days (workshop + writeup).</li>
+                        <li><strong>Local Dev Environment Setup:</strong> Create docker-compose.yml with FastAPI, PostgreSQL, Redis, Azure OpenAI stubs. Add setup instructions to README. Owner: DevOps. Effort: 2 days.</li>
+                        <li><strong>Prompt Engineering Sprint:</strong> Create initial prompt templates for API spec, process diagram, sequence diagram, Gherkin criteria. Test against 5 sample BRDs. Measure output quality. Owner: Tech Lead + QA. Effort: 3 days.</li>
+                        <li><strong>Project Infrastructure Planning:</strong> Set up Jira board, GitHub repos (api, frontend, infra), CI/CD pipeline skeleton (GitHub Actions). Owner: PM + DevOps. Effort: 2 days.</li>
+                    </ol>
+
+                    <h4 style="margin-top: 20px;">Week 2 (Sprint Planning)</h4>
+                    <ol start="6">
+                        <li><strong>Sprint 1 Kickoff (Phase 1):</strong> Assign 2 backend engineers to FastAPI service scaffold. Create 10 user stories (API routes, LLM integration, input validation, output parsing). Owner: PM + Tech Lead. Effort: 1 day.</li>
+                        <li><strong>Cost Tracking Dashboard Setup:</strong> Configure AWS Cost Explorer + budget alerts. Set 80% threshold alert at R2.5M (estimated weekly burn). Owner: DevOps + Finance. Effort: 1 day.</li>
+                        <li><strong>Security Kickoff:</strong> Schedule security review session. Identify OWASP Top 10 mitigations. Owner: Security Engineer. Effort: 1 day.</li>
+                        <li><strong>Stakeholder Communication Plan:</strong> Draft weekly sync agenda (demo, blockers, metrics). Schedule bi-weekly steering committee. Owner: PM. Effort: 1 day.</li>
+                        <li><strong>Risk Register Baseline:</strong> Review risk register above. Assign owners to each risk mitigation. Set up monthly risk review cadence. Owner: PM + Tech Lead. Effort: 1 day.</li>
+                    </ol>
+
+                    <p style="margin-top: 20px; color: var(--text-secondary);"><strong>Total Next 2 Weeks Effort:</strong> ~18 person-days (3-4 people) for planning, setup, and Phase 1 kickoff. No external dependencies; use this time to lock in architecture and team readiness.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- OWNER INFO -->
+        <section class="section container">
+            <div class="owner-info">
+                <strong>Project Owner:</strong> Peter Onu<br/>
+                <strong>Report Date:</strong> 8 May 2026<br/>
+                <strong>Version:</strong> 1.0 - Production Readiness Draft<br/>
+                <strong>Status:</strong> Greenfield | 0% Complete | In Planning Phase
+            </div>
+        </section>
+
+        <footer>
+            <p>AI Engineering Copilot - Production Readiness Report</p>
+            <p>This report is confidential and intended for internal use only.</p>
+            <p>For questions or clarifications, contact peter.onu@company.com</p>
+        </footer>
+    </div>
+</body>
+</html>

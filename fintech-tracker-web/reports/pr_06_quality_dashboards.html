@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PR-06: AI/ML-Powered Quality Dashboards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1419;
+            --surface: #1a1f2e;
+            --surface-2: #252d3d;
+            --accent: #00d9ff;
+            --accent-dark: #0099cc;
+            --text-1: #e8eef2;
+            --text-2: #b8c1cc;
+            --text-3: #8892a0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-1);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface) 100%);
+            border-left: 4px solid var(--accent);
+            padding: 40px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .header p {
+            color: var(--text-2);
+            font-size: 1.1em;
+        }
+
+        .use-case-id {
+            display: inline-block;
+            background-color: var(--surface-2);
+            padding: 8px 16px;
+            border-radius: 4px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        h3 {
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: var(--text-1);
+        }
+
+        .section {
+            background-color: var(--surface);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border: 1px solid var(--surface-2);
+        }
+
+        .metric {
+            display: inline-block;
+            background-color: var(--surface-2);
+            padding: 12px 20px;
+            margin: 5px 10px 5px 0;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .metric-label {
+            color: var(--text-3);
+            font-size: 0.85em;
+        }
+
+        .metric-value {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.3em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background-color: var(--surface-2);
+            color: var(--accent);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--surface-2);
+        }
+
+        tr:hover {
+            background-color: var(--surface-2);
+        }
+
+        code {
+            background-color: var(--surface-2);
+            color: var(--accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: var(--surface-2);
+            color: var(--text-1);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 3px solid var(--accent);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-in-progress {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-complete {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-not-started {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .risk-high {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid var(--danger);
+        }
+
+        .risk-medium {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid var(--warning);
+        }
+
+        .risk-low {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success);
+        }
+
+        .phase-box {
+            background-color: var(--surface-2);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .phase-title {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .info-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--info);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+
+        .success-box {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--success);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <div class="header">
+            <div class="use-case-id">PR-06 | AI/ML-Powered Quality Dashboards</div>
+            <h1>Intelligent Quality Intelligence Platform</h1>
+            <p>AI-driven dashboards providing real-time quality insights, predictive trend analysis, and automated anomaly detection</p>
+        </div>
+
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p>
+                This Production Readiness Report documents <span class="highlight">AI/ML-Powered Quality Dashboards</span>,
+                an advanced use case for consolidating and intelligently analyzing quality metrics across the fintech platform.
+                The system delivers:
+            </p>
+            <ul style="margin-left: 20px; margin-top: 15px;">
+                <li>Unified quality data ingestion from multiple sources (CI/CD, test results, production monitoring)</li>
+                <li>Predictive analytics for quality trends and regression detection</li>
+                <li>Automated root cause analysis and anomaly explanation</li>
+                <li>Executive dashboards with intelligent recommendations</li>
+                <li>Integration with Jira/Azure DevOps for automatic issue creation</li>
+            </ul>
+            <div style="margin-top: 20px;">
+                <div class="metric">
+                    <div class="metric-label">Current Completion</div>
+                    <div class="metric-value">25%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Target Completion</div>
+                    <div class="metric-value">100%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Effort (Days)</div>
+                    <div class="metric-value">35</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Current State & Implementation Gaps</h2>
+            <p><span class="status-badge status-in-progress">In Progress (25%)</span></p>
+
+            <h3>Current Situation</h3>
+            <p>
+                Basic dashboard infrastructure exists with hardcoded Grafana panels displaying test pass rates and
+                execution times. No predictive analytics, no cross-team data consolidation, and manual root cause analysis.
+                QA insights are buried in Jenkins logs rather than presented intelligently.
+            </p>
+
+            <h3>Completed Components (25%)</h3>
+            <ul style="margin-left: 20px;">
+                <li>PostgreSQL schema for test results and metrics (complete)</li>
+                <li>Basic data ingestion pipelines from Jest and Pytest runners</li>
+                <li>Grafana dashboard templates (static)</li>
+            </ul>
+
+            <h3>Critical Gaps</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gap Category</th>
+                        <th>Current State</th>
+                        <th>Required State</th>
+                        <th>Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Predictive Analytics</strong></td>
+                        <td>None</td>
+                        <td>ML models predicting quality metrics 1-2 weeks ahead</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Anomaly Detection</strong></td>
+                        <td>Threshold-based alerts</td>
+                        <td>ML-driven anomaly detection with explanations</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Root Cause Analysis</strong></td>
+                        <td>Manual investigation</td>
+                        <td>Automated RCA with code/config change correlation</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-source Data Integration</strong></td>
+                        <td>Two sources (Jest, Pytest)</td>
+                        <td>6+ sources including production, Jira, deployments</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Intelligent Dashboards</strong></td>
+                        <td>Static Grafana panels</td>
+                        <td>Interactive React dashboards with ML recommendations</td>
+                        <td>Medium</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Technical Architecture</h2>
+
+            <h3>Core Components</h3>
+
+            <div class="phase-box">
+                <div class="phase-title">1. Multi-Source Data Ingestion</div>
+                <p>Consolidates quality data from CI/CD pipelines, test frameworks, production monitoring, and issue tracking.</p>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">2. Quality Metrics Engine</div>
+                <p>Normalizes, deduplicates, and enriches raw metrics with business context and relationships.</p>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">3. ML Analytics Pipeline</div>
+                <p>Trains and executes predictive models, anomaly detectors, and root cause analyzers.</p>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">4. Insight Generation Engine</div>
+                <p>Synthesizes ML predictions into actionable recommendations and executive summaries.</p>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">5. Interactive Dashboard UI</div>
+                <p>React-based visualization with drill-down capabilities and real-time notifications.</p>
+            </div>
+
+            <h3>Technology Stack</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Data Pipeline</strong></td>
+                        <td>Apache Kafka, Airflow, dbt</td>
+                        <td>ETL and data orchestration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Warehouse</strong></td>
+                        <td>PostgreSQL + Timescale, Snowflake</td>
+                        <td>Time-series metrics storage</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ML Models</strong></td>
+                        <td>scikit-learn, Prophet, XGBoost</td>
+                        <td>Forecasting and anomaly detection</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backend APIs</strong></td>
+                        <td>FastAPI, GraphQL</td>
+                        <td>Dashboard data serving</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Frontend</strong></td>
+                        <td>React 18, D3.js, Recharts</td>
+                        <td>Interactive visualizations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Integrations</strong></td>
+                        <td>Webhooks, REST APIs</td>
+                        <td>Jira, GitHub, Slack, Teams</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Detailed Implementation Plan (Complete 75% to Production)</h2>
+
+            <h3>Phase 1: Complete Data Integration & Normalization (Days 1-12)</h3>
+
+            <div class="phase-box">
+                <div class="phase-title">Expand Data Ingestion (from 2 to 6+ sources)</div>
+                <pre>// Kafka Consumer for multi-source data
+import json
+from kafka import KafkaConsumer
+from sqlalchemy import create_engine
+
+class QualityDataConsumer:
+    def __init__(self):
+        self.consumer = KafkaConsumer(
+            'quality-events',
+            bootstrap_servers=['kafka:9092'],
+            group_id='dashboard-ingestion',
+            value_deserializer=lambda m: json.loads(m.decode('utf-8'))
+        )
+        self.db_engine = create_engine(
+            'postgresql://user:pass@postgres:5432/quality_db'
+        )
+
+    def normalize_event(self, event):
+        """Normalize events from different sources"""
+        source = event.get('source_type')
+
+        if source == 'jest':
+            return {
+                'source': 'jest',
+                'test_file': event['test_file'],
+                'passed': event['passed'],
+                'duration_ms': event['duration'],
+                'timestamp': event['timestamp'],
+                'team': event.get('team', 'unknown')
+            }
+        elif source == 'pytest':
+            return {
+                'source': 'pytest',
+                'test_file': event['test_path'],
+                'passed': event['outcome'] == 'passed',
+                'duration_ms': event['duration_ms'],
+                'timestamp': event['timestamp'],
+                'team': event.get('team', 'unknown')
+            }
+        elif source == 'jira':
+            return {
+                'source': 'jira',
+                'issue_type': event['issuetype'],
+                'priority': event['priority'],
+                'created_date': event['created'],
+                'team': event['project'],
+                'status': event['status']
+            }
+        elif source == 'github_deploy':
+            return {
+                'source': 'deployment',
+                'service': event['service'],
+                'version': event['version'],
+                'deployed_at': event['timestamp'],
+                'status': event['status'],
+                'team': event['team']
+            }
+        elif source == 'prometheus':
+            return {
+                'source': 'production_metrics',
+                'metric_name': event['metric'],
+                'value': event['value'],
+                'timestamp': event['timestamp'],
+                'labels': event.get('labels', {})
+            }
+        elif source == 'elastic':
+            return {
+                'source': 'logs',
+                'error_count': event['error_count'],
+                'error_types': event['error_types'],
+                'timestamp': event['timestamp'],
+                'service': event['service']
+            }
+
+    def consume_and_store(self):
+        for message in self.consumer:
+            normalized = self.normalize_event(message.value)
+            self.store_event(normalized)
+
+    def store_event(self, normalized_event):
+        with self.db_engine.connect() as conn:
+            conn.execute(
+                f"""INSERT INTO quality_events
+                   (source, event_data, timestamp)
+                   VALUES (%s, %s, %s)""",
+                (normalized_event['source'],
+                 json.dumps(normalized_event),
+                 normalized_event.get('timestamp', 'now()'))
+            )
+            conn.commit()</pre>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">Enhanced PostgreSQL Schema with Timescale</div>
+                <pre>-- Enable Timescale extension for time-series optimization
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+
+CREATE TABLE IF NOT EXISTS quality_events (
+    time TIMESTAMP NOT NULL,
+    source VARCHAR(50) NOT NULL,
+    event_data JSONB NOT NULL,
+    event_type VARCHAR(100),
+    team VARCHAR(100),
+    severity VARCHAR(20)
+);
+
+-- Convert to hypertable for efficient time-series queries
+SELECT create_hypertable('quality_events', 'time', if_not_exists => TRUE);
+
+-- Create continuous aggregates for performance insights
+CREATE MATERIALIZED VIEW daily_quality_metrics AS
+SELECT
+    time_bucket('1 day', time) as day,
+    source,
+    team,
+    COUNT(*) as event_count,
+    ROUND(
+        (COUNT(*) FILTER (WHERE event_data->>'passed' = 'true')
+         * 100.0 / COUNT(*)), 2
+    ) as pass_rate,
+    ROUND(
+        (event_data->>'duration_ms')::float, 2
+    ) as avg_duration_ms
+FROM quality_events
+WHERE event_type = 'test_result'
+GROUP BY time_bucket('1 day', time), source, team;
+
+CREATE INDEX idx_quality_events_team_time
+    ON quality_events (team, time DESC);
+
+CREATE INDEX idx_quality_events_source_time
+    ON quality_events (source, time DESC);</pre>
+            </div>
+
+            <p><strong>Deliverables:</strong> Multi-source Kafka ingestion, normalized schema, TimescaleDB optimization</p>
+
+            <h3>Phase 2: ML Models & Predictive Analytics (Days 13-24)</h3>
+
+            <div class="phase-box">
+                <div class="phase-title">Forecasting Model (Prophet for Quality Metrics)</div>
+                <pre>import pandas as pd
+from fbprophet import Prophet
+from sklearn.metrics import mean_absolute_percentage_error
+import pickle
+
+class QualityForecastModel:
+    def __init__(self, metric_name):
+        self.metric_name = metric_name
+        self.model = Prophet(
+            yearly_seasonality=True,
+            weekly_seasonality=True,
+            daily_seasonality=False,
+            interval_width=0.95
+        )
+
+    def prepare_data(self, metrics_df):
+        """Format metrics for Prophet"""
+        # Aggregate daily metrics
+        daily_metrics = metrics_df.groupby('date').agg({
+            'pass_rate': 'mean',
+            'test_count': 'sum',
+            'duration_ms': 'mean',
+            'error_count': 'sum'
+        }).reset_index()
+
+        # Rename for Prophet compatibility
+        daily_metrics.rename(
+            columns={'date': 'ds', self.metric_name: 'y'},
+            inplace=True
+        )
+
+        # Add regressors (exogenous variables)
+        daily_metrics['deployment_flag'] = (
+            daily_metrics['date'].isin(get_deployment_dates())
+        ).astype(int)
+
+        return daily_metrics[['ds', 'y', 'deployment_flag']]
+
+    def train(self, historical_metrics_df):
+        """Train forecasting model"""
+        df = self.prepare_data(historical_metrics_df)
+
+        # Add external regressor
+        self.model.add_regressor('deployment_flag')
+
+        # Fit model
+        self.model.fit(df)
+
+        # Validate on holdout set
+        future = self.model.make_future_dataframe(periods=14)
+        forecast = self.model.predict(future)
+
+        # Calculate validation metric
+        validation_mape = mean_absolute_percentage_error(
+            df[-30:]['y'].values,
+            forecast[-30:-16]['yhat'].values
+        )
+
+        return {'validation_mape': validation_mape}
+
+    def forecast(self, periods_ahead=14):
+        """Generate forecast for next 2 weeks"""
+        future = self.model.make_future_dataframe(periods=periods_ahead)
+        forecast = self.model.predict(future)
+
+        return {
+            'forecast_dates': forecast['ds'].tail(periods_ahead).tolist(),
+            'predicted_values': forecast['yhat'].tail(periods_ahead).tolist(),
+            'upper_bound': forecast['yhat_upper'].tail(periods_ahead).tolist(),
+            'lower_bound': forecast['yhat_lower'].tail(periods_ahead).tolist(),
+        }
+
+    def save(self, path):
+        with open(f'{path}/model_{self.metric_name}.pkl', 'wb') as f:
+            pickle.dump(self.model, f)</pre>
+            </div>
+
+            <div class="phase-box">
+                <div class="phase-title">Anomaly Detection with Isolation Forest</div>
+                <pre>from sklearn.ensemble import IsolationForest
+import numpy as np
+
+class QualityAnomalyDetector:
+    def __init__(self, contamination=0.1):
+        self.detector = IsolationForest(
+            contamination=contamination,
+            random_state=42,
+            n_estimators=100
+        )
+
+    def extract_features(self, daily_metrics):
+        """Create feature vectors from metrics"""
+        features = np.column_stack([
+            daily_metrics['pass_rate'].values,
+            daily_metrics['avg_duration_ms'].values,
+            daily_metrics['test_count'].values,
+            daily_metrics['error_rate'].values,
+            daily_metrics['flaky_test_count'].values,
+        ])
+        return features
+
+    def train(self, historical_daily_metrics):
+        """Train anomaly detector"""
+        features = self.extract_features(historical_daily_metrics)
+        self.detector.fit(features)
+
+    def detect_anomalies(self, current_daily_metrics):
+        """Identify anomalous days"""
+        features = self.extract_features(current_daily_metrics)
+        predictions = self.detector.predict(features)
+        scores = self.detector.score_samples(features)
+
+        anomalies = []
+        for idx, pred in enumerate(predictions):
+            if pred == -1:  # Anomaly
+                anomalies.append({
+                    'date': current_daily_metrics.iloc[idx]['date'],
+                    'anomaly_score': float(scores[idx]),
+                    'metrics': {
+                        'pass_rate': float(current_daily_metrics.iloc[idx]['pass_rate']),
+                        'duration_ms': float(current_daily_metrics.iloc[idx]['avg_duration_ms']),
+                        'error_rate': float(current_daily_metrics.iloc[idx]['error_rate'])
+                    }
+                })
+
+        return anomalies</pre>
+            </div>
+
+            <p><strong>Deliverables:</strong> Forecasting models for quality metrics, anomaly detection system, model training pipeline</p>
+
+            <h3>Phase 3: Insight Generation & Dashboard UI (Days 25-35)</h3>
+
+            <div class="phase-box">
+                <div class="phase-title">Insight Generation Service (FastAPI)</div>
+                <pre>from fastapi import FastAPI, BackgroundTasks
+from datetime import datetime, timedelta
+import asyncio
+
+app = FastAPI()
+
+class InsightGenerator:
+    def __init__(self):
+        self.forecast_model = QualityForecastModel('pass_rate')
+        self.anomaly_detector = QualityAnomalyDetector()
+
+    def generate_daily_insights(self):
+        """Generate insights for dashboard"""
+        # Get current metrics
+        current_metrics = self.fetch_today_metrics()
+
+        # Detect anomalies
+        anomalies = self.anomaly_detector.detect_anomalies(
+            pd.DataFrame([current_metrics])
+        )
+
+        # Generate forecast
+        forecast = self.forecast_model.forecast(periods_ahead=14)
+
+        # Analyze trends
+        trend_analysis = self.analyze_trends()
+
+        # Create recommendations
+        recommendations = self.create_recommendations(
+            current_metrics, anomalies, trend_analysis
+        )
+
+        return {
+            'timestamp': datetime.utcnow().isoformat(),
+            'current_state': current_metrics,
+            'anomalies': anomalies,
+            'forecast': forecast,
+            'trends': trend_analysis,
+            'recommendations': recommendations,
+            'health_score': self.calculate_health_score(current_metrics)
+        }
+
+    def analyze_trends(self):
+        """Analyze quality trends"""
+        metrics_30d = self.fetch_metrics(days=30)
+
+        trends = {
+            'pass_rate_trend': self.calculate_slope(metrics_30d['pass_rate']),
+            'duration_trend': self.calculate_slope(metrics_30d['avg_duration']),
+            'error_trend': self.calculate_slope(metrics_30d['error_rate']),
+            'flakiness_trend': self.calculate_slope(metrics_30d['flaky_tests'])
+        }
+
+        return {
+            'direction': {k: 'improving' if v < 0 else 'degrading'
+                         for k, v in trends.items()},
+            'magnitude': trends
+        }
+
+    def create_recommendations(self, current, anomalies, trends):
+        """Generate actionable recommendations"""
+        recommendations = []
+
+        if current['pass_rate'] < 0.95:
+            recommendations.append({
+                'priority': 'high',
+                'type': 'test_quality',
+                'message': 'Pass rate below 95% - investigate failures',
+                'suggested_action': 'Review recent test failures and code changes'
+            })
+
+        if trends['duration_trend'] > 0.05:
+            recommendations.append({
+                'priority': 'medium',
+                'type': 'performance',
+                'message': 'Test execution time increasing',
+                'suggested_action': 'Consider test parallelization or optimization'
+            })
+
+        if anomalies:
+            recommendations.append({
+                'priority': 'high',
+                'type': 'anomaly',
+                'message': f'{len(anomalies)} anomalies detected',
+                'suggested_action': 'Review recent deployments and code changes'
+            })
+
+        return recommendations
+
+    def calculate_health_score(self, metrics):
+        """Calculate overall quality health (0-100)"""
+        components = {
+            'pass_rate': metrics['pass_rate'] * 100,
+            'reliability': (1 - metrics['error_rate']) * 100,
+            'flakiness': (1 - metrics['flaky_test_pct']) * 100,
+        }
+
+        return {
+            'overall': sum(components.values()) / len(components),
+            'components': components
+        }
+
+@app.get("/insights/daily")
+async def get_daily_insights():
+    """Get daily quality insights"""
+    generator = InsightGenerator()
+    return generator.generate_daily_insights()
+
+@app.get("/insights/team/{team_name}")
+async def get_team_insights(team_name: str):
+    """Get team-specific insights"""
+    metrics = fetch_team_metrics(team_name, days=30)
+    return {
+        'team': team_name,
+        'pass_rate': metrics['pass_rate'],
+        'trend': metrics['trend'],
+        'hot_issues': identify_hot_issues(team_name),
+        'top_flaky_tests': get_flaky_tests(team_name, limit=5)
+    }
+
+@app.post("/insights/create-jira-issues")
+async def create_jira_issues(background_tasks: BackgroundTasks):
+    """Auto-create Jira issues for critical issues"""
+    insights = InsightGenerator().generate_daily_insights()
+
+    for rec in insights['recommendations']:
+        if rec['priority'] == 'high':
+            background_tasks.add_task(
+                create_jira_issue,
+                title=rec['message'],
+                description=rec['suggested_action'],
+                priority='High'
+            )
+
+            <p><strong>Deliverables:</strong> API endpoints for insights, daily dashboard data, Jira integration</p>
+        </div>
+
+        <div class="section">
+            <h2>Integration Points</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>System</th>
+                        <th>Integration Type</th>
+                        <th>Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Jenkins/GitHub Actions</strong></td>
+                        <td>Webhook for test result submission</td>
+                        <td>Per test execution</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Prometheus</strong></td>
+                        <td>Metrics scraping and remote write</td>
+                        <td>Real-time (15s intervals)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Elasticsearch</strong></td>
+                        <td>Log ingestion for error analysis</td>
+                        <td>Real-time streaming</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Jira</strong></td>
+                        <td>REST API for issue creation/updates</td>
+                        <td>Event-driven (anomalies)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Slack/Teams</strong></td>
+                        <td>Webhook notifications for alerts</td>
+                        <td>Event-driven</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GitHub</strong></td>
+                        <td>Commit history correlation for RCA</td>
+                        <td>On-demand (per analysis)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Production Requirements</h2>
+
+            <h3>Infrastructure Specifications</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>CPU</th>
+                        <th>Memory</th>
+                        <th>Storage</th>
+                        <th>HA Configuration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Kafka Cluster</td>
+                        <td>8 cores (per broker)</td>
+                        <td>16 GB (per broker)</td>
+                        <td>500 GB (per broker, SSD)</td>
+                        <td>3+ brokers, replication factor 3</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL + Timescale</td>
+                        <td>16 cores</td>
+                        <td>32 GB</td>
+                        <td>2 TB (SSD, partitioned by time)</td>
+                        <td>Primary-replica with failover</td>
+                    </tr>
+                    <tr>
+                        <td>ML Analytics Service</td>
+                        <td>8 cores</td>
+                        <td>16 GB</td>
+                        <td>100 GB (model cache)</td>
+                        <td>2 replicas, model replication</td>
+                    </tr>
+                    <tr>
+                        <td>FastAPI Backend</td>
+                        <td>4 cores</td>
+                        <td>8 GB</td>
+                        <td>N/A</td>
+                        <td>3+ replicas, load balancer</td>
+                    </tr>
+                    <tr>
+                        <td>React Dashboard</td>
+                        <td>2 cores</td>
+                        <td>2 GB</td>
+                        <td>50 GB</td>
+                        <td>CDN distribution, static caching</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Security Requirements</h3>
+            <ul style="margin-left: 20px;">
+                <li><strong>Authentication:</strong> OAuth 2.0 with OIDC, SSO integration with company directory</li>
+                <li><strong>Authorization:</strong> RBAC with team-based view restrictions, Jira integration for issue creation</li>
+                <li><strong>Encryption:</strong> TLS 1.3 for all data in transit, AES-256 for sensitive metrics at rest</li>
+                <li><strong>Audit Logging:</strong> All insights accessed logged to CloudTrail, dashboard view tracking</li>
+                <li><strong>Data Privacy:</strong> No PII in metrics, anonymized user/team identification, GDPR compliance</li>
+                <li><strong>Secrets:</strong> HashiCorp Vault for API credentials, database passwords, Jira tokens</li>
+            </ul>
+
+            <h3>Monitoring & Alerting</h3>
+            <ul style="margin-left: 20px;">
+                <li>Prometheus metrics for API latency, ML model inference time, data ingestion lag</li>
+                <li>Custom Grafana dashboards for quality metrics, forecast accuracy, anomaly detection performance</li>
+                <li>Alert rules for data ingestion failures, model drift detection, dashboard availability</li>
+                <li>ELK stack for centralized logging with structured JSON events</li>
+                <li>PagerDuty integration for critical metric regressions</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Gap Analysis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Priority</th>
+                        <th>Effort (Days)</th>
+                        <th>Risk</th>
+                        <th>Resolution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Multi-source data normalization logic</td>
+                        <td>Critical</td>
+                        <td>8</td>
+                        <td>High</td>
+                        <td>Build Kafka consumer with source-specific mappers; test with real data</td>
+                    </tr>
+                    <tr>
+                        <td>ML model training infrastructure</td>
+                        <td>Critical</td>
+                        <td>6</td>
+                        <td>High</td>
+                        <td>Set up Airflow DAGs for daily model retraining; version models in MLflow</td>
+                    </tr>
+                    <tr>
+                        <td>Jira/GitHub integration</td>
+                        <td>High</td>
+                        <td>5</td>
+                        <td>Medium</td>
+                        <td>Implement webhook handlers; test automation workflows</td>
+                    </tr>
+                    <tr>
+                        <td>Dashboard UI component library</td>
+                        <td>High</td>
+                        <td>7</td>
+                        <td>Medium</td>
+                        <td>Build reusable React components; integrate with D3.js for charts</td>
+                    </tr>
+                    <tr>
+                        <td>Performance optimization for large datasets</td>
+                        <td>Medium</td>
+                        <td>4</td>
+                        <td>Low</td>
+                        <td>Implement pagination, caching, aggregate queries; profile slow endpoints</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>RACI Matrix</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>QA Lead</th>
+                        <th>ML Engineer</th>
+                        <th>Backend Lead</th>
+                        <th>Frontend Lead</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Data ingestion & normalization</td>
+                        <td>A</td>
+                        <td>C</td>
+                        <td>R</td>
+                        <td>I</td>
+                    </tr>
+                    <tr>
+                        <td>ML model development</td>
+                        <td>I</td>
+                        <td>A/R</td>
+                        <td>C</td>
+                        <td>I</td>
+                    </tr>
+                    <tr>
+                        <td>API development</td>
+                        <td>C</td>
+                        <td>C</td>
+                        <td>A/R</td>
+                        <td>C</td>
+                    </tr>
+                    <tr>
+                        <td>Dashboard UI</td>
+                        <td>C</td>
+                        <td>I</td>
+                        <td>C</td>
+                        <td>A/R</td>
+                    </tr>
+                    <tr>
+                        <td>Jira/external integration</td>
+                        <td>A/R</td>
+                        <td>I</td>
+                        <td>C</td>
+                        <td>I</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>R</strong> = Responsible, <strong>A</strong> = Accountable, <strong>C</strong> = Consulted, <strong>I</strong> = Informed</p>
+        </div>
+
+        <div class="section">
+            <h2>Risk Register</h2>
+
+            <div class="risk-high">
+                <h3>High Risk: Data Quality & Garbage-In-Garbage-Out</h3>
+                <p>
+                    <strong>Description:</strong> If normalized data is incorrect, all ML models and insights will be unreliable.
+                </p>
+                <p>
+                    <strong>Mitigation:</strong> Implement data quality checks (dbt tests, Great Expectations), manual validation
+                    of first 1000 events per source, side-by-side comparison with original sources before going live.
+                </p>
+                <p><strong>Owner:</strong> Data Engineer</p>
+            </div>
+
+            <div class="risk-high">
+                <h3>High Risk: Model Accuracy & False Positives</h3>
+                <p>
+                    <strong>Description:</strong> Anomaly detector may flag legitimate changes as issues, overwhelming teams.
+                </p>
+                <p>
+                    <strong>Mitigation:</strong> Conservative initial thresholds, manual review mode for first month, calibration
+                    with business team, integration of calendar/holiday data for known variations.
+                </p>
+                <p><strong>Owner:</strong> ML Engineer</p>
+            </div>
+
+            <div class="risk-medium">
+                <h3>Medium Risk: Performance at Scale</h3>
+                <p>
+                    <strong>Description:</strong> Dashboard queries may slow down with 6+ months of historical data.
+                </p>
+                <p>
+                    <strong>Mitigation:</strong> TimescaleDB compression for old data, materialized views for aggregates,
+                    query profiling and optimization, pagination for large result sets.
+                </p>
+                <p><strong>Owner:</strong> Backend Lead</p>
+            </div>
+
+            <div class="risk-medium">
+                <h3>Medium Risk: Integration Complexity</h3>
+                <p>
+                    <strong>Description:</strong> Jira/GitHub integrations may require custom authentication and error handling.
+                </p>
+                <p>
+                    <strong>Mitigation:</strong> Use official API libraries, comprehensive error handling, rate limiting, mock
+                    integration tests, gradual rollout with pilot team first.
+                </p>
+                <p><strong>Owner:</strong> Backend Lead</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Effort Estimation</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Duration (Days)</th>
+                        <th>Team Size</th>
+                        <th>Key Activities</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Phase 1: Data Integration</strong></td>
+                        <td>12</td>
+                        <td>2 (Backend, Data Engineer)</td>
+                        <td>Multi-source ingestion, schema, TimescaleDB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 2: ML Analytics</strong></td>
+                        <td>12</td>
+                        <td>2 (ML Engineer, Data Engineer)</td>
+                        <td>Model development, training, validation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phase 3: UI & Integration</strong></td>
+                        <td>11</td>
+                        <td>3 (Backend, Frontend, QA)</td>
+                        <td>API, dashboard, Jira integration, testing</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Total Effort: 35 days | Team: 2-3 people | Start to Production: 5-6 weeks</strong></p>
+        </div>
+
+        <div class="section">
+            <h2>Definition of Done</h2>
+            <ul class="checklist">
+                <li>All data sources successfully normalized and ingested via Kafka</li>
+                <li>TimescaleDB hypertables created with proper indexing and compression</li>
+                <li>Prophet and Isolation Forest models trained with >85% accuracy</li>
+                <li>API endpoints fully tested and documented with OpenAPI/Swagger</li>
+                <li>React dashboard displays real-time quality metrics and forecasts</li>
+                <li>Jira integration automatically creates issues for critical anomalies</li>
+                <li>Slack/Teams notifications sent for high-priority recommendations</li>
+                <li>Performance testing shows <500ms API latency for dashboard queries</li>
+                <li>Security review completed (SAST, secrets scanning, penetration testing)</li>
+                <li>Data quality validation tests passing for all sources</li>
+                <li>Monitoring dashboards deployed with alert rules configured</li>
+                <li>Team trained on dashboard usage and interpretation</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Action Items</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Owner</th>
+                        <th>Due Date</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Allocate ML engineer and frontend developer</td>
+                        <td>Head of AI & Eng</td>
+                        <td>Week 1</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td>Extract 90 days of historical metrics</td>
+                        <td>Data Engineer</td>
+                        <td>Week 1</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td>Design data normalization schemas</td>
+                        <td>Backend Lead</td>
+                        <td>Week 1</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Set up Kafka infrastructure</td>
+                        <td>DevOps Lead</td>
+                        <td>Week 2</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Complete initial model training</td>
+                        <td>ML Engineer</td>
+                        <td>Week 4</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Finish dashboard UI components</td>
+                        <td>Frontend Lead</td>
+                        <td>Week 5</td>
+                        <td>High</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Success Metrics</h2>
+            <div class="success-box">
+                <h3>KPIs (Measured at Go-Live and 6-Month Mark)</h3>
+                <ul style="margin-left: 20px;">
+                    <li><strong>Forecast Accuracy:</strong> MAPE <10% for quality metrics 2 weeks ahead</li>
+                    <li><strong>Anomaly Detection:</strong> Precision >80%, recall >70% for real issues</li>
+                    <li><strong>Dashboard Usage:</strong> >80% of QA team accessing dashboards daily</li>
+                    <li><strong>Time-to-Insight:</strong> Reduce manual RCA from 4 hours to <30 minutes</li>
+                    <li><strong>Issue Creation:</strong> Automatic Jira issue creation for 70% of high-priority anomalies</li>
+                    <li><strong>Data Freshness:</strong> Dashboard updated within 5 minutes of test completion</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

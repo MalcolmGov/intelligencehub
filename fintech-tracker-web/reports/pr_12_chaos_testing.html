@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Readiness Report - Chaos Testing Agent</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --accent: #0ea5e9;
+            --accent-dark: #0284c7;
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --purple: #8b5cf6;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border-bottom: 2px solid var(--accent);
+            padding: 3rem 2rem;
+            margin: -2rem -2rem 2rem -2rem;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .header-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .header-content p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .metadata {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .metadata-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .metadata-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .metadata-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        section {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: var(--surface);
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin: 1.5rem 0 1rem 0;
+            color: var(--accent-dark);
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .summary-card {
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .summary-card strong {
+            color: var(--accent);
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #a8e6cf;
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid var(--surface-light);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: #a8e6cf;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .architecture {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border: 1px solid var(--purple);
+        }
+
+        .architecture h4 {
+            color: var(--purple);
+            margin-bottom: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--surface-light);
+        }
+
+        th {
+            background: rgba(14, 165, 233, 0.15);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(14, 165, 233, 0.05);
+        }
+
+        .phase {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid var(--green);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+        }
+
+        .phase-title {
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--red);
+        }
+
+        .risk-medium {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--amber);
+        }
+
+        .risk-low {
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid var(--green);
+        }
+
+        .success-metric {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--green);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.75rem 0;
+        }
+
+        .definition-item {
+            background: rgba(14, 165, 233, 0.08);
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+        }
+
+        .action-item {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--amber);
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border-radius: 4px;
+        }
+
+        .raci-matrix {
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--surface-light);
+            margin-top: 3rem;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem 0.25rem 0.25rem 0;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1rem 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Chaos Testing Agent</h1>
+                <p>AI-Driven Continuous Resilience Testing & Automatic Remediation</p>
+                <div class="metadata">
+                    <div class="metadata-item">
+                        <div class="metadata-label">Use Case ID</div>
+                        <div class="metadata-value">PR-12</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Baseline Completion</div>
+                        <div class="metadata-value">100% (Built from 15% baseline)</div>
+                    </div>
+                    <div class="metadata-item">
+                        <div class="metadata-label">Owned By</div>
+                        <div class="metadata-value">Anupam Sharma</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>Executive Summary</h2>
+            <p>The Chaos Testing Agent is an AI-powered system that continuously injects controlled failures into the production environment to validate system resilience, detect hidden failure modes, and automatically trigger remediation. Using machine learning, the system learns from failure patterns, optimizes chaos experiments, and predicts optimal times to run tests with minimal customer impact. This transforms reactive incident response into proactive resilience engineering.</p>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <strong>Current State:</strong> Manual chaos testing scheduled quarterly; reactive incident response; limited automation for recovery; no ML-driven optimization
+                </div>
+                <div class="summary-card">
+                    <strong>Target State:</strong> Continuous AI-driven chaos experiments; automated discovery of failure modes; intelligent remediation with rollback; ML-optimized test scheduling
+                </div>
+                <div class="summary-card">
+                    <strong>Key Value:</strong> 70% reduction in MTTR (Mean Time To Recovery); proactive identification of failures before customer impact; improved system resilience
+                </div>
+                <div class="summary-card">
+                    <strong>Timeline:</strong> 50 days across 4 phases; production deployment with confidence by end of Phase 4
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Current Implementation Gaps</h2>
+            <p>Analysis of the current 15% baseline implementation reveals critical gaps that must be addressed:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gap Category</th>
+                        <th>Current State</th>
+                        <th>Required for Production</th>
+                        <th>Effort Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Chaos Experiment Injection</td>
+                        <td>Basic stubs only</td>
+                        <td>Network faults, compute failures, storage faults, cascading failures with chaos operators</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Impact Assessment</td>
+                        <td>None</td>
+                        <td>Real-time metrics monitoring, blast radius calculation, customer impact detection</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Automated Remediation</td>
+                        <td>None</td>
+                        <td>Auto-rollback, circuit breaker activation, DNS failover, replica scaling</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>ML Optimization</td>
+                        <td>None</td>
+                        <td>Test scheduling optimization, failure pattern learning, anomaly detection, root cause analysis</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Human-in-the-Loop Approvals</td>
+                        <td>None</td>
+                        <td>Approval workflows, blast radius limits, safeguards, audit trails</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Observability Integration</td>
+                        <td>None</td>
+                        <td>Prometheus/Datadog integration, correlation of chaos events with metrics, dashboards</td>
+                        <td>Medium</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Technical Architecture</h2>
+            <p>The Chaos Testing Agent comprises eight integrated components coordinating chaos injection, impact assessment, and automated remediation:</p>
+            <div class="architecture">
+                <h4>Core Components</h4>
+                <p><strong>1. Experiment Orchestrator</strong> - Plans and schedules chaos experiments based on ML optimization. Manages approval workflows. Controls experiment lifecycle from planning to rollback.</p>
+                <p><strong>2. Chaos Injection Engine</strong> - Implements network faults (latency, packet loss, DNS failures), compute failures (CPU spike, memory leak), storage faults (disk full, I/O timeout), cascading failures across services.</p>
+                <p><strong>3. Impact Assessment Service</strong> - Monitors real-time metrics during chaos. Calculates blast radius. Detects customer-facing impact via golden signals (latency, error rate, throughput, saturation).</p>
+                <p><strong>4. Automated Remediation Engine</strong> - Executes predefined recovery actions: auto-rollback, circuit breaker activation, DNS failover, scale-up operations, health check bypasses.</p>
+                <p><strong>5. Failure Pattern Learning</strong> - ML model learns from historical chaos results. Identifies which failures have highest impact. Optimizes experiment selection for maximum coverage.</p>
+                <p><strong>6. Anomaly Detection Service</strong> - Uses isolation forests to detect unexpected system behavior during chaos. Flags novel failure modes requiring investigation.</p>
+                <p><strong>7. Root Cause Analysis Engine</strong> - Correlates chaos events with system logs, metrics, and trace data. Identifies root causes of failures automatically.</p>
+                <p><strong>8. Human-in-the-Loop Controller</strong> - Enforces approval policies, safeguards, and blast radius limits. Maintains audit trail of all chaos activities.</p>
+            </div>
+            <p>The system integrates with Prometheus/Datadog for metrics, Elasticsearch for log correlation, Kubernetes for container chaos injection via LitmusChaos operators, and PagerDuty for incident notifications.</p>
+        </section>
+
+        <section>
+            <h2>Integration Points</h2>
+            <h3>Kubernetes Integration</h3>
+            <p>Uses LitmusChaos operators for pod failures, node failures, network delays. Integrates with Kubernetes API for deployment rollback, replica scaling, drain/cordon operations.</p>
+            <h3>Observability Stack</h3>
+            <ul>
+                <li><strong>Prometheus</strong> - Metrics scraping; time-series storage of system metrics during chaos experiments</li>
+                <li><strong>Datadog/New Relic</strong> - APM integration for distributed trace correlation during failures</li>
+                <li><strong>Elasticsearch</strong> - Log storage and aggregation for RCA (root cause analysis)</li>
+                <li><strong>Grafana</strong> - Dashboards for experiment results and failure analysis</li>
+            </ul>
+            <h3>Incident Management Integration</h3>
+            <p>PagerDuty integration for alerting on experiment failures. Automated incident creation for high-impact failures discovered during testing.</p>
+            <h3>CI/CD Pipeline Integration</h3>
+            <p>Jenkins/GitHub Actions trigger scheduled chaos experiments. Test results published as artifacts. Pass/fail gates prevent deployments if critical resilience gaps discovered.</p>
+        </section>
+
+        <section>
+            <h2>Production Requirements</h2>
+            <h3>Infrastructure Specifications</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>CPU</th>
+                        <th>Memory</th>
+                        <th>Storage</th>
+                        <th>Replicas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Experiment Orchestrator</td>
+                        <td>4 cores</td>
+                        <td>8GB</td>
+                        <td>50GB</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Chaos Injection Engine</td>
+                        <td>8 cores</td>
+                        <td>16GB</td>
+                        <td>100GB</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Impact Assessment Service</td>
+                        <td>6 cores</td>
+                        <td>12GB</td>
+                        <td>200GB</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Remediation Engine</td>
+                        <td>4 cores</td>
+                        <td>8GB</td>
+                        <td>50GB</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>ML Learning & RCA Service</td>
+                        <td>8 cores</td>
+                        <td>16GB</td>
+                        <td>200GB</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL (Experiment History)</td>
+                        <td>12 cores</td>
+                        <td>24GB</td>
+                        <td>500GB SSD</td>
+                        <td>1 + 1 replica</td>
+                    </tr>
+                    <tr>
+                        <td>Redis (Experiment Cache)</td>
+                        <td>4 cores</td>
+                        <td>16GB</td>
+                        <td>100GB</td>
+                        <td>1 + 1 sentinel</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3>Security Requirements</h3>
+            <ul>
+                <li>RBAC with role-based approval (Admin, Engineer, Viewer levels)</li>
+                <li>Blast radius enforcement: max 5% customer traffic affected per experiment</li>
+                <li>Automatic rollback triggered if customer-facing error rate exceeds 0.1%</li>
+                <li>All chaos operations logged to audit trail with immutable timestamps</li>
+                <li>TLS 1.3 for all control plane communications</li>
+                <li>Encrypted Kubernetes secrets for remediation credentials</li>
+            </ul>
+            <h3>Performance SLAs</h3>
+            <ul>
+                <li>Experiment injection latency: <1 second from trigger to chaos injection</li>
+                <li>Impact detection: <5 seconds to identify customer-facing impact</li>
+                <li>Automatic remediation: <10 seconds to activate rollback/failover</li>
+                <li>RCA completion: <15 minutes for initial root cause hypothesis</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Detailed Implementation Guidelines</h2>
+
+            <h3>Phase 1: Foundation & Chaos Injection (Days 1-15)</h3>
+            <div class="phase">
+                <div class="phase-title">Objectives</div>
+                <p>Build core infrastructure, implement basic chaos injection, and establish monitoring integration</p>
+            </div>
+
+            <h4>Step 1.1: Database Schema & Experiment Tracking (Days 1-3)</h4>
+            <pre><code>-- PostgreSQL Schema for Chaos Experiments
+CREATE TABLE chaos_experiments (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    chaos_type VARCHAR(50), -- 'network', 'compute', 'storage', 'cascading'
+    target_service VARCHAR(255),
+    target_namespace VARCHAR(255),
+    blast_radius_percent FLOAT,
+    scheduled_time TIMESTAMP,
+    executed_time TIMESTAMP,
+    status VARCHAR(20), -- 'scheduled', 'running', 'completed', 'rolled_back'
+    created_by VARCHAR(255),
+    approved_by VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE experiment_results (
+    id UUID PRIMARY KEY,
+    experiment_id UUID REFERENCES chaos_experiments(id),
+    metric_name VARCHAR(100),
+    baseline_value FLOAT,
+    chaos_value FLOAT,
+    change_percent FLOAT,
+    blast_radius_detected FLOAT,
+    customer_impact BOOLEAN,
+    recorded_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE remediation_actions (
+    id UUID PRIMARY KEY,
+    experiment_id UUID REFERENCES chaos_experiments(id),
+    action_type VARCHAR(50), -- 'rollback', 'scale_up', 'failover', 'circuit_breaker'
+    action_details JSONB,
+    executed_at TIMESTAMP,
+    success BOOLEAN,
+    duration_ms INTEGER,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_chaos_experiments_status ON chaos_experiments(status);
+CREATE INDEX idx_experiment_results_experiment_id ON experiment_results(experiment_id);
+CREATE INDEX idx_remediation_actions_experiment_id ON remediation_actions(experiment_id);</code></pre>
+
+            <h4>Step 1.2: Chaos Injection Engine - Network Faults (Days 4-8)</h4>
+            <pre><code>from typing import Dict, List
+import subprocess
+import json
+from dataclasses import dataclass
+
+@dataclass
+class NetworkFault:
+    service_name: str
+    namespace: str
+    latency_ms: int = 0
+    packet_loss_percent: float = 0.0
+    error_rate_percent: float = 0.0
+    duration_seconds: int = 60
+
+class ChaosInjectionEngine:
+    def __init__(self, kubernetes_client):
+        self.k8s = kubernetes_client
+        self.litmus_namespace = "litmus"
+
+    def inject_network_latency(self, fault: NetworkFault) -> str:
+        """Inject network latency using LitmusChaos pod-network-latency"""
+        chaos_manifest = {
+            "apiVersion": "litmuschaos.io/v1alpha1",
+            "kind": "ChaosEngine",
+            "metadata": {
+                "name": f"latency-{fault.service_name}",
+                "namespace": fault.namespace
+            },
+            "spec": {
+                "appinfo": {
+                    "appns": fault.namespace,
+                    "applabel": f"app={fault.service_name}"
+                },
+                "engineState": "active",
+                "chaosServiceAccount": "litmus-admin",
+                "experiments": [{
+                    "name": "pod-network-latency",
+                    "spec": {
+                        "components": {
+                            "env": [
+                                {"name": "NETWORK_LATENCY", "value": str(fault.latency_ms)},
+                                {"name": "TOTAL_CHAOS_DURATION", "value": str(fault.duration_seconds)},
+                                {"name": "JITTER", "value": "50"}
+                            ]
+                        }
+                    }
+                }]
+            }
+        }
+
+        return self._apply_manifest(chaos_manifest)
+
+    def inject_packet_loss(self, fault: NetworkFault) -> str:
+        """Inject packet loss using LitmusChaos pod-network-packet-loss"""
+        chaos_manifest = {
+            "apiVersion": "litmuschaos.io/v1alpha1",
+            "kind": "ChaosEngine",
+            "metadata": {
+                "name": f"packet-loss-{fault.service_name}",
+                "namespace": fault.namespace
+            },
+            "spec": {
+                "appinfo": {
+                    "appns": fault.namespace,
+                    "applabel": f"app={fault.service_name}"
+                },
+                "experiments": [{
+                    "name": "pod-network-packet-loss",
+                    "spec": {
+                        "components": {
+                            "env": [
+                                {"name": "PACKET_LOSS_PERCENTAGE",
+                                 "value": str(fault.packet_loss_percent)},
+                                {"name": "TOTAL_CHAOS_DURATION",
+                                 "value": str(fault.duration_seconds)}
+                            ]
+                        }
+                    }
+                }]
+            }
+        }
+
+        return self._apply_manifest(chaos_manifest)
+
+    def inject_compute_failure(self, service: str, namespace: str,
+                               cpu_percent: int = 80,
+                               duration_seconds: int = 60) -> str:
+        """Inject high CPU usage using stress-ng in pod"""
+        chaos_manifest = {
+            "apiVersion": "litmuschaos.io/v1alpha1",
+            "kind": "ChaosEngine",
+            "metadata": {
+                "name": f"cpu-stress-{service}",
+                "namespace": namespace
+            },
+            "spec": {
+                "experiments": [{
+                    "name": "pod-cpu-hog",
+                    "spec": {
+                        "components": {
+                            "env": [
+                                {"name": "CPU_CORES", "value": "2"},
+                                {"name": "TOTAL_CHAOS_DURATION",
+                                 "value": str(duration_seconds)},
+                                {"name": "CHAOS_KILL_COMMAND",
+                                 "value": "killall stress-ng"}
+                            ]
+                        }
+                    }
+                }]
+            }
+        }
+
+        return self._apply_manifest(chaos_manifest)
+
+    def _apply_manifest(self, manifest: Dict) -> str:
+        """Apply Kubernetes manifest and return ChaosEngine name"""
+        yaml_str = json.dumps(manifest)
+        result = subprocess.run(
+            ["kubectl", "apply", "-f", "-"],
+            input=yaml_str,
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode != 0:
+            raise Exception(f"Failed to apply chaos manifest: {result.stderr}")
+
+        return manifest['metadata']['name']</code></pre>
+
+            <h3>Phase 2: Impact Assessment & Metrics Integration (Days 16-28)</h3>
+            <div class="phase">
+                <div class="phase-title">Objectives</div>
+                <p>Implement real-time impact detection and automated blast radius calculation</p>
+            </div>
+
+            <h4>Step 2.1: Impact Assessment Service (Days 16-20)</h4>
+            <pre><code>from prometheus_client import prometheus_client as prom
+import numpy as np
+from dataclasses import dataclass
+
+@dataclass
+class MetricBaseline:
+    p50_latency_ms: float
+    p99_latency_ms: float
+    error_rate_percent: float
+    throughput_rps: float
+
+class ImpactAssessmentService:
+    def __init__(self, prometheus_client):
+        self.prometheus = prometheus_client
+        self.error_threshold = 0.1  # 0.1% error rate
+        self.latency_threshold = 1.5  # 1.5x baseline
+
+    def calculate_blast_radius(self, experiment_id: str,
+                              duration_seconds: int) -> Dict:
+        """Calculate percentage of traffic/customers affected"""
+
+        # Fetch baseline metrics (pre-chaos period)
+        baseline = self._get_baseline_metrics(duration_seconds * 2)
+
+        # Fetch current metrics during chaos
+        current = self._get_current_metrics()
+
+        # Calculate deviations
+        error_rate_change = (
+            (current.error_rate_percent - baseline.error_rate_percent) /
+            (baseline.error_rate_percent + 0.01)
+        )
+
+        latency_ratio = (
+            current.p99_latency_ms / (baseline.p99_latency_ms + 1)
+        )
+
+        throughput_ratio = (
+            current.throughput_rps / (baseline.throughput_rps + 1)
+        )
+
+        # Customer-facing impact detection
+        has_customer_impact = (
+            current.error_rate_percent > self.error_threshold or
+            latency_ratio > self.latency_threshold
+        )
+
+        # Estimate blast radius as percentage of traffic affected
+        blast_radius = min(100, max(
+            error_rate_change * 100,
+            (latency_ratio - 1) * 50,
+            (1 - throughput_ratio) * 100
+        ))
+
+        return {
+            "blast_radius_percent": blast_radius,
+            "has_customer_impact": has_customer_impact,
+            "error_rate_change_percent": error_rate_change * 100,
+            "latency_ratio": latency_ratio,
+            "throughput_ratio": throughput_ratio,
+            "metrics": {
+                "baseline": baseline.__dict__,
+                "current": current.__dict__
+            }
+        }
+
+    def _get_baseline_metrics(self, lookback_seconds: int) -> MetricBaseline:
+        """Query Prometheus for pre-chaos baseline metrics"""
+        queries = {
+            'p50_latency': 'histogram_quantile(0.5, http_request_duration_ms)',
+            'p99_latency': 'histogram_quantile(0.99, http_request_duration_ms)',
+            'error_rate': 'rate(http_errors_total[5m])',
+            'throughput': 'rate(http_requests_total[1m])'
+        }
+
+        # Execute Prometheus queries
+        results = {}
+        for name, query in queries.items():
+            value = self.prometheus.query_range(
+                query,
+                start_time=f"-{lookback_seconds}s",
+                step="30s"
+            )
+            results[name] = self._average_metric(value)
+
+        return MetricBaseline(
+            p50_latency_ms=results['p50_latency'],
+            p99_latency_ms=results['p99_latency'],
+            error_rate_percent=results['error_rate'],
+            throughput_rps=results['throughput']
+        )
+
+    def _get_current_metrics(self) -> MetricBaseline:
+        """Query Prometheus for current metrics during chaos"""
+        # Similar to _get_baseline_metrics but for recent 5 minutes
+        pass
+
+    def _average_metric(self, time_series_data: List) -> float:
+        """Calculate average of time series data points"""
+        values = [point['value'] for point in time_series_data]
+        return np.mean(values) if values else 0.0</code></pre>
+
+            <h3>Phase 3: Automated Remediation & Recovery (Days 29-40)</h3>
+            <div class="phase">
+                <div class="phase-title">Objectives</div>
+                <p>Implement automated rollback, failover, and recovery mechanisms</p>
+            </div>
+
+            <h4>Step 3.1: Automated Remediation Engine (Days 29-34)</h4>
+            <pre><code>from enum import Enum
+import asyncio
+
+class RemediationAction(Enum):
+    ROLLBACK_DEPLOYMENT = "rollback_deployment"
+    SCALE_UP_REPLICAS = "scale_up_replicas"
+    CIRCUIT_BREAKER = "circuit_breaker"
+    DNS_FAILOVER = "dns_failover"
+    DRAIN_NODE = "drain_node"
+
+class RemediationEngine:
+    def __init__(self, k8s_client, prometheus_client):
+        self.k8s = k8s_client
+        self.prometheus = prometheus_client
+        self.remediation_timeout = 30  # seconds
+
+    async def auto_remediate(self, experiment_id: str,
+                            impact_assessment: Dict) -> List[str]:
+        """Automatically execute remediation if blast radius exceeded"""
+
+        blast_radius = impact_assessment['blast_radius_percent']
+        has_customer_impact = impact_assessment['has_customer_impact']
+
+        executed_actions = []
+
+        # Trigger remediation if customer impact detected
+        if has_customer_impact and blast_radius > 5:
+            # Step 1: Attempt automatic rollback
+            rollback_success = await self._rollback_deployment(experiment_id)
+            if rollback_success:
+                executed_actions.append("deployment_rollback")
+                return executed_actions  # Rollback successful, stop
+
+            # Step 2: If rollback fails, scale up replicas
+            scale_success = await self._scale_up_replicas(experiment_id)
+            if scale_success:
+                executed_actions.append("scale_up_replicas")
+
+            # Step 3: Activate circuit breaker
+            circuit_breaker_success = await self._activate_circuit_breaker(
+                experiment_id
+            )
+            if circuit_breaker_success:
+                executed_actions.append("circuit_breaker_activated")
+
+            # Step 4: Attempt DNS failover if available
+            failover_success = await self._dns_failover(experiment_id)
+            if failover_success:
+                executed_actions.append("dns_failover")
+
+        return executed_actions
+
+    async def _rollback_deployment(self, experiment_id: str) -> bool:
+        """Rollback Kubernetes deployment to previous revision"""
+        try:
+            # Get experiment details
+            experiment = self.db.get_experiment(experiment_id)
+            service = experiment['target_service']
+            namespace = experiment['target_namespace']
+
+            # Get deployment rollout history
+            revisions = self.k8s.get_deployment_revisions(
+                service, namespace
+            )
+
+            if len(revisions) < 2:
+                return False  # No previous revision
+
+            previous_revision = revisions[-2]
+
+            # Execute rollback
+            result = self.k8s.rollout_undo(
+                service,
+                namespace,
+                to_revision=previous_revision['revision']
+            )
+
+            if result['status'] == 'success':
+                # Wait for rollback to complete
+                await asyncio.sleep(5)
+
+                # Verify rollback success via metrics
+                return await self._verify_metric_recovery()
+
+            return False
+
+        except Exception as e:
+            print(f"Rollback failed: {e}")
+            return False
+
+    async def _scale_up_replicas(self, experiment_id: str) -> bool:
+        """Increase replica count for affected service"""
+        try:
+            experiment = self.db.get_experiment(experiment_id)
+            current_replicas = experiment['current_replicas']
+
+            # Scale to 1.5x current capacity
+            new_replicas = int(current_replicas * 1.5)
+
+            self.k8s.scale_deployment(
+                experiment['target_service'],
+                experiment['target_namespace'],
+                replicas=new_replicas
+            )
+
+            # Wait for new pods to become ready
+            await asyncio.sleep(10)
+
+            # Verify capacity increase
+            return await self._verify_throughput_increase()
+
+        except Exception as e:
+            print(f"Scale-up failed: {e}")
+            return False
+
+    async def _activate_circuit_breaker(self, experiment_id: str) -> bool:
+        """Activate circuit breaker to shed excess traffic"""
+        try:
+            # Update Istio DestinationRule with circuit breaker policy
+            circuit_breaker_config = {
+                "maxConnections": 1000,
+                "http": {
+                    "http1MaxPendingRequests": 1000,
+                    "maxRequestsPerConnection": 10,
+                    "consecutiveErrors": 5,
+                    "interval": "30s",
+                    "baseEjectionTime": "30s"
+                }
+            }
+
+            self.k8s.update_destination_rule(
+                experiment_id,
+                circuit_breaker_config
+            )
+
+            return True
+
+        except Exception as e:
+            print(f"Circuit breaker activation failed: {e}")
+            return False
+
+    async def _verify_metric_recovery(self) -> bool:
+        """Verify metrics return to baseline after remediation"""
+        baseline_error_rate = 0.01
+        max_latency_ms = 100
+
+        current_metrics = self.prometheus.query(
+            'http_errors_total'
+        )
+
+        current_error_rate = current_metrics.get('value', 0)
+
+        return current_error_rate <= baseline_error_rate</code></pre>
+
+            <h3>Phase 4: ML Optimization & RCA (Days 41-50)</h3>
+            <div class="phase">
+                <div class="phase-title">Objectives</div>
+                <p>Implement ML-driven scheduling, failure pattern learning, and root cause analysis</p>
+            </div>
+
+            <h4>Step 4.1: Failure Pattern Learning & Optimization (Days 41-45)</h4>
+            <pre><code>from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+class FailurePatternLearner:
+    def __init__(self, postgresql_client):
+        self.db = postgresql_client
+        self.impact_predictor = GradientBoostingRegressor(
+            n_estimators=100,
+            learning_rate=0.1
+        )
+        self.scaler = StandardScaler()
+
+    def learn_from_historical_experiments(self):
+        """Train ML model on historical chaos experiment results"""
+
+        # Load historical experiments from database
+        experiments = self.db.query(
+            """SELECT id, chaos_type, target_service, blast_radius_percent,
+                      customer_impact, error_rate_change, latency_ratio
+               FROM experiment_results WHERE status = 'completed'"""
+        )
+
+        if len(experiments) < 50:
+            return False  # Not enough data
+
+        # Feature engineering
+        X = np.array([
+            [
+                self._chaos_type_to_int(exp['chaos_type']),
+                self._service_to_embedding(exp['target_service']),
+                exp.get('error_rate_change', 0),
+                exp.get('latency_ratio', 1.0)
+            ]
+            for exp in experiments
+        ])
+
+        y = np.array([exp['blast_radius_percent'] for exp in experiments])
+
+        # Scale features
+        X_scaled = self.scaler.fit_transform(X)
+
+        # Train model
+        self.impact_predictor.fit(X_scaled, y)
+
+        return True
+
+    def predict_impact(self, chaos_type: str,
+                      target_service: str) -> float:
+        """Predict expected blast radius for proposed experiment"""
+
+        features = np.array([[
+            self._chaos_type_to_int(chaos_type),
+            self._service_to_embedding(target_service),
+            0.0,  # Baseline error rate change
+            1.0   # Baseline latency ratio
+        ]])
+
+        features_scaled = self.scaler.transform(features)
+        predicted_impact = self.impact_predictor.predict(features_scaled)[0]
+
+        return max(0, min(100, predicted_impact))
+
+    def optimize_experiment_schedule(self) -> List[Dict]:
+        """Generate optimal experiment schedule minimizing customer impact"""
+
+        # Load all planned experiments
+        planned = self.db.query(
+            "SELECT * FROM chaos_experiments WHERE status = 'scheduled'"
+        )
+
+        # Score each experiment by predicted impact
+        scored = []
+        for exp in planned:
+            predicted_impact = self.predict_impact(
+                exp['chaos_type'],
+                exp['target_service']
+            )
+
+            # Calculate optimal time (low traffic hours: 2-4 AM)
+            optimal_time = self._calculate_optimal_time(
+                exp['target_service']
+            )
+
+            scored.append({
+                'experiment_id': exp['id'],
+                'predicted_impact': predicted_impact,
+                'optimal_time': optimal_time,
+                'priority': 1.0 / (predicted_impact + 1)  # Higher priority for lower impact
+            })
+
+        # Sort by priority (higher first)
+        sorted_exps = sorted(scored, key=lambda x: x['priority'], reverse=True)
+
+        return sorted_exps
+
+    def _chaos_type_to_int(self, chaos_type: str) -> int:
+        type_map = {
+            'network': 0,
+            'compute': 1,
+            'storage': 2,
+            'cascading': 3
+        }
+        return type_map.get(chaos_type, -1)
+
+    def _service_to_embedding(self, service_name: str) -> float:
+        """Convert service name to numeric embedding"""
+        return hash(service_name) % 100 / 100.0
+
+    def _calculate_optimal_time(self, service_name: str) -> str:
+        """Calculate optimal time window for experiment (low traffic hours)"""
+        # Query traffic patterns for service
+        traffic_pattern = self.db.query(
+            f"""SELECT hour, avg_traffic FROM traffic_patterns
+               WHERE service = '{service_name}'"""
+        )
+
+        # Find hour with lowest traffic
+        min_hour = min(traffic_pattern,
+                       key=lambda x: x['avg_traffic'])['hour']
+
+        return f"{min_hour:02d}:00"</code></pre>
+
+            <h4>Step 4.2: Root Cause Analysis Engine (Days 46-50)</h4>
+            <pre><code>class RootCauseAnalysisEngine:
+    def __init__(self, elasticsearch_client, postgres_client):
+        self.es = elasticsearch_client
+        self.db = postgres_client
+
+    def analyze_failure(self, experiment_id: str) -> Dict:
+        """Automatically determine root cause of failure during chaos"""
+
+        experiment = self.db.get_experiment(experiment_id)
+
+        # Collect evidence from multiple sources
+        logs = self._fetch_logs(experiment, duration_minutes=15)
+        metrics = self._fetch_metrics(experiment, duration_minutes=15)
+        traces = self._fetch_traces(experiment, duration_minutes=15)
+
+        # Analyze evidence
+        root_causes = []
+
+        # Check for resource exhaustion
+        if metrics['memory_percent'] > 90:
+            root_causes.append({
+                'cause': 'memory_exhaustion',
+                'evidence': f"Memory usage peaked at {metrics['memory_percent']}%",
+                'confidence': 0.95
+            })
+
+        # Check for service dependency failures
+        failed_services = self._extract_failed_services(logs)
+        for service in failed_services:
+            root_causes.append({
+                'cause': f'downstream_service_failure_{service}',
+                'evidence': f"Service {service} returned errors during chaos",
+                'confidence': 0.85
+            })
+
+        # Check for configuration issues
+        config_changes = self._analyze_config_history(experiment)
+        if config_changes:
+            root_causes.append({
+                'cause': 'configuration_mismatch',
+                'evidence': f"Configuration changed: {config_changes}",
+                'confidence': 0.70
+            })
+
+        # Sort by confidence
+        root_causes.sort(key=lambda x: x['confidence'], reverse=True)
+
+        return {
+            'experiment_id': experiment_id,
+            'root_causes': root_causes,
+            'primary_cause': root_causes[0] if root_causes else None,
+            'recommendations': self._generate_recommendations(root_causes)
+        }
+
+    def _fetch_logs(self, experiment: Dict, duration_minutes: int) -> List[str]:
+        """Fetch application logs during chaos window"""
+        query = {
+            "bool": {
+                "must": [
+                    {"match": {"service": experiment['target_service']}},
+                    {"range": {"timestamp": {
+                        "gte": f"now-{duration_minutes}m"
+                    }}}
+                ]
+            }
+        }
+
+        results = self.es.search(index="application-logs", body=query)
+        return [hit['_source']['message'] for hit in results['hits']['hits']]
+
+    def _extract_failed_services(self, logs: List[str]) -> List[str]:
+        """Extract services that failed based on log analysis"""
+        failed_services = set()
+
+        for log_entry in logs:
+            if "connection refused" in log_entry.lower():
+                service = self._extract_service_name(log_entry)
+                if service:
+                    failed_services.add(service)
+
+            if "timeout" in log_entry.lower():
+                service = self._extract_service_name(log_entry)
+                if service:
+                    failed_services.add(service)
+
+        return list(failed_services)
+
+    def _generate_recommendations(self, root_causes: List[Dict]) -> List[str]:
+        """Generate actionable recommendations based on root causes"""
+        recommendations = []
+
+        for cause in root_causes:
+            if cause['cause'] == 'memory_exhaustion':
+                recommendations.append(
+                    "Increase memory limits for affected service"
+                )
+                recommendations.append(
+                    "Implement memory-based auto-scaling (HPA)"
+                )
+
+            elif 'downstream_service_failure' in cause['cause']:
+                service = cause['cause'].split('_')[-1]
+                recommendations.append(
+                    f"Implement circuit breaker for {service} calls"
+                )
+                recommendations.append(
+                    f"Add retries with exponential backoff for {service}"
+                )
+
+            elif cause['cause'] == 'configuration_mismatch':
+                recommendations.append(
+                    "Review and update service configuration"
+                )
+                recommendations.append(
+                    "Implement configuration validation in CI/CD"
+                )
+
+        return recommendations</code></pre>
+        </section>
+
+        <section>
+            <h2>Gap Analysis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Impact</th>
+                        <th>Resolution</th>
+                        <th>Timeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>No automated remediation</td>
+                        <td>Critical - Manual intervention required for every failure</td>
+                        <td>Implement automated rollback, scaling, failover (Days 29-40)</td>
+                        <td>Phase 3</td>
+                    </tr>
+                    <tr>
+                        <td>No impact assessment</td>
+                        <td>Critical - Cannot determine blast radius or customer impact</td>
+                        <td>Implement metrics monitoring and blast radius calculation (Days 16-28)</td>
+                        <td>Phase 2</td>
+                    </tr>
+                    <tr>
+                        <td>Limited chaos injection types</td>
+                        <td>High - Only basic stubs, no comprehensive failure scenarios</td>
+                        <td>Implement network, compute, storage, cascading failures (Days 4-15)</td>
+                        <td>Phase 1</td>
+                    </tr>
+                    <tr>
+                        <td>No ML optimization</td>
+                        <td>Medium - Cannot optimize experiment scheduling or predict impact</td>
+                        <td>Implement failure pattern learning and schedule optimization (Days 41-50)</td>
+                        <td>Phase 4</td>
+                    </tr>
+                    <tr>
+                        <td>No RCA automation</td>
+                        <td>Medium - Manual investigation required for each failure</td>
+                        <td>Implement log correlation and root cause analysis (Days 46-50)</td>
+                        <td>Phase 4</td>
+                    </tr>
+                    <tr>
+                        <td>No safeguards or approvals</td>
+                        <td>High - Risk of unintended customer impact</td>
+                        <td>Implement RBAC, blast radius limits, approval workflows</td>
+                        <td>Phase 1-2</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>RACI Matrix</h2>
+            <table class="raci-matrix">
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Anupam</th>
+                        <th>Backend</th>
+                        <th>DevOps</th>
+                        <th>ML Eng</th>
+                        <th>SRE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Chaos injection implementation</td>
+                        <td>A</td>
+                        <td>R</td>
+                        <td>C</td>
+                        <td>-</td>
+                        <td>C</td>
+                    </tr>
+                    <tr>
+                        <td>Metrics & impact assessment</td>
+                        <td>C</td>
+                        <td>R</td>
+                        <td>C</td>
+                        <td>-</td>
+                        <td>A</td>
+                    </tr>
+                    <tr>
+                        <td>Automated remediation</td>
+                        <td>A</td>
+                        <td>R</td>
+                        <td>C</td>
+                        <td>-</td>
+                        <td>C</td>
+                    </tr>
+                    <tr>
+                        <td>ML model training</td>
+                        <td>I</td>
+                        <td>C</td>
+                        <td>-</td>
+                        <td>A/R</td>
+                        <td>I</td>
+                    </tr>
+                    <tr>
+                        <td>Root cause analysis engine</td>
+                        <td>C</td>
+                        <td>A/R</td>
+                        <td>C</td>
+                        <td>C</td>
+                        <td>I</td>
+                    </tr>
+                    <tr>
+                        <td>Infrastructure & Kubernetes integration</td>
+                        <td>-</td>
+                        <td>C</td>
+                        <td>A/R</td>
+                        <td>-</td>
+                        <td>C</td>
+                    </tr>
+                    <tr>
+                        <td>Approval workflows & safeguards</td>
+                        <td>A</td>
+                        <td>C</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>R</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Risk Register</h2>
+            <div class="risk-high">
+                <h4>Risk 1: Unintended Customer Impact</h4>
+                <p><strong>Probability:</strong> High | <strong>Impact:</strong> Critical</p>
+                <p><strong>Description:</strong> Chaos experiments could exceed blast radius limits and cause real customer impact.</p>
+                <p><strong>Mitigation:</strong> Enforce hard limits: max 5% traffic affected, auto-rollback if error rate >0.1%, require approval for production experiments, start with staging environment only.</p>
+            </div>
+            <div class="risk-high">
+                <h4>Risk 2: Remediation Failure</h4>
+                <p><strong>Probability:</strong> Medium | <strong>Impact:</strong> Critical</p>
+                <p><strong>Description:</strong> Automatic remediation fails to recover system to baseline state.</p>
+                <p><strong>Mitigation:</strong> Multi-strategy approach (rollback → scale-up → circuit breaker → failover); manual override capability; PagerDuty integration for on-call escalation; timeout of 30 seconds for full recovery.</p>
+            </div>
+            <div class="risk-medium">
+                <h4>Risk 3: Experiment Schedule Conflicts</h4>
+                <p><strong>Probability:</strong> Medium | <strong>Impact:</strong> Medium</p>
+                <p><strong>Description:</strong> Multiple experiments scheduled simultaneously could cause cascading failures.</p>
+                <p><strong>Mitigation:</strong> ML optimizer ensures experiments scheduled sequentially; minimum 1-hour gap between experiments; blast radius sum <10% across all concurrent experiments.</p>
+            </div>
+            <div class="risk-medium">
+                <h4>Risk 4: ML Model Accuracy Issues</h4>
+                <p><strong>Probability:</strong> Medium | <strong>Impact:</strong> Medium</p>
+                <p><strong>Description:</strong> Impact predictions may be inaccurate, leading to poor experiment prioritization.</p>
+                <p><strong>Mitigation:</strong> Retrain model weekly with latest experiment data; maintain >80% prediction accuracy; use conservative estimates (round up predicted impact by 20%).</p>
+            </div>
+            <div class="risk-low">
+                <h4>Risk 5: Log Storage Overflow</h4>
+                <p><strong>Probability:</strong> Low | <strong>Impact:</strong> Medium</p>
+                <p><strong>Description:</strong> High volume of chaos experiment logs could exhaust Elasticsearch storage.</p>
+                <p><strong>Mitigation:</strong> Implement log retention policy (30-day rolling window); compress old logs; archive to S3; set index size limits in Elasticsearch.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Effort Estimation</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Component</th>
+                        <th>Effort (Days)</th>
+                        <th>Team Size</th>
+                        <th>Key Deliverable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3">Phase 1</td>
+                        <td>Database & Infrastructure</td>
+                        <td>3</td>
+                        <td>1 Backend</td>
+                        <td>PostgreSQL schema, Kubernetes namespaces</td>
+                    </tr>
+                    <tr>
+                        <td>Chaos Injection Engine</td>
+                        <td>7</td>
+                        <td>2 Backend</td>
+                        <td>Network, compute, storage fault injection</td>
+                    </tr>
+                    <tr>
+                        <td>Infrastructure Setup</td>
+                        <td>5</td>
+                        <td>1 DevOps + 1 SRE</td>
+                        <td>LitmusChaos operator installation</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">Phase 2</td>
+                        <td>Impact Assessment Service</td>
+                        <td>6</td>
+                        <td>2 Backend</td>
+                        <td>Metrics monitoring, blast radius calculation</td>
+                    </tr>
+                    <tr>
+                        <td>Prometheus Integration</td>
+                        <td>4</td>
+                        <td>1 DevOps + 1 Backend</td>
+                        <td>Metrics scraping and storage</td>
+                    </tr>
+                    <tr>
+                        <td>Alert Configuration</td>
+                        <td>3</td>
+                        <td>1 SRE</td>
+                        <td>PagerDuty integration, alert thresholds</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">Phase 3</td>
+                        <td>Remediation Engine</td>
+                        <td>8</td>
+                        <td>2 Backend</td>
+                        <td>Automatic rollback, scaling, failover</td>
+                    </tr>
+                    <tr>
+                        <td>Kubernetes Integration</td>
+                        <td>5</td>
+                        <td>1 DevOps</td>
+                        <td>Deployment rollout, scaling APIs</td>
+                    </tr>
+                    <tr>
+                        <td>Circuit Breaker Implementation</td>
+                        <td>4</td>
+                        <td>1 Backend</td>
+                        <td>Istio DestinationRule updates</td>
+                    </tr>
+                    <tr>
+                        <td>Testing & Validation</td>
+                        <td>3</td>
+                        <td>1 QA + 1 SRE</td>
+                        <td>End-to-end remediation tests</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">Phase 4</td>
+                        <td>ML Pattern Learning</td>
+                        <td>5</td>
+                        <td>1 ML + 1 Backend</td>
+                        <td>Failure pattern models</td>
+                    </tr>
+                    <tr>
+                        <td>Experiment Scheduling</td>
+                        <td>4</td>
+                        <td>1 ML + 1 Backend</td>
+                        <td>Optimal schedule generation</td>
+                    </tr>
+                    <tr>
+                        <td>Root Cause Analysis</td>
+                        <td>5</td>
+                        <td>1 Backend + 1 ML</td>
+                        <td>Log correlation, RCA engine</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><strong>Total Effort:</strong> 62 person-days across 50 calendar days</p>
+            <p><strong>Team Composition:</strong> 4 Backend Engineers, 1 ML Engineer, 2 DevOps Engineers, 1 SRE, 1 QA Engineer</p>
+        </section>
+
+        <section>
+            <h2>Definition of Done</h2>
+            <div class="definition-item">
+                <strong>Chaos Injection Component</strong>
+                <ul>
+                    <li>Network latency injection working reliably (tested 100+ times)</li>
+                    <li>Packet loss injection verified on test cluster</li>
+                    <li>Compute failure (CPU spike) injection functional</li>
+                    <li>Storage failure injection (disk full) implemented</li>
+                    <li>LitmusChaos operators properly configured</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>Impact Assessment System</strong>
+                <ul>
+                    <li>Blast radius calculation accurate within ±15%</li>
+                    <li>Customer impact detection has <5% false positive rate</li>
+                    <li>Metrics monitored in real-time during chaos injection</li>
+                    <li>Prometheus integration complete with <5 second update interval</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>Automated Remediation</strong>
+                <ul>
+                    <li>Automatic rollback executes within 10 seconds</li>
+                    <li>Scale-up remediations verified in production-like cluster</li>
+                    <li>Circuit breaker activation and deactivation working reliably</li>
+                    <li>Manual override available for emergency situations</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>ML Optimization</strong>
+                <ul>
+                    <li>Impact prediction model achieves >80% accuracy</li>
+                    <li>Experiment schedule optimizer generates 50+ viable schedules</li>
+                    <li>Models retrained weekly with latest data</li>
+                    <li>Model performance metrics tracked in Prometheus</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>Root Cause Analysis</strong>
+                <ul>
+                    <li>RCA engine identifies root cause within 15 minutes of failure</li>
+                    <li>Log correlation queries return results in <10 seconds</li>
+                    <li>Elasticsearch indexes optimized for chaos event filtering</li>
+                    <li>Recommendations generated automatically for 90% of failures</li>
+                </ul>
+            </div>
+            <div class="definition-item">
+                <strong>Production Readiness</strong>
+                <ul>
+                    <li>Blast radius limits enforced in software (max 5% traffic)</li>
+                    <li>RBAC configured with approval workflows</li>
+                    <li>Audit trail logs all chaos activities immutably</li>
+                    <li>Load tested to 100+ simultaneous experiments</li>
+                    <li>Security audit completed; sensitive data encrypted</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Action Items</h2>
+            <div class="action-item">
+                <strong>[P0] LitmusChaos Operator Installation</strong> - Owner: DevOps | Due: Day 3
+                <p>Install LitmusChaos operator on production Kubernetes cluster. Configure RBAC and monitor namespace.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P0] PostgreSQL Cluster Setup</strong> - Owner: DevOps | Due: Day 3
+                <p>Provision PostgreSQL instance with replication, backup, and Prometheus monitoring.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P0] Prometheus Metrics Pipeline</strong> - Owner: DevOps + Backend | Due: Day 12
+                <p>Configure Prometheus scraping for application metrics. Set up Grafana dashboards for experiment monitoring.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P1] Chaos Injection Engine Development</strong> - Owner: Backend Team | Due: Day 15
+                <p>Complete implementation of network, compute, and storage fault injection using LitmusChaos.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P1] Impact Assessment Service</strong> - Owner: Backend + SRE | Due: Day 28
+                <p>Implement real-time metrics monitoring and blast radius calculation. Validate accuracy on staging cluster.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P2] Automated Remediation Implementation</strong> - Owner: Backend + DevOps | Due: Day 40
+                <p>Complete rollback, scaling, circuit breaker, and failover mechanisms. Test end-to-end on production-like cluster.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P3] ML Model Training</strong> - Owner: ML Engineer + Backend | Due: Day 50
+                <p>Train impact prediction and experiment scheduling models. Achieve >80% prediction accuracy.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P3] Root Cause Analysis Engine</strong> - Owner: Backend + ML | Due: Day 50
+                <p>Implement log correlation and RCA engine. Test on 50+ historical chaos experiments.</p>
+            </div>
+            <div class="action-item">
+                <strong>[P3] Production Readiness Review</strong> - Owner: Anupam + SRE | Due: Day 50
+                <p>Security audit, safeguards validation, RBAC testing. Obtain stakeholder approval for production deployment.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Success Metrics</h2>
+            <div class="success-metric">
+                <strong>MTTR Reduction:</strong> 70% reduction in Mean Time To Recovery (from 45 min to 15 min)
+            </div>
+            <div class="success-metric">
+                <strong>Failure Detection:</strong> >90% of system failures detected proactively via chaos testing within 30 days
+            </div>
+            <div class="success-metric">
+                <strong>Automated Remediation Success:</strong> >85% of failures automatically recovered without manual intervention
+            </div>
+            <div class="success-metric">
+                <strong>Customer Impact Prevention:</strong> 0% customer-facing impact from experiments (blast radius <0.1%)
+            </div>
+            <div class="success-metric">
+                <strong>ML Prediction Accuracy:</strong> Impact prediction model achieves ≥85% accuracy
+            </div>
+            <div class="success-metric">
+                <strong>Experiment Coverage:</strong> ≥80% of critical user paths tested via chaos experiments within 60 days
+            </div>
+            <div class="success-metric">
+                <strong>RCA Automation:</strong> ≥95% of failures have automated root cause analysis completed within 15 minutes
+            </div>
+            <div class="success-metric">
+                <strong>System Resilience Improvement:</strong> ≥40% reduction in production incidents after 90 days
+            </div>
+        </section>
+
+        <footer>
+            <p>Production Readiness Report - Chaos Testing Agent</p>
+            <p>For Anupam Sharma, Head of QA Automation/AI QA Engineering</p>
+            <p>Generated for AI Transformation Initiative | May 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

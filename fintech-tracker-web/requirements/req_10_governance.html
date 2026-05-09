@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-10: Governance, RBAC & Compliance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: #58a6ff;
+            font-size: 2.2em;
+            margin-bottom: 12px;
+        }
+
+        header p {
+            color: #8b949e;
+            margin: 6px 0;
+        }
+
+        .badge-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-priority-p3 {
+            background-color: #1f6feb;
+            color: white;
+        }
+
+        .badge-status {
+            background-color: #238636;
+            color: white;
+        }
+
+        .section {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            color: #58a6ff;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        .section h3 {
+            color: #79c0ff;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .persona-card {
+            background-color: #0d1117;
+            border-left: 4px solid #58a6ff;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .persona-card strong {
+            color: #58a6ff;
+        }
+
+        .user-story {
+            background-color: #0d1117;
+            border-left: 4px solid #79c0ff;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+
+        .user-story-id {
+            color: #79c0ff;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .priority-high {
+            background-color: #da3633;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+
+        .priority-medium {
+            background-color: #9e6a03;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+
+        .requirement-item {
+            background-color: #0d1117;
+            border-left: 4px solid #238636;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .requirement-id {
+            color: #238636;
+            font-weight: 600;
+        }
+
+        .acceptance-criteria {
+            background-color: #0d1117;
+            border-left: 4px solid #d29922;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .criteria-item {
+            margin: 8px 0;
+            padding-left: 15px;
+        }
+
+        .criteria-item:before {
+            content: "• ";
+            color: #d29922;
+        }
+
+        .dependency-item {
+            background-color: #0d1117;
+            border-left: 4px solid #a371f7;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .assumption-item {
+            background-color: #0d1117;
+            border-left: 4px solid #79c0ff;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .out-of-scope-item {
+            background-color: #0d1117;
+            border-left: 4px solid #8b949e;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+        }
+
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #238636;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <h1>UC-10: Governance, RBAC & Compliance</h1>
+            <p><strong>Owner:</strong> Anupam Sharma<br><strong>Author:</strong> Malcolm Govender (Head of AI &amp; Engineering)</p>
+            <p><strong>Version:</strong> v1.0</p>
+            <p><strong>Date:</strong> May 2026</p>
+            <div class="badge-group">
+                <span class="badge badge-priority-p3">Priority: P3</span>
+                <span class="badge badge-status">Status: Done (100%)</span>
+            </div>
+                <div class="meta-item">
+                    <span class="meta-label">Author</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+        </header>
+
+        <div class="section">
+            <h2>Problem Statement</h2>
+            <p>
+                As AI-powered QA automation tools proliferate across the organization, governance and access control become critical. Different teams, projects, and roles require different levels of access to sensitive test data, automation scripts, credentials, and quality metrics. Current systems lack role-based access control (RBAC), audit trails, and compliance mechanisms required for regulated industries (fintech, healthcare, etc.).
+            </p>
+            <p style="margin-top: 12px;">
+                A comprehensive Governance, RBAC & Compliance system would establish clear access policies, enforce role-based permissions, maintain audit logs of all automation activities, and ensure compliance with regulatory requirements (SOC 2, GDPR, HIPAA, etc.). This enables secure, scalable deployment of AI QA tools while maintaining data privacy, auditability, and organizational control.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Target Users & Personas</h2>
+
+            <h3>Personas</h3>
+
+            <div class="persona-card">
+                <strong>Security Officer / CISO</strong><br/>
+                Responsible for organizational security posture and regulatory compliance. Needs visibility into who accesses what, when, and how. Requires audit trails, access policies, and compliance reports. Concerned about data breaches, unauthorized access, and regulatory violations.
+            </div>
+
+            <div class="persona-card">
+                <strong>Platform / Infrastructure Engineer</strong><br/>
+                Manages the QA automation platform and its deployment across teams. Needs to configure access policies, manage user roles, provision new teams, and integrate with existing identity systems. Responsible for uptime and security of the platform.
+            </div>
+
+            <div class="persona-card">
+                <strong>QA Team Lead / Manager</strong><br/>
+                Manages a team of QA engineers and owns test automation strategy. Needs to control access to team's test scripts, data, and sensitive credentials. Wants to delegate administrative tasks without compromising security.
+            </div>
+
+            <div class="persona-card">
+                <strong>Compliance Officer / Audit</strong><br/>
+                Ensures the organization complies with regulatory requirements (SOC 2, GDPR, etc.). Needs comprehensive audit logs, evidence of access controls, and compliance certifications. Performs regular audits and validates security controls.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>User Stories</h2>
+
+            <div class="user-story">
+                <span class="user-story-id">US-39:</span> As a Security Officer, I want to view a comprehensive audit log showing all access to automation scripts, test data, and credentials, including who accessed what, when, and from where.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-40:</span> As a Platform Engineer, I want to define role-based access control policies: Admin, Team Lead, QA Engineer, Developer, Viewer — with granular permission matrices for different resources.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-41:</span> As a QA Team Lead, I want to grant access to my team's test scripts and data to specific engineers while restricting access to other teams' resources.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-42:</span> As a Security Officer, I want the system to enforce credential encryption at rest and in transit, and support credential rotation policies (credentials expire after 90 days).
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-43:</span> As a Compliance Officer, I want to generate SOC 2 Type II compliance reports showing access controls, audit logs, and security measures in place.
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-44:</span> As a Platform Engineer, I want to integrate with SSO/OAuth (Okta, Azure AD) so users authenticate with their corporate identity without separate credentials.
+                <span class="priority-high">High Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-45:</span> As a Security Officer, I want to be alerted in real-time if suspicious activity is detected (e.g., multiple failed logins, unusual data access patterns, credential misuse).
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+
+            <div class="user-story">
+                <span class="user-story-id">US-46:</span> As a Compliance Officer, I want to verify that the system meets GDPR requirements: data subject access requests, right to erasure, data retention policies.
+                <span class="priority-medium">Medium Priority</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-01:</span> Implement role-based access control (RBAC) with predefined roles: Admin, Team Lead, QA Engineer, Developer, Viewer.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-02:</span> Support custom role creation with granular permission assignment (create, read, update, delete) for different resource types.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-03:</span> Maintain comprehensive audit logs of all access, modifications, and actions within the platform.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-04:</span> Implement SSO/OAuth integration with Okta, Azure AD, and Google Workspace for enterprise authentication.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-05:</span> Support multi-factor authentication (MFA) for high-privilege users (Admin, Security Officer).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-06:</span> Encrypt all sensitive data (test credentials, API keys, secrets) at rest using AES-256.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-07:</span> Enforce credential rotation policies and enforce expiration of passwords/tokens.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-08:</span> Provide audit log query interface with filtering, searching, and export capabilities.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-09:</span> Support data retention policies: automatically archive/delete audit logs after X days (configurable).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-10:</span> Implement session management with idle timeouts and concurrent session limits.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-11:</span> Generate compliance reports for SOC 2, GDPR, HIPAA standards.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-12:</span> Support GDPR data subject access requests: export personal data in machine-readable format.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">FR-13:</span> Implement anomaly detection and real-time alerting for suspicious activities.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-01:</span> All audit logs must be immutable once written (write-once, read-many pattern).
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-02:</span> Audit log queries must return results within 5 seconds even for years of historical data.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-03:</span> Access control decisions must be enforced within 100ms to avoid user-facing delays.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-04:</span> System must maintain 99.95% availability for authentication and authorization services.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-05:</span> All data in transit must be encrypted using TLS 1.2+.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-06:</span> Support audit of 10,000+ users with 1M+ daily access events without performance degradation.
+            </div>
+
+            <div class="requirement-item">
+                <span class="requirement-id">NFR-07:</span> Comply with SOC 2 Type II, GDPR, and industry-specific standards (HIPAA for healthcare).
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Acceptance Criteria</h2>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 1: RBAC Enforcement</strong><br/>
+                <div class="criteria-item">Given a QA Engineer with "read" permission on test scripts, When they attempt to delete a script, Then system must deny access with clear error message.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 2: Audit Logging</strong><br/>
+                <div class="criteria-item">Given a user accesses sensitive test data, When the action is logged, Then audit log must record: timestamp, user ID, action, resource, IP address, and outcome within 100ms.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 3: Credential Encryption</strong><br/>
+                <div class="criteria-item">Given a database credential stored in the system, When queried, Then data must be decrypted only by authorized services with proper authentication/authorization checks.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 4: SSO Integration</strong><br/>
+                <div class="criteria-item">Given an employee with Okta account, When they log into SentinelQA, Then they must be authenticated via Okta OAuth without creating separate credentials.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 5: Compliance Reporting</strong><br/>
+                <div class="criteria-item">Given a compliance officer requesting SOC 2 report, When they generate the report, Then it must include: access controls, audit logs, encryption, incident response evidence, with >95% completeness.</div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <strong>Scenario 6: Anomaly Detection</strong><br/>
+                <div class="criteria-item">Given a user attempting 10+ failed logins in 5 minutes, When threshold is exceeded, Then system must alert security team and optionally lock account temporarily.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Dependencies & Integrations</h2>
+
+            <div class="dependency-item">
+                <strong>Identity Provider:</strong> Okta, Azure AD, Google Workspace, or custom LDAP
+            </div>
+
+            <div class="dependency-item">
+                <strong>Encryption Library:</strong> OpenSSL or cryptography library for AES-256, TLS
+            </div>
+
+            <div class="dependency-item">
+                <strong>Audit Logging Database:</strong> Immutable log store (append-only database or blockchain-inspired)
+            </div>
+
+            <div class="dependency-item">
+                <strong>Security Monitoring:</strong> SIEM integration or custom alerting service
+            </div>
+
+            <div class="dependency-item">
+                <strong>Compliance Framework:</strong> SOC 2, GDPR, HIPAA standards documentation and guidelines
+            </div>
+
+            <div class="dependency-item">
+                <strong>SentinelQA Core:</strong> Integration with existing QA automation platform
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Assumptions & Constraints</h2>
+
+            <div class="assumption-item">
+                Assumes organization has defined security policies and compliance requirements.
+            </div>
+
+            <div class="assumption-item">
+                Assumes identity provider (SSO) is available for enterprise authentication.
+            </div>
+
+            <div class="assumption-item">
+                Governance policies are configured and maintained by Platform Engineers or Security Officers.
+            </div>
+
+            <div class="assumption-item">
+                Audit logs are stored separately from operational data for immutability and availability.
+            </div>
+
+            <div class="assumption-item">
+                Constraint: Does not replace legal/compliance review; supports compliance but does not guarantee regulatory approval.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Out of Scope (v1)</h2>
+
+            <div class="out-of-scope-item">
+                Physical access control to data centers (handled by infrastructure team)
+            </div>
+
+            <div class="out-of-scope-item">
+                Advanced threat detection (AI-based anomaly detection beyond rule-based alerting)
+            </div>
+
+            <div class="out-of-scope-item">
+                Compliance certifications (e.g., ISO 27001); system supports compliance but certification is separate process
+            </div>
+
+            <div class="out-of-scope-item">
+                Integration with all possible identity providers (v1 covers major players; others via future plugins)
+            </div>
+
+            <div class="out-of-scope-item">
+                Data residency enforcement by geographic region (v2+ feature)
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Definition of Done</h2>
+            <ul class="checklist">
+                <li>RBAC system fully implemented with predefined roles and custom role support</li>
+                <li>Permission matrix created and tested for all resource types</li>
+                <li>Audit logging system operational and immutable</li>
+                <li>SSO/OAuth integration completed for Okta and Azure AD</li>
+                <li>MFA implementation deployed for high-privilege users</li>
+                <li>All sensitive data encrypted at rest (AES-256) and in transit (TLS 1.2+)</li>
+                <li>Credential rotation policies implemented and enforced</li>
+                <li>Audit log query interface fully functional with export capabilities</li>
+                <li>Data retention and archival policies configured and operational</li>
+                <li>Session management with timeouts and concurrency limits implemented</li>
+                <li>Anomaly detection rules configured and alerting functional</li>
+                <li>SOC 2 Type II compliance report generation template created</li>
+                <li>GDPR data subject access request process implemented</li>
+                <li>Security audit completed: penetration testing, code review, compliance verification</li>
+                <li>Documentation completed: admin guide, user guide, security policy</li>
+                <li>UAT with Security, Compliance, and Platform teams completed with sign-off</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

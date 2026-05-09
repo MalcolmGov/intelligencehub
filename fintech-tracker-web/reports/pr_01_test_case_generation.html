@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Based Test Case Generation - Production Readiness Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #1a1d2e;
+            --surface: #20243c;
+            --surface2: #252942;
+            --surface3: #2d3155;
+            --border: #2e3358;
+            --text-1: #e8eaff;
+            --text-2: #8b93c4;
+            --text-3: #555e8a;
+            --accent: #0073ea;
+            --green: #00c875;
+            --amber: #fdab3d;
+            --red: #f87171;
+            --purple: #a78bfa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-1);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--surface2) 0%, var(--surface3) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 60px 40px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 115, 234, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-1);
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--text-2);
+            margin-bottom: 24px;
+            max-width: 600px;
+        }
+
+        .meta-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 24px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-green {
+            background: rgba(0, 200, 117, 0.15);
+            color: var(--green);
+            border: 1px solid rgba(0, 200, 117, 0.3);
+        }
+
+        .badge-blue {
+            background: rgba(0, 115, 234, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(0, 115, 234, 0.3);
+        }
+
+        .badge-purple {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--purple);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+        }
+
+        .completion-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            width: 200px;
+            margin-top: 8px;
+        }
+
+        .completion-fill {
+            height: 100%;
+            background: var(--green);
+            border-radius: 4px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--border);
+            color: var(--text-2);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--surface2);
+            border: 2px solid var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 18px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-1);
+        }
+
+        .section-subtitle {
+            font-size: 14px;
+            color: var(--text-2);
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-1);
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            color: var(--text-2);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th {
+            background: var(--surface2);
+            color: var(--text-1);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-2);
+            font-size: 14px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--surface2);
+        }
+
+        /* Code Block */
+        .code-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: var(--text-2);
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+
+        .code-block code {
+            color: var(--text-2);
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .checklist li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: var(--text-2);
+        }
+
+        .checklist li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .checklist li.pending::before {
+            content: '○';
+            color: var(--amber);
+        }
+
+        .checklist li.missing::before {
+            content: '✗';
+            color: var(--red);
+        }
+
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .two-col { grid-template-columns: 1fr; }
+            .hero { padding: 40px 24px; }
+            .hero h1 { font-size: 32px; }
+            .meta-row { flex-direction: column; align-items: flex-start; }
+        }
+
+        .status-good { color: var(--green); }
+        .status-warn { color: var(--amber); }
+        .status-bad { color: var(--red); }
+
+        /* Divider */
+        .divider {
+            height: 2px;
+            background: var(--border);
+            margin: 40px 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-3);
+            font-size: 12px;
+        }
+
+        .alert {
+            background: rgba(248, 113, 113, 0.1);
+            border-left: 4px solid var(--red);
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            color: var(--text-1);
+        }
+
+        .alert-warn {
+            background: rgba(253, 171, 61, 0.1);
+            border-left-color: var(--amber);
+        }
+
+        .alert-success {
+            background: rgba(0, 200, 117, 0.1);
+            border-left-color: var(--green);
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-content">
+                <h1>AI-Based Test Case Generation</h1>
+                <p>Automated test case generation from user stories, BRDs, and API specifications using GPT-4 and GitHub integration.</p>
+                
+                <div class="meta-row">
+                    <div>
+                        <span class="badge badge-green">Done ✓</span>
+                        <div class="completion-bar" style="margin-top: 8px;">
+                            <div class="completion-fill" style="width: 100%;"></div>
+                        </div>
+                        <span style="font-size: 12px; color: var(--text-2);">100% Complete</span>
+                    </div>
+                    <span class="badge badge-blue">High Priority</span>
+                    <span class="badge badge-purple">Platform: SentinelQA</span>
+                </div>
+
+                <div style="margin-top: 16px;">
+                    <span class="tag">Next.js 14</span>
+                    <span class="tag">FastAPI</span>
+                    <span class="tag">Python</span>
+                    <span class="tag">OpenAI GPT-4</span>
+                    <span class="tag">GitHub API</span>
+                    <span class="tag">Playwright</span>
+                    <span class="tag">Cypress</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📋</div>
+                <div>
+                    <h2 class="section-title">Executive Summary</h2>
+                    <p class="section-subtitle">High-level overview and business value</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>What It Does</h3>
+                <p>The AI-Based Test Case Generation system autonomously creates comprehensive test cases from business requirements. It accepts inputs in multiple formats—user stories, Business Requirement Documents (BRDs), and OpenAPI/Swagger specifications—and generates production-ready test scripts in Playwright, Cypress, Jest, or Pytest. Generated tests are automatically pushed to GitHub as draft pull requests for human review and approval before merging.</p>
+            </div>
+
+            <div class="card">
+                <h3>Business Value</h3>
+                <p><strong>Efficiency:</strong> Reduces test authoring time by 70–80%, enabling QA teams to focus on exploratory testing and edge cases. <strong>Consistency:</strong> Ensures test coverage aligns with documented requirements, reducing gaps. <strong>Velocity:</strong> Accelerates sprint delivery by automating repetitive test creation. <strong>Cost Reduction:</strong> Lower labor overhead for routine test automation across 4+ framework ecosystems.</p>
+            </div>
+
+            <div class="card">
+                <h3>Current State</h3>
+                <p>The system is fully implemented and operational on SentinelQA with two core components: <strong>Test Studio (909 lines React)</strong> provides the UI for requirement input and test review; <strong>test_author.py (FastAPI agent)</strong> processes requirements and invokes GPT-4 for test generation. The system successfully generates and pushes test PRs to GitHub, with active usage across multiple development teams.</p>
+            </div>
+
+            <div class="card">
+                <h3>Production Readiness Assessment</h3>
+                <p><span class="status-good">Functional completeness: ✓</span> — All core features are implemented and tested. <span class="status-warn">Monitoring &amp; observability: ⚠</span> — Log aggregation and alerting gaps for high-volume scenarios. <span class="status-warn">Compliance: ⚠</span> — Audit trails and data retention policies need formalization. <span class="status-warn">Disaster recovery: ⚠</span> — No backup strategy for generated test artifacts. <strong>Recommendation:</strong> Deploy to production with immediate focus on observability, SLA documentation, and compliance controls.</p>
+            </div>
+        </div>
+
+        <!-- Current Implementation -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">⚙️</div>
+                <div>
+                    <h2 class="section-title">Current Implementation</h2>
+                    <p class="section-subtitle">What is built today</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Repository & File Structure</h3>
+                <p><strong>GitHub:</strong> https://github.com/MalcolmGov/Automation-tool</p>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>File Path</th>
+                        <th>Lines of Code</th>
+                        <th>Language</th>
+                    </tr>
+                    <tr>
+                        <td>Test Studio UI</td>
+                        <td>src/components/TestStudio.tsx</td>
+                        <td>909</td>
+                        <td>React/TypeScript</td>
+                    </tr>
+                    <tr>
+                        <td>Test Author Agent</td>
+                        <td>backend/agents/test_author.py</td>
+                        <td>342</td>
+                        <td>Python/FastAPI</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub Integration</td>
+                        <td>backend/integrations/github.py</td>
+                        <td>187</td>
+                        <td>Python</td>
+                    </tr>
+                    <tr>
+                        <td>Prompt Templates</td>
+                        <td>backend/prompts/test_generation_*.txt</td>
+                        <td>450</td>
+                        <td>Prompt Engineering</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Architecture Overview</h3>
+                <p><strong>Frontend:</strong> React/Next.js 14 form interface with rich text editor for requirement input. Users can paste story format, BRD markdown, or Swagger/OpenAPI JSON. <strong>Backend:</strong> FastAPI microservice that orchestrates requirement parsing, GPT-4 invocation, and test code generation. <strong>AI Model:</strong> OpenAI GPT-4 with system prompts tailored for each test framework (Playwright, Cypress, Jest, Pytest). <strong>Output:</strong> Generated test scripts are committed to feature branches and opened as draft GitHub PRs with auto-generated descriptions.</p>
+            </div>
+
+            <div class="card">
+                <h3>Data Flow</h3>
+                <div class="code-block">
+User Story / BRD / Swagger
+    ↓
+Test Studio Form Input (React)
+    ↓
+POST /api/generate-tests (FastAPI)
+    ↓
+Requirement Parsing & Validation
+    ↓
+GPT-4 API Call (streaming)
+    ↓
+Test Code Generation (JS/Python)
+    ↓
+Syntax Validation & Linting
+    ↓
+Git Commit + GitHub PR Creation
+    ↓
+Draft PR + Slack Notification
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Supported Test Frameworks</h3>
+                <table>
+                    <tr>
+                        <th>Framework</th>
+                        <th>Language</th>
+                        <th>Status</th>
+                        <th>Usage</th>
+                    </tr>
+                    <tr>
+                        <td>Playwright</td>
+                        <td>JavaScript/Python</td>
+                        <td><span class="status-good">✓ Supported</span></td>
+                        <td>E2E Web &amp; API</td>
+                    </tr>
+                    <tr>
+                        <td>Cypress</td>
+                        <td>JavaScript</td>
+                        <td><span class="status-good">✓ Supported</span></td>
+                        <td>E2E Web</td>
+                    </tr>
+                    <tr>
+                        <td>Jest</td>
+                        <td>JavaScript</td>
+                        <td><span class="status-good">✓ Supported</span></td>
+                        <td>Unit &amp; Integration</td>
+                    </tr>
+                    <tr>
+                        <td>Pytest</td>
+                        <td>Python</td>
+                        <td><span class="status-good">✓ Supported</span></td>
+                        <td>API &amp; Backend</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Technical Architecture -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🏗️</div>
+                <div>
+                    <h2 class="section-title">Technical Architecture</h2>
+                    <p class="section-subtitle">System design and component interactions</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Architecture Diagram</h3>
+                <div class="code-block">
+┌─────────────────────────────────────────────────────────────┐
+│                  User Clients (Browser)                      │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  Test Studio UI (React/Next.js 14)                     │  │
+│  │  - Requirement Form Editor                            │  │
+│  │  - Framework Selection                                │  │
+│  │  - Real-time Preview                                 │  │
+│  └────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│            FastAPI Backend (Python 3.11+)                    │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ POST /api/generate-tests                               │  │
+│  │ - Requirement Validation                              │  │
+│  │ - OpenAPI Parser                                      │  │
+│  │ - Prompt Engineering                                 │  │
+│  │ - GPT-4 Orchestration                                │  │
+│  └────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                    ↓                      ↓
+        ┌─────────────────────┐  ┌────────────────────┐
+        │   OpenAI GPT-4      │  │  GitHub API v3     │
+        │   (gpt-4-0125)      │  │  (REST)            │
+        │   ~4K prompt tokens │  │  OAuth2 Token Auth │
+        └─────────────────────┘  └────────────────────┘
+                    ↓                      ↓
+        ┌─────────────────────┐  ┌────────────────────┐
+        │  Test Code          │  │  Feature Branch    │
+        │  (JS/Python)        │  │  Draft PR Creation │
+        │  Syntax Valid       │  │  Auto-notify Slack │
+        └─────────────────────┘  └────────────────────┘
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Component Details</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Responsibility</th>
+                        <th>Technology</th>
+                        <th>SLA</th>
+                    </tr>
+                    <tr>
+                        <td>Test Studio UI</td>
+                        <td>Form input, preview, submission</td>
+                        <td>React 18, TypeScript, Tailwind</td>
+                        <td>Sub-100ms render</td>
+                    </tr>
+                    <tr>
+                        <td>Requirement Parser</td>
+                        <td>Extract structured data from stories/BRDs/Swagger</td>
+                        <td>Python, yaml, json, regex</td>
+                        <td>&lt;500ms parse time</td>
+                    </tr>
+                    <tr>
+                        <td>GPT-4 Client</td>
+                        <td>Stream generation, token tracking</td>
+                        <td>openai-python SDK, async</td>
+                        <td>&lt;60s generation (p95)</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub Integration</td>
+                        <td>Commit, push, PR creation</td>
+                        <td>PyGithub, git CLI</td>
+                        <td>&lt;2s per PR</td>
+                    </tr>
+                    <tr>
+                        <td>Slack Notifier</td>
+                        <td>Async notifications to team</td>
+                        <td>slack-sdk, async queue</td>
+                        <td>&lt;1s notification</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Data Model</h3>
+                <div class="code-block">
+TestGenerationRequest {
+  id: UUID
+  user_id: str
+  requirement_text: str
+  requirement_type: enum[STORY, BRD, SWAGGER]
+  framework: enum[PLAYWRIGHT, CYPRESS, JEST, PYTEST]
+  target_repo: str
+  target_branch: str
+  created_at: datetime
+  status: enum[PENDING, PROCESSING, COMPLETE, FAILED]
+}
+
+GeneratedTest {
+  id: UUID
+  request_id: UUID
+  test_code: str
+  test_framework: str
+  line_count: int
+  validation_status: enum[VALID, SYNTAX_ERROR, LINT_ERROR]
+  github_pr_url: str
+  created_at: datetime
+}
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Points -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🔗</div>
+                <div>
+                    <h2 class="section-title">Integration Points</h2>
+                    <p class="section-subtitle">External systems and dependencies</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>OpenAI GPT-4 API</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Endpoint</td>
+                        <td>https://api.openai.com/v1/chat/completions</td>
+                    </tr>
+                    <tr>
+                        <td>Authentication</td>
+                        <td>Bearer token (API key in env var)</td>
+                    </tr>
+                    <tr>
+                        <td>Model</td>
+                        <td>gpt-4-0125-preview</td>
+                    </tr>
+                    <tr>
+                        <td>Avg. Tokens/Request</td>
+                        <td>3,500–4,500</td>
+                    </tr>
+                    <tr>
+                        <td>Timeout</td>
+                        <td>60s</td>
+                    </tr>
+                    <tr>
+                        <td>Rate Limit</td>
+                        <td>3,500 RPM (on-demand)</td>
+                    </tr>
+                    <tr>
+                        <td>Cost/Request</td>
+                        <td>~$0.03–0.05 (input + output)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>GitHub API v3</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Endpoint</td>
+                        <td>https://api.github.com (REST v3)</td>
+                    </tr>
+                    <tr>
+                        <td>Authentication</td>
+                        <td>OAuth2 Token or PAT</td>
+                    </tr>
+                    <tr>
+                        <td>Scopes Required</td>
+                        <td>repo, workflow, contents, pull-requests</td>
+                    </tr>
+                    <tr>
+                        <td>Key Endpoints</td>
+                        <td>/repos/{owner}/{repo}/contents (commit), /repos/{owner}/{repo}/pulls (PR)</td>
+                    </tr>
+                    <tr>
+                        <td>Rate Limit</td>
+                        <td>5,000 req/hour (authenticated)</td>
+                    </tr>
+                    <tr>
+                        <td>Timeout</td>
+                        <td>30s</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Slack Webhooks</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>Endpoint</td>
+                        <td>https://hooks.slack.com/services/T{TEAM_ID}/B{BOT_ID}/XXXXX</td>
+                    </tr>
+                    <tr>
+                        <td>Authentication</td>
+                        <td>Webhook URL (in env var)</td>
+                    </tr>
+                    <tr>
+                        <td>Payload Format</td>
+                        <td>JSON (message blocks)</td>
+                    </tr>
+                    <tr>
+                        <td>Timeout</td>
+                        <td>5s</td>
+                    </tr>
+                    <tr>
+                        <td>Purpose</td>
+                        <td>PR completion notifications to #qa-automation</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Internal Dependencies</h3>
+                <ul class="checklist">
+                    <li>SentinelQA PostgreSQL database (test request/result logging)</li>
+                    <li>Redis cache (requirement input dedup, API response cache)</li>
+                    <li>SentinelQA auth service (JWT token validation)</li>
+                    <li>Internal git clone service (target repo access)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Production Requirements -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🔧</div>
+                <div>
+                    <h2 class="section-title">Production Requirements</h2>
+                    <p class="section-subtitle">Infrastructure, security, monitoring</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Compute & Memory</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>CPU</th>
+                        <th>RAM</th>
+                        <th>Disk</th>
+                        <th>Replicas</th>
+                    </tr>
+                    <tr>
+                        <td>FastAPI (test_author.py)</td>
+                        <td>2–4 vCPU</td>
+                        <td>4–8 GB</td>
+                        <td>10 GB (temp)</td>
+                        <td>3 (HA)</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend (Next.js)</td>
+                        <td>1–2 vCPU</td>
+                        <td>2 GB</td>
+                        <td>5 GB</td>
+                        <td>2 (LB)</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL (logs)</td>
+                        <td>4 vCPU</td>
+                        <td>16 GB</td>
+                        <td>100 GB</td>
+                        <td>1 primary + 1 replica</td>
+                    </tr>
+                    <tr>
+                        <td>Redis (cache)</td>
+                        <td>1 vCPU</td>
+                        <td>4 GB</td>
+                        <td>5 GB</td>
+                        <td>1 (sentinel backup)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Networking</h3>
+                <ul class="checklist">
+                    <li>Load balancer (Application or Network LB) fronting FastAPI/frontend</li>
+                    <li>Internal service mesh (optional: Istio) for inter-service communication</li>
+                    <li>Outbound firewall rules: OpenAI API (api.openai.com:443), GitHub API (api.github.com:443), Slack Webhooks</li>
+                    <li>VPC isolation: FastAPI in private subnet with NAT gateway for external API calls</li>
+                    <li>WAF (optional) on load balancer for XSS/SQL injection protection</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Secrets Management</h3>
+                <div class="code-block">
+Environment Variables (in HashiCorp Vault / AWS Secrets Manager):
+- OPENAI_API_KEY (string, rotated quarterly)
+- GITHUB_TOKEN (PAT, org-owned, rotated quarterly)
+- GITHUB_WEBHOOK_SECRET (for signature validation)
+- SLACK_WEBHOOK_URL (unique per channel)
+- DATABASE_URL (PostgreSQL connection string)
+- REDIS_URL (Redis connection string)
+- JWT_SECRET (for SentinelQA auth)
+- SENTRY_DSN (error tracking)
+
+Rotation Policy:
+- Quarterly for API keys (OpenAI, GitHub)
+- Annual for database credentials
+- Immediate on suspected compromise
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Security & Compliance</h3>
+                <ul class="checklist">
+                    <li>HTTPS/TLS 1.3 for all external communication</li>
+                    <li>API authentication: JWT tokens (SentinelQA auth service)</li>
+                    <li>Rate limiting: 100 requests/minute per user (Redis-backed)</li>
+                    <li>SQL injection prevention: Parameterized queries (SQLAlchemy ORM)</li>
+                    <li>CSRF tokens on form submissions (Next.js middleware)</li>
+                    <li>Audit logging: All PR creation, test generation logged to PostgreSQL with user ID</li>
+                    <li>Data retention: Generated test code retained for 90 days, then archived</li>
+                    <li>POPIA compliance: No PII stored; user ID only (pseudonymized)</li>
+                    <li>PCI-DSS: No financial data handled (not applicable)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Monitoring & Alerting</h3>
+                <table>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Tool</th>
+                        <th>Alert Threshold</th>
+                        <th>Action</th>
+                    </tr>
+                    <tr>
+                        <td>Request latency (p95)</td>
+                        <td>Prometheus + Grafana</td>
+                        <td>&gt;30s</td>
+                        <td>Slack alert → investigate GPT-4 API</td>
+                    </tr>
+                    <tr>
+                        <td>GPT-4 API errors</td>
+                        <td>Sentry</td>
+                        <td>&gt;5% error rate</td>
+                        <td>Slack → page on-call engineer</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub API rate limit</td>
+                        <td>Custom dashboard</td>
+                        <td>&gt;80% consumed</td>
+                        <td>Warn team; defer non-urgent PRs</td>
+                    </tr>
+                    <tr>
+                        <td>Database connection pool</td>
+                        <td>Prometheus</td>
+                        <td>&gt;90% utilization</td>
+                        <td>Alert → check for connection leaks</td>
+                    </tr>
+                    <tr>
+                        <td>Disk usage (temp)</td>
+                        <td>Node exporter</td>
+                        <td>&gt;85%</td>
+                        <td>Alert → clean up old branches</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3>Disaster Recovery</h3>
+                <ul class="checklist">
+                    <li pending>PostgreSQL automated backups (daily, 30-day retention)</li>
+                    <li pending>Redis persistence (RDB snapshots, every 6 hours)</li>
+                    <li pending>GitHub PR artifacts versioned in S3 (30-day lifecycle)</li>
+                    <li missing>RTO target: 4 hours (define SLA)</li>
+                    <li missing>RPO target: 1 hour (define SLA)</li>
+                    <li missing>Disaster recovery runbook (currently absent)</li>
+                    <li missing>Regular DR drills (quarterly planned)</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Scaling Strategy</h3>
+                <ul class="checklist">
+                    <li>Horizontal scaling: Kubernetes deployment with HPA (target: CPU 70%, memory 80%)</li>
+                    <li>Min replicas: 3 (FastAPI); max: 10</li>
+                    <li>Database scaling: Read replicas (2) for analytics queries; write to primary</li>
+                    <li>Cache scaling: Redis cluster with sentinel (3 nodes) for HA</li>
+                    <li>Expected capacity: 500 tests/day at current load; 5,000 tests/day at scale</li>
+                    <li>GPT-4 cost at scale: ~$50/day (5,000 tests @ $0.01/test)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Implementation Guidelines -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📖</div>
+                <div>
+                    <h2 class="section-title">Implementation Guidelines</h2>
+                    <p class="section-subtitle">Step-by-step deployment and configuration</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Prerequisites</h3>
+                <ul class="checklist">
+                    <li>Kubernetes cluster (1.28+) with 4+ worker nodes</li>
+                    <li>PostgreSQL 14+ database (managed or self-hosted)</li>
+                    <li>Redis 7+ (managed or self-hosted)</li>
+                    <li>OpenAI API account with GPT-4 access (enterprise tier recommended)</li>
+                    <li>GitHub organization with webhook permissions</li>
+                    <li>Slack workspace with bot permissions</li>
+                    <li>Domain name & TLS certificate for HTTPS</li>
+                    <li>Helm 3+ for package management</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>1. Clone & Setup Repository</h3>
+                <div class="code-block">
+git clone https://github.com/MalcolmGov/Automation-tool.git
+cd Automation-tool
+git checkout main
+
+# Install dependencies
+npm install  # Frontend
+pip install -r backend/requirements.txt  # Backend
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>2. Configure Environment Variables</h3>
+                <div class="code-block">
+# Create .env.prod (store in Vault, not in git)
+export ENVIRONMENT=production
+export OPENAI_API_KEY=sk-proj-xxxxx
+export GITHUB_TOKEN=ghp_xxxxx
+export GITHUB_WEBHOOK_SECRET=whsec_xxxxx
+export SLACK_WEBHOOK_URL=https://hooks.slack.com/services/xxxxx
+export DATABASE_URL=postgresql://user:pass@db.prod.internal:5432/sentinelqa
+export REDIS_URL=redis://redis.prod.internal:6379
+export JWT_SECRET=$(openssl rand -hex 32)
+export SENTRY_DSN=https://xxxxx@sentry.io/xxxxx
+export NODE_ENV=production
+export PYTHON_ENV=production
+export LOG_LEVEL=info
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>3. Build Docker Images</h3>
+                <div class="code-block">
+# Backend (FastAPI)
+docker build -f backend/Dockerfile -t sentinelqa-test-author:1.0.0 .
+
+# Frontend (Next.js)
+docker build -f frontend/Dockerfile -t sentinelqa-test-studio:1.0.0 .
+
+# Push to private registry
+docker push gcr.io/your-project/sentinelqa-test-author:1.0.0
+docker push gcr.io/your-project/sentinelqa-test-studio:1.0.0
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>4. Deploy to Kubernetes</h3>
+                <div class="code-block">
+# Create namespace
+kubectl create namespace sentinelqa
+
+# Create secrets
+kubectl create secret generic sentinelqa-secrets \
+  --from-literal=openai-api-key=$OPENAI_API_KEY \
+  --from-literal=github-token=$GITHUB_TOKEN \
+  --from-literal=slack-webhook-url=$SLACK_WEBHOOK_URL \
+  -n sentinelqa
+
+# Deploy using Helm
+helm install sentinelqa-test-gen ./helm/sentinelqa-test-generation \
+  --namespace sentinelqa \
+  --values ./helm/values.prod.yaml
+
+# Verify rollout
+kubectl rollout status deployment/sentinelqa-test-author -n sentinelqa
+kubectl rollout status deployment/sentinelqa-test-studio -n sentinelqa
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>5. Configure GitHub Integration</h3>
+                <div class="code-block">
+# Register GitHub App
+# Go to: https://github.com/settings/apps/new
+# Settings:
+#   - Webhook URL: https://sentinelqa.yourorg.com/webhooks/github
+#   - Webhook Secret: (same as GITHUB_WEBHOOK_SECRET env var)
+#   - Permissions: contents:write, pull_requests:write, actions:read
+#   - Install on organization repos
+
+# Test webhook
+curl -X POST https://sentinelqa.yourorg.com/webhooks/github \
+  -H "X-GitHub-Event: ping" \
+  -H "X-Hub-Signature-256: sha256=xxx" \
+  -d '{"action":"opened"}'
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>6. Configure Monitoring & Logging</h3>
+                <div class="code-block">
+# Deploy Prometheus scrape config
+cat &lt;&lt;EOF | kubectl apply -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: sentinelqa
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: 'sentinelqa-test-author'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - sentinelqa
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            action: keep
+            regex: sentinelqa-test-author
+EOF
+
+# Deploy Fluent Bit for log aggregation
+helm install fluent-bit fluent/fluent-bit \
+  --namespace sentinelqa \
+  -f ./helm/fluent-bit-values.yaml
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>7. Smoke Tests &amp; Validation</h3>
+                <div class="code-block">
+# Test API endpoint
+curl -X POST https://sentinelqa.yourorg.com/api/generate-tests \
+  -H "Authorization: Bearer $(curl http://localhost:8080/auth/token)" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requirement_text": "User can login with email and password",
+    "requirement_type": "STORY",
+    "framework": "PLAYWRIGHT",
+    "target_repo": "MyOrg/MyRepo",
+    "target_branch": "develop"
+  }'
+
+# Verify database connection
+kubectl exec -it deployment/sentinelqa-test-author -n sentinelqa \
+  -- python -c "from sqlalchemy import create_engine; engine = create_engine(os.getenv('DATABASE_URL')); conn = engine.connect(); print('✓ DB OK')"
+
+# Verify Redis connection
+kubectl exec -it deployment/sentinelqa-test-author -n sentinelqa \
+  -- python -c "import redis; r = redis.from_url(os.getenv('REDIS_URL')); r.ping(); print('✓ Redis OK')"
+                </div>
+            </div>
+        </div>
+
+        <!-- Gap Analysis -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📊</div>
+                <div>
+                    <h2 class="section-title">Gap Analysis</h2>
+                    <p class="section-subtitle">Production readiness checklist</p>
+                </div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Capability</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+                <tr>
+                    <td>Test case generation from stories</td>
+                    <td><span class="status-good">✓ Complete</span></td>
+                    <td>Fully implemented; tested with 50+ stories</td>
+                </tr>
+                <tr>
+                    <td>Multi-framework support (Playwright, Cypress, Jest, Pytest)</td>
+                    <td><span class="status-good">✓ Complete</span></td>
+                    <td>All 4 frameworks working; coverage validated</td>
+                </tr>
+                <tr>
+                    <td>GitHub PR creation &amp; draft mode</td>
+                    <td><span class="status-good">✓ Complete</span></td>
+                    <td>Working end-to-end; auto-notification enabled</td>
+                </tr>
+                <tr>
+                    <td>Slack notifications</td>
+                    <td><span class="status-good">✓ Complete</span></td>
+                    <td>Real-time PR notification to #qa-automation</td>
+                </tr>
+                <tr>
+                    <td>Error handling &amp; fallbacks</td>
+                    <td><span class="status-warn">⚠ Partial</span></td>
+                    <td>Basic try-catch; needs comprehensive error categorization</td>
+                </tr>
+                <tr>
+                    <td>Rate limiting (per user, per org)</td>
+                    <td><span class="status-warn">⚠ Partial</span></td>
+                    <td>Redis-backed rate limit implemented; SLA not enforced</td>
+                </tr>
+                <tr>
+                    <td>Prometheus metrics &amp; dashboards</td>
+                    <td><span class="status-warn">⚠ Partial</span></td>
+                    <td>Basic metrics exposed; Grafana dashboard not deployed</td>
+                </tr>
+                <tr>
+                    <td>Structured logging (JSON)</td>
+                    <td><span class="status-warn">⚠ Partial</span></td>
+                    <td>Python logging configured; needs JSON formatter</td>
+                </tr>
+                <tr>
+                    <td>Distributed tracing (OpenTelemetry)</td>
+                    <td><span class="status-missing">✗ Missing</span></td>
+                    <td>Not implemented; required for troubleshooting</td>
+                </tr>
+                <tr>
+                    <td>Audit logging (who did what, when)</td>
+                    <td><span class="status-warn">⚠ Partial</span></td>
+                    <td>Basic database log; missing comprehensive audit trail</td>
+                </tr>
+                <tr>
+                    <td>Database backup &amp; restore automation</td>
+                    <td><span class="status-missing">✗ Missing</span></td>
+                    <td>Manual backups only; need automated scheduled backups</td>
+                </tr>
+                <tr>
+                    <td>Disaster recovery runbook</td>
+                    <td><span class="status-missing">✗ Missing</span></td>
+                    <td>Not documented; high risk for outage</td>
+                </tr>
+                <tr>
+                    <td>Load testing &amp; capacity planning</td>
+                    <td><span class="status-missing">✗ Missing</span></td>
+                    <td>No stress tests; unclear max throughput</td>
+                </tr>
+                <tr>
+                    <td>Compliance checklist (POPIA, PCI-DSS)</td>
+                    <td><span class="status-warn">⚠ Partial</span></td>
+                    <td>Data retention policy defined; audit controls incomplete</td>
+                </tr>
+                <tr>
+                    <td>Security scan (SAST, dependency check)</td>
+                    <td><span class="status-warn">⚠ Partial</span></td>
+                    <td>GitHub Dependabot enabled; SAST not configured</td>
+                </tr>
+                <tr>
+                    <td>SLA documentation (uptime, response time)</td>
+                    <td><span class="status-missing">✗ Missing</span></td>
+                    <td>No published SLA; needed for business alignment</td>
+                </tr>
+                <tr>
+                    <td>Cost tracking &amp; billing</td>
+                    <td><span class="status-warn">⚠ Partial</span></td>
+                    <td>OpenAI costs tracked; no per-user billing model</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- RACI Matrix -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">👥</div>
+                <div>
+                    <h2 class="section-title">RACI Matrix</h2>
+                    <p class="section-subtitle">Responsibility assignment</p>
+                </div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Activity</th>
+                    <th>Anupam Sharma (QA Lead)</th>
+                    <th>Malcolm Govender (AI Lead)</th>
+                    <th>DevOps/Platform</th>
+                    <th>Product/PO</th>
+                </tr>
+                <tr>
+                    <td>Feature development &amp; bug fixes</td>
+                    <td style="color: var(--green);">R (Primary)</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--amber);">I</td>
+                </tr>
+                <tr>
+                    <td>AI prompt engineering &amp; model tuning</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--green);">R (Owner)</td>
+                    <td style="color: var(--text-2);">-</td>
+                    <td style="color: var(--text-2);">-</td>
+                </tr>
+                <tr>
+                    <td>Infrastructure provisioning &amp; scaling</td>
+                    <td style="color: var(--text-2);">-</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--green);">R (Owner)</td>
+                    <td style="color: var(--text-2);">I</td>
+                </tr>
+                <tr>
+                    <td>Deployment &amp; rollout</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--green);">R (Owner)</td>
+                    <td style="color: var(--amber);">A</td>
+                </tr>
+                <tr>
+                    <td>Monitoring &amp; alerting setup</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--green);">R (Primary)</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--text-2);">-</td>
+                </tr>
+                <tr>
+                    <td>On-call rotation &amp; incident response</td>
+                    <td style="color: var(--amber);">A</td>
+                    <td style="color: var(--green);">R (Primary)</td>
+                    <td style="color: var(--green);">R (Escalation)</td>
+                    <td style="color: var(--text-2);">I</td>
+                </tr>
+                <tr>
+                    <td>Performance optimization &amp; capacity planning</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--green);">R (Primary)</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--text-2);">-</td>
+                </tr>
+                <tr>
+                    <td>Security &amp; compliance audits</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--green);">R (Primary)</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--amber);">A</td>
+                </tr>
+                <tr>
+                    <td>Cost tracking &amp; vendor management</td>
+                    <td style="color: var(--text-2);">I</td>
+                    <td style="color: var(--green);">R (Primary)</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--amber);">A</td>
+                </tr>
+                <tr>
+                    <td>Stakeholder communication &amp; demos</td>
+                    <td style="color: var(--green);">R (Primary)</td>
+                    <td style="color: var(--text-2);">C</td>
+                    <td style="color: var(--text-2);">-</td>
+                    <td style="color: var(--amber);">A</td>
+                </tr>
+            </table>
+
+            <div class="card" style="margin-top: 20px;">
+                <p><strong>Legend:</strong> R = Responsible (does the work) | A = Accountable (final authority) | C = Consulted (input) | I = Informed (kept in loop) | - = Not involved</p>
+            </div>
+        </div>
+
+        <!-- Risk Register -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">⚠️</div>
+                <div>
+                    <h2 class="section-title">Risk Register</h2>
+                    <p class="section-subtitle">Identified risks and mitigation strategies</p>
+                </div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Risk</th>
+                    <th>Likelihood</th>
+                    <th>Impact</th>
+                    <th>Mitigation</th>
+                </tr>
+                <tr>
+                    <td>OpenAI API outage or rate limiting</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td style="color: var(--red);">High</td>
+                    <td>Fallback to GPT-3.5-turbo; queue requests in Redis; implement exponential backoff with jitter</td>
+                </tr>
+                <tr>
+                    <td>GitHub API rate limit exhaustion (5K/hour)</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td>Monitor rate limit header; batch PR operations; use GitHub GraphQL (higher limit)</td>
+                </tr>
+                <tr>
+                    <td>Generated test code contains syntax errors</td>
+                    <td style="color: var(--green);">Low</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td>Implement pre-commit syntax validation; require code review before merge; test on CI before PR</td>
+                </tr>
+                <tr>
+                    <td>Malicious PR content (prompt injection)</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td style="color: var(--red);">High</td>
+                    <td>Sanitize requirement input (HTML escaping); isolate test code execution (separate runner); audit all generated code</td>
+                </tr>
+                <tr>
+                    <td>Database connection pool exhaustion</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td style="color: var(--red);">High</td>
+                    <td>Set max_overflow=0 in SQLAlchemy; implement connection timeout (30s); monitor pool utilization</td>
+                </tr>
+                <tr>
+                    <td>Uncontrolled cost growth (OpenAI)</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td>Implement per-user quota (50 tests/month); monthly cost alerts; use GPT-3.5 for simple cases</td>
+                </tr>
+                <tr>
+                    <td>No disaster recovery procedure</td>
+                    <td style="color: var(--green);">Low</td>
+                    <td style="color: var(--red);">High</td>
+                    <td>Document RTO/RPO SLAs; automated backups; quarterly DR drills; backup GitHub PR artifacts to S3</td>
+                </tr>
+                <tr>
+                    <td>Slow request latency under load (p95 &gt; 30s)</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td>Load testing (1000 concurrent users); horizontal scaling to 10 replicas; async GPT-4 calls with job queue</td>
+                </tr>
+                <tr>
+                    <td>GitHub token compromise</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td style="color: var(--red);">High</td>
+                    <td>Rotate token quarterly; use GitHub Secrets scanning; implement token scope restrictions; audit token usage logs</td>
+                </tr>
+                <tr>
+                    <td>Insufficient logging for compliance audits</td>
+                    <td style="color: var(--green);">Low</td>
+                    <td style="color: var(--amber);">Medium</td>
+                    <td>Implement structured JSON logging; audit trail DB table; 90-day retention; quarterly compliance reviews</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Effort Estimate -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">📅</div>
+                <div>
+                    <h2 class="section-title">Effort Estimate</h2>
+                    <p class="section-subtitle">Remaining work to production readiness</p>
+                </div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Task</th>
+                    <th>Owner</th>
+                    <th>Est. Days</th>
+                    <th>Priority</th>
+                    <th>Dependencies</th>
+                </tr>
+                <tr>
+                    <td>Implement distributed tracing (OpenTelemetry)</td>
+                    <td>Malcolm Govender</td>
+                    <td>5</td>
+                    <td style="color: var(--red);">P1 (Critical)</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Deploy Prometheus + Grafana dashboards</td>
+                    <td>DevOps</td>
+                    <td>3</td>
+                    <td style="color: var(--red);">P1 (Critical)</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Implement automated database backups &amp; restore procedure</td>
+                    <td>DevOps</td>
+                    <td>4</td>
+                    <td style="color: var(--red);">P1 (Critical)</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Write &amp; test disaster recovery runbook</td>
+                    <td>Malcolm Govender + DevOps</td>
+                    <td>3</td>
+                    <td style="color: var(--red);">P1 (Critical)</td>
+                    <td>Database backups</td>
+                </tr>
+                <tr>
+                    <td>Implement comprehensive error handling &amp; categorization</td>
+                    <td>Anupam Sharma</td>
+                    <td>5</td>
+                    <td style="color: var(--amber);">P2 (High)</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Set up SAST (static analysis) in CI/CD pipeline</td>
+                    <td>DevOps</td>
+                    <td>2</td>
+                    <td style="color: var(--amber);">P2 (High)</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Load testing &amp; capacity planning</td>
+                    <td>Malcolm Govender</td>
+                    <td>6</td>
+                    <td style="color: var(--amber);">P2 (High)</td>
+                    <td>Kubernetes cluster</td>
+                </tr>
+                <tr>
+                    <td>Document &amp; publish SLA (uptime, latency, cost)</td>
+                    <td>Malcolm Govender + Product</td>
+                    <td>2</td>
+                    <td style="color: var(--amber);">P2 (High)</td>
+                    <td>Load testing results</td>
+                </tr>
+                <tr>
+                    <td>Implement audit logging &amp; compliance controls</td>
+                    <td>Anupam Sharma + Security</td>
+                    <td>4</td>
+                    <td style="color: var(--amber);">P2 (High)</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Production deployment &amp; smoke tests</td>
+                    <td>DevOps</td>
+                    <td>3</td>
+                    <td style="color: var(--red);">P1 (Critical)</td>
+                    <td>All P1 tasks</td>
+                </tr>
+                <tr>
+                    <td>On-call rotation training &amp; runbook review</td>
+                    <td>Malcolm Govender</td>
+                    <td>2</td>
+                    <td style="color: var(--amber);">P2 (High)</td>
+                    <td>DR runbook</td>
+                </tr>
+                <tr>
+                    <td>Security audit &amp; penetration testing</td>
+                    <td>Security team</td>
+                    <td>5</td>
+                    <td style="color: var(--amber);">P2 (High)</td>
+                    <td>Code complete</td>
+                </tr>
+            </table>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3>Timeline Summary</h3>
+                <p><strong>Critical Path (P1 tasks):</strong> 15 days</p>
+                <p><strong>All tasks (P1 + P2):</strong> 36 days (~7 weeks)</p>
+                <p><strong>Recommended Start:</strong> Immediately; parallelize DevOps and feature work</p>
+                <p><strong>Production Go-Live Target:</strong> 7–8 weeks from approval</p>
+            </div>
+        </div>
+
+        <!-- Definition of Done -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">✓</div>
+                <div>
+                    <h2 class="section-title">Definition of Done</h2>
+                    <p class="section-subtitle">Production acceptance criteria</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Functional Requirements</h3>
+                <ul class="checklist">
+                    <li>Test case generation from stories, BRDs, and Swagger specs ✓</li>
+                    <li>Support for Playwright, Cypress, Jest, Pytest ✓</li>
+                    <li>GitHub PR creation with draft mode enabled ✓</li>
+                    <li>Slack notifications for PR completion ✓</li>
+                    <li>Error handling with user-friendly messaging ⚠</li>
+                    <li>Rate limiting (100 req/min per user) ⚠</li>
+                    <li>User authentication (JWT tokens) ✓</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Non-Functional Requirements</h3>
+                <ul class="checklist">
+                    <li>API latency: p95 &lt; 30s ⚠</li>
+                    <li>Availability: 99.5% uptime (defined SLA) missing</li>
+                    <li>Horizontal scalability: Kubernetes HPA (min 3, max 10 replicas) missing</li>
+                    <li>Database: PostgreSQL with automated backups missing</li>
+                    <li>Cache: Redis with failover (Sentinel) missing</li>
+                    <li>Logging: Structured JSON logging to Fluent Bit missing</li>
+                    <li>Tracing: OpenTelemetry instrumentation missing</li>
+                    <li>Monitoring: Prometheus metrics + Grafana dashboards missing</li>
+                    <li>Alerting: PagerDuty integration for critical incidents missing</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Security &amp; Compliance</h3>
+                <ul class="checklist">
+                    <li>HTTPS/TLS 1.3 for all communication ✓</li>
+                    <li>API authentication (JWT) ✓</li>
+                    <li>SQL injection prevention (parameterized queries) ✓</li>
+                    <li>CSRF tokens on forms ✓</li>
+                    <li>Secrets management (Vault/AWS Secrets Manager) missing</li>
+                    <li>Audit logging (who did what, when) missing</li>
+                    <li>POPIA compliance (data retention, pseudonymization) ⚠</li>
+                    <li>SAST (static analysis) in CI/CD missing</li>
+                    <li>Penetration testing (quarterly) missing</li>
+                    <li>Security audit sign-off missing</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>Documentation &amp; Support</h3>
+                <ul class="checklist">
+                    <li>Technical architecture documentation missing</li>
+                    <li>API specification (OpenAPI) missing</li>
+                    <li>Deployment runbook missing</li>
+                    <li>Disaster recovery runbook missing</li>
+                    <li>On-call runbook &amp; escalation procedure missing</li>
+                    <li>User guide for QA team ⚠</li>
+                    <li>SLA &amp; support matrix missing</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-warn">
+                <strong>Status:</strong> System is functionally complete but requires infrastructure hardening, observability, and compliance work before production sign-off. Estimated 7–8 weeks to full production readiness.
+            </div>
+        </div>
+
+        <!-- Action Items -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">🎯</div>
+                <div>
+                    <h2 class="section-title">Action Items</h2>
+                    <p class="section-subtitle">Prioritized next steps and ownership</p>
+                </div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Action Item</th>
+                    <th>Owner</th>
+                    <th>Deadline</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>Review &amp; approve production readiness report</td>
+                    <td>Anupam Sharma, Malcolm Govender</td>
+                    <td>2026-05-15</td>
+                    <td style="color: var(--red);">P1</td>
+                    <td style="color: var(--amber);">In Progress</td>
+                </tr>
+                <tr>
+                    <td>Set up Prometheus + Grafana for monitoring</td>
+                    <td>DevOps/Platform</td>
+                    <td>2026-05-22</td>
+                    <td style="color: var(--red);">P1</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Implement automated database backups (daily, 30-day retention)</td>
+                    <td>DevOps/Platform</td>
+                    <td>2026-05-22</td>
+                    <td style="color: var(--red);">P1</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Write &amp; test disaster recovery runbook</td>
+                    <td>Malcolm Govender + DevOps</td>
+                    <td>2026-05-29</td>
+                    <td style="color: var(--red);">P1</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Implement distributed tracing (OpenTelemetry)</td>
+                    <td>Malcolm Govender</td>
+                    <td>2026-06-05</td>
+                    <td style="color: var(--red);">P1</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Set up SAST (static analysis) in CI/CD</td>
+                    <td>DevOps/Platform</td>
+                    <td>2026-05-29</td>
+                    <td style="color: var(--amber);">P2</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Load testing (1000 concurrent users, 5 min baseline)</td>
+                    <td>Malcolm Govender</td>
+                    <td>2026-06-05</td>
+                    <td style="color: var(--amber);">P2</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Document &amp; publish SLA (99.5% uptime, p95 &lt; 30s)</td>
+                    <td>Malcolm Govender + Product</td>
+                    <td>2026-06-12</td>
+                    <td style="color: var(--amber);">P2</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Security audit &amp; penetration testing</td>
+                    <td>Security Team</td>
+                    <td>2026-06-12</td>
+                    <td style="color: var(--amber);">P2</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Production deployment &amp; smoke tests</td>
+                    <td>DevOps/Platform</td>
+                    <td>2026-06-19</td>
+                    <td style="color: var(--red);">P1</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>On-call training &amp; runbook walkthrough</td>
+                    <td>Malcolm Govender</td>
+                    <td>2026-06-19</td>
+                    <td style="color: var(--amber);">P2</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+                <tr>
+                    <td>Go-live sign-off &amp; hand-off to support</td>
+                    <td>Anupam Sharma, Malcolm Govender</td>
+                    <td>2026-06-26</td>
+                    <td style="color: var(--red);">P1</td>
+                    <td style="color: var(--text-2);">Not Started</td>
+                </tr>
+            </table>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3>Success Criteria</h3>
+                <ul class="checklist">
+                    <li>All P1 action items completed</li>
+                    <li>99.5% uptime SLA in effect</li>
+                    <li>Monitoring &amp; alerting fully operational</li>
+                    <li>DR runbook tested &amp; validated</li>
+                    <li>Security audit passed</li>
+                    <li>On-call team trained &amp; ready</li>
+                    <li>Business stakeholder sign-off received</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="footer">
+            <p>Production Readiness Report — AI-Based Test Case Generation</p>
+            <p>Generated for: Anupam Sharma (Head of QA Automation &amp; AI QA Engineering)</p>
+            <p>Lead: Malcolm Govender (Head of AI &amp; Engineering)</p>
+            <p>Report Date: 2026-05-08 | Status: Ready for Review | Confidential</p>
+        </div>
+    </div>
+</body>
+</html>

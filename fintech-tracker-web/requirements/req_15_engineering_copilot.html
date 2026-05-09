@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-15: AI Engineering Copilot Requirements</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #10161c 100%);
+            color: #e0e6ed;
+            line-height: 1.6;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            color: #58a6ff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(88, 166, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid #30363d;
+        }
+        
+        .meta-label {
+            color: #79c0ff;
+            font-weight: 600;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-p1 {
+            background: #da3633;
+            color: #fff;
+        }
+        
+        .badge-not-started {
+            background: #6e40aa;
+            color: #fff;
+        }
+        
+        .badge-in-progress {
+            background: #1f6feb;
+            color: #fff;
+        }
+        
+        .badge-must-have {
+            background: #da3633;
+            color: #fff;
+        }
+        
+        .badge-should-have {
+            background: #d29922;
+            color: #fff;
+        }
+        
+        .badge-nice-to-have {
+            background: #238636;
+            color: #fff;
+        }
+        
+        section {
+            margin-bottom: 40px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #79c0ff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+        
+        h3 {
+            font-size: 16px;
+            color: #c9d1d9;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            color: #d0d9e0;
+            line-height: 1.7;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+            color: #d0d9e0;
+        }
+        
+        .persona-card {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #58a6ff;
+        }
+        
+        .persona-card h4 {
+            color: #58a6ff;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .persona-detail {
+            font-size: 13px;
+            color: #8b949e;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .persona-detail strong {
+            color: #c9d1d9;
+        }
+        
+        .story-card {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid #79c0ff;
+        }
+        
+        .story-id {
+            font-size: 12px;
+            color: #79c0ff;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .story-text {
+            color: #d0d9e0;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        
+        .story-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 12px;
+        }
+        
+        .req-item {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 14px;
+            margin-bottom: 12px;
+            color: #d0d9e0;
+        }
+        
+        .req-id {
+            color: #79c0ff;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            padding: 12px;
+            text-align: left;
+            color: #79c0ff;
+            font-weight: 600;
+        }
+        
+        td {
+            border: 1px solid #30363d;
+            padding: 12px;
+            color: #d0d9e0;
+        }
+        
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .checklist li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #238636;
+            font-weight: bold;
+        }
+        
+        .accent-box {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1) 0%, rgba(79, 195, 247, 0.05) 100%);
+            border: 1px solid #1f6feb;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 15px 0;
+            color: #c9d1d9;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, rgba(210, 153, 34, 0.1) 0%, rgba(210, 153, 34, 0.05) 100%);
+            border: 1px solid #d29922;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 15px 0;
+            color: #c9d1d9;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #8b949e;
+            font-size: 12px;
+            border-top: 1px solid #30363d;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div>
+                    <h1>AI Engineering Copilot</h1>
+                    <p style="color: #8b949e; margin: 0;">For Product & Systems Design</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <span class="badge badge-p1">P1 Priority</span>
+                    <span class="badge badge-not-started">0% Complete</span>
+                </div>
+            </div>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Use Case ID:</span>
+                    <span>UC-15</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Owner:</span>
+                    <span>Peter Onu</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Version:</span>
+                    <span>v1.0</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Date:</span>
+                    <span>May 2026</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Author:</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role:</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Status:</span>
+                    <span>Not Started</span>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>1. Problem Statement</h2>
+            <p>
+                Organizations struggle to bridge the gap between high-level business requirements and detailed technical specifications. Product managers and business analysts spend weeks manually translating BRDs into process flows, sequence diagrams, API contracts, and acceptance criteria. This manual translation is error-prone, creates bottlenecks, and delays product development cycles.
+            </p>
+            <p>
+                <strong>Core Pain Points:</strong>
+            </p>
+            <ul>
+                <li><strong>Time-to-spec:</strong> 2–4 weeks to produce comprehensive design artifacts from raw requirements</li>
+                <li><strong>Inconsistency:</strong> Different teams produce diagrams and specs in different formats with varying levels of detail</li>
+                <li><strong>Traceability:</strong> No clear link between original requirements, user stories, test cases, and API specs</li>
+                <li><strong>Rework:</strong> Architects and engineers must spend 20–30% of design time clarifying and refining ambiguous specs</li>
+                <li><strong>Knowledge loss:</strong> Context and design rationale not captured; onboarding new team members is slow</li>
+                <li><strong>Tool fragmentation:</strong> Teams use Confluence, Notion, Figma, Postman, Jira — no unified workflow</li>
+            </ul>
+            <div class="accent-box">
+                <strong>Why This Matters:</strong> In competitive fintech and SaaS markets, design velocity is a competitive advantage. Reducing spec-to-code time by 60% while improving clarity directly accelerates product launches and reduces rework costs by an estimated $500K–$2M per year for mid-size teams.
+            </div>
+        </section>
+
+        <section>
+            <h2>2. Target Users & Personas</h2>
+            
+            <div class="persona-card">
+                <h4>👨‍💼 Solution Architect (Sarah Chen)</h4>
+                <div class="persona-detail">
+                    <div><strong>Role:</strong> Enterprise Architecture Lead, 12 years experience</div>
+                </div>
+                <div class="persona-detail">
+                    <div><strong>Goals:</strong> Fast diagram generation, standardized notation, design consistency across teams</div>
+                </div>
+                <p><strong>Frustrations:</strong> Manually drawing Mermaid diagrams, context switching between tools, recreating the same patterns in different formats for different stakeholders, difficulty enforcing architectural standards.</p>
+                <p><strong>Usage Pattern:</strong> Weekly. Needs to produce 3–4 context/sequence/component diagrams per sprint to align distributed teams.</p>
+            </div>
+
+            <div class="persona-card">
+                <h4>📊 Product Manager (David Okafor)</h4>
+                <div class="persona-detail">
+                    <div><strong>Role:</strong> Senior Product Manager, fintech, 8 years PM experience</div>
+                </div>
+                <div class="persona-detail">
+                    <div><strong>Goals:</strong> Convert rough requirements into structured specs, generate acceptance criteria, maintain traceability</div>
+                </div>
+                <p><strong>Frustrations:</strong> Writing 50+ user stories manually each quarter, lack of standardized acceptance criteria format, engineers asking clarifying questions weeks into development, no easy way to validate completeness of specs before handoff.</p>
+                <p><strong>Usage Pattern:</strong> 4–5 times per week. Heavy use during sprint planning and design review phases.</p>
+            </div>
+
+            <div class="persona-card">
+                <h4>🔍 Business Analyst (Amara Nkosi)</h4>
+                <div class="persona-detail">
+                    <div><strong>Role:</strong> Senior BA, regulatory compliance background, 10 years experience</div>
+                </div>
+                <div class="persona-detail">
+                    <div><strong>Goals:</strong> Generate test scenarios from requirements, ensure compliance traceability, maintain audit trail</div>
+                </div>
+                <p><strong>Frustrations:</strong> Manually writing test cases, difficulty linking test cases back to original requirements, compliance gaps discovered late in development, limited visibility into what's actually being built vs. what was specified.</p>
+                <p><strong>Usage Pattern:</strong> 3–4 times per week. Critical during UAT phases and compliance reviews.</p>
+            </div>
+
+            <div class="persona-card">
+                <h4>⚙️ Engineering Lead (James Rodriguez)</h4>
+                <div class="persona-detail">
+                    <div><strong>Role:</strong> VP Engineering, 15 years background, scaling team from 8 to 25 engineers</div>
+                </div>
+                <div class="persona-detail">
+                    <div><strong>Goals:</strong> API contract clarity, reduced back-and-forth with product, automated API spec generation, speed up dev planning</div>
+                </div>
+                <p><strong>Frustrations:</strong> Vague API requirements lead to 15–20% rework, engineers writing specs in disparate formats, integration issues discovered during testing, lack of machine-readable contracts for code generation and SDK generation.</p>
+                <p><strong>Usage Pattern:</strong> 2–3 times per week in design phase; heavy use during architecture reviews.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>3. User Stories</h2>
+
+            <div class="story-card">
+                <div class="story-id">US-01</div>
+                <div class="story-text">As a Product Manager, I want to paste or upload a BRD or user story document and have the system generate a structured process flow diagram (swimlane or BPMN format), so that I can quickly align stakeholders on workflow.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-02</div>
+                <div class="story-text">As a Solution Architect, I want to generate sequence diagrams automatically from use case descriptions, so that I can document system interactions without manual drawing.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-03</div>
+                <div class="story-text">As an Engineering Lead, I want the system to generate OpenAPI 3.0 specs from natural-language use cases and user stories, so that I can automatically scaffold API stubs and SDKs.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-04</div>
+                <div class="story-text">As a Product Manager, I want to convert user stories into formal Given-When-Then acceptance criteria, so that developers and QA have unambiguous requirements.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-05</div>
+                <div class="story-text">As a Business Analyst, I want to generate test scenarios (happy path, edge cases, error scenarios) automatically from acceptance criteria, so that I can reduce manual test case writing by 70%.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-06</div>
+                <div class="story-text">As a Product Manager, I want to maintain traceability links (BRD → user story → acceptance criteria → test case → API spec), so that I can validate completeness and impact any requirement change.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-07</div>
+                <div class="story-text">As any user, I want to refine and iterate on generated diagrams and specs via a chat interface, so that I can correct mistakes and customize output without leaving the tool.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-08</div>
+                <div class="story-text">As an Engineering Lead, I want one-click export of generated artifacts to Postman or OpenAPI format, so that my team can immediately use the specs in development.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-09</div>
+                <div class="story-text">As a Product Manager, I want to publish generated specs directly to Confluence or Notion, so that team documentation is always in sync with design artifacts.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-10</div>
+                <div class="story-text">As a Solution Architect, I want the system to suggest architectural patterns and best practices based on detected use case type, so that I can ensure consistency with organizational standards.</div>
+                <div class="story-meta">
+                    <span class="badge badge-nice-to-have">Nice to Have</span>
+                    <span style="color: #79c0ff;">Priority 3</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-11</div>
+                <div class="story-text">As a Business Analyst, I want to generate compliance checklist items from regulatory keywords detected in requirements, so that compliance gaps are surfaced early.</div>
+                <div class="story-meta">
+                    <span class="badge badge-nice-to-have">Nice to Have</span>
+                    <span style="color: #79c0ff;">Priority 3</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-12</div>
+                <div class="story-text">As a Product Manager, I want to generate a data model / ERD diagram from domain entities mentioned in requirements, so that data architects can validate schema design early.</div>
+                <div class="story-meta">
+                    <span class="badge badge-nice-to-have">Nice to Have</span>
+                    <span style="color: #79c0ff;">Priority 3</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-13</div>
+                <div class="story-text">As any user, I want the system to suggest missing edge cases and error scenarios based on industry best practices, so that test coverage is more comprehensive.</div>
+                <div class="story-meta">
+                    <span class="badge badge-nice-to-have">Nice to Have</span>
+                    <span style="color: #79c0ff;">Priority 3</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-14</div>
+                <div class="story-text">As an Engineering Lead, I want performance and scalability requirements to be extracted and validated against infrastructure constraints, so that non-functional requirements are not overlooked.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-15</div>
+                <div class="story-text">As a Solution Architect, I want to version and compare different versions of generated specs, so that I can review changes and maintain an audit trail of design decisions.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>4. Functional Requirements</h2>
+
+            <div class="req-item">
+                <span class="req-id">FR-01:</span>
+                System must accept BRD, user story documents, and free-form requirement text in .docx, .pdf, .txt, and Markdown formats via file upload or copy-paste.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-02:</span>
+                System must generate process flow diagrams in Mermaid flowchart and BPMN (XML) formats from natural-language workflows, with configurable swimlane layout.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-03:</span>
+                System must generate sequence diagrams (Mermaid or PlantUML) showing actor-system-actor interactions, including alternative flows and exception paths.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-04:</span>
+                System must generate OpenAPI 3.0 JSON/YAML specifications including paths, methods, request/response schemas, authentication, and error codes from use case descriptions.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-05:</span>
+                System must convert user stories into structured Given-When-Then acceptance criteria following Gherkin syntax, validatable against test scenarios.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-06:</span>
+                System must generate test scenarios covering happy path, alternative flows, edge cases, and error conditions from acceptance criteria.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-07:</span>
+                System must maintain bidirectional traceability: each generated artifact must link back to source requirement and forward to dependent specs (story → acceptance criteria → test case).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-08:</span>
+                System must provide an interactive chat interface for iterative refinement, allowing users to request diagram redraw, regenerate specs with modified context, and customize output.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-09:</span>
+                System must export generated diagrams as SVG, PNG, and Mermaid/PlantUML source code; export OpenAPI specs as JSON/YAML; export test scenarios as CSV or Gherkin.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-10:</span>
+                System must integrate with Confluence (read/write pages, link artifacts) and Notion (append specs to database) via OAuth2 and API authentication.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-11:</span>
+                System must extract and validate non-functional requirements (latency, throughput, availability, compliance) from requirement text and flag risks.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-12:</span>
+                System must support version control: track spec versions, show diffs, rollback to prior versions, annotate changes with timestamp and user.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-13:</span>
+                System must detect and parse regulatory keywords (GDPR, PCI-DSS, SOC2, POPIA) and auto-generate compliance checklist items relevant to detected frameworks.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-14:</span>
+                System must generate component diagrams and architecture overview diagrams from high-level system context described in requirements.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-15:</span>
+                System must extract entities, relationships, and constraints from requirements and suggest ERD (Entity-Relationship Diagram) structures.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-16:</span>
+                System must provide a library of reusable requirement patterns, acceptance criteria templates, and diagram archetypes for common use cases (CRUD, search, payment flow).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-17:</span>
+                System must suggest edge cases and error scenarios based on domain knowledge and industry best practices, with user ability to accept/reject suggestions.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-18:</span>
+                System must generate data dictionary / glossary from domain terms detected in requirements, with definitions and cross-references.
+            </div>
+        </section>
+
+        <section>
+            <h2>5. Non-Functional Requirements</h2>
+
+            <div class="req-item">
+                <span class="req-id">NFR-01:</span>
+                <strong>Performance:</strong> Generation of diagrams and specs must complete within 5 seconds for documents up to 50 pages / 20,000 words. P99 latency &lt; 10 seconds for larger documents.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-02:</span>
+                <strong>Availability:</strong> System must maintain 99.5% uptime SLA with automated failover and graceful degradation during LLM API latency spikes.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-03:</span>
+                <strong>Security:</strong> All user-uploaded documents must be scanned for malware, encrypted at rest with AES-256, and deleted after 30 days. Support SSO (Okta, Azure AD) and RBAC.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-04:</span>
+                <strong>Data Privacy:</strong> System must be GDPR-compliant with user data minimization, right to deletion, and audit logging. Support data residency requirements (EU, US).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-05:</span>
+                <strong>Scalability:</strong> System must scale to support 10,000+ concurrent users with auto-scaling compute and queue-based LLM request batching.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-06:</span>
+                <strong>Reliability:</strong> System must have automated backup of all generated specs and traceability links; RPO &lt; 1 hour, RTO &lt; 4 hours.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-07:</span>
+                <strong>Compliance:</strong> For regulated industries (fintech, healthcare), system must support audit logging of all generation operations with immutable records.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-08:</span>
+                <strong>Usability:</strong> System must support dark mode, keyboard navigation (WCAG 2.1 AA), and be accessible on mobile browsers for spec review.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-09:</span>
+                <strong>Integration:</strong> System must provide REST API and webhooks for external tool integration (CI/CD pipelines, project management tools, code generation frameworks).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-10:</span>
+                <strong>Cost Efficiency:</strong> System must optimize LLM token usage via prompt caching, batch processing, and tiered model selection (use GPT-4 Turbo for complex diagrams, GPT-4o mini for simple specs).
+            </div>
+        </section>
+
+        <section>
+            <h2>6. Acceptance Criteria</h2>
+
+            <h3>Core Story: BRD → Process Flow Diagram (US-01)</h3>
+            <div class="accent-box">
+                <strong>Given</strong> a Product Manager uploads a 10-page requirements document describing a payment processing workflow
+                <br><strong>When</strong> the system processes the document
+                <br><strong>Then</strong> the system generates a swimlane diagram with at least 5 pools (roles/systems) and 12+ steps, in Mermaid flowchart syntax
+                <br><strong>And</strong> the diagram is editable in the chat interface
+                <br><strong>And</strong> the diagram can be exported as SVG and embedded in Confluence
+            </div>
+
+            <h3>Core Story: User Story → Acceptance Criteria (US-04)</h3>
+            <div class="accent-box">
+                <strong>Given</strong> a user story "As a user, I want to filter transactions by date range so I can find specific payments"
+                <br><strong>When</strong> the system parses the story
+                <br><strong>Then</strong> the system generates 3–5 Gherkin-format acceptance criteria (e.g., "Given I am on the transaction page, When I select date range X to Y, Then only transactions in that range are shown")
+                <br><strong>And</strong> acceptance criteria include validation for edge cases (empty range, future dates, single-day range)
+                <br><strong>And</strong> acceptance criteria are linked to the source user story for traceability
+            </div>
+
+            <h3>Integration Story: Confluence Publish (US-09)</h3>
+            <div class="accent-box">
+                <strong>Given</strong> a user has authorized Confluence access and generated 5 specs (diagrams, API spec, test scenarios)
+                <br><strong>When</strong> the user clicks "Publish to Confluence"
+                <br><strong>Then</strong> each artifact is published as a separate page under a designated space
+                <br><strong>And</strong> a parent page is created with links to all artifacts
+                <br><strong>And</strong> the user receives confirmation with links to each published page
+                <br><strong>And</strong> subsequent regenerations offer "update existing page" option
+            </div>
+
+            <h3>Quality Story: Test Scenario Generation (US-05)</h3>
+            <div class="accent-box">
+                <strong>Given</strong> 5 acceptance criteria for a login flow
+                <br><strong>When</strong> the system generates test scenarios
+                <br><strong>Then</strong> the system produces at least 15 test cases covering:
+                <ul style="margin: 10px 0; color: #d0d9e0;">
+                    <li>Happy path (valid credentials)</li>
+                    <li>Alternative flows (forgot password, SSO, MFA)</li>
+                    <li>Edge cases (empty fields, SQL injection attempt, rate limiting)</li>
+                    <li>Error scenarios (invalid password, account locked, network timeout)</li>
+                </ul>
+                <br><strong>And</strong> each test case includes expected result and assertion
+                <br><strong>And</strong> test cases are exportable as Gherkin and CSV
+            </div>
+        </section>
+
+        <section>
+            <h2>7. Dependencies & Integrations</h2>
+
+            <h3>External Systems</h3>
+            <ul>
+                <li><strong>Large Language Models:</strong> Claude (3.5 Sonnet/Opus), GPT-4 Turbo for diagram generation, with fallback to 4o mini for cost optimization</li>
+                <li><strong>Document Processing:</strong> PDF/DOCX parsing (PyPDF2, python-docx), OCR for scanned documents (optional)</li>
+                <li><strong>Diagram Generation:</strong> Mermaid CLI, PlantUML server for SVG rendering</li>
+                <li><strong>API Validation:</strong> OpenAPI 3.0 validator (Swagger Parser), JSON Schema validator</li>
+                <li><strong>Confluence Integration:</strong> Atlassian Cloud API (v3), OAuth2 for authentication</li>
+                <li><strong>Notion Integration:</strong> Notion SDK for TypeScript, database append operations</li>
+                <li><strong>Authentication:</strong> Auth0 or Okta for SSO, OIDC support</li>
+                <li><strong>Storage:</strong> AWS S3 for document and spec storage, encryption at rest</li>
+                <li><strong>Database:</strong> PostgreSQL for traceability links, version control, audit logs</li>
+                <li><strong>Message Queue:</strong> AWS SQS or Kafka for async LLM request batching</li>
+                <li><strong>Search:</strong> Elasticsearch for full-text indexing of requirements and traceability</li>
+            </ul>
+
+            <h3>Internal System Dependencies</h3>
+            <ul>
+                <li>UC-01 (Test Case Generation): Test scenarios feed into UC-01 execution engine</li>
+                <li>UC-04 (QA Automation): Generated Gherkin scenarios compatible with UC-04 test orchestration</li>
+                <li>PayGuard Fraud Shield (UC-16): Diagram generation for fintech compliance workflows</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>8. Assumptions & Constraints</h2>
+
+            <h3>Assumptions</h3>
+            <ul>
+                <li>User-supplied requirements are written in English (other languages in v2+)</li>
+                <li>Users have basic knowledge of swimlane diagrams, sequence diagrams, and Gherkin syntax</li>
+                <li>Integration partners (Confluence, Notion) provide stable APIs and maintain backward compatibility</li>
+                <li>LLM APIs (Claude, GPT-4) remain available with <50ms latency SLA</li>
+                <li>Customers have existing Confluence/Notion instances or are willing to adopt them</li>
+                <li>Regulatory requirements (GDPR, PCI-DSS) are non-negotiable and must be met before GA launch</li>
+            </ul>
+
+            <h3>Constraints</h3>
+            <ul>
+                <li><strong>LLM Token Limits:</strong> OpenAPI specs and full traceability links may exceed token budgets for very large requirements; implement summarization and chunking</li>
+                <li><strong>Diagram Complexity:</strong> Swimlane diagrams with >15 pools or >50 steps become hard to read; recommend breaking into sub-flows</li>
+                <li><strong>Accuracy Dependency:</strong> Generated diagrams are only as good as input requirements; garbage in = garbage out. UI must guide users to provide clear, structured input</li>
+                <li><strong>Integration Latency:</strong> Confluence/Notion API calls add 2–5 seconds per publish; user experience must set clear expectations</li>
+                <li><strong>Regulatory Scope:</strong> Initial release targets English-speaking, US/EU/APAC regulatory environments; ASEAN/China compliance deferred to v2</li>
+                <li><strong>Cost:</strong> LLM costs scale with document size and iteration count; implement usage quotas and cost controls for enterprise plans</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>9. Out of Scope (v1.0)</h2>
+
+            <ul>
+                <li>Multi-language requirement support (non-English requirements)</li>
+                <li>Manual diagram editing canvas (v1 is view/regenerate only; edit happens via chat refinement)</li>
+                <li>Integration with code generation frameworks (Nx, Spring Boot scaffolding) — deferred to v2</li>
+                <li>Real-time collaborative editing of specs</li>
+                <li>Automatic migration of legacy requirements from Jira/Azure DevOps into system</li>
+                <li>Mobile app (web-responsive only)</li>
+                <li>Custom LLM fine-tuning on customer data</li>
+                <li>Integration with design tools (Figma, FigJam) — deferred to v2</li>
+                <li>GraphQL schema generation (OpenAPI only in v1)</li>
+                <li>Advanced analytics (usage metrics, quality scoring) — basic telemetry only in v1</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>10. Definition of Done</h2>
+
+            <ul class="checklist">
+                <li>All functional requirements (FR-01 to FR-18) implemented and tested</li>
+                <li>All non-functional requirements (NFR-01 to NFR-10) validated (performance tested, security audit passed, scalability load tested)</li>
+                <li>Acceptance criteria for all 15 user stories verified by QA</li>
+                <li>Confluence and Notion integrations tested end-to-end with live instances</li>
+                <li>OpenAPI 3.0 specs generated by system validated by OpenAPI validator</li>
+                <li>Gherkin acceptance criteria validated against UC-01/UC-04 test frameworks</li>
+                <li>User documentation (quick start guide, API reference, troubleshooting) completed</li>
+                <li>Security audit and GDPR compliance review passed</li>
+                <li>Load testing completed at 99th percentile latency targets (p99 &lt; 10s for large docs)</li>
+                <li>Rollout plan and customer communication prepared</li>
+                <li>Monitoring and alerting configured (LLM latency, error rates, integration failures)</li>
+                <li>Beta access granted to 3–5 pilot customers for feedback</li>
+                <li>Traceability matrix linking requirements to test cases 100% complete</li>
+                <li>Version v1.0 tagged and documented with known limitations</li>
+            </ul>
+        </section>
+
+        <section style="border: 2px solid #238636; background: rgba(35, 134, 54, 0.1);">
+            <h2 style="color: #3fb950;">Success Metrics (v1.0)</h2>
+            <ul>
+                <li><strong>Time to Spec:</strong> Reduce BRD-to-complete-spec time from 3 weeks to 3 hours</li>
+                <li><strong>Accuracy:</strong> &gt; 85% of generated specs require &lt; 2 rounds of refinement before handoff</li>
+                <li><strong>Adoption:</strong> &gt; 60% of target personas actively using system within 90 days of release</li>
+                <li><strong>Rework Reduction:</strong> Engineer clarification questions drop by 50% due to clearer specs</li>
+                <li><strong>Tool Consolidation:</strong> &gt; 70% of teams reduce tool count from 4–5 (Jira, Confluence, Postman, Figma) to 2 (Jira + Engineering Copilot)</li>
+                <li><strong>Quality:</strong> Test coverage (lines covered by generated test cases) increases by 30%</li>
+            </ul>
+        </section>
+
+        <div class="footer">
+            <p>AI Engineering Copilot | UC-15 | Requirements Document v1.0 | May 2026</p>
+            <p>Owner: Peter Onu | Status: Not Started | Confidential</p>
+        </div>
+    </div>
+</body>
+</html>

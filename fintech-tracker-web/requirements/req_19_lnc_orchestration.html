@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-19 LNC & API Orchestration Agent — Requirements & User Stories</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { border-bottom: 2px solid #30363d; padding-bottom: 30px; margin-bottom: 40px; }
+        h1 { font-size: 2.5em; margin-bottom: 15px; color: #38bdf8; }
+        .header-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .meta-item { background: #161b22; padding: 15px; border-left: 3px solid #38bdf8; border-radius: 4px; }
+        .meta-label { font-size: 0.85em; color: #8b949e; text-transform: uppercase; margin-bottom: 5px; }
+        .meta-value { font-size: 1.1em; color: #e6edf3; font-weight: 500; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-right: 8px; margin-top: 10px; }
+        .badge-p3 { background: #3fb950; color: #0d1117; }
+        .badge-not-started { background: #30363d; color: #8b949e; }
+        .badge-must { background: #da3633; color: white; }
+        .badge-should { background: #f0883e; color: white; }
+        .badge-nice { background: #3fb950; color: white; }
+        section { margin-bottom: 50px; background: #161b22; padding: 30px; border: 1px solid #30363d; border-radius: 6px; border-left: 4px solid #38bdf8; }
+        h2 { font-size: 1.8em; color: #38bdf8; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #30363d; }
+        h3 { font-size: 1.3em; color: #a371f7; margin-top: 20px; margin-bottom: 10px; }
+        p { color: #c9d1d9; margin-bottom: 12px; }
+        .card { background: #0d1117; padding: 15px; margin: 15px 0; border: 1px solid #30363d; border-radius: 4px; border-left: 3px solid #38bdf8; }
+        .card-title { font-weight: 600; color: #38bdf8; margin-bottom: 8px; }
+        .card-content { font-size: 0.95em; line-height: 1.5; color: #c9d1d9; }
+        .user-story { background: #0d1117; padding: 15px; margin: 12px 0; border-left: 3px solid #1f6feb; border: 1px solid #30363d; border-radius: 4px; }
+        .story-id { font-weight: 700; color: #38bdf8; font-size: 0.9em; }
+        .story-text { margin: 10px 0; font-style: italic; color: #c9d1d9; }
+        .requirement { padding: 12px 0; border-bottom: 1px solid #30363d; }
+        .requirement:last-child { border-bottom: none; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: #0d1117; border: 1px solid #30363d; }
+        thead { background: #161b22; border-bottom: 2px solid #30363d; }
+        th { padding: 12px; text-align: left; color: #38bdf8; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #30363d; color: #c9d1d9; }
+        tbody tr:hover { background: #161b22; }
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 10px 0; padding-left: 30px; position: relative; color: #c9d1d9; border-bottom: 1px solid #21262d; }
+        .checklist li:last-child { border-bottom: none; }
+        .checklist li:before { content: "✓"; position: absolute; left: 0; color: #3fb950; font-weight: bold; }
+        .dependency-item { padding: 10px; margin: 10px 0; background: #0d1117; border-left: 3px solid #38bdf8; border: 1px solid #30363d; border-radius: 4px; }
+        .dependency-system { font-weight: 600; color: #38bdf8; }
+        .dependency-detail { color: #8b949e; font-size: 0.9em; margin-top: 5px; }
+        .warning-box { background: rgba(248,113,113,0.1); border: 1px solid #f87171; border-left: 4px solid #f87171; border-radius: 4px; padding: 15px; margin: 15px 0; color: #fca5a5; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #30363d; text-align: center; color: #8b949e; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+<div class="container">
+
+    <header>
+        <h1>LNC &amp; API Orchestration Agent</h1>
+        <div class="header-meta">
+            <div class="meta-item">
+                <div class="meta-label">Use Case ID</div>
+                <div class="meta-value">UC-19</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Owner</div>
+                <div class="meta-value">Artemij Demidczyk</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Version</div>
+                <div class="meta-value">v1.0</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Document Date</div>
+                <div class="meta-value">May 2026</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Author</div>
+                <div class="meta-value" style="color:#60a5fa;font-weight:700;">Malcolm Govender</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Role</div>
+                <div class="meta-value" style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</div>
+            </div>
+        </div>
+        <div style="margin-top: 15px;">
+            <span class="badge badge-p3">PRIORITY: P3</span>
+            <span class="badge badge-not-started">STATUS: Not Started (0%)</span>
+        </div>
+        <div style="margin-top: 15px; color: #8b949e; font-size: 0.95em;">
+            <strong>Tech Stack (Planned):</strong> TypeScript, Next.js, Azure OpenAI (GPT-4o Tool Use), REST/GraphQL APIs, OAuth 2.0, Azure AI Search
+        </div>
+    </header>
+
+    <!-- PROBLEM STATEMENT -->
+    <section>
+        <h2>Problem Statement</h2>
+        <p>Complex multi-step operations on the fintech platform — such as merchant onboarding, compliance configuration, payment limit adjustments, and API key provisioning — require engineers and operations staff to manually chain together multiple API calls across different systems. This process is:</p>
+        <div class="card">
+            <div class="card-title">Time-Consuming and Error-Prone</div>
+            <div class="card-content">A typical merchant onboarding workflow involves 8–12 API calls across 3 systems. Manual execution takes 30–90 minutes and is prone to errors when steps are executed out of sequence or with incorrect parameters.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Requires Deep Technical Knowledge</div>
+            <div class="card-content">Operations staff without deep API knowledge cannot execute these workflows independently. Every complex task requires a developer. This creates bottlenecks and reduces operational agility.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">No Audit Trail for Composite Operations</div>
+            <div class="card-content">When a multi-step operation partially fails, there is no centralised record of what succeeded and what failed. Recovery requires manual investigation across multiple system logs.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Undocumented Tribal Knowledge</div>
+            <div class="card-content">The correct sequence and parameters for complex workflows exist only in experienced engineers' heads or in informal Confluence pages. New team members cannot safely execute these operations without guidance.</div>
+        </div>
+    </section>
+
+    <!-- PERSONAS -->
+    <section>
+        <h2>Personas &amp; Stakeholders</h2>
+        <h3>Primary Users</h3>
+        <div class="card">
+            <div class="card-title">Operations Engineer (Primary)</div>
+            <div class="card-content">Executes platform configuration and onboarding tasks daily. Technical but not a software developer. Wants to describe what they need in plain language and have the system figure out the right API sequence. Needs confidence that irreversible actions won't execute without their explicit approval.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Platform Engineer / Developer</div>
+            <div class="card-content">Builds and maintains the internal APIs. Will use the orchestration agent for complex debugging and configuration tasks. Comfortable with API call details — wants to review and edit the generated plan before execution. Needs the audit log for post-incident investigation.</div>
+        </div>
+        <h3>Secondary Stakeholders</h3>
+        <div class="card">
+            <div class="card-title">Head of Engineering (Malcolm Govender)</div>
+            <div class="card-content">Cares about reduction in developer interruptions for ops tasks, audit trail completeness, and POPIA compliance. Will sign off on production go-live.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">CISO</div>
+            <div class="card-content">Deeply concerned about an AI agent that can execute write operations on production systems. Requires threat model, privilege control documentation, and approval gate design before any testing on non-dev environments.</div>
+        </div>
+    </section>
+
+    <!-- USER STORIES -->
+    <section>
+        <h2>User Stories</h2>
+
+        <div class="warning-box">
+            ⚠ <strong>Pre-build requirement:</strong> Before any user stories can be implemented, the approval gate policy and tool registry risk classification must be completed and signed off by the CISO. No write-enabled tools should be accessible to the agent without this framework in place.
+        </div>
+
+        <h3>Epic 1: Natural Language Task Orchestration</h3>
+
+        <div class="user-story">
+            <div class="story-id">US-19-01 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As an operations engineer, I want to describe a platform task in plain English and have the agent generate a step-by-step execution plan that I can review before anything runs, so I can safely perform complex workflows without knowing the exact API calls."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>Agent accepts natural language task description via web UI</li>
+                <li>Step planner generates ordered plan with: step name, API to call, parameters, expected outcome, risk level</li>
+                <li>Plan displayed for user review before any execution begins</li>
+                <li>User can edit individual step parameters before approving</li>
+                <li>Plan generation completes within 15 seconds</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-19-02 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As an operations engineer, I want the agent to pause and ask for my explicit approval before executing any step that creates, modifies, or deletes data, so I am always in control of irreversible actions."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>All steps classified as WRITE, DELETE, or READ at plan generation time</li>
+                <li>WRITE and DELETE steps require explicit user approval before execution</li>
+                <li>Approval UI shows: what will be called, with what parameters, what the expected side effect is</li>
+                <li>User can cancel at any approval gate without partial execution side effects (or with clear rollback guidance)</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-19-03 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As an operations engineer, I want to see a real-time execution log as the agent runs each step, so I know what is happening and can intervene if something looks wrong."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>Each step shows: status (pending / running / success / failed), API called, response summary</li>
+                <li>Step results update in real-time without page refresh</li>
+                <li>Execution can be paused or aborted by the user at any point</li>
+                <li>Final execution summary shows: total steps, successful, failed, time taken</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-19-04 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As an operations engineer, I want the agent to automatically retry failed steps with the correct parameters, and tell me clearly when a failure requires manual intervention, so I don't have to restart entire workflows from scratch."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>Transient failures (network timeouts, rate limits) auto-retried up to 3 times with exponential back-off</li>
+                <li>Permanent failures (validation errors, auth failures) surfaced immediately with clear error message and suggested resolution</li>
+                <li>Successfully completed steps are not re-run on retry</li>
+                <li>User can resume from last successful step after resolving a failure</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-19-05 <span class="badge badge-must">MUST</span></div>
+            <div class="story-text">"As a compliance officer, I want every orchestration execution to be fully logged with the actor, all API calls made, parameters sent, and responses received, so we have a complete audit trail for regulatory purposes."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>Immutable audit log entry created for every orchestration execution</li>
+                <li>Log includes: actor (user identity), task description, plan generated, each step executed, API endpoint, request payload (PII redacted), response status, timestamp</li>
+                <li>Logs retained for minimum 12 months</li>
+                <li>Logs queryable by actor, date range, workflow type</li>
+                <li>Log cannot be modified or deleted by any user (including admins)</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-19-06 <span class="badge badge-should">SHOULD</span></div>
+            <div class="story-text">"As an operations engineer, I want to save common workflow templates so I can re-run standard operations (e.g., standard merchant onboarding) with just a few parameter inputs, without re-describing the full workflow each time."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>Any executed workflow can be saved as a named template</li>
+                <li>Template stores: workflow name, step structure, input parameter schema</li>
+                <li>Template can be triggered with only variable parameters as input</li>
+                <li>Templates can be shared across team (or kept private)</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-19-07 <span class="badge badge-should">SHOULD</span></div>
+            <div class="story-text">"As a platform engineer, I want to run the orchestration agent in dry-run mode where all API calls are simulated and no real changes are made, so I can validate complex plans safely before executing on production."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>Dry-run mode clearly indicated in UI (cannot be confused with real execution)</li>
+                <li>All API calls simulated against mock responses or staging environment</li>
+                <li>Dry-run report shows what would have been called and expected outcomes</li>
+                <li>Dry-run results can be converted to a real execution with one action</li>
+            </ul>
+        </div>
+
+        <div class="user-story">
+            <div class="story-id">US-19-08 <span class="badge badge-nice">NICE TO HAVE</span></div>
+            <div class="story-text">"As an operations engineer, I want the agent to suggest the most relevant workflow template when I describe a task, rather than always generating a plan from scratch, so common operations are fast and consistent."</div>
+            <div><strong>Acceptance Criteria:</strong></div>
+            <ul style="margin-top:8px; padding-left:20px; color:#c9d1d9;">
+                <li>Agent matches user description to existing templates using semantic similarity</li>
+                <li>Top 3 matching templates offered before plan generation starts</li>
+                <li>User can select a template or continue with fresh plan generation</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>Functional Requirements</h2>
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>FR-19-01</strong></td>
+                    <td>Step planner shall decompose natural language task descriptions into ordered, typed execution steps using GPT-4o structured output</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+                <tr>
+                    <td><strong>FR-19-02</strong></td>
+                    <td>Tool registry shall catalogue all available API tools with schema, auth method, risk classification (READ/WRITE/DELETE), and rate limits</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+                <tr>
+                    <td><strong>FR-19-03</strong></td>
+                    <td>Approval gateway shall require explicit user confirmation before executing any WRITE or DELETE classified tool call</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+                <tr>
+                    <td><strong>FR-19-04</strong></td>
+                    <td>Execution engine shall run steps sequentially, pass outputs between steps, and handle retry with exponential back-off</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+                <tr>
+                    <td><strong>FR-19-05</strong></td>
+                    <td>State manager shall persist execution state to support resume-from-failure without re-running completed steps</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+                <tr>
+                    <td><strong>FR-19-06</strong></td>
+                    <td>Audit log shall record every orchestration with actor identity, all API calls, parameters (PII redacted), responses, and timestamps; logs are immutable</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+                <tr>
+                    <td><strong>FR-19-07</strong></td>
+                    <td>Agent shall execute all API calls using the caller's OAuth token; service accounts with elevated privileges shall not be used</td>
+                    <td><span class="badge badge-must" style="margin:0;">MUST</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+                <tr>
+                    <td><strong>FR-19-08</strong></td>
+                    <td>Workflow templates shall be saveable and reusable with variable parameter inputs; templates can be shared within a team</td>
+                    <td><span class="badge badge-should" style="margin:0;">SHOULD</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+                <tr>
+                    <td><strong>FR-19-09</strong></td>
+                    <td>Dry-run mode shall simulate all API calls without real execution; dry-run report shall document expected outcomes per step</td>
+                    <td><span class="badge badge-should" style="margin:0;">SHOULD</span></td>
+                    <td style="color:#f0883e;">Not Built</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- NON-FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>Non-Functional Requirements</h2>
+        <table>
+            <thead>
+                <tr><th>Category</th><th>Requirement</th><th>Target</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Performance</strong></td><td>Step plan generation latency</td><td>&lt; 15 seconds</td></tr>
+                <tr><td><strong>Performance</strong></td><td>Per-step execution latency (excluding external API latency)</td><td>&lt; 2 seconds overhead</td></tr>
+                <tr><td><strong>Security</strong></td><td>Agent must execute using caller OAuth token only — no privilege escalation via service account</td><td>Mandatory</td></tr>
+                <tr><td><strong>Security</strong></td><td>API request payloads containing PII must be redacted before audit log storage</td><td>POPIA compliant</td></tr>
+                <tr><td><strong>Availability</strong></td><td>Orchestration service uptime</td><td>99.5%</td></tr>
+                <tr><td><strong>Audit</strong></td><td>Audit log retention period</td><td>12 months minimum</td></tr>
+                <tr><td><strong>Scalability</strong></td><td>Concurrent orchestration sessions without degradation</td><td>≥ 20 simultaneous users</td></tr>
+                <tr><td><strong>Recoverability</strong></td><td>Failed orchestrations must be resumable from last successful step within 24 hours</td><td>Mandatory</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- DEPENDENCIES -->
+    <section>
+        <h2>Technical Dependencies</h2>
+        <div class="dependency-item">
+            <div class="dependency-system">Azure OpenAI — GPT-4o (Structured Output / Tool Use)</div>
+            <div class="dependency-detail">Required for step planner and tool selection. Must use structured output mode with JSON schema enforcement for reliable plan generation. Azure South Africa North deployment required for data residency compliance.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Internal API Inventory &amp; OpenAPI Specs</div>
+            <div class="dependency-detail">The tool registry can only be built once all internal APIs are documented with OpenAPI specs. This is a Sprint 0 dependency — Artemij must compile the full API inventory before Sprint 1 begins.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">OAuth 2.0 Identity Provider</div>
+            <div class="dependency-detail">The agent must obtain and forward the caller's OAuth token to each downstream API. Requires identity provider integration (Azure AD / Entra ID) and token forwarding mechanism in execution engine.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Persistent State Store</div>
+            <div class="dependency-detail">Execution state must be persisted to survive restarts. Recommend Azure Cosmos DB or PostgreSQL for state storage. Schema must support: execution ID, step states, intermediate outputs, and actor identity.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Immutable Audit Log Store</div>
+            <div class="dependency-detail">Audit logs require a write-once, tamper-evident store. Options: Azure Immutable Blob Storage, Azure Monitor Logs with retention lock, or a dedicated append-only database table. Legal sign-off on storage approach required.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">CISO Approval — Threat Model &amp; Risk Framework</div>
+            <div class="dependency-detail">Non-negotiable: CISO must review and approve the threat model, approval gate policy, and privilege control design before any code is written for production-facing components. This is a blocker for Sprint 1.</div>
+        </div>
+    </section>
+
+    <!-- ACCEPTANCE CRITERIA -->
+    <section>
+        <h2>Definition of Done — Full Acceptance Criteria</h2>
+        <ul class="checklist">
+            <li>CISO threat model review completed and approved prior to Sprint 1 start</li>
+            <li>Tool registry compiled with all internal APIs, risk classifications, and OpenAPI schemas</li>
+            <li>Step planner generates correct execution plans for ≥ 15 documented workflow scenarios</li>
+            <li>Approval gateway tested: no WRITE or DELETE step executes without explicit user confirmation in any test scenario</li>
+            <li>Execution engine handles sequential steps, output passing, and retry correctly across all test scenarios</li>
+            <li>Failed executions resumable from last successful step within 24 hours of failure</li>
+            <li>All API calls execute using caller OAuth token — confirmed via penetration test that no privilege escalation is possible</li>
+            <li>Audit log captures complete execution trace; PII fields redacted per POPIA; logs retained for 12 months</li>
+            <li>Dry-run mode validated: zero real API calls made during dry-run execution in all test cases</li>
+            <li>Integration test suite passing on ≥ 15 workflow scenarios including error paths and approval gate flows</li>
+            <li>Head of Engineering and CISO production sign-off obtained</li>
+            <li>4-week shadow-mode completed — parallel manual process comparison; MTTR/time-savings validated</li>
+            <li>On-call runbook published; escalation path documented for stuck/failed orchestrations</li>
+        </ul>
+    </section>
+
+    <footer>
+        <p>UC-19 LNC &amp; API Orchestration Agent — Requirements &amp; User Stories v1.0</p>
+        <p style="margin-top:5px;">Owner: Artemij Demidczyk · Author: Malcolm Govender, Head of AI &amp; Engineering · May 2026</p>
+        <p style="margin-top:5px;">South African Fintech AI Transformation Programme</p>
+    </footer>
+
+</div>
+</body>
+</html>

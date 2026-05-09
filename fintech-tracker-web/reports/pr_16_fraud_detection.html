@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Readiness Report: Intelligent Transaction Monitoring & Fraud Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #1a1d2e;
+            --surface: #20243c;
+            --surface2: #252942;
+            --surface3: #2d3155;
+            --border: #2e3358;
+            --text-1: #e8eaff;
+            --text-2: #8b93c4;
+            --text-3: #555e8a;
+            --accent: #0073ea;
+            --green: #00c875;
+            --amber: #fdab3d;
+            --red: #f87171;
+            --purple: #a78bfa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text-1);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container { max-width: 1280px; margin: 0 auto; padding: 40px 20px; }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 115, 234, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-content { position: relative; z-index: 1; }
+
+        .hero-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .hero-title {
+            flex: 1;
+        }
+
+        .hero-title h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-1);
+        }
+
+        .hero-title p {
+            font-size: 1.1em;
+            color: var(--text-2);
+            margin-bottom: 20px;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-status { background: rgba(0, 200, 117, 0.2); color: var(--green); }
+        .badge-priority { background: rgba(255, 193, 7, 0.2); color: var(--amber); }
+        .badge-tech { background: rgba(0, 115, 234, 0.2); color: var(--accent); }
+
+        .progress-bar {
+            width: 200px;
+            height: 6px;
+            background: var(--surface3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill { height: 100%; background: var(--green); width: 75%; }
+
+        .progress-label {
+            color: var(--text-2);
+            font-size: 0.9em;
+            margin-top: 8px;
+        }
+
+        .owner-info {
+            background: var(--surface3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .owner-info strong { color: var(--accent); }
+
+        .tech-stack {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .tech-tag {
+            padding: 6px 12px;
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: var(--text-2);
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 40px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--accent);
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section h3 {
+            font-size: 1.2em;
+            margin: 25px 0 15px 0;
+            color: var(--text-1);
+        }
+
+        .section p {
+            color: var(--text-2);
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+
+        .code-block {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85em;
+            color: var(--accent);
+            line-height: 1.5;
+        }
+
+        .list-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: var(--text-2);
+        }
+
+        .list-item::before {
+            content: '▸';
+            color: var(--accent);
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--surface3);
+        }
+
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-1);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-2);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-complete { color: var(--green); font-weight: 600; }
+        .status-warn { color: var(--amber); font-weight: 600; }
+        .status-incomplete { color: var(--red); font-weight: 600; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card h4 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 1.05em;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid var(--bg);
+        }
+
+        .timeline-item strong {
+            color: var(--text-1);
+        }
+
+        .risk-high { color: var(--red); }
+        .risk-medium { color: var(--amber); }
+        .risk-low { color: var(--green); }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            .hero-header { flex-direction: column; }
+            .hero-title h1 { font-size: 1.8em; }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-3);
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <!-- HERO SECTION -->
+        <div class="hero">
+            <div class="hero-content">
+                <div class="hero-header">
+                    <div class="hero-title">
+                        <h1>Intelligent Transaction Monitoring & Fraud Detection</h1>
+                        <p>PayGuard Fraud Shield — Real-time AML/Fraud detection for South African fintech</p>
+                        <div class="hero-meta">
+                            <div class="badge badge-status">In Progress</div>
+                            <div class="badge badge-priority">Priority P1</div>
+                            <div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill"></div>
+                                </div>
+                                <div class="progress-label">75% Complete</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="owner-info">
+                        <div><strong>Owner:</strong> Peter Onu (Engineer)</div>
+                        <div><strong>Lead:</strong> Malcolm Govender (Head of AI & Engineering)</div>
+                        <div><strong>Repository:</strong> github.com/MalcolmGov/payguard-fraud-shield</div>
+                    </div>
+                </div>
+
+                <div class="tech-stack">
+                    <span class="tech-tag">Apache Kafka</span>
+                    <span class="tech-tag">Python FastAPI</span>
+                    <span class="tech-tag">Neo4j</span>
+                    <span class="tech-tag">TypeScript/Node.js</span>
+                    <span class="tech-tag">React</span>
+                    <span class="tech-tag">Docker/Kubernetes</span>
+                    <span class="tech-tag">PostgreSQL</span>
+                    <span class="tech-tag">Redis</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXECUTIVE SUMMARY -->
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p>PayGuard Fraud Shield is a real-time transaction monitoring system designed to detect fraudulent transactions, money laundering patterns, and sanctions violations in South African fintech operations. The platform combines rule-based scoring with machine learning to identify suspicious activities across millions of daily transactions from mobile money providers like MTN MoMo.</p>
+
+            <h3>Business Value</h3>
+            <div class="list-item">Prevents financial crime losses (estimated R2.1B annually in SA fintech fraud)</div>
+            <div class="list-item">Enables FICA/AML regulatory compliance and SAR filing automation</div>
+            <div class="list-item">Real-time alert generation for fraud analysts (sub-second latency)</div>
+            <div class="list-item">Fraud ring detection via graph analytics — identifies coordinated attack patterns</div>
+            <div class="list-item">POPIA/PCI-DSS compliance for data protection and card handling</div>
+
+            <h3>Current State (75% Complete)</h3>
+            <p><strong>What's Built:</strong> Production Kafka pipeline, 26-rule scoring engine, Neo4j graph analysis, device binding service, React analyst dashboard, compliance documentation.</p>
+            <p><strong>What's Missing (25% Remaining Work):</strong> ML model implementation, AML/Sanctions database integration, anomaly detection engine, load testing, explainability framework (SHAP), human-in-the-loop case management, internal data integration.</p>
+
+            <h3>Production Readiness Gap</h3>
+            <p>The system is <strong>75% architecturally complete but 0% production-ready</strong> without the following critical components:</p>
+            <ul style="margin-left: 20px; color: var(--text-2);">
+                <li><strong>ML Models:</strong> ai_fraud_rules.py is a stub; requires trained XGBoost/Isolation Forest models</li>
+                <li><strong>AML/Sanctions:</strong> Rule 022 (sanctions screening) is disconnected; needs OFAC/UN/SARB watchlist integration</li>
+                <li><strong>Anomaly Detection:</strong> Only basic velocity rules; needs statistical models (Z-score, IQR, autoencoders)</li>
+                <li><strong>Load Validation:</strong> Untested at production volumes (MTN processes millions of transactions/day)</li>
+                <li><strong>Compliance Audit Trail:</strong> Missing explainability (SHAP) required for FICA suspicious activity reporting</li>
+            </ul>
+        </div>
+
+        <!-- TECHNICAL ARCHITECTURE -->
+        <div class="section">
+            <h2>Technical Architecture</h2>
+
+            <h3>System Components</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4>1. Transaction Ingestion</h4>
+                    <p><strong>Kafka Topic:</strong> transactions.inbound (25k msg/sec)</p>
+                    <p>Receives real-time transaction events from payment gateways, mobile money providers. Schema: {txn_id, amount, sender_id, receiver_id, timestamp, device_id, location, merchant_category}</p>
+                </div>
+                <div class="card">
+                    <h4>2. Risk Scoring Engine</h4>
+                    <p><strong>Service:</strong> fraud-risk-engine (Python FastAPI)</p>
+                    <p>26 composable rules: velocity, amount anomaly, geolocation jump, device fingerprinting, behavioral patterns. Produces risk_score (0-100).</p>
+                </div>
+                <div class="card">
+                    <h4>3. Graph Fraud Ring Detection</h4>
+                    <p><strong>Service:</strong> fraud_ring_detector.py (Neo4j)</p>
+                    <p>Detects coordinated fraud rings via graph traversal. Models: sender→receiver relationships, shared devices, shared IPs, shared locations.</p>
+                </div>
+                <div class="card">
+                    <h4>4. Device Binding Service</h4>
+                    <p><strong>Repo:</strong> device-binding/src/index.ts (TypeScript)</p>
+                    <p>Fingerprints devices (OS, browser, hardware identifiers) to detect multi-account abuse, SIM swap fraud.</p>
+                </div>
+                <div class="card">
+                    <h4>5. Signal API</h4>
+                    <p><strong>Repo:</strong> api/src/index.ts (TypeScript REST)</p>
+                    <p>Public API for risk assessment, device lookup, sanctions screening. Rate-limited (1k req/sec).</p>
+                </div>
+                <div class="card">
+                    <h4>6. Analyst Dashboard</h4>
+                    <p><strong>Repo:</strong> frontend/src (React)</p>
+                    <p>Real-time fraud alerts, transaction investigation, case management, rule performance analytics.</p>
+                </div>
+            </div>
+
+            <h3>Data Flow Architecture</h3>
+            <div class="code-block">
+Transaction Event
+    ↓
+[Kafka: transactions.inbound] — 25k msg/sec, 3-day retention
+    ↓
+[Risk Scoring Engine] — FastAPI, 26 rules (velocity, amount, geolocation, device, behavior)
+    ↓
+[Neo4j Graph] — fraud_ring_detector.py detects coordinated patterns
+    ↓
+[Alert Generation] — Kafka: fraud.alerts (high/medium/low severity)
+    ↓
+[Cache: Redis] — Device fingerprints, user risk profiles (5min TTL)
+    ↓
+[Persistent Store: PostgreSQL] — Transaction history, audit logs, case records
+    ↓
+[React Dashboard] — Real-time WebSocket updates for analyst review
+            </div>
+
+            <h3>Key APIs & Integrations</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Endpoint/Topic</th>
+                        <th>Protocol</th>
+                        <th>Latency SLA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Signal Risk API</td>
+                        <td>POST /api/v1/risk/assess</td>
+                        <td>REST/JSON</td>
+                        <td>&lt;200ms (p95)</td>
+                    </tr>
+                    <tr>
+                        <td>Device Binding</td>
+                        <td>POST /api/v1/device/fingerprint</td>
+                        <td>REST/JSON</td>
+                        <td>&lt;150ms (p95)</td>
+                    </tr>
+                    <tr>
+                        <td>Sanctions Screening (STUB)</td>
+                        <td>POST /api/v1/sanctions/check</td>
+                        <td>REST/JSON</td>
+                        <td>&lt;500ms (p95)</td>
+                    </tr>
+                    <tr>
+                        <td>Transaction Ingest</td>
+                        <td>transactions.inbound</td>
+                        <td>Kafka</td>
+                        <td>&lt;50ms (p99)</td>
+                    </tr>
+                    <tr>
+                        <td>Fraud Alerts</td>
+                        <td>fraud.alerts</td>
+                        <td>Kafka</td>
+                        <td>&lt;500ms (p95)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CURRENT IMPLEMENTATION -->
+        <div class="section">
+            <h2>Current Implementation Status</h2>
+
+            <h3>What's Built ✓ (75%)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Kafka Pipeline</td>
+                        <td><span class="status-complete">✓ BUILT</span></td>
+                        <td>Production-grade transactions.inbound topic, schema registry, 3-day retention, 25k msg/sec throughput validated in staging</td>
+                    </tr>
+                    <tr>
+                        <td>Risk Scoring Engine</td>
+                        <td><span class="status-complete">✓ BUILT</span></td>
+                        <td>26 rule handlers: velocity (Rule 001-005), amount anomaly (006-009), geolocation (010-015), device (016-020), behavioral (021-026)</td>
+                    </tr>
+                    <tr>
+                        <td>Neo4j Graph Analyzer</td>
+                        <td><span class="status-complete">✓ BUILT</span></td>
+                        <td>fraud_ring_detector.py implements graph traversal, ring detection, centrality analysis. Validated on test data</td>
+                    </tr>
+                    <tr>
+                        <td>Device Binding Service</td>
+                        <td><span class="status-complete">✓ BUILT</span></td>
+                        <td>TypeScript service with browser/OS fingerprinting, device clustering, anomaly detection for multi-account abuse</td>
+                    </tr>
+                    <tr>
+                        <td>Signal REST API</td>
+                        <td><span class="status-complete">✓ BUILT</span></td>
+                        <td>TypeScript/Express API, risk assessment endpoint, device lookup, rate limiting (1k req/sec), API key auth</td>
+                    </tr>
+                    <tr>
+                        <td>React Dashboard</td>
+                        <td><span class="status-complete">✓ BUILT</span></td>
+                        <td>Real-time alerts, transaction details, case investigation UI, analyst assignment, rule performance charts</td>
+                    </tr>
+                    <tr>
+                        <td>POPIA Compliance</td>
+                        <td><span class="status-complete">✓ BUILT</span></td>
+                        <td>Data Processing Agreement, data minimization policy, consent tracking, residency controls (ZA data in ZA DC)</td>
+                    </tr>
+                    <tr>
+                        <td>PCI-DSS Controls</td>
+                        <td><span class="status-complete">✓ BUILT</span></td>
+                        <td>Card data encryption (AES-256), masked storage, quarterly vulnerability scans, network segmentation</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>What's Missing ✗ (25%)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Status</th>
+                        <th>Impact</th>
+                        <th>Est. Effort</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ML Models (ai_fraud_rules.py)</td>
+                        <td><span class="status-incomplete">✗ STUB</span></td>
+                        <td>No actual ML; only if-then rules. Misses sophisticated fraud patterns. Rules degrade over time.</td>
+                        <td>4 weeks</td>
+                    </tr>
+                    <tr>
+                        <td>AML/Sanctions Integration (Rule 022)</td>
+                        <td><span class="status-incomplete">✗ STUB</span></td>
+                        <td>Cannot screen transactions against OFAC/UN/SARB watchlists. Compliance violation (FICA requirement).</td>
+                        <td>2 weeks</td>
+                    </tr>
+                    <tr>
+                        <td>Anomaly Detection Engine</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>Only velocity rules; misses statistical outliers. Required for advanced fraud detection.</td>
+                        <td>3 weeks</td>
+                    </tr>
+                    <tr>
+                        <td>Load Testing (Production Volumes)</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>Untested at 2M+ txns/day. Kafka, ML models, graph DB may bottleneck. P99 latency unknown.</td>
+                        <td>2 weeks</td>
+                    </tr>
+                    <tr>
+                        <td>Internal Data Integration</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>Current data: external only. Missing customer history, previous fraud flags, internal account linking.</td>
+                        <td>3 weeks</td>
+                    </tr>
+                    <tr>
+                        <td>Model Monitoring & Retraining</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>No drift detection, no A/B testing framework, no automated retraining. Models decay over time.</td>
+                        <td>3 weeks</td>
+                    </tr>
+                    <tr>
+                        <td>Explainability (SHAP)</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>No audit trail for risk decisions. FICA/POPIA compliance requires human-understandable explanations.</td>
+                        <td>2 weeks</td>
+                    </tr>
+                    <tr>
+                        <td>Case Management (Human-in-the-Loop)</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>No workflow for analyst investigation, no SAR (Suspicious Activity Report) auto-generation.</td>
+                        <td>2 weeks</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Code Snippets: Current State</h3>
+
+            <h4>Kafka Configuration (Working)</h4>
+            <div class="code-block">
+# docker-compose.yml
+version: '3'
+services:
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+    ports:
+      - "9092:9092"
+
+  risk-engine:
+    build: ./fraud-risk-engine
+    environment:
+      KAFKA_BROKERS: kafka:29092
+      REDIS_URL: redis://redis:6379
+      NEO4J_URI: bolt://neo4j:7687
+      LOG_LEVEL: INFO
+    depends_on:
+      - kafka
+      - redis
+      - neo4j
+            </div>
+
+            <h4>Risk Scoring Rules (Working — 26 Rules Implemented)</h4>
+            <div class="code-block">
+# fraud_risk_engine.py
+class RiskScorer:
+    RULES = {
+        '001': VelocityRule(window=10, threshold=5),      # 5 txns in 10min
+        '002': AmountAnomalyRule(zscore_threshold=3.0),   # Amount outlier
+        '003': GeolocationRule(km_threshold=1000),        # Impossible travel
+        '004': DeviceAnomalyRule(),                       # New device
+        '022': SanctionsRule(),                           # STUB - not implemented
+    }
+
+    def score(self, txn: Transaction) -> RiskScore:
+        total_score = 0
+        for rule_id, rule in self.RULES.items():
+            if rule.matches(txn):
+                total_score += rule.weight * rule.severity
+        return RiskScore(score=min(total_score, 100), rules_triggered=[...])
+            </div>
+
+            <h4>ML Models (STUB — Needs Implementation)</h4>
+            <div class="code-block">
+# ai_fraud_rules.py - CURRENTLY A STUB
+class MLFraudClassifier:
+    """
+    TODO: Implement XGBoost/Isolation Forest model
+    - Train on 12 months historical fraud labels
+    - Features: amount, velocity, device_age, geolocation, velocity_zscore
+    - Predict fraud probability (0-1)
+    - Drift detection: Monitor performance weekly
+    - Retraining: Auto-retrain monthly or on drift detection
+    """
+
+    def __init__(self):
+        self.model = None  # Should load: joblib.load('models/xgboost_v2.pkl')
+
+    def predict_fraud_score(self, txn: Transaction) -> float:
+        # STUB: Currently returns 0 (no fraud detection)
+        return 0.0  # TODO: Implement
+            </div>
+
+            <h4>Sanctions Screening (STUB — Rule 022)</h4>
+            <div class="code-block">
+# sanctions_rule.py
+class SanctionsRule(Rule):
+    """
+    TODO: Integrate with OFAC, UN, SARB watchlists
+    - Query OFAC API (daily refresh) or cached DB
+    - Cross-reference sender/receiver names against watchlist
+    - Return severity if match found
+    - Required for FICA compliance (AML/CTF)
+    """
+
+    def matches(self, txn: Transaction) -> bool:
+        # STUB: Always returns False
+        sender_name = txn.sender_name
+        receiver_name = txn.receiver_name
+        # TODO: Query sanctions DB
+        # return self.watchlist.contains(sender_name) or self.watchlist.contains(receiver_name)
+        return False
+            </div>
+        </div>
+
+        <!-- INTEGRATION POINTS -->
+        <div class="section">
+            <h2>Integration Points</h2>
+
+            <h3>External Systems & Data Sources</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>System</th>
+                        <th>Integration Type</th>
+                        <th>Frequency</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MTN MoMo (Payment Gateway)</td>
+                        <td>Kafka Topic: transactions.inbound</td>
+                        <td>Real-time (25k msg/sec)</td>
+                        <td><span class="status-complete">✓</span></td>
+                        <td>Schema validated, 3-day retention, high-volume tested in staging</td>
+                    </tr>
+                    <tr>
+                        <td>OFAC Sanctions Database</td>
+                        <td>REST API (OFAC.gov) + Local Cache</td>
+                        <td>Daily (00:00 UTC)</td>
+                        <td><span class="status-incomplete">✗ STUB</span></td>
+                        <td>Required for Rule 022 (AML/CTF compliance). Download → PostgreSQL cache</td>
+                    </tr>
+                    <tr>
+                        <td>UN Security Council Watchlist</td>
+                        <td>XML Feed (un.org/sc)</td>
+                        <td>Daily</td>
+                        <td><span class="status-incomplete">✗ STUB</span></td>
+                        <td>Supplementary to OFAC. Parse and cache locally</td>
+                    </tr>
+                    <tr>
+                        <td>SARB Guidance (Local Watchlist)</td>
+                        <td>Manual Upload + API</td>
+                        <td>As Updated</td>
+                        <td><span class="status-incomplete">✗ STUB</span></td>
+                        <td>South African Reserve Bank local watchlist. Admin-uploadable</td>
+                    </tr>
+                    <tr>
+                        <td>Customer Master Data</td>
+                        <td>Kafka Topic: customer.updates</td>
+                        <td>Event-driven</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>Internal CRM/KYC data. Required for account linking, history enrichment</td>
+                    </tr>
+                    <tr>
+                        <td>Historical Fraud Labels</td>
+                        <td>PostgreSQL Export</td>
+                        <td>Monthly (ML Training)</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>Manual labels from analyst review. Used for ML model training/validation</td>
+                    </tr>
+                    <tr>
+                        <td>Device Intelligence (3rd Party)</td>
+                        <td>REST API (e.g., FraudLabs Pro)</td>
+                        <td>Real-time</td>
+                        <td><span class="status-warn">⚠ OPTIONAL</span></td>
+                        <td>Enriches device fingerprinting. Cost ~R0.05/API call. Can use internal service</td>
+                    </tr>
+                    <tr>
+                        <td>SARS Transaction Reporting</td>
+                        <td>SFTP (SARS-Secure Server)</td>
+                        <td>Daily (SAR Filing)</td>
+                        <td><span class="status-incomplete">✗ MISSING</span></td>
+                        <td>Auto-generate Suspicious Activity Reports (SARs) for FICA. SFTP to SARS</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Internal Data Integration (Required for Production)</h3>
+            <p>Currently the system operates on external transaction data only. To move to production, connect these internal data sources:</p>
+            <div class="code-block">
+# Internal Data Sources (TODO)
+1. Customer Database
+   - Kafka Topic: customer.updates (CRM)
+   - Schema: {customer_id, name, phone, email, kyc_level, account_created, account_status}
+   - Used for: Velocity rules per customer, account linking, behavioral baseline
+
+2. Historical Fraud Labels
+   - PostgreSQL Table: fraud_labels
+   - Schema: {txn_id, analyst_decision, decision_date, sar_filed, case_id}
+   - Used for: ML model training, performance evaluation, false positive analysis
+
+3. Transaction History Archive
+   - PostgreSQL Table: transactions_historical (last 24 months)
+   - Schema: {txn_id, amount, sender_id, receiver_id, timestamp, status}
+   - Used for: Behavioral baseline, velocity calculations, anomaly detection
+
+4. Account Linking Graph
+   - Neo4j Relationship: LINKED_TO (same customer, shared payment method, etc.)
+   - Used for: Coordinated fraud ring detection, multi-account abuse
+            </div>
+        </div>
+
+        <!-- PRODUCTION REQUIREMENTS -->
+        <div class="section">
+            <h2>Production Requirements</h2>
+
+            <h3>Infrastructure & Deployment</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Environment</th>
+                        <th>Specs</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Kafka Cluster</td>
+                        <td>Kubernetes (EKS/AKS)</td>
+                        <td>3x brokers, 3x replicas, 1TB SSD storage</td>
+                        <td>25k msg/sec throughput required. 3-day retention = 6.5TB/cluster</td>
+                    </tr>
+                    <tr>
+                        <td>Risk Engine API</td>
+                        <td>Kubernetes (EKS/AKS)</td>
+                        <td>10x pods (autoscaling 5-20), 2 CPU / 4GB RAM each</td>
+                        <td>Load: 10k req/sec. P95 latency &lt;200ms. Horizontal scaling</td>
+                    </tr>
+                    <tr>
+                        <td>Neo4j Graph DB</td>
+                        <td>Managed (AWS Neptune / On-Prem Cluster)</td>
+                        <td>32GB RAM, 500GB NVMe storage, read replicas</td>
+                        <td>Fraud ring detection. Graph queries &lt;500ms. Monthly backups</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL (Audit/Transactions)</td>
+                        <td>Managed (RDS Multi-AZ) / On-Prem</td>
+                        <td>2 vCPU, 16GB RAM, 500GB SSD, automated backups</td>
+                        <td>SAR records, case management, labels for ML retraining</td>
+                    </tr>
+                    <tr>
+                        <td>Redis Cache</td>
+                        <td>Managed (ElastiCache / On-Prem)</td>
+                        <td>16GB cluster-mode, 3 shards, 5min TTL</td>
+                        <td>Device fingerprints, user risk profiles. High availability</td>
+                    </tr>
+                    <tr>
+                        <td>React Dashboard</td>
+                        <td>CloudFront CDN + S3 / Nginx</td>
+                        <td>Global edge locations, &lt;100ms latency</td>
+                        <td>Analyst access. Real-time WebSocket updates via API</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Security & Compliance (Critical for Fintech)</h3>
+
+            <h4>POPIA (Protection of Personal Information Act) — South Africa</h4>
+            <ul style="margin-left: 20px; color: var(--text-2);">
+                <li><strong>Data Minimization:</strong> Collect only necessary PII (sender name, phone, but not full ID). Implement data retention policies (delete transaction details after 90 days if not flagged).</li>
+                <li><strong>Consent:</strong> Ensure customers consent to fraud monitoring. Document in T&amp;Cs.</li>
+                <li><strong>Data Residency:</strong> All transaction data must reside in South African data centers (POPIA requirement). Use on-prem or AWS/Azure ZA regions only.</li>
+                <li><strong>Breach Notification:</strong> If PII is compromised, notify affected individuals within 72 hours and POPIA Regulator.</li>
+                <li><strong>Third-Party Processing:</strong> DPA required for any cloud provider or data processor.</li>
+            </ul>
+
+            <h4>FICA (Financial Intelligence Centre Act) — South Africa</h4>
+            <ul style="margin-left: 20px; color: var(--text-2);">
+                <li><strong>AML/CTF Reporting:</strong> File Suspicious Activity Reports (SARs) within 24 hours of detection to SARS. Implement SAR generation in case management system.</li>
+                <li><strong>Sanctions Screening:</strong> Screen all transactions against OFAC, UN, SARB watchlists (Rule 022). Mandatory — non-compliance = criminal liability.</li>
+                <li><strong>Audit Trail:</strong> Maintain audit logs of all rule decisions, analyst actions, SAR filings. Immutable (write-once database).</li>
+                <li><strong>KYC Requirements:</strong> Validate customer identity and beneficial ownership for high-risk transactions.</li>
+            </ul>
+
+            <h4>PCI-DSS Level 1 (Payment Card Industry)</h4>
+            <ul style="margin-left: 20px; color: var(--text-2);">
+                <li><strong>Card Data Encryption:</strong> AES-256 encryption at rest, TLS 1.2+ in transit. Key management (AWS KMS / HashiCorp Vault).</li>
+                <li><strong>Network Segmentation:</strong> Card data isolated in separate VLAN/security group. No cross-traffic to non-payment systems.</li>
+                <li><strong>Quarterly Vulnerability Scans:</strong> External pen testing by approved vendors (e.g., Trustwave, Qualys).</li>
+                <li><strong>Annual Audit:</strong> SOC 2 Type II attestation or PCI-DSS audit report required.</li>
+            </ul>
+
+            <h4>SARB Guidance Note 4 of 2017 (Cyber Resilience)</h4>
+            <ul style="margin-left: 20px; color: var(--text-2);">
+                <li><strong>Incident Response Plan:</strong> Document response procedures for fraud ring detection, system compromise, data breach.</li>
+                <li><strong>Business Continuity:</strong> RTO &lt;4 hours, RPO &lt;1 hour. Tested failover to secondary data center.</li>
+                <li><strong>Access Controls:</strong> MFA for all admin/analyst accounts. Audit logs of access (who accessed what, when).</li>
+                <li><strong>Risk Assessment:</strong> Annual cyber risk assessment. Remediate critical findings within 30 days.</li>
+            </ul>
+
+            <h3>Monitoring & Alerting</h3>
+            <div class="code-block">
+Key Metrics to Monitor:
+1. Fraud Detection Performance
+   - True Positive Rate (% of fraud caught)
+   - False Positive Rate (alert fatigue)
+   - Mean Time to Detection (MTTD)
+   - Coverage: % of transactions scanned
+
+2. System Health
+   - Kafka lag (should be &lt;500ms)
+   - Risk engine P99 latency (&lt;200ms)
+   - Neo4j query time (&lt;500ms)
+   - PostgreSQL connection pool utilization
+
+3. Compliance Metrics
+   - SAR filing time (target: within 24 hours of detection)
+   - Audit log completeness (0% missing entries)
+   - Data residency violations (0)
+
+Alerting Thresholds:
+- Kafka lag &gt; 5 sec → Page on-call engineer
+- Risk engine error rate &gt; 0.5% → Alert DevOps
+- False positive rate &gt; 30% → Alert fraud team lead
+- PII data egress &gt; baseline → Lock down, escalate to security
+            </div>
+        </div>
+
+        <!-- IMPLEMENTATION GUIDELINES -->
+        <div class="section">
+            <h2>Implementation Guidelines</h2>
+
+            <h3>Phase 1: ML Model Training & Deployment (Weeks 1-4)</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Week 1: Data Preparation</strong><br/>
+                    <span style="color: var(--text-3);">Export 12 months historical transaction data + fraud labels from PostgreSQL. Feature engineering: amount, velocity, geolocation, device, behavioral features. Split: 80% train, 10% val, 10% test.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 2: Model Training</strong><br/>
+                    <span style="color: var(--text-3);">Train XGBoost and Isolation Forest models. Hyperparameter tuning via GridSearchCV. Evaluate: AUC-ROC, precision, recall, F1. Target: AUC &gt;0.90.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 3: Explainability & Validation</strong><br/>
+                    <span style="color: var(--text-3);">Add SHAP values for model interpretability (required for FICA audit trail). Validate on holdout test set. Document decision rationale for compliance.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 4: Integration & Testing</strong><br/>
+                    <span style="color: var(--text-3);">Replace ai_fraud_rules.py stub with trained models. Load models into risk engine. Integration test: end-to-end transaction → risk score. Stress test at 10k req/sec.</span>
+                </div>
+            </div>
+
+            <h3>Phase 2: AML/Sanctions Integration (Weeks 5-6)</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Week 5: Watchlist Integration</strong><br/>
+                    <span style="color: var(--text-3);">Integrate OFAC API (daily refresh). Implement local PostgreSQL cache (sanctions_watchlist table). Create Rule 022 sanctions screening handler. Test: known sanctioned names must trigger alert.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 6: SAR Filing Automation</strong><br/>
+                    <span style="color: var(--text-3);">Implement SAR (Suspicious Activity Report) auto-generation in case management. Schema: {txn_id, risk_score, rules_triggered, analyst_notes, sar_filed_date}. Test SFTP upload to SARS secure server.</span>
+                </div>
+            </div>
+
+            <h3>Phase 3: Anomaly Detection (Weeks 7-9)</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Week 7: Statistical Models</strong><br/>
+                    <span style="color: var(--text-3);">Implement Z-score and IQR-based anomaly detection for transaction amounts. Per-customer baseline calculation (running mean/stddev). Flag transactions &gt;3σ from baseline.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 8: Autoencoder (Optional Advanced)</strong><br/>
+                    <span style="color: var(--text-3);">Train sparse autoencoder on normal transaction patterns. Reconstruction error → anomaly score. Complements ML model for pattern discovery.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 9: Integration & Tuning</strong><br/>
+                    <span style="color: var(--text-3);">Add anomaly scores to risk engine. Tune thresholds to balance detection vs. false positives. Backtest on historical data.</span>
+                </div>
+            </div>
+
+            <h3>Phase 4: Load Testing & Optimization (Weeks 10-11)</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Week 10: Production Volume Testing</strong><br/>
+                    <span style="color: var(--text-3);">Load test Kafka pipeline at 2M txns/day (25k msg/sec). Monitor: CPU, memory, latency. Identify bottlenecks. Risk engine: test 10k req/sec. Neo4j: graph query performance under load.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 11: Optimization & Failover</strong><br/>
+                    <span style="color: var(--text-3);">Optimize slow queries. Add database indices. Implement circuit breakers for downstream dependencies. Test failover: Kafka broker loss, DB failure, Neo4j unavailability. Verify RTO &lt;4 hours.</span>
+                </div>
+            </div>
+
+            <h3>Phase 5: Case Management & Human-in-the-Loop (Weeks 12-13)</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Week 12: Workflow Automation</strong><br/>
+                    <span style="color: var(--text-3);">Build case management system: create case on high-risk alert, assign to analyst, track investigation status (open/investigating/resolved/false_positive). Implement SAR filing workflow.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 13: Feedback Loop</strong><br/>
+                    <span style="color: var(--text-3);">Analyst feedback → training labels. Implement label upload, store in PostgreSQL. Use for monthly model retraining. Measure improvement (AUC, coverage).</span>
+                </div>
+            </div>
+
+            <h3>Phase 6: Production Hardening & Compliance (Weeks 14-15)</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <strong>Week 14: Security & Compliance Audit</strong><br/>
+                    <span style="color: var(--text-3);">PCI-DSS assessment: card data encryption, network segmentation, access logs. POPIA audit: data minimization, residency, consent. FICA audit: SAR workflow, sanctions screening, audit trail. Document all controls.</span>
+                </div>
+                <div class="timeline-item">
+                    <strong>Week 15: Deployment & Runbooks</strong><br/>
+                    <span style="color: var(--text-3);">Deploy to production Kubernetes cluster. Document runbooks: incident response, model retraining, watchlist updates, SAR filing. Train fraud analysts on dashboard and case management.</span>
+                </div>
+            </div>
+
+            <h3>Commands & Docker Configuration</h3>
+            <div class="code-block">
+# Train ML Models
+cd fraud-risk-engine
+python scripts/train_models.py \
+  --input-data /data/transactions_labeled.csv \
+  --output-dir ./models \
+  --test-size 0.1 \
+  --random-state 42
+
+# Deploy to Kubernetes
+kubectl create namespace fraud-detection
+helm install payguard ./helm/fraud-shield \
+  --namespace fraud-detection \
+  --values ./helm/values-prod.yaml
+
+# Check deployment status
+kubectl rollout status deployment/fraud-risk-engine -n fraud-detection
+
+# Scale risk engine (manual)
+kubectl scale deployment fraud-risk-engine --replicas=15 -n fraud-detection
+
+# Monitor logs
+kubectl logs -f deployment/fraud-risk-engine -n fraud-detection -c risk-engine
+
+# Backup PostgreSQL (daily)
+pg_dump fraud_detection_db > /backups/fraud_db_$(date +%Y%m%d).sql
+gzip /backups/fraud_db_*.sql
+aws s3 cp /backups/ s3://backups/fraud-detection/
+            </div>
+
+            <h3>Environment Variables (Production)</h3>
+            <div class="code-block">
+# .env.prod (Kubernetes ConfigMap)
+KAFKA_BROKERS=kafka-1:9092,kafka-2:9092,kafka-3:9092
+KAFKA_SECURITY_PROTOCOL=SSL
+KAFKA_SSL_TRUSTSTORE=/etc/secrets/kafka-truststore.jks
+
+NEO4J_URI=bolt://neo4j-primary:7687
+NEO4J_AUTH_USER=neo4j
+NEO4J_AUTH_PASSWORD=[VAULT]
+
+POSTGRESQL_HOST=fraud-db-prod.rds.amazonaws.com
+POSTGRESQL_USER=fraud_app
+POSTGRESQL_PASSWORD=[VAULT]
+POSTGRESQL_SSL_MODE=require
+
+REDIS_HOST=fraud-cache.ng7xy2.ng.0001.use1.cache.amazonaws.com
+REDIS_PORT=6379
+REDIS_SSL=true
+
+OPENAI_API_KEY=[VAULT]  # For SHAP explainability
+
+MODEL_PATH=/models/xgboost_v2.pkl
+SANCTIONS_DB_PATH=/data/sanctions_watchlist.sqlite
+
+LOG_LEVEL=INFO
+ENVIRONMENT=production
+REGION=za-south-1
+            </div>
+        </div>
+
+        <!-- GAP ANALYSIS -->
+        <div class="section">
+            <h2>Gap Analysis: 25% Remaining Work</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Status</th>
+                        <th>Owner</th>
+                        <th>Est. Days</th>
+                        <th>Priority</th>
+                        <th>Blocker?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ML Model Training (XGBoost)</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>Peter Onu</td>
+                        <td>20</td>
+                        <td>P1</td>
+                        <td>Yes (core detection)</td>
+                    </tr>
+                    <tr>
+                        <td>OFAC/UN/SARB Integration</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>Peter Onu</td>
+                        <td>10</td>
+                        <td>P1</td>
+                        <td>Yes (FICA compliance)</td>
+                    </tr>
+                    <tr>
+                        <td>Anomaly Detection (Z-score, IQR)</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>Peter Onu</td>
+                        <td>15</td>
+                        <td>P1</td>
+                        <td>No (enhances detection)</td>
+                    </tr>
+                    <tr>
+                        <td>Load Testing (2M txns/day)</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>Peter Onu + DevOps</td>
+                        <td>10</td>
+                        <td>P1</td>
+                        <td>Yes (production validation)</td>
+                    </tr>
+                    <tr>
+                        <td>Internal Data Integration (CRM/KYC)</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>Peter Onu + Data Eng</td>
+                        <td>15</td>
+                        <td>P2</td>
+                        <td>No (nice-to-have initially)</td>
+                    </tr>
+                    <tr>
+                        <td>Model Drift Detection & Retraining</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>Peter Onu + MLOps</td>
+                        <td>15</td>
+                        <td>P2</td>
+                        <td>No (post-launch)</td>
+                    </tr>
+                    <tr>
+                        <td>SHAP Explainability Framework</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>Peter Onu</td>
+                        <td>10</td>
+                        <td>P1</td>
+                        <td>Yes (FICA audit trail)</td>
+                    </tr>
+                    <tr>
+                        <td>Case Management & SAR Workflow</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>Peter Onu + Frontend</td>
+                        <td>12</td>
+                        <td>P1</td>
+                        <td>Yes (compliance)</td>
+                    </tr>
+                    <tr>
+                        <td>POPIA/FICA/PCI-DSS Compliance Audit</td>
+                        <td><span class="status-warn">⚠</span></td>
+                        <td>Compliance + Security</td>
+                        <td>8</td>
+                        <td>P1</td>
+                        <td>Yes (regulatory)</td>
+                    </tr>
+                    <tr>
+                        <td>Production Kubernetes Hardening</td>
+                        <td><span class="status-incomplete">✗</span></td>
+                        <td>DevOps + Security</td>
+                        <td>8</td>
+                        <td>P1</td>
+                        <td>Yes (deployment)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Summary:</strong> 113 days of work remaining (23 weeks at 5 days/week). Critical blockers: ML models, AML/sanctions, SHAP explainability, case management. Without these, system cannot be production-ready.</p>
+        </div>
+
+        <!-- RACI MATRIX -->
+        <div class="section">
+            <h2>RACI Matrix</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Peter Onu</th>
+                        <th>Malcolm G.</th>
+                        <th>DevOps/Infra</th>
+                        <th>Compliance/Risk</th>
+                        <th>Business</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ML Model Training</td>
+                        <td>R/A</td>
+                        <td>Consult</td>
+                        <td>Support (GPU)</td>
+                        <td>—</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>AML/Sanctions Integration</td>
+                        <td>R/A</td>
+                        <td>Consult</td>
+                        <td>—</td>
+                        <td>Approve</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>Load Testing</td>
+                        <td>R</td>
+                        <td>A</td>
+                        <td>R</td>
+                        <td>—</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>POPIA/FICA/PCI-DSS Audit</td>
+                        <td>Support</td>
+                        <td>Consult</td>
+                        <td>Support</td>
+                        <td>R/A</td>
+                        <td>Approve</td>
+                    </tr>
+                    <tr>
+                        <td>Case Management System</td>
+                        <td>R/A</td>
+                        <td>Consult</td>
+                        <td>Support (Infra)</td>
+                        <td>Consult</td>
+                        <td>Approve</td>
+                    </tr>
+                    <tr>
+                        <td>Production Deployment</td>
+                        <td>Support</td>
+                        <td>A</td>
+                        <td>R</td>
+                        <td>Support (audit)</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>Runbook & Incident Response</td>
+                        <td>R</td>
+                        <td>A</td>
+                        <td>R</td>
+                        <td>Consult</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>Analyst Training</td>
+                        <td>Support</td>
+                        <td>A</td>
+                        <td>—</td>
+                        <td>Consult</td>
+                        <td>R</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Legend:</strong> R = Responsible (does the work) | A = Accountable (final approval) | Consult = Provides input | Support = Helps as needed | — = Not involved</p>
+        </div>
+
+        <!-- RISK REGISTER -->
+        <div class="section">
+            <h2>Risk Register</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Risk</th>
+                        <th>Probability</th>
+                        <th>Impact</th>
+                        <th>Mitigation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ML Model Accuracy Poor</strong><br/>Trained models fail to detect fraud or produce high false positives</td>
+                        <td class="risk-medium">Medium</td>
+                        <td class="risk-high">High (core functionality)</td>
+                        <td>Allocate 4 weeks for feature engineering, hyperparameter tuning. Backtest on 12mo historical data. Validate AUC &gt;0.90 before prod. Monthly retraining.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kafka Pipeline Bottleneck</strong><br/>Unable to process 25k msg/sec at production volumes</td>
+                        <td class="risk-low">Low</td>
+                        <td class="risk-high">High (system fails)</td>
+                        <td>Load test at 2M txns/day in week 10. Monitor broker CPU/memory. Scale horizontally (add brokers). Implement consumer lag alerting.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OFAC Integration Failure</strong><br/>Sanctions screening doesn't work; FICA violation</td>
+                        <td class="risk-medium">Medium</td>
+                        <td class="risk-high">High (legal liability)</td>
+                        <td>Implement in week 5-6. Test with known sanctioned names. Daily reconciliation of watchlist cache vs. OFAC API. Audit trail of all queries.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Residency Breach</strong><br/>Customer data leaves South Africa (POPIA violation)</td>
+                        <td class="risk-low">Low</td>
+                        <td class="risk-high">High (regulatory fine, criminal)</td>
+                        <td>Use on-prem or AWS/Azure ZA regions only. Restrict S3 bucket to ZA. Encrypt data at rest. Quarterly residency audit.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Model Drift Undetected</strong><br/>Fraud patterns change; model accuracy degrades over time</td>
+                        <td class="risk-high">High</td>
+                        <td class="risk-medium">Medium (degraded detection)</td>
+                        <td>Implement drift detection in week 12 (monitor AUC, false positive rate). Auto-trigger retraining if AUC drops &gt;5%. Monthly retraining cycle.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Neo4j Graph DB Overload</strong><br/>Ring detection queries slow under production load</td>
+                        <td class="risk-medium">Medium</td>
+                        <td class="risk-medium">Medium (increased latency)</td>
+                        <td>Load test graph queries in week 10. Profile slow queries. Add indices on frequently-searched properties. Consider query caching.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Analyst Dashboard Down</strong><br/>Fraud analysts cannot investigate cases</td>
+                        <td class="risk-low">Low</td>
+                        <td class="risk-medium">Medium (manual process fallback)</td>
+                        <td>Deploy on Kubernetes with ≥2 replicas. CloudFront CDN for static assets. Implement health checks. RTO &lt;30 min. Provide manual query access to PostgreSQL.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Compliance Audit Failure</strong><br/>PCI-DSS, POPIA, or FICA audit fails; cannot launch</td>
+                        <td class="risk-medium">Medium</td>
+                        <td class="risk-high">High (launch blocked)</td>
+                        <td>Start compliance audit in week 14 (not week 15). Engage Compliance/Risk early. Document all controls (encryption, access logs, audit trail) as you build. External auditor review by week 14.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- EFFORT ESTIMATE -->
+        <div class="section">
+            <h2>Effort Estimate: Remaining Work to Production</h2>
+
+            <h3>Summary</h3>
+            <p><strong>Total Effort: 113 person-days (~23 weeks, assuming 1 FTE)</strong></p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h4>Phase 1: ML Models (20 days)</h4>
+                    <p>Data prep, model training, SHAP integration, validation</p>
+                </div>
+                <div class="card">
+                    <h4>Phase 2: AML/Sanctions (10 days)</h4>
+                    <p>OFAC integration, SAR automation</p>
+                </div>
+                <div class="card">
+                    <h4>Phase 3: Anomaly Detection (15 days)</h4>
+                    <p>Z-score, IQR, optional autoencoder</p>
+                </div>
+                <div class="card">
+                    <h4>Phase 4: Load Testing (10 days)</h4>
+                    <p>Stress test, bottleneck analysis, optimization</p>
+                </div>
+                <div class="card">
+                    <h4>Phase 5: Case Management (12 days)</h4>
+                    <p>Workflow automation, feedback loop</p>
+                </div>
+                <div class="card">
+                    <h4>Phase 6: Compliance & Deploy (16 days)</h4>
+                    <p>Security audit, Kubernetes hardening, training, deployment</p>
+                </div>
+                <div class="card">
+                    <h4>Phase X: Internal Data Integration (15 days)</h4>
+                    <p>CRM/KYC integration (post-launch improvement)</p>
+                </div>
+                <div class="card">
+                    <h4>Phase X: Model Monitoring (15 days)</h4>
+                    <p>Drift detection, retraining pipeline (post-launch)</p>
+                </div>
+            </div>
+
+            <h3>Resource Allocation</h3>
+            <p><strong>Required for 23-week timeline:</strong></p>
+            <ul style="margin-left: 20px; color: var(--text-2);">
+                <li><strong>Peter Onu (Engineer):</strong> 1.0 FTE (all phases)</li>
+                <li><strong>Malcolm Govender (Lead):</strong> 0.3 FTE (oversight, architecture, release sign-off)</li>
+                <li><strong>DevOps/Platform:</strong> 0.5 FTE (Kubernetes, load testing, monitoring setup)</li>
+                <li><strong>Security/Compliance:</strong> 0.4 FTE (audit, controls documentation)</li>
+                <li><strong>QA/Testing:</strong> 0.3 FTE (integration testing, edge cases)</li>
+            </ul>
+
+            <h3>Budget Estimate (South African Market)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Cost</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Peter Onu (23 weeks @ R80k/week)</td>
+                        <td>R1,840,000</td>
+                        <td>1.0 FTE engineer effort</td>
+                    </tr>
+                    <tr>
+                        <td>Support Staff (Malcolm, DevOps, Compliance, QA)</td>
+                        <td>R1,150,000</td>
+                        <td>0.3+0.5+0.4+0.3 = 1.5 FTE @ weighted rate</td>
+                    </tr>
+                    <tr>
+                        <td>AWS/Cloud Infrastructure (23 weeks)</td>
+                        <td>R450,000</td>
+                        <td>Kafka, RDS, Neptune, ElastiCache, EKS</td>
+                    </tr>
+                    <tr>
+                        <td>External Compliance Audit</td>
+                        <td>R150,000</td>
+                        <td>PCI-DSS, POPIA, FICA audit (1-2 weeks)</td>
+                    </tr>
+                    <tr>
+                        <td>3rd-party Data Services (OFAC, UN, etc.)</td>
+                        <td>R80,000</td>
+                        <td>API subscriptions, watchlist feeds, pen testing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td><strong>R3,670,000</strong></td>
+                        <td>~USD $200k equivalent</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- DEFINITION OF DONE -->
+        <div class="section">
+            <h2>Definition of Done: Production Readiness Checklist</h2>
+
+            <h3>Technical Readiness</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Criterion</th>
+                        <th>Status</th>
+                        <th>Evidence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ML models deployed (XGBoost, Isolation Forest)</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Models in /models/xgboost_v2.pkl, AUC &gt;0.90, SHAP explanations working</td>
+                    </tr>
+                    <tr>
+                        <td>OFAC/UN/SARB sanctions screening live</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Rule 022 triggers for all known sanctioned entities. Audit log of queries.</td>
+                    </tr>
+                    <tr>
+                        <td>Anomaly detection engine active</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Z-score, IQR models deployed. Anomaly alerts in system.</td>
+                    </tr>
+                    <tr>
+                        <td>Load tested at 2M txns/day</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Kafka lag &lt;500ms, risk engine P95 &lt;200ms at 25k msg/sec. No errors.</td>
+                    </tr>
+                    <tr>
+                        <td>Case management system live</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Analysts can create/investigate cases, file SARs. SAR workflow automated.</td>
+                    </tr>
+                    <tr>
+                        <td>Dashboard real-time updates working</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>WebSocket updates, &lt;5sec alert notification delay. No lost updates.</td>
+                    </tr>
+                    <tr>
+                        <td>Database backups automated</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Daily PostgreSQL/Neo4j backups to S3. RPO &lt;1 hour. Restore test passed.</td>
+                    </tr>
+                    <tr>
+                        <td>Monitoring & alerting configured</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Prometheus/CloudWatch dashboards. Alert thresholds set. On-call rotation ready.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Compliance Readiness</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Compliance Requirement</th>
+                        <th>Status</th>
+                        <th>Evidence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>POPIA:</strong> Data residency (ZA only)</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>AWS/Azure ZA region verified. Audit log of all data transfers. S3 bucket region-locked.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>POPIA:</strong> Encryption at rest (AES-256)</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>RDS encrypted, KMS key configured, key rotation enabled. Test decryption/re-encryption.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>POPIA:</strong> Consent documented</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Customer T&amp;Cs updated. Consent tracking in customer DB. Audit trail of consent.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>FICA:</strong> AML/CTF reporting (SAR filing)</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>SAR auto-generated on high-risk alerts. SFTP upload to SARS tested. Records audited.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>FICA:</strong> Sanctions screening active</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Rule 022 live. All txns checked against OFAC/UN/SARB. 0% bypass rate.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCI-DSS:</strong> Card data encryption TLS 1.2+</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>TLS 1.2+ enforced on all APIs. Certificate pinning tested. SSL Labs A+ rating.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCI-DSS:</strong> Network segmentation</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Card data isolated in separate VPC/security group. No cross-traffic to other systems.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PCI-DSS:</strong> Quarterly pen test</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>External pen test scheduled. High/critical findings remediated. Report filed.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SARB Guidance 4/2017:</strong> Incident response plan</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Runbook documented. Response times defined (4hr RTO). Simulated incident response drill passed.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SARB Guidance 4/2017:</strong> Cyber risk assessment</td>
+                        <td><span class="status-incomplete">✗ TODO</span></td>
+                        <td>Annual assessment completed. Critical findings &lt;30 days. Risk dashboard updated.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Operational Readiness</h3>
+            <ul style="margin-left: 20px; color: var(--text-2); line-height: 2;">
+                <li>Runbooks written: deployment, incident response, model retraining, SAR filing, failover procedures</li>
+                <li>On-call rotation established (fraud engineer, DevOps, security contact)</li>
+                <li>Analyst training completed (dashboard usage, case management, SAR workflow)</li>
+                <li>SLA agreements signed (RTO &lt;4 hrs, RPO &lt;1 hr, 99.9% availability target)</li>
+                <li>Change management process in place (code review, staging validation, blue-green deployment)</li>
+                <li>Communication plan: who to notify on fraud ring detection, system outage, data breach</li>
+            </ul>
+        </div>
+
+        <!-- ACTION ITEMS -->
+        <div class="section">
+            <h2>Immediate Action Items (Next 2 Weeks)</h2>
+
+            <h3>Priority 1: Start ML Model Development</h3>
+            <div class="list-item"><strong>Action:</strong> Peter Onu to begin ML model training pipeline (Week 1)</div>
+            <div class="list-item"><strong>Deliverable:</strong> Feature engineering script, train/val/test splits, baseline XGBoost model</div>
+            <div class="list-item"><strong>Owner:</strong> Peter Onu</div>
+            <div class="list-item"><strong>Due:</strong> 1 week</div>
+
+            <h3>Priority 2: OFAC Integration Planning</h3>
+            <div class="list-item"><strong>Action:</strong> Peter Onu to design OFAC API integration and local cache schema</div>
+            <div class="list-item"><strong>Deliverable:</strong> Design doc, PostgreSQL schema for sanctions_watchlist table, API contract</div>
+            <div class="list-item"><strong>Owner:</strong> Peter Onu</div>
+            <div class="list-item"><strong>Due:</strong> 1 week (so it can start in week 5)</div>
+
+            <h3>Priority 3: Load Testing Environment Setup</h3>
+            <div class="list-item"><strong>Action:</strong> DevOps to provision staging environment with production-like Kafka/DB specs</div>
+            <div class="list-item"><strong>Deliverable:</strong> Staging cluster live, Kafka topics pre-created, data generation script ready</div>
+            <div class="list-item"><strong>Owner:</strong> DevOps/Malcolm Govender</div>
+            <div class="list-item"><strong>Due:</strong> 2 weeks (needed for week 10 load testing)</div>
+
+            <h3>Priority 4: Compliance & Risk Engagement</h3>
+            <div class="list-item"><strong>Action:</strong> Malcolm Govender to engage Compliance/Risk team for early audit planning</div>
+            <div class="list-item"><strong>Deliverable:</strong> Compliance checklist, audit schedule, control documentation started</div>
+            <div class="list-item"><strong>Owner:</strong> Malcolm Govender + Compliance</div>
+            <div class="list-item"><strong>Due:</strong> 1 week</div>
+
+            <h3>Priority 5: Stakeholder Communication</h3>
+            <div class="list-item"><strong>Action:</strong> Malcolm Govender to brief business on 23-week timeline and resource needs</div>
+            <div class="list-item"><strong>Deliverable:</strong> Project plan approved, budget allocated, milestones communicated</div>
+            <div class="list-item"><strong>Owner:</strong> Malcolm Govender</div>
+            <div class="list-item"><strong>Due:</strong> 1 week</div>
+        </div>
+
+        <div class="footer">
+            <p>Production Readiness Report: Intelligent Transaction Monitoring & Fraud Detection</p>
+            <p>Generated: May 8, 2026 | Owner: Peter Onu | Lead: Malcolm Govender (Head of AI & Engineering)</p>
+            <p>South African Fintech AI Transformation Initiative</p>
+        </div>
+    </div>
+</body>
+</html>

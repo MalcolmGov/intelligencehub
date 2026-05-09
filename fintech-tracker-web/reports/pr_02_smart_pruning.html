@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PR-02: Test Case Optimization / Smart Pruning</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1d2e;
+      --surface: #20243c;
+      --surface2: #252942;
+      --surface3: #2d3155;
+      --border: #2e3358;
+      --text-1: #e8eaff;
+      --text-2: #8b93c4;
+      --text-3: #555e8a;
+      --accent: #0073ea;
+      --green: #00c875;
+      --amber: #fdab3d;
+      --red: #f87171;
+      --purple: #a78bfa;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text-1);
+      line-height: 1.6;
+      padding: 0;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+    
+    /* Hero Header */
+    .hero {
+      background: linear-gradient(135deg, var(--surface3) 0%, var(--surface2) 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3rem;
+      margin-bottom: 2rem;
+    }
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .hero-subtitle {
+      color: var(--text-2);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+    .badge-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+    .badge-status-inprogress {
+      background: rgba(253, 171, 61, 0.15);
+      color: var(--amber);
+      border: 1px solid rgba(253, 171, 61, 0.3);
+    }
+    .badge-priority-high {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+    .badge-tech {
+      background: rgba(0, 115, 234, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(0, 115, 234, 0.3);
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--surface);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--amber), var(--accent));
+      width: 20%;
+    }
+    
+    /* Sections */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--surface3);
+    }
+    
+    /* Cards */
+    .card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .card-text {
+      color: var(--text-2);
+      font-size: 0.95rem;
+    }
+    
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th {
+      background: var(--surface3);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--text-2);
+    }
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    tr:hover { background: var(--surface3); }
+    
+    /* Status indicators */
+    .status-done { color: var(--green); font-weight: 600; }
+    .status-partial { color: var(--amber); font-weight: 600; }
+    .status-missing { color: var(--red); font-weight: 600; }
+    
+    /* Code block */
+    .code-block {
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: var(--text-2);
+    }
+    
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+    
+    /* Lists */
+    ul, ol {
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+    }
+    li {
+      margin-bottom: 0.5rem;
+      color: var(--text-2);
+    }
+    
+    .highlight {
+      background: rgba(0, 115, 234, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 4px;
+    }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .footer {
+      text-align: center;
+      padding-top: 2rem;
+      margin-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-3);
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+  <div class="container">
+    <!-- HERO HEADER -->
+    <div class="hero">
+      <div class="hero-title">Test Case Optimization / Smart Pruning</div>
+      <div class="hero-subtitle">SentinelQA Use Case #2 — Anupam Sharma (Head of QA Automation)</div>
+      
+      <div class="badge-group">
+        <span class="badge badge-status-inprogress">⏳ In Progress (20%)</span>
+        <span class="badge badge-priority-high">🔴 High Priority</span>
+        <span class="badge badge-tech">Python</span>
+        <span class="badge badge-tech">FastAPI</span>
+        <span class="badge badge-tech">ML (scikit-learn/XGBoost)</span>
+        <span class="badge badge-tech">React</span>
+        <span class="badge badge-tech">PostgreSQL</span>
+      </div>
+      
+      <div style="font-size: 0.95rem; color: var(--text-2); margin-bottom: 1rem;">
+        <strong>Completion:</strong> 20% | <strong>Owner:</strong> Anupam Sharma | <strong>Status:</strong> STUB PHASE
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <div class="section">
+      <div class="section-title">Executive Summary</div>
+      <div class="card">
+        <div class="card-title">What It Does</div>
+        <div class="card-text">
+          Intelligent test case optimization leverages AI to identify redundant, overlapping, and low-value regression tests within the test suite. The system analyzes test coverage relationships, execution history, defect correlation, and code churn patterns to recommend pruning strategies that reduce overall test execution time while maintaining or improving defect detection capability.
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Business Value</div>
+        <ul style="margin-top: 0.5rem;">
+          <li><strong>Reduce test execution time</strong> by 30-40% through intelligent pruning</li>
+          <li><strong>Improve CI/CD velocity</strong> without sacrificing coverage</li>
+          <li><strong>Lower infrastructure costs</strong> by reducing test resource consumption</li>
+          <li><strong>Faster feedback loops</strong> for developers (< 10 min regression runs)</li>
+          <li><strong>Maintain or improve defect detection</strong> through ML-driven coverage analysis</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Current State</div>
+        <div class="card-text">
+          Only a 23-line STUB exists in <code>regression_optimiser.py</code>. No scoring algorithm, no coverage analysis engine, no UI integration. The foundation for test metadata ingestion and feature engineering is missing entirely.
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">What's Needed to Reach Production</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>Implement full test coverage analysis algorithm</li>
+          <li>Build ML scoring model (redundancy + low-value detection)</li>
+          <li>Integrate with test execution backends (pytest, Jest, Selenium Hub)</li>
+          <li>Wire React UI to backend scoring API</li>
+          <li>Deploy to production with monitoring & alerting</li>
+          <li>Establish A/B testing framework to validate recommendations</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CURRENT IMPLEMENTATION -->
+    <div class="section">
+      <div class="section-title">Current Implementation</div>
+      <div class="card">
+        <div class="card-title">What IS Built</div>
+        <ul style="margin-top: 0.5rem;">
+          <li><strong>regression_optimiser.py (STUB):</strong> 23-line placeholder with function signatures only</li>
+          <li><strong>Placeholder UI page:</strong> Basic layout, no functionality</li>
+          <li><strong>Database schema:</strong> PostgreSQL tables for test metadata (partial)</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">What IS NOT Built</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>Test metadata ingestion engine (pytest/Jest/Selenium Hub)</li>
+          <li>Coverage relationship mapping (test→code→test graphs)</li>
+          <li>ML model for redundancy scoring (scikit-learn/XGBoost)</li>
+          <li>Feature engineering pipeline (coverage overlap, defect correlation, code churn)</li>
+          <li>API endpoints for scoring & recommendations</li>
+          <li>React frontend wired to backend</li>
+          <li>Real-time test execution integration</li>
+          <li>Recommendation confidence scoring & explanations</li>
+          <li>A/B testing framework</li>
+          <li>Monitoring & alerting</li>
+        </ul>
+      </div>
+      
+      <div class="code-block">
+# Current regression_optimiser.py (STUB)
+def analyze_test_coverage():
+    pass
+
+def score_redundancy():
+    pass
+
+def recommend_pruning():
+    pass
+      </div>
+    </div>
+
+    <!-- TECHNICAL ARCHITECTURE -->
+    <div class="section">
+      <div class="section-title">Technical Architecture</div>
+      
+      <div class="card">
+        <div class="card-title">System Components</div>
+        <div style="margin-top: 1rem;">
+          <strong style="color: var(--accent);">Test Metadata Ingestion</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Connectors for pytest, Jest, Selenium Hub; webhooks from CI/CD systems. Extracts test names, assertions, execution time, pass/fail history.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">Coverage Analysis Engine</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Analyzes coverage.py/Istanbul reports; builds test-to-code relationship graphs; identifies overlapping coverage regions.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">ML Scoring Module</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            scikit-learn/XGBoost model trained on historical test data. Scores redundancy (0-1), low-value (0-1), flakiness (0-1). Outputs test risk matrix.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">FastAPI Backend</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            RESTful API for metadata ingestion, model scoring, recommendation retrieval. Caches model predictions.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">PostgreSQL</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Stores test metadata, coverage data, execution history, model predictions, user feedback on recommendations.
+          </div>
+          
+          <strong style="color: var(--accent); margin-top: 1rem; display: block;">React Frontend</strong>
+          <div class="card-text" style="margin-top: 0.5rem; margin-left: 1rem;">
+            Visualization: test dependency graphs, redundancy heatmaps, pruning scenarios, execution time savings projections.
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Data Flow</div>
+        <div class="code-block" style="margin-top: 1rem;">
+CI/CD (pytest/Jest output)
+  ↓
+Metadata Ingestion API
+  ↓
+PostgreSQL (tests, coverage, history)
+  ↓
+Feature Engineering Pipeline
+  ↓
+ML Model (scoring redundancy/low-value)
+  ↓
+Recommendation Cache
+  ↓
+React UI + FastAPI endpoints
+  ↓
+User accepts/rejects pruning recommendation
+  ↓
+Feedback loop → model retraining
+        </div>
+      </div>
+    </div>
+
+    <!-- INTEGRATION POINTS -->
+    <div class="section">
+      <div class="section-title">Integration Points</div>
+      <table>
+        <tr>
+          <th>System</th>
+          <th>Integration Type</th>
+          <th>Protocol/Method</th>
+          <th>Current Status</th>
+        </tr>
+        <tr>
+          <td>pytest / Jest</td>
+          <td>Test execution metadata</td>
+          <td>JSON webhooks or CI/CD API polling</td>
+          <td><span class="status-missing">✗ Not Started</span></td>
+        </tr>
+        <tr>
+          <td>coverage.py / Istanbul</td>
+          <td>Code coverage data</td>
+          <td>JSON report parsing</td>
+          <td><span class="status-missing">✗ Not Started</span></td>
+        </tr>
+        <tr>
+          <td>Git / GitHub API</td>
+          <td>Code churn & defect correlation</td>
+          <td>REST API (commits, blame)</td>
+          <td><span class="status-missing">✗ Not Started</span></td>
+        </tr>
+        <tr>
+          <td>Jenkins / GitHub Actions</td>
+          <td>CI/CD trigger & feedback</td>
+          <td>CI/CD hooks & API</td>
+          <td><span class="status-missing">✗ Not Started</span></td>
+        </tr>
+        <tr>
+          <td>PostgreSQL</td>
+          <td>Data persistence</td>
+          <td>SQLAlchemy ORM</td>
+          <td><span class="status-partial">⚠ Partial (schema only)</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- PRODUCTION REQUIREMENTS -->
+    <div class="section">
+      <div class="section-title">Production Requirements</div>
+      
+      <div class="card">
+        <div class="card-title">Infrastructure & Deployment</div>
+        <ul style="margin-top: 0.5rem;">
+          <li><strong>FastAPI service:</strong> 2-4 replicas, 1-2 GB RAM per pod, auto-scaling on CPU/memory</li>
+          <li><strong>PostgreSQL:</strong> Production-grade (RDS preferred), 100 GB+ storage, automated backups, replication</li>
+          <li><strong>ML Model Serving:</strong> MLflow or BentoML for versioning & serving, model retraining pipeline (weekly)</li>
+          <li><strong>React frontend:</strong> S3 + CloudFront CDN, static asset caching, SPA deployment</li>
+          <li><strong>Message queue:</strong> Redis for background job processing (metadata ingestion, model training)</li>
+          <li><strong>Container orchestration:</strong> Kubernetes with Helm charts</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Security & Compliance</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>OAuth 2.0 + OIDC for API authentication</li>
+          <li>Role-based access control (RBAC): Admin, QA Lead, Developer</li>
+          <li>TLS 1.3 for all API communication</li>
+          <li>Database encryption at rest (AWS KMS)</li>
+          <li>API rate limiting (500 req/min per user)</li>
+          <li>Audit logging for all pruning decisions & model retraining</li>
+          <li>GDPR compliance: PII masking for test names if applicable</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Monitoring & Observability</div>
+        <ul style="margin-top: 0.5rem;">
+          <li><strong>Prometheus metrics:</strong> API latency, model prediction time, recommendation acceptance rate, false positives (pruned tests later catch defects)</li>
+          <li><strong>Structured logging:</strong> ELK Stack or CloudWatch, 30-day retention</li>
+          <li><strong>APM:</strong> Datadog or New Relic for trace instrumentation</li>
+          <li><strong>Alerting:</strong> PagerDuty for model degradation, API errors, high false-positive rate</li>
+          <li><strong>Dashboards:</strong> Grafana for system health, model accuracy, business metrics</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Scaling & Performance</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>Support 10,000+ tests per organization</li>
+          <li>Metadata ingestion: batch ingest 1000 tests/sec</li>
+          <li>Model scoring: < 100ms per test (caching with Redis)</li>
+          <li>Frontend load: 1000+ concurrent users</li>
+          <li>Model retraining: incremental updates (daily), full retraining (weekly)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- IMPLEMENTATION GUIDELINES -->
+    <div class="section">
+      <div class="section-title">Implementation Guidelines</div>
+      
+      <div class="card">
+        <div class="card-title">Phase 1: Foundation (Weeks 1-3)</div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">1.1 Extend PostgreSQL Schema</strong>
+        <div class="code-block">
+-- Add test metadata tables
+CREATE TABLE tests (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255),
+  suite_id INT,
+  avg_duration FLOAT,
+  flakiness_score FLOAT,
+  last_executed TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE coverage_relations (
+  id SERIAL PRIMARY KEY,
+  test_id INT REFERENCES tests(id),
+  code_file VARCHAR(255),
+  coverage_percentage FLOAT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE execution_history (
+  id SERIAL PRIMARY KEY,
+  test_id INT REFERENCES tests(id),
+  passed BOOLEAN,
+  duration FLOAT,
+  executed_at TIMESTAMP,
+  ci_run_id VARCHAR(255)
+);
+
+CREATE TABLE pruning_recommendations (
+  id SERIAL PRIMARY KEY,
+  test_id INT REFERENCES tests(id),
+  redundancy_score FLOAT,
+  low_value_score FLOAT,
+  reason TEXT,
+  confidence FLOAT,
+  accepted BOOLEAN,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_tests_suite ON tests(suite_id);
+CREATE INDEX idx_coverage_test ON coverage_relations(test_id);
+CREATE INDEX idx_execution_test ON execution_history(test_id);
+        </div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">1.2 Build Test Metadata Ingestion API</strong>
+        <div class="code-block">
+# sentinelqa/backend/ingest.py
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from datetime import datetime
+
+router = APIRouter(prefix="/ingest", tags=["ingest"])
+
+class TestMetadata(BaseModel):
+    name: str
+    suite_id: int
+    duration: float
+
+@router.post("/tests")
+async def ingest_tests(tests: list[TestMetadata], db: Session):
+    """Ingest test metadata from CI/CD"""
+    try:
+        for test in tests:
+            db_test = Tests(
+                name=test.name,
+                suite_id=test.suite_id,
+                avg_duration=test.duration,
+                last_executed=datetime.utcnow()
+            )
+            db.add(db_test)
+        db.commit()
+        return {"status": "ok", "count": len(tests)}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/coverage")
+async def ingest_coverage(test_id: int, file: str, coverage: float, db: Session):
+    """Ingest coverage relationship data"""
+    coverage_rel = CoverageRelation(
+        test_id=test_id,
+        code_file=file,
+        coverage_percentage=coverage
+    )
+    db.add(coverage_rel)
+    db.commit()
+    return {"status": "ok"}
+
+@router.post("/execution")
+async def ingest_execution(test_id: int, passed: bool, duration: float, ci_run_id: str, db: Session):
+    """Ingest test execution history"""
+    execution = ExecutionHistory(
+        test_id=test_id,
+        passed=passed,
+        duration=duration,
+        executed_at=datetime.utcnow(),
+        ci_run_id=ci_run_id
+    )
+    db.add(execution)
+    db.commit()
+    return {"status": "ok"}
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Phase 2: ML Scoring (Weeks 4-6)</div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">2.1 Feature Engineering Pipeline</strong>
+        <div class="code-block">
+# sentinelqa/ml/feature_engineering.py
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
+def extract_features(test_id, db_session):
+    """Extract features for ML model"""
+    
+    # Coverage redundancy: % tests covering same code
+    test = db_session.query(Tests).filter_by(id=test_id).first()
+    coverage_files = db_session.query(CoverageRelation)\
+        .filter_by(test_id=test_id).all()
+    
+    # Calculate coverage overlap
+    overlap_count = 0
+    for coverage in coverage_files:
+        other_tests = db_session.query(CoverageRelation)\
+            .filter_by(code_file=coverage.code_file)\
+            .count()
+        overlap_count += other_tests - 1
+    
+    redundancy = overlap_count / max(len(coverage_files), 1)
+    
+    # Low-value score: based on execution history
+    executions = db_session.query(ExecutionHistory)\
+        .filter_by(test_id=test_id)\
+        .order_by(ExecutionHistory.executed_at.desc())\
+        .limit(100).all()
+    
+    if executions:
+        pass_rate = sum(1 for e in executions if e.passed) / len(executions)
+        avg_duration = sum(e.duration for e in executions) / len(executions)
+    else:
+        pass_rate = 1.0
+        avg_duration = 0
+    
+    # Flakiness: variance in pass rate
+    flakiness = 1.0 - pass_rate if pass_rate < 0.95 else 0.0
+    
+    # Low-value heuristic: high pass rate + long duration + high overlap
+    low_value_score = (pass_rate * 0.4) + (avg_duration / 100 * 0.3) + (redundancy * 0.3)
+    
+    return {
+        'redundancy': redundancy,
+        'low_value_score': low_value_score,
+        'flakiness': flakiness,
+        'pass_rate': pass_rate,
+        'avg_duration': avg_duration
+    }
+
+def prepare_training_data(db_session):
+    """Prepare dataset for model training"""
+    tests = db_session.query(Tests).all()
+    features_list = []
+    
+    for test in tests:
+        features = extract_features(test.id, db_session)
+        features['test_id'] = test.id
+        features_list.append(features)
+    
+    return pd.DataFrame(features_list)
+        </div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">2.2 ML Model Training</strong>
+        <div class="code-block">
+# sentinelqa/ml/model.py
+from sklearn.ensemble import XGBClassifier
+from sklearn.preprocessing import StandardScaler
+import joblib
+
+class SmartPruningModel:
+    def __init__(self):
+        self.model = XGBClassifier(n_estimators=100, max_depth=6)
+        self.scaler = StandardScaler()
+    
+    def train(self, X, y):
+        """Train model on historical data"""
+        X_scaled = self.scaler.fit_transform(X)
+        self.model.fit(X_scaled, y)
+    
+    def predict_prune_probability(self, X):
+        """Predict if test should be pruned"""
+        X_scaled = self.scaler.transform(X)
+        return self.model.predict_proba(X_scaled)[:, 1]
+    
+    def save(self, path):
+        joblib.dump({
+            'model': self.model,
+            'scaler': self.scaler
+        }, path)
+    
+    def load(self, path):
+        data = joblib.load(path)
+        self.model = data['model']
+        self.scaler = data['scaler']
+
+# Training script
+def retrain_model():
+    from sentinelqa.ml.feature_engineering import prepare_training_data
+    from sentinelqa.db import SessionLocal
+    
+    db = SessionLocal()
+    X = prepare_training_data(db)
+    
+    # Labels: manually marked prunable tests or empirical data
+    y = X['low_value_score'] > 0.7  # Simple heuristic
+    
+    model = SmartPruningModel()
+    model.train(X[['redundancy', 'flakiness', 'avg_duration']], y)
+    model.save('/models/smart_pruning_v1.pkl')
+    db.close()
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Phase 3: API & Frontend Integration (Weeks 7-9)</div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">3.1 Scoring API Endpoint</strong>
+        <div class="code-block">
+# sentinelqa/backend/scoring.py
+from fastapi import APIRouter
+from sqlalchemy.orm import Session
+from sentinelqa.ml.feature_engineering import extract_features
+from sentinelqa.ml.model import SmartPruningModel
+
+router = APIRouter(prefix="/score", tags=["scoring"])
+model = SmartPruningModel()
+model.load('/models/smart_pruning_v1.pkl')
+
+@router.get("/tests")
+async def score_all_tests(db: Session):
+    """Score all tests for pruning recommendation"""
+    tests = db.query(Tests).all()
+    results = []
+    
+    for test in tests:
+        features = extract_features(test.id, db)
+        prune_prob = model.predict_prune_probability(
+            [[features['redundancy'], features['flakiness'], features['avg_duration']]]
+        )[0]
+        
+        # Save recommendation
+        recommendation = PruningRecommendation(
+            test_id=test.id,
+            redundancy_score=features['redundancy'],
+            low_value_score=features['low_value_score'],
+            confidence=prune_prob,
+            reason=f"High overlap ({features['redundancy']:.2%}) + Pass rate {features['pass_rate']:.2%}"
+        )
+        db.add(recommendation)
+        results.append({
+            'test_id': test.id,
+            'test_name': test.name,
+            'prune_probability': float(prune_prob),
+            'reason': recommendation.reason
+        })
+    
+    db.commit()
+    return results
+
+@router.post("/apply")
+async def apply_pruning(test_ids: list[int], db: Session):
+    """Apply pruning decision and monitor"""
+    pruned_suite = [t.name for t in db.query(Tests).filter(Tests.id.notin_(test_ids)).all()]
+    return {
+        'status': 'ok',
+        'pruned_count': len(pruned_suite),
+        'remaining_tests': len(test_ids),
+        'estimated_time_saved': '35%'
+    }
+        </div>
+        
+        <strong style="display: block; margin-top: 1rem; color: var(--accent);">3.2 React Frontend Component</strong>
+        <div class="code-block">
+// sentinelqa/frontend/SmartPruning.tsx
+import React, { useEffect, useState } from 'react';
+import { LineChart, BarChart } from 'recharts';
+
+export default function SmartPruning() {
+  const [recommendations, setRecommendations] = useState([]);
+  const [selectedTests, setSelectedTests] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/score/tests')
+      .then(r => r.json())
+      .then(data => setRecommendations(data));
+  }, []);
+
+  const handleApply = async () => {
+    const response = await fetch('/api/score/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        test_ids: recommendations
+          .filter(r => selectedTests.includes(r.test_id))
+          .map(r => r.test_id)
+      })
+    });
+    const result = await response.json();
+    alert(`Pruned ${result.pruned_count} tests. Estimated time saved: ${result.estimated_time_saved}`);
+  };
+
+  return (
+    <div className="smart-pruning">
+      <h2>Test Case Optimization</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Test Name</th>
+            <th>Prune Probability</th>
+            <th>Reason</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {recommendations.map(rec => (
+            <tr key={rec.test_id}>
+              <td>{rec.test_name}</td>
+              <td>{(rec.prune_probability * 100).toFixed(1)}%</td>
+              <td>{rec.reason}</td>
+              <td>
+                <input
+                  type="checkbox"
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedTests([...selectedTests, rec.test_id]);
+                    } else {
+                      setSelectedTests(selectedTests.filter(id => id !== rec.test_id));
+                    }
+                  }}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={handleApply}>Apply Pruning</button>
+    </div>
+  );
+}
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Environment Variables</div>
+        <div class="code-block">
+# .env
+DATABASE_URL=postgresql://user:pass@localhost:5432/sentinelqa
+REDIS_URL=redis://localhost:6379
+MODEL_PATH=/models/smart_pruning_v1.pkl
+MODEL_RETRAIN_INTERVAL=7  # days
+LOG_LEVEL=INFO
+API_PORT=8000
+        </div>
+      </div>
+    </div>
+
+    <!-- GAP ANALYSIS -->
+    <div class="section">
+      <div class="section-title">Gap Analysis</div>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Status</th>
+          <th>Notes</th>
+          <th>Owner</th>
+          <th>Est. Days</th>
+        </tr>
+        <tr>
+          <td>PostgreSQL Schema Extension</td>
+          <td><span class="status-partial">⚠ 20% (STUB)</span></td>
+          <td>Basic table definitions exist; need indices, constraints, audit trail</td>
+          <td>Anupam Sharma</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>Test Metadata Ingestion</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>pytest/Jest connectors, webhook handlers, batch ingest</td>
+          <td>Anupam Sharma</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>Coverage Analysis Engine</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Parse coverage.py/Istanbul, build relationship graphs, identify overlap</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>Feature Engineering Pipeline</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Extract redundancy, low-value, flakiness scores from data</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>ML Model (scikit-learn/XGBoost)</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Train/test on historical data; validate accuracy; handle class imbalance</td>
+          <td>Anupam Sharma</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>FastAPI Scoring Endpoints</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>/score/tests, /score/apply; caching via Redis</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>React Frontend UI</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Table visualization, recommendation acceptance, time savings projection</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>CI/CD Integration (Jenkins/GitHub Actions)</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Webhooks for test execution, automated ingest triggers</td>
+          <td>DevOps/Platform</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>Model Serving & Retraining</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>MLflow deployment, weekly retraining pipeline, versioning</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>Monitoring & Alerting</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Prometheus metrics, false-positive tracking, Grafana dashboards</td>
+          <td>DevOps/Platform</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>A/B Testing Framework</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>Validate pruning recommendations against control group</td>
+          <td>Anupam Sharma</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>Security & RBAC</td>
+          <td><span class="status-missing">✗ 0%</span></td>
+          <td>OAuth 2.0 integration, role-based API access control</td>
+          <td>DevOps/Platform</td>
+          <td>3</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- RACI MATRIX -->
+    <div class="section">
+      <div class="section-title">RACI Matrix</div>
+      <table>
+        <tr>
+          <th>Activity</th>
+          <th>Anupam Sharma</th>
+          <th>Malcolm Govender</th>
+          <th>DevOps/Platform</th>
+          <th>Business/PO</th>
+        </tr>
+        <tr>
+          <td>Feature definition & acceptance</td>
+          <td>A</td>
+          <td>R</td>
+          <td>I</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>Backend API development</td>
+          <td>R</td>
+          <td>A</td>
+          <td>I</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>ML model design & training</td>
+          <td>R</td>
+          <td>A</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>React frontend development</td>
+          <td>R</td>
+          <td>A</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>CI/CD webhook integration</td>
+          <td>I</td>
+          <td>A</td>
+          <td>R</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Database & infrastructure</td>
+          <td>I</td>
+          <td>A</td>
+          <td>R</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Monitoring & observability setup</td>
+          <td>I</td>
+          <td>A</td>
+          <td>R</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Security & compliance review</td>
+          <td>I</td>
+          <td>R</td>
+          <td>A</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>A/B testing & validation</td>
+          <td>R</td>
+          <td>A</td>
+          <td>I</td>
+          <td>C</td>
+        </tr>
+        <tr>
+          <td>Production deployment</td>
+          <td>I</td>
+          <td>A</td>
+          <td>R</td>
+          <td>-</td>
+        </tr>
+      </table>
+      <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-2);">
+        <strong>R:</strong> Responsible | <strong>A:</strong> Accountable | <strong>C:</strong> Consulted | <strong>I:</strong> Informed
+      </div>
+    </div>
+
+    <!-- RISK REGISTER -->
+    <div class="section">
+      <div class="section-title">Risk Register</div>
+      <table>
+        <tr>
+          <th>Risk</th>
+          <th>Likelihood</th>
+          <th>Impact</th>
+          <th>Mitigation</th>
+        </tr>
+        <tr>
+          <td>ML model false positives (pruning tests that later catch defects)</td>
+          <td>High</td>
+          <td>High</td>
+          <td>Implement A/B testing framework; maintain control group; monitor false-positive rate in production; gradual rollout with manual approval required initially</td>
+        </tr>
+        <tr>
+          <td>Test metadata ingestion failures (missing or corrupted data)</td>
+          <td>Medium</td>
+          <td>High</td>
+          <td>Webhook retry logic with DLQ; validation schema on ingest; daily audit checks; alerting on ingestion failures</td>
+        </tr>
+        <tr>
+          <td>Model degradation over time (drift in test characteristics)</td>
+          <td>Medium</td>
+          <td>Medium</td>
+          <td>Weekly model retraining on latest data; track model accuracy metrics; trigger alerts on accuracy drop; keep historical model versions</td>
+        </tr>
+        <tr>
+          <td>High latency during recommendation scoring (timeouts on large test suites)</td>
+          <td>Medium</td>
+          <td>Medium</td>
+          <td>Implement Redis caching for predictions; async batch scoring; optimize feature extraction; load test with 10,000+ tests</td>
+        </tr>
+        <tr>
+          <td>Database performance issues (slow queries on large history tables)</td>
+          <td>Medium</td>
+          <td>Medium</td>
+          <td>Proper indexing strategy; partitioning execution_history by date; query optimization; separate read replicas for analytics</td>
+        </tr>
+        <tr>
+          <td>User reluctance to trust pruning recommendations</td>
+          <td>High</td>
+          <td>Medium</td>
+          <td>Transparent explanation of recommendations; detailed reasoning in UI; start with low-confidence thresholds; build trust over time with A/B results</td>
+        </tr>
+        <tr>
+          <td>Coverage analysis inaccuracy (missing dependencies, false overlaps)</td>
+          <td>Medium</td>
+          <td>High</td>
+          <td>Manual review of coverage relationships; test with diverse test suites; include domain expert validation in scoring</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- EFFORT ESTIMATE -->
+    <div class="section">
+      <div class="section-title">Effort Estimate</div>
+      <table>
+        <tr>
+          <th>Task</th>
+          <th>Owner</th>
+          <th>Est. Days</th>
+          <th>Priority</th>
+        </tr>
+        <tr>
+          <td>Phase 1: Foundation & Schema</td>
+          <td>Anupam Sharma</td>
+          <td>2</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Test metadata ingestion API</td>
+          <td>Anupam Sharma</td>
+          <td>5</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Coverage analysis engine</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Feature engineering pipeline</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>ML model training & evaluation</td>
+          <td>Anupam Sharma</td>
+          <td>5</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Phase 2: API & Frontend Integration</td>
+          <td>Anupam Sharma</td>
+          <td>3</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>React UI implementation</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>CI/CD webhook integration</td>
+          <td>DevOps/Platform</td>
+          <td>3</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Model serving & retraining pipeline</td>
+          <td>Anupam Sharma</td>
+          <td>4</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Monitoring & alerting setup</td>
+          <td>DevOps/Platform</td>
+          <td>3</td>
+          <td>P1</td>
+        </tr>
+        <tr>
+          <td>A/B testing framework</td>
+          <td>Anupam Sharma</td>
+          <td>5</td>
+          <td>P1</td>
+        </tr>
+        <tr>
+          <td>Security & RBAC hardening</td>
+          <td>DevOps/Platform</td>
+          <td>3</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td>Production deployment & go-live</td>
+          <td>DevOps/Platform</td>
+          <td>2</td>
+          <td>P0</td>
+        </tr>
+        <tr>
+          <td><strong>TOTAL</strong></td>
+          <td></td>
+          <td><strong>46 days</strong></td>
+          <td></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- DEFINITION OF DONE -->
+    <div class="section">
+      <div class="section-title">Definition of Done (Production Checklist)</div>
+      
+      <div class="card">
+        <div class="card-title">Functional Requirements</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>✓ Test metadata ingestion working for pytest, Jest, Selenium (1000+ tests/min)</li>
+          <li>✓ Coverage analysis identifies overlapping test coverage</li>
+          <li>✓ ML model achieves >80% accuracy in predicting prunable tests</li>
+          <li>✓ API scoring endpoint returns recommendations with confidence & reasoning</li>
+          <li>✓ React UI displays recommendations with visualization & approval workflow</li>
+          <li>✓ Pruning decisions are tracked and audited in database</li>
+          <li>✓ A/B testing validates that pruned test suites maintain defect detection</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Non-Functional Requirements</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>✓ API latency < 100ms for recommendation scoring (p95)</li>
+          <li>✓ Frontend load time < 3 seconds</li>
+          <li>✓ System supports 10,000+ tests per organization</li>
+          <li>✓ Model retraining completes weekly without impacting production</li>
+          <li>✓ Database queries optimized; full scan time < 5 seconds</li>
+          <li>✓ Horizontal scaling: 2-4 API replicas, load balanced</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Security & Compliance</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>✓ OAuth 2.0 + OIDC authentication on all endpoints</li>
+          <li>✓ Role-based access control: Admin, QA Lead, Developer</li>
+          <li>✓ TLS 1.3 for all API communication</li>
+          <li>✓ Database encryption at rest (AWS KMS)</li>
+          <li>✓ API rate limiting (500 req/min per user)</li>
+          <li>✓ Audit logging for all pruning decisions</li>
+          <li>✓ OWASP Top 10 security scan passed</li>
+          <li>✓ PII masking for test names where applicable</li>
+        </ul>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Observability & Operations</div>
+        <ul style="margin-top: 0.5rem;">
+          <li>✓ Prometheus metrics: API latency, model scoring time, recommendation acceptance rate</li>
+          <li>✓ False-positive rate tracked and < 5% (pruned tests later catch defects)</li>
+          <li>✓ Structured logging to ELK; 30-day retention</li>
+          <li>✓ Grafana dashboards for system health & business metrics</li>
+          <li>✓ PagerDuty alerts configured for model degradation, API errors</li>
+          <li>✓ Runbooks documented for on-call troubleshooting</li>
+          <li>✓ Uptime > 99.5%</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ACTION ITEMS -->
+    <div class="section">
+      <div class="section-title">Action Items (Prioritised)</div>
+      <table>
+        <tr>
+          <th>Priority</th>
+          <th>Action Item</th>
+          <th>Owner</th>
+          <th>Target Date</th>
+          <th>Status</th>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Extend PostgreSQL schema with test metadata & execution history tables</td>
+          <td>Anupam Sharma</td>
+          <td>2026-05-15</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Build test metadata ingestion API (pytest, Jest connectors)</td>
+          <td>Anupam Sharma</td>
+          <td>2026-05-29</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Implement coverage analysis engine (relationship mapping)</td>
+          <td>Anupam Sharma</td>
+          <td>2026-06-12</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Build feature engineering pipeline (redundancy, low-value, flakiness scores)</td>
+          <td>Anupam Sharma</td>
+          <td>2026-06-12</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Train ML model (scikit-learn/XGBoost) & validate accuracy</td>
+          <td>Anupam Sharma</td>
+          <td>2026-06-26</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Develop FastAPI scoring endpoints (/score/tests, /score/apply)</td>
+          <td>Anupam Sharma</td>
+          <td>2026-07-03</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Build React UI for recommendation display & approval</td>
+          <td>Anupam Sharma</td>
+          <td>2026-07-17</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Integrate CI/CD webhooks (Jenkins/GitHub Actions)</td>
+          <td>DevOps/Platform</td>
+          <td>2026-07-17</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Setup model serving & weekly retraining pipeline (MLflow)</td>
+          <td>Anupam Sharma</td>
+          <td>2026-07-24</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P0</td>
+          <td>Security hardening: OAuth 2.0, RBAC, TLS, database encryption</td>
+          <td>DevOps/Platform</td>
+          <td>2026-07-31</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P1</td>
+          <td>Implement monitoring & alerting (Prometheus, Grafana, PagerDuty)</td>
+          <td>DevOps/Platform</td>
+          <td>2026-08-07</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P1</td>
+          <td>Build A/B testing framework & validation</td>
+          <td>Anupam Sharma</td>
+          <td>2026-08-21</td>
+          <td>Not Started</td>
+        </tr>
+        <tr>
+          <td>P1</td>
+          <td>Production deployment & go-live</td>
+          <td>DevOps/Platform</td>
+          <td>2026-09-04</td>
+          <td>Not Started</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="footer">
+      <strong>Report Generated:</strong> 2026-05-08<br>
+      <strong>Owned By:</strong> Anupam Sharma (Head of QA Automation / AI QA Engineering)<br>
+      <strong>Project Lead:</strong> Malcolm Govender (Head of AI & Engineering)<br>
+      <strong>Status:</strong> Production Readiness Report — In Progress (20%)<br>
+      <em>This is a living document. Update as implementation progresses.</em>
+    </div>
+  </div>
+</body>
+</html>

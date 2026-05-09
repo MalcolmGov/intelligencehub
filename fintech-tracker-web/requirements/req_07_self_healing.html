@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-07: Self-Healing Automation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif; background-color: #0d1117; color: #e6edf3; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #1c2128 0%, #161b22 100%); border: 1px solid #30363d; border-radius: 8px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .header h1 { font-size: 2.2em; margin-bottom: 15px; color: #58a6ff; }
+        .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 0.95em; margin-top: 20px; }
+        .meta-item { display: flex; align-items: center; gap: 8px; }
+        .meta-label { color: #8b949e; font-weight: 600; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        .badge-success { background-color: rgba(3, 102, 71, 0.3); color: #3fb950; border: 1px solid #238636; }
+        .badge-p1 { background-color: rgba(248, 81, 73, 0.15); color: #f85149; border: 1px solid #da3633; }
+        .section { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+        .section h2 { color: #58a6ff; font-size: 1.5em; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #30363d; }
+        .section h3 { color: #79c0ff; font-size: 1.1em; margin: 20px 0 12px 0; }
+        p, li { color: #e6edf3; margin-bottom: 12px; }
+        ul, ol { margin-left: 25px; margin-bottom: 15px; }
+        .persona-card { background: #0d1117; border-left: 4px solid #58a6ff; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        .persona-card strong { color: #79c0ff; }
+        .user-story { background: #0d1117; border-left: 4px solid #3fb950; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        .user-story.must-have { border-left-color: #f85149; }
+        .user-story.should-have { border-left-color: #d29922; }
+        .story-id { color: #8b949e; font-size: 0.85em; font-weight: 600; margin-bottom: 8px; }
+        .story-text { color: #e6edf3; margin-bottom: 8px; font-style: italic; }
+        .story-priority { display: inline-block; padding: 2px 8px; font-size: 0.75em; border-radius: 4px; font-weight: 600; }
+        .priority-must { background: rgba(248, 81, 73, 0.2); color: #f85149; }
+        .priority-should { background: rgba(210, 153, 34, 0.2); color: #d29922; }
+        .req-item { background: #0d1117; border-left: 4px solid #1f6feb; padding: 12px 15px; margin-bottom: 12px; border-radius: 4px; }
+        .req-id { color: #79c0ff; font-weight: 600; margin-right: 10px; }
+        .acceptance-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #238636; border-radius: 4px; }
+        .dependency-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #9e6a03; border-radius: 4px; }
+        .exclusion-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #d1242f; border-radius: 4px; }
+        .checklist { list-style: none; }
+        .checklist li { padding-left: 25px; position: relative; }
+        .checklist li:before { content: "☐"; position: absolute; left: 0; color: #3fb950; }
+        strong { color: #79c0ff; }
+        .version-date { color: #8b949e; font-size: 0.9em; margin-top: 20px; padding-top: 15px; border-top: 1px solid #30363d; }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>Self-Healing Automation</h1>
+            <div class="meta">
+                <div class="meta-item"><span class="meta-label">ID:</span><span>UC-07</span></div>
+                <div class="meta-item"><span class="meta-label">Owner:</span><span>Anupam Sharma</span></div>
+                <div class="meta-item"><span class="meta-label">Status:</span><span class="badge badge-success">Done (100%)</span></div>
+                <div class="meta-item"><span class="meta-label">Priority:</span><span class="badge badge-p1">P1</span></div>
+                <div class="meta-item"><span class="meta-label">Version:</span><span>v1.0</span></div>
+                <div class="meta-item"><span class="meta-label">Date:</span><span>May 2026</span></div>
+                <div class="meta-item">
+                    <span class="meta-label">Author</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Problem Statement</h2>
+            <p>Automated tests are brittle: when UI elements change—CSS class names are updated, IDs are modified, elements are relocated—tests fail immediately. Teams spend 20–30% of their time maintaining and fixing broken selectors rather than improving test coverage or writing new tests.</p>
+            <p>Current pain points:</p>
+            <ul>
+                <li>Minor CSS changes break 50+ tests; manual selector updates required across multiple files</li>
+                <li>Tests fail on layout refactors even though functionality is unchanged</li>
+                <li>No visibility into which selectors are fragile; maintenance becomes reactive</li>
+                <li>Teams must choose between aggressive retry logic (masking real failures) or frequent test flakiness</li>
+                <li>Mobile UI changes (responsive layouts) cause cascading selector failures</li>
+            </ul>
+            <p>Self-healing automation uses AI, semantic matching, and computer vision to autonomously repair broken selectors, dramatically reducing maintenance burden and increasing test reliability. For SentinelQA fintech customers, this translates to faster feature releases, fewer false-positive test failures, and more time for exploratory testing.</p>
+        </div>
+
+        <div class="section">
+            <h2>Target Users & Personas</h2>
+
+            <div class="persona-card">
+                <strong>1. Maya Gupta – QA Engineer (4 yrs experience)</strong><br>
+                <strong>Role:</strong> Maintains 200+ Playwright tests across web and mobile<br>
+                <strong>Goals:</strong> Reduce selector maintenance time from 6 hrs/sprint to <1 hr, automatically fix broken tests, increase test execution success rate<br>
+                <strong>Frustrations:</strong> Spends half her time fixing selectors; misses actual bugs because she's fixing broken tests; team blame when CSS changes break tests
+            </div>
+
+            <div class="persona-card">
+                <strong>2. Dev Lead (Frontend) – Cross-Functional Ownership</strong><br>
+                <strong>Role:</strong> Owns both feature development and test stability<br>
+                <strong>Goals:</strong> Unblock QA from selector maintenance; enable faster refactors without breaking tests; improve test visibility in CI/CD<br>
+                <strong>Frustrations:</strong> QA complains about every CSS change; tests fail before CI pipeline completes; feels responsible for test flakiness
+            </div>
+
+            <div class="persona-card">
+                <strong>3. Platform QA Lead – Large Team (10+ QA engineers)</strong><br>
+                <strong>Role:</strong> Responsible for test suite health and team productivity<br>
+                <strong>Goals:</strong> Reduce selector maintenance across team; enforce consistent selector strategies; improve test reliability metrics<br>
+                <strong>Frustrations:</strong> Hard to measure selector fragility; team spends too much time on maintenance; inconsistent selector approaches
+            </div>
+
+            <div class="persona-card">
+                <strong>4. Fintech Product Manager – Time-Sensitive Features</strong><br>
+                <strong>Role:</strong> Owns payment processing, compliance features with tight release windows<br>
+                <strong>Goals:</strong> Faster testing turnaround, fewer test-related delays, maintain compliance test coverage during rapid feature iterations<br>
+                <strong>Frustrations:</strong> QA automation blocks releases due to selector failures on non-critical UI changes; expensive re-runs
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>User Stories</h2>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-18</div>
+                <div class="story-text">As a QA engineer, when a test fails due to "element not found," I want the system to autonomously attempt to locate the element using alternative selectors (ARIA labels, semantic matching, visual similarity) and automatically repair the test, so that I don't need to manually update selectors.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-19</div>
+                <div class="story-text">As a QA engineer, when a selector is auto-repaired, I want to review the change in a dashboard (old selector → new selector, confidence score, auto-applied or queued for approval), so that I can audit repairs and reject false positives.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-20</div>
+                <div class="story-text">As a platform QA lead, I want visibility into which selectors are fragile (changed frequently or failed repairs) and flagged for refactoring, so that I can proactively identify brittle tests before they cause widespread failures.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-21</div>
+                <div class="story-text">As a QA engineer, I want auto-repaired selectors to be submitted as pull requests to my codebase (with explanation comments), so that changes are tracked in version control and can be reviewed before merging.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-22</div>
+                <div class="story-text">As a QA engineer, I want the system to detect when UI layout changes (responsive design, mobile vs desktop) break selectors and suggest adaptive selectors (device-aware, screen-size-aware), so that tests pass across all device types.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-23</div>
+                <div class="story-text">As a dev lead, I want to understand the impact of CSS changes on test selectors before deploying; suggest "CSS change safe" patterns, so that we can refactor CSS without breaking tests.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-24</div>
+                <div class="story-text">As a QA engineer, I want the system to learn selector patterns from successful tests and apply them to similar elements (e.g., "all buttons use data-testid"), so that selector consistency improves automatically over time.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Functional Requirements</h2>
+
+            <div class="req-item"><span class="req-id">FR-28</span>Monitor all test executions; when a selector fails (element not found), capture the page screenshot and DOM context (HTML source, CSS state).</div>
+
+            <div class="req-item"><span class="req-id">FR-29</span>Implement multi-strategy selector recovery: (1) Semantic matching on ARIA labels, placeholders, alt text; (2) Computer vision to locate similar-looking elements; (3) Fallback XPath with regex; (4) Parent/sibling structural matching.</div>
+
+            <div class="req-item"><span class="req-id">FR-30</span>When a repair is found, either auto-apply (if confidence > 95%) or queue for human approval (if confidence 70–95%); log confidence score and recovery method.</div>
+
+            <div class="req-item"><span class="req-id">FR-31</span>Provide a "Selector Repairs" dashboard showing all repaired selectors with before/after, confidence, recovery method, and approval status.</div>
+
+            <div class="req-item"><span class="req-id">FR-32</span>Generate pull requests with repaired selectors, including: old/new selectors side-by-side, test file line references, confidence score, recovery method in comment.</div>
+
+            <div class="req-item"><span class="req-id">FR-33</span>Track selector fragility over time: flag selectors that change frequently, fail repairs multiple times, or are device-dependent.</div>
+
+            <div class="req-item"><span class="req-id">FR-34</span>Support adaptive selectors for responsive design: device-aware locators that adjust XPath/CSS based on screen size or device type.</div>
+
+            <div class="req-item"><span class="req-id">FR-35</span>Integrate with SentinelQA test runner: intercept selector failures, trigger healing logic, retry test with healed selector automatically.</div>
+
+            <div class="req-item"><span class="req-id">FR-36</span>Provide CSS change impact analysis: when a CSS file changes, estimate which tests may be affected and suggest proactive repairs.</div>
+
+            <div class="req-item"><span class="req-id">FR-37</span>Store repair history per selector: all historical repairs, success rates, and recommend "best" selector based on stability.</div>
+
+            <div class="req-item"><span class="req-id">FR-38</span>Support explicit selector repair approval workflow: QA can review and approve/reject repairs in dashboard before auto-commit to GitHub.</div>
+
+            <div class="req-item"><span class="req-id">FR-39</span>Generate metrics: % of tests with auto-healed selectors, success rate of repairs, reduction in manual selector maintenance time.</div>
+        </div>
+
+        <div class="section">
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="req-item"><span class="req-id">NFR-16</span><strong>Performance:</strong> Heal selector within 3 seconds of failure detection; page screenshot capture and analysis <1 second.</div>
+
+            <div class="req-item"><span class="req-id">NFR-17</span><strong>Accuracy:</strong> Repair confidence >90% for common UI patterns; false-positive repairs <2%; manual review rate <10%.</div>
+
+            <div class="req-item"><span class="req-id">NFR-18</span><strong>Reliability:</strong> Healing logic must not introduce test flakiness; conservative approach when confidence <70%; always preserve original selector as fallback.</div>
+
+            <div class="req-item"><span class="req-id">NFR-19</span><strong>Scalability:</strong> Handle 10,000+ concurrent test failures without queue backlog; process 1000 repairs/hour.</div>
+
+            <div class="req-item"><span class="req-id">NFR-20</span><strong>Security:</strong> Sanitise page screenshots (mask PII, payment data); store only selector metadata, not full DOM; RBAC on repair approval.</div>
+
+            <div class="req-item"><span class="req-id">NFR-21</span><strong>Auditability:</strong> Log every repair attempt, success, confidence score, approval decision; export audit trail for compliance reviews.</div>
+
+            <div class="req-item"><span class="req-id">NFR-22</span><strong>Observability:</strong> Track repair success rate, healing latency, confidence distribution; export metrics to CloudWatch for dashboards.</div>
+
+            <div class="req-item"><span class="req-id">NFR-23</span><strong>Accessibility:</strong> Dashboard must be keyboard-navigable and screen-reader compatible; WCAG 2.1 AA compliance.</div>
+        </div>
+
+        <div class="section">
+            <h2>Acceptance Criteria</h2>
+
+            <h3>Feature: Autonomous Selector Repair</h3>
+            <div class="acceptance-item">Given a test fails with "element not found" for a button with original selector #submit-btn, when the page has changed and the button now has class submit-primary, then the system finds the button via semantic matching (still a submit button) and suggests the new selector with >90% confidence.</div>
+            <div class="acceptance-item">Given a high-confidence repair (>95%), when auto-applied, then the test is automatically retried with the new selector and passes.</div>
+            <div class="acceptance-item">Given a medium-confidence repair (75–85%), when queued for approval, then it appears in the Selector Repairs dashboard with confidence score, recovery method, and side-by-side comparison.</div>
+
+            <h3>Feature: Repair Dashboard</h3>
+            <div class="acceptance-item">Given 50 repaired selectors, when viewing the dashboard, then all repairs are listed with before/after, confidence, recovery method, and approval status; filters for device type, urgency, and confidence range are functional.</div>
+            <div class="acceptance-item">Given a QA engineer viewing a repair, when clicking "Approve," then the repair is committed to GitHub as a PR with explanation comment; when clicking "Reject," the repair is discarded and logged.</div>
+
+            <h3>Feature: Fragility Detection</h3>
+            <div class="acceptance-item">Given a selector that has been repaired 5+ times in the last month, when viewed in the dashboard, then it is flagged as "fragile" with recommendation to refactor the underlying element.</div>
+
+            <h3>Feature: GitHub PR Creation</h3>
+            <div class="acceptance-item">Given 10 approved repairs, when "Create PR" is selected, then a single draft PR is created with all repairs, organized by file, with clear commit message linking to original test files and confidence scores in comments.</div>
+        </div>
+
+        <div class="section">
+            <h2>Dependencies & Integrations</h2>
+
+            <div class="dependency-item"><strong>SentinelQA Test Runner:</strong> Intercept test failures; capture page state (screenshot, DOM). Status: Requires instrumentation in existing runner.</div>
+
+            <div class="dependency-item"><strong>Computer Vision / Image Similarity Library:</strong> Compare current UI screenshot to previous known-good screenshots to locate moved elements. Recommendation: OpenCV or TensorFlow-based vision model. Status: To be integrated.</div>
+
+            <div class="dependency-item"><strong>Semantic HTML Parser:</strong> Extract ARIA labels, alt text, placeholders, semantic roles from page DOM. Recommendation: 'jsdom' (Node.js), 'BeautifulSoup' (Python). Status: To be integrated.</div>
+
+            <div class="dependency-item"><strong>GitHub API:</strong> Create PRs with repair suggestions. Status: Existing integration.</div>
+
+            <div class="dependency-item"><strong>SentinelQA Test Studio DB:</strong> Store repair history, selector fragility metrics. Status: Existing integration (requires new tables).</div>
+
+            <div class="dependency-item"><strong>Playwright / Cypress Inspector:</strong> Access to selector locator engine for testing alternative selectors. Status: Existing integration.</div>
+
+            <div class="dependency-item"><strong>CloudWatch / DataDog:</strong> Logging, metrics, alerting on repair success rates. Status: Existing infrastructure.</div>
+        </div>
+
+        <div class="section">
+            <h2>Assumptions & Constraints</h2>
+
+            <h3>Assumptions</h3>
+            <ul>
+                <li>Page DOM structure remains logically similar after UI changes; element semantic properties (buttons are still buttons, inputs are still inputs) don't drastically change.</li>
+                <li>Repair history is available from previous executions; first-time failures on new elements have lower confidence.</li>
+                <li>QA engineers will review and approve repairs in a timely manner; approval workflow won't bottleneck automation.</li>
+                <li>Screenshots of test pages can be securely stored and analyzed without exposing sensitive data.</li>
+                <li>Computer vision models can generalize across different apps and UI frameworks.</li>
+            </ul>
+
+            <h3>Constraints</h3>
+            <ul>
+                <li><strong>Accuracy Trade-Off:</strong> High confidence repairs (>95%) may miss edge cases; must be balanced against false-positive risk.</li>
+                <li><strong>Fintech Compliance:</strong> Page screenshots must be sanitised (mask payment data, PII); storage must be encrypted and retention limited.</li>
+                <li><strong>Dynamic Content:</strong> Tests with dynamically-generated IDs or content (React keys, timestamps) cannot be healed reliably; require stable semantic anchors.</li>
+                <li><strong>Multi-Browser Support:</strong> Selectors may differ across browsers (Safari vs Chrome); healing strategy must account for browser variations.</li>
+                <li><strong>Mobile-Specific Challenges:</strong> Responsive layout changes may require device-specific selectors; healing must support adaptive locators.</li>
+                <li><strong>Performance Budget:</strong> Healing latency must not exceed 3 seconds; real-time computer vision analysis is constrained by available CPU.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Out of Scope (v1.0)</h2>
+
+            <div class="exclusion-item">Automatic refactoring of entire test suites to use "best practice" selectors (proactive optimization planned for v1.1).</div>
+
+            <div class="exclusion-item">Support for JavaScript frameworks with heavy client-side rendering (React, Vue) that render IDs dynamically – requires stable data-testid attributes.</div>
+
+            <div class="exclusion-item">Healing of shadow DOM elements or iframes (complex scoping; v1.1 planned).</div>
+
+            <div class="exclusion-item">Multi-language page support; v1 targets English-language UIs only.</div>
+
+            <div class="exclusion-item">Integration with visual regression tools (separate from selector healing; considered out of scope).</div>
+
+            <div class="exclusion-item">Proactive selector recommendations before deployment (post-deployment healing only in v1).</div>
+        </div>
+
+        <div class="section">
+            <h2>Definition of Done</h2>
+
+            <ul class="checklist">
+                <li>All user stories (US-18 to US-24) validated with QA personas in UAT</li>
+                <li>FR-28 to FR-39 implemented and unit-tested (>85% coverage)</li>
+                <li>NFR-16 to NFR-23 verified via load testing, accuracy benchmarking, security audit</li>
+                <li>Computer vision model for element matching integrated and tested on 10+ UI frameworks</li>
+                <li>Selector Repairs dashboard fully functional with filters, approval workflow, metrics</li>
+                <li>GitHub PR creation for approved repairs tested and working</li>
+                <li>Page screenshot capture and sanitisation for PII/payment data verified</li>
+                <li>Repair success rate >85% on common UI patterns; false-positive rate <3%</li>
+                <li>Performance testing: repair within 3 seconds; 1000 repairs/hour throughput verified</li>
+                <li>Integration with SentinelQA test runner completed and tested end-to-end</li>
+                <li>User documentation (dashboard walkthrough, repair workflow guide) created</li>
+                <li>Security audit: screenshots encrypted, RBAC on approvals, compliance with PCI-DSS/FICA requirements</li>
+                <li>Accessibility audit: dashboard meets WCAG 2.1 AA standards</li>
+                <li>Cost analysis: vision API usage, storage costs per repair documented</li>
+                <li>Production deployment plan with database schema, feature flags, rollback procedure</li>
+                <li>Sign-off from Anupam Sharma, QA lead, and security team</li>
+            </ul>
+
+            <div class="version-date">
+                <strong>Document Version:</strong> v1.0<br>
+                <strong>Last Updated:</strong> May 2026<br>
+                <strong>Owner:</strong> Anupam Sharma<br><strong>Author:</strong> Malcolm Govender (Head of AI &amp; Engineering)
+            </div>
+        </div>
+    </div>
+</body>
+</html>

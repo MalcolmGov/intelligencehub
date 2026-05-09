@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-04: AI-Based Test Automation Script Generation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif; background-color: #0d1117; color: #e6edf3; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #1c2128 0%, #161b22 100%); border: 1px solid #30363d; border-radius: 8px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .header h1 { font-size: 2.2em; margin-bottom: 15px; color: #58a6ff; }
+        .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 0.95em; margin-top: 20px; }
+        .meta-item { display: flex; align-items: center; gap: 8px; }
+        .meta-label { color: #8b949e; font-weight: 600; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        .badge-success { background-color: rgba(3, 102, 71, 0.3); color: #3fb950; border: 1px solid #238636; }
+        .badge-p2 { background-color: rgba(79, 90, 102, 0.3); color: #8b949e; border: 1px solid #30363d; }
+        .section { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
+        .section h2 { color: #58a6ff; font-size: 1.5em; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #30363d; }
+        .section h3 { color: #79c0ff; font-size: 1.1em; margin: 20px 0 12px 0; }
+        p, li { color: #e6edf3; margin-bottom: 12px; }
+        ul, ol { margin-left: 25px; margin-bottom: 15px; }
+        .persona-card { background: #0d1117; border-left: 4px solid #58a6ff; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        .persona-card strong { color: #79c0ff; }
+        .user-story { background: #0d1117; border-left: 4px solid #3fb950; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        .user-story.must-have { border-left-color: #f85149; }
+        .user-story.should-have { border-left-color: #d29922; }
+        .story-id { color: #8b949e; font-size: 0.85em; font-weight: 600; margin-bottom: 8px; }
+        .story-text { color: #e6edf3; margin-bottom: 8px; font-style: italic; }
+        .story-priority { display: inline-block; padding: 2px 8px; font-size: 0.75em; border-radius: 4px; font-weight: 600; }
+        .priority-must { background: rgba(248, 81, 73, 0.2); color: #f85149; }
+        .priority-should { background: rgba(210, 153, 34, 0.2); color: #d29922; }
+        .req-item { background: #0d1117; border-left: 4px solid #1f6feb; padding: 12px 15px; margin-bottom: 12px; border-radius: 4px; }
+        .req-id { color: #79c0ff; font-weight: 600; margin-right: 10px; }
+        .acceptance-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #238636; border-radius: 4px; }
+        .dependency-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #9e6a03; border-radius: 4px; }
+        .exclusion-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #d1242f; border-radius: 4px; }
+        .checklist { list-style: none; }
+        .checklist li { padding-left: 25px; position: relative; }
+        .checklist li:before { content: "☐"; position: absolute; left: 0; color: #3fb950; }
+        strong { color: #79c0ff; }
+        .version-date { color: #8b949e; font-size: 0.9em; margin-top: 20px; padding-top: 15px; border-top: 1px solid #30363d; }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>AI-Based Test Automation Script Generation</h1>
+            <div class="meta">
+                <div class="meta-item"><span class="meta-label">ID:</span><span>UC-04</span></div>
+                <div class="meta-item"><span class="meta-label">Owner:</span><span>Anupam Sharma</span></div>
+                <div class="meta-item"><span class="meta-label">Status:</span><span class="badge badge-success">Done (100%)</span></div>
+                <div class="meta-item"><span class="meta-label">Priority:</span><span class="badge badge-p2">P2</span></div>
+                <div class="meta-item"><span class="meta-label">Version:</span><span>v1.0</span></div>
+                <div class="meta-item"><span class="meta-label">Date:</span><span>May 2026</span></div>
+                <div class="meta-item">
+                    <span class="meta-label">Author</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Problem Statement</h2>
+            <p>Converting test cases into runnable automation scripts requires specialized knowledge of each testing framework (Playwright, Cypress, Jest, Pytest), boilerplate code structure, and best practices for selectors, assertions, and error handling. QA engineers frequently:</p>
+            <ul>
+                <li>Spend 60–80% of automation time writing boilerplate setup, teardown, and helper functions</li>
+                <li>Struggle with framework-specific syntax, leading to slow script development and inconsistent patterns</li>
+                <li>Duplicate fixture logic and assertion patterns across test files</li>
+                <li>Cannot quickly switch between frameworks when projects require different tech stacks</li>
+                <li>Face delays when learning new frameworks, blocking feature testing</li>
+            </ul>
+            <p>For SentinelQA, enabling rapid, framework-agnostic test script generation unlocks faster automation cycles, reduces ramp-up time for new team members, and allows QA to focus on test logic rather than boilerplate engineering.</p>
+        </div>
+
+        <div class="section">
+            <h2>Target Users & Personas</h2>
+
+            <div class="persona-card">
+                <strong>1. Jordan Lee – Mid-Level Automation Engineer</strong><br>
+                <strong>Role:</strong> Writes and maintains Playwright/Cypress scripts<br>
+                <strong>Goals:</strong> Convert test cases to runnable scripts in <15 minutes, reduce context-switching between frameworks, maintain code consistency<br>
+                <strong>Frustrations:</strong> Spends hours writing boilerplate; forgot Cypress syntax when switching projects; inconsistent CSS selector patterns
+            </div>
+
+            <div class="persona-card">
+                <strong>2. Alex Rodriguez – Senior SDET (Senior Development Engineer in Test)</strong><br>
+                <strong>Role:</strong> Owns test framework architecture and CI/CD integration<br>
+                <strong>Goals:</strong> Standardize script generation across projects, enforce coding standards, reduce tech debt from inconsistent scripts<br>
+                <strong>Frustrations:</strong> Too many script style variations; difficult to maintain; new team members write inefficient code
+            </div>
+
+            <div class="persona-card">
+                <strong>3. Lisa Zhang – QA Engineer with Python Background</strong><br>
+                <strong>Role:</strong> Primarily writes Pytest scripts, occasionally needs JavaScript (Playwright)<br>
+                <strong>Goals:</strong> Generate JavaScript/Playwright scripts without learning syntax, reuse Python-based fixtures in JavaScript, fast ramp-up<br>
+                <strong>Frustrations:</strong> Doesn't know JavaScript well; typing errors; copy-paste frustration; can't quickly contribute to Playwright tests
+            </div>
+
+            <div class="persona-card">
+                <strong>4. CTO/Engineering Lead – Multi-Framework Fintech Org</strong><br>
+                <strong>Role:</strong> Sets testing standards across backend (Pytest), API (Playwright), and UI (Cypress) teams<br>
+                <strong>Goals:</strong> Ensure consistent test quality across frameworks, reduce onboarding friction, speed up test coverage<br>
+                <strong>Frustrations:</strong> Different teams write tests differently; hard to enforce best practices; slow to scale QA
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>User Stories</h2>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-10</div>
+                <div class="story-text">As a QA engineer, I want to input plain-English test steps and select a target framework (Playwright/Cypress/Jest/Pytest), and have the system generate fully runnable, syntax-correct scripts with proper selectors and assertions, so that I can reduce script writing time from 2 hours to 15 minutes per test.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-11</div>
+                <div class="story-text">As an SDET, I want generated scripts to follow a project-specific coding standard (custom naming conventions, assertion library, fixture patterns), so that all auto-generated scripts maintain consistent quality and are mergeable without linting failures.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-12</div>
+                <div class="story-text">As a QA engineer, I want generated Playwright/Cypress scripts to include smart element selectors (robust CSS/XPath, data attributes, ARIA labels), so that tests are resilient to minor UI changes and don't fail on layout updates.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story must-have">
+                <div class="story-id">US-13</div>
+                <div class="story-text">As a QA engineer, I want to push generated scripts to GitHub as draft PRs (like test cases), review them, and merge them into the test suite without manual file creation, so that the automation pipeline is streamlined end-to-end.</div>
+                <span class="story-priority priority-must">Must Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-14</div>
+                <div class="story-text">As a QA engineer, I want generated scripts to support parameterised tests (data-driven) with CSV/JSON fixture import, so that I can test multiple data combinations without duplicating test code.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-15</div>
+                <div class="story-text">As an SDET, I want to define reusable helper functions (page objects, common actions) and have generated scripts automatically use them, so that fixture duplication is eliminated and maintenance burden is reduced.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-16</div>
+                <div class="story-text">As a QA engineer, I want generated scripts to include error handling, retry logic, and timeouts configured per project standards, so that tests are resilient and don't fail on transient issues.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+
+            <div class="user-story should-have">
+                <div class="story-id">US-17</div>
+                <div class="story-text">As a Python QA engineer, I want Pytest scripts to be auto-generated with fixtures, markers, and assertions matching my team's standards, so that I contribute to Pytest automation without ramp-up time.</div>
+                <span class="story-priority priority-should">Should Have</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Functional Requirements</h2>
+
+            <div class="req-item"><span class="req-id">FR-16</span>Accept test steps in plain English and generate syntactically-correct, runnable scripts in Playwright, Cypress, Jest, or Pytest based on user selection.</div>
+
+            <div class="req-item"><span class="req-id">FR-17</span>Generate element selectors using a priority strategy: data attributes > ARIA attributes > CSS ID > robust CSS classes > XPath; fall back to computer vision if no selectors found.</div>
+
+            <div class="req-item"><span class="req-id">FR-18</span>Support project-level configuration: custom naming conventions, assertion library (Chai, Jest Matchers, pytest assertions), base URLs, timeouts, retry policies.</div>
+
+            <div class="req-item"><span class="req-id">FR-19</span>Generate parameterised tests that accept CSV/JSON fixture files and loop over test data; output proper test naming per iteration (e.g., test_login[user1], test_login[user2]).</div>
+
+            <div class="req-item"><span class="req-id">FR-20</span>Detect common patterns in test steps and auto-generate reusable page objects / helper functions with proper documentation.</div>
+
+            <div class="req-item"><span class="req-id">FR-21</span>Include error handling, timeout configuration, retry logic, and failure screenshots/videos in generated scripts.</div>
+
+            <div class="req-item"><span class="req-id">FR-22</span>Generate API test scripts (Pytest requests, Jest supertest) with proper authentication, header/body validation, and schema checking.</div>
+
+            <div class="req-item"><span class="req-id">FR-23</span>Support batch script generation: convert 50+ test cases to scripts in one async job with progress tracking and email notification.</div>
+
+            <div class="req-item"><span class="req-id">FR-24</span>Create GitHub draft PRs with generated scripts, allowing review, edit, and merge into feature/main branch.</div>
+
+            <div class="req-item"><span class="req-id">FR-25</span>Allow engineers to edit generated scripts, mark as approved/rejected, and use feedback to refine generation for future scripts.</div>
+
+            <div class="req-item"><span class="req-id">FR-26</span>Export scripts with proper file structure: organized folders per feature, shared fixtures in common/ folder, CI config templates.</div>
+
+            <div class="req-item"><span class="req-id">FR-27</span>Validate generated scripts for syntax errors and test-ability (can be parsed and dry-run without execution) before PR creation.</div>
+        </div>
+
+        <div class="section">
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="req-item"><span class="req-id">NFR-09</span><strong>Performance:</strong> Generate 10 scripts from test cases in <5 seconds; support batch conversion of 100 scripts in <60 seconds (async).</div>
+
+            <div class="req-item"><span class="req-id">NFR-10</span><strong>Code Quality:</strong> Generated scripts must pass linting (ESLint for JS, pylint for Python) and adhere to code style standards without manual fixes.</div>
+
+            <div class="req-item"><span class="req-id">NFR-11</span><strong>Consistency:</strong> All generated scripts for a project follow identical patterns; fixture reuse across scripts is automatic; no boilerplate duplication.</div>
+
+            <div class="req-item"><span class="req-id">NFR-12</span><strong>Extensibility:</strong> Support for custom fixtures and helper functions defined in project templates; framework-agnostic generation logic.</div>
+
+            <div class="req-item"><span class="req-id">NFR-13</span><strong>Security:</strong> Sanitise sensitive data in scripts (no hardcoded passwords, API keys, or PII); support secret injection via environment variables.</div>
+
+            <div class="req-item"><span class="req-id">NFR-14</span><strong>Maintainability:</strong> Generated scripts include comments explaining steps, selectors, and assertions for future maintenance.</div>
+
+            <div class="req-item"><span class="req-id">NFR-15</span><strong>Auditability:</strong> Log all script generation with framework version, AI model version, project config, and output checksum for reproducibility.</div>
+        </div>
+
+        <div class="section">
+            <h2>Acceptance Criteria</h2>
+
+            <h3>Feature: Test Case → Script Generation</h3>
+            <div class="acceptance-item">Given a test case with steps (e.g., "Click Login button, Enter email, Click Submit"), when selected for Playwright generation, then a syntactically-valid Playwright script is produced with correct selectors, locators, and assertions within 5 seconds.</div>
+            <div class="acceptance-item">Given a test case and Pytest selected, when converted, then a properly-structured Pytest file is generated with fixtures, setup/teardown, and assert statements matching team conventions.</div>
+            <div class="acceptance-item">Given a generated script, when linted with ESLint (JS) or pylint (Python), then zero linting errors are reported without manual edits.</div>
+
+            <h3>Feature: Parameterised Test Generation</h3>
+            <div class="acceptance-item">Given a test case and a CSV with 5 user rows, when converted to Playwright, then 5 separate test variations are generated with proper naming (test_login[row1], test_login[row2], etc.).</div>
+            <div class="acceptance-item">Given parameterised Pytest, when run, then all parameter combinations execute and report independently.</div>
+
+            <h3>Feature: GitHub PR Creation</h3>
+            <div class="acceptance-item">Given 20 generated scripts, when "Create PR" is selected, then a single draft PR is created with all scripts in organized folder structure and a clear commit message.</div>
+            <div class="acceptance-item">Given a generated script in a PR, when viewed on GitHub, then it includes comments explaining test purpose and key assertions.</div>
+
+            <h3>Feature: Project Configuration Compliance</h3>
+            <div class="acceptance-item">Given a project config with custom assertion style and timeout settings, when scripts are generated, then all scripts use the specified style without exceptions.</div>
+        </div>
+
+        <div class="section">
+            <h2>Dependencies & Integrations</h2>
+
+            <div class="dependency-item"><strong>SentinelQA Test Studio:</strong> Retrieve test cases from Test Studio DB; store generated scripts as artifacts. Status: Existing integration.</div>
+
+            <div class="dependency-item"><strong>GitHub API:</strong> Create draft PRs with generated script files. Status: Existing integration.</div>
+
+            <div class="dependency-item"><strong>Framework-Specific Parsers:</strong> Validate Playwright, Cypress, Jest, Pytest syntax. Recommendation: 'playwright-inspector' (JS), 'py_compile' (Python). Status: To be integrated.</div>
+
+            <div class="dependency-item"><strong>Linting Tools (ESLint, pylint):</strong> Validate generated code for style compliance. Status: Integration required.</div>
+
+            <div class="dependency-item"><strong>AI Language Model:</strong> For test case parsing, script generation, and code optimization. Status: Existing (Claude 3.5 Sonnet).</div>
+
+            <div class="dependency-item"><strong>Project Config Storage:</strong> Store project-specific generation rules (naming, assertion style, fixtures). Status: To be implemented (database table or YAML config files).</div>
+
+            <div class="dependency-item"><strong>CloudWatch / DataDog:</strong> Logging, metrics, performance tracking. Status: Existing infrastructure.</div>
+        </div>
+
+        <div class="section">
+            <h2>Assumptions & Constraints</h2>
+
+            <h3>Assumptions</h3>
+            <ul>
+                <li>Test cases are structured with clear steps; vague or ambiguous steps will produce lower-quality scripts.</li>
+                <li>Project configurations (naming conventions, assertion styles) are defined upfront by SDETs.</li>
+                <li>Generated scripts will be reviewed and refined by engineers; AI output is a starting point.</li>
+                <li>Element selectors are stable and can be identified from UI screenshots or provided in test case metadata.</li>
+                <li>Engineers have basic familiarity with the generated framework (no starter course required).</li>
+            </ul>
+
+            <h3>Constraints</h3>
+            <ul>
+                <li><strong>Framework Coverage:</strong> v1 supports Playwright, Cypress, Jest, Pytest only; other frameworks (Selenium, TestCafe) not supported in v1.</li>
+                <li><strong>Selector Robustness:</strong> AI-generated selectors may fail on significant UI redesigns; manual adjustment required for complex dynamic elements.</li>
+                <li><strong>Custom Fixtures:</strong> If project uses proprietary fixture patterns, custom templates must be provided upfront.</li>
+                <li><strong>API Rate Limits:</strong> GitHub API rate limiting applies to batch PR creation; queue management required for 100+ scripts.</li>
+                <li><strong>Secret Management:</strong> Generated scripts must not include hardcoded credentials; environment variable injection required for local testing.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Out of Scope (v1.0)</h2>
+
+            <div class="exclusion-item">Test execution or result reporting (handled by CI/CD pipelines).</div>
+
+            <div class="exclusion-item">Mobile app automation (Appium, XCUITest) – web-only in v1.</div>
+
+            <div class="exclusion-item">Visual regression testing or computer vision-based selectors (fallback only, not primary).</div>
+
+            <div class="exclusion-item">Automatic migration of existing manual scripts to AI-generated format.</div>
+
+            <div class="exclusion-item">Support for languages beyond English for test case input.</div>
+
+            <div class="exclusion-item">Integration with ALM/test management tools beyond GitHub (Jira, Azure DevOps plugins planned for v1.1).</div>
+
+            <div class="exclusion-item">Code review automation or approval workflows (manual QA review required).</div>
+        </div>
+
+        <div class="section">
+            <h2>Definition of Done</h2>
+
+            <ul class="checklist">
+                <li>All user stories (US-10 to US-17) validated with personas in UAT</li>
+                <li>FR-16 to FR-27 implemented with unit tests (>85% coverage)</li>
+                <li>NFR-09 to NFR-15 verified via performance testing, linting validation, security audit</li>
+                <li>Generated scripts pass linting (ESLint, pylint) without manual fixes</li>
+                <li>End-to-end integration test: test case → script generation → GitHub PR → script review</li>
+                <li>Performance target met: 10 scripts in <5 seconds, 100 scripts in <60 seconds</li>
+                <li>Project configuration system implemented and documented</li>
+                <li>User documentation (screenshot walkthrough, best practices guide) created</li>
+                <li>Security review: no credential leakage, secret management validated</li>
+                <li>Accessibility audit: UI meets WCAG 2.1 AA standards</li>
+                <li>Cost analysis: AI token usage per script documented and optimized</li>
+                <li>Production deployment plan: database schema, feature flags, rollback procedure</li>
+                <li>Sign-off from Anupam Sharma, SDET lead, and QA team</li>
+            </ul>
+
+            <div class="version-date">
+                <strong>Document Version:</strong> v1.0<br>
+                <strong>Last Updated:</strong> May 2026<br>
+                <strong>Owner:</strong> Anupam Sharma<br><strong>Author:</strong> Malcolm Govender (Head of AI &amp; Engineering)
+            </div>
+        </div>
+    </div>
+</body>
+</html>

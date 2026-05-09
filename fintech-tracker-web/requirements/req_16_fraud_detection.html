@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-16: PayGuard Fraud Shield Requirements</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #10161c 100%);
+            color: #e0e6ed;
+            line-height: 1.6;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            color: #58a6ff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .header-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 14px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(88, 166, 255, 0.1);
+            border-radius: 4px;
+            border: 1px solid #30363d;
+        }
+        
+        .meta-label {
+            color: #79c0ff;
+            font-weight: 600;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-p1 {
+            background: #da3633;
+            color: #fff;
+        }
+        
+        .badge-in-progress {
+            background: #1f6feb;
+            color: #fff;
+        }
+        
+        .badge-75 {
+            background: #238636;
+            color: #fff;
+        }
+        
+        .badge-must-have {
+            background: #da3633;
+            color: #fff;
+        }
+        
+        .badge-should-have {
+            background: #d29922;
+            color: #fff;
+        }
+        
+        .badge-nice-to-have {
+            background: #238636;
+            color: #fff;
+        }
+        
+        section {
+            margin-bottom: 40px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #79c0ff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #30363d;
+        }
+        
+        h3 {
+            font-size: 16px;
+            color: #c9d1d9;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            color: #d0d9e0;
+            line-height: 1.7;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+            color: #d0d9e0;
+        }
+        
+        .persona-card {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #58a6ff;
+        }
+        
+        .persona-card h4 {
+            color: #58a6ff;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .persona-detail {
+            font-size: 13px;
+            color: #8b949e;
+            margin-bottom: 8px;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .persona-detail strong {
+            color: #c9d1d9;
+        }
+        
+        .story-card {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-left: 4px solid #79c0ff;
+        }
+        
+        .story-id {
+            font-size: 12px;
+            color: #79c0ff;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        
+        .story-text {
+            color: #d0d9e0;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        
+        .story-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 12px;
+        }
+        
+        .req-item {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            padding: 14px;
+            margin-bottom: 12px;
+            color: #d0d9e0;
+        }
+        
+        .req-id {
+            color: #79c0ff;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        th {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            padding: 12px;
+            text-align: left;
+            color: #79c0ff;
+            font-weight: 600;
+        }
+        
+        td {
+            border: 1px solid #30363d;
+            padding: 12px;
+            color: #d0d9e0;
+        }
+        
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .checklist li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #238636;
+            font-weight: bold;
+        }
+        
+        .accent-box {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1) 0%, rgba(79, 195, 247, 0.05) 100%);
+            border: 1px solid #1f6feb;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 15px 0;
+            color: #c9d1d9;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, rgba(210, 153, 34, 0.1) 0%, rgba(210, 153, 34, 0.05) 100%);
+            border: 1px solid #d29922;
+            border-radius: 6px;
+            padding: 16px;
+            margin: 15px 0;
+            color: #c9d1d9;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: #0d1117;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+            border: 1px solid #30363d;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #238636 0%, #3fb950 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #8b949e;
+            font-size: 12px;
+            border-top: 1px solid #30363d;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div>
+                    <h1>PayGuard Fraud Shield</h1>
+                    <p style="color: #8b949e; margin: 0;">Intelligent Transaction Monitoring & Fraud Detection</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <span class="badge badge-p1">P1 Priority</span>
+                    <span class="badge badge-in-progress">75% Complete</span>
+                </div>
+            </div>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Use Case ID:</span>
+                    <span>UC-16</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Owner:</span>
+                    <span>Peter Onu</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Version:</span>
+                    <span>v1.0</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Date:</span>
+                    <span>May 2026</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Author:</span>
+                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Role:</span>
+                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Status:</span>
+                    <span>In Progress</span>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <p style="color: #8b949e; margin-bottom: 10px;"><strong>Build Progress:</strong></p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 75%;">75% Complete</div>
+                </div>
+                <p style="color: #8b949e; font-size: 12px; margin: 8px 0 0;">Core platform operational. 25% outstanding: ML model training, AML integration, anomaly detection expansion, load testing, model explainability.</p>
+            </div>
+        </header>
+
+        <section>
+            <h2>1. Problem Statement</h2>
+            <p>
+                African fintech platforms face unprecedented fraud threats: social engineering attacks targeting customer support teams, account takeover via credential stuffing and SIM swaps, and sophisticated payment fraud schemes exploiting underinvestment in real-time fraud detection infrastructure. Traditional rule-based fraud detection systems fail to adapt to evolving attack vectors and produce unacceptable false positive rates (10–15%), driving customers to competitors.
+            </p>
+            <p>
+                <strong>Core Pain Points:</strong>
+            </p>
+            <ul>
+                <li><strong>Attack Volume:</strong> 2–5% of transactions flagged as suspicious; manual review consumes 40+ hours/week from 3–4 analysts</li>
+                <li><strong>Detection Lag:</strong> Fraud detected in post-transaction analysis (24–48 hours); real-time blocking limited to crude velocity checks</li>
+                <li><strong>False Positives:</strong> 12–15% of legitimate transactions blocked, driving customer complaints and churn</li>
+                <li><strong>Ring Fraud:</strong> Coordinated fraud rings (friends/family schemes, mule networks) escape velocity-based detection</li>
+                <li><strong>Regulatory Risk:</strong> FICA (SA AML), POPIA (data protection), PCI-DSS compliance gaps create audit findings and regulatory penalties</li>
+                <li><strong>Operational Overhead:</strong> Case investigation manual and unstructured; fraud intelligence not shared across teams</li>
+                <li><strong>Latency Pressure:</strong> Real-time decisions required at payment (sub-50ms decision window); legacy systems take 200–500ms</li>
+            </ul>
+            <div class="accent-box">
+                <strong>Why This Matters:</strong> Fraud losses for a mid-sized fintech (~$50M annualized transaction volume) run 0.3–0.8% of volume, or $150K–$400K/year. A 60% reduction in fraud via real-time detection, combined with 50% reduction in false positives, saves $200K+/year while significantly improving customer trust and regulatory posture.
+            </div>
+        </section>
+
+        <section>
+            <h2>2. Current State (75% Built)</h2>
+            <h3>✓ Delivered Components</h3>
+            <div class="accent-box">
+                <strong>Real-Time Kafka Pipeline:</strong> High-throughput transaction streaming with <100ms end-to-end latency. Processes 5,000+ TPS peak load; supports backpressure and circuit breaker patterns.
+            </div>
+
+            <div class="accent-box">
+                <strong>26-Rule Scoring Engine:</strong> Rules across 6 categories:
+                <ul style="margin: 10px 0 20px;">
+                    <li><strong>Velocity Rules (8):</strong> Transaction count (1m, 5m, 1h, 24h windows), amount velocity, new device velocity</li>
+                    <li><strong>Device Rules (4):</strong> Device binding, device switching, new device in new location, jailbroken/rooted device detection</li>
+                    <li><strong>Geolocation Rules (3):</strong> Impossible travel (transactions >1000km in <1h), country mismatch, high-risk jurisdiction</li>
+                    <li><strong>Behavioral Rules (5):</strong> Transaction pattern deviation, time-of-day anomaly, merchant category anomaly, cash-out spike, KYC mismatch</li>
+                    <li><strong>Network Rules (3):</strong> Shared email address, shared phone number, shared device across accounts</li>
+                    <li><strong>Account Rules (3):</strong> Account age, profile completeness, email/phone verification status</li>
+                </ul>
+            </div>
+
+            <div class="accent-box">
+                <strong>Neo4j Fraud Ring Detector:</strong> Graph-based detection identifying coordinated fraud rings via relationship patterns (shared devices, emails, IP addresses, phone numbers, beneficial owners). Real-time ring scoring with configurable thresholds.
+            </div>
+
+            <div class="accent-box">
+                <strong>Device Binding Service:</strong> Hardware fingerprinting (device type, OS version, app version, device timezone, app locale) to detect account takeover via SIM swap or credential compromise. Cryptographic binding of device-account pairs with grace period for legitimate device changes.
+            </div>
+
+            <div class="accent-box">
+                <strong>React Analyst Dashboard:</strong> Real-time fraud alerts, case management (triage, investigation, disposition), historical fraud analysis, customer whitelist/blacklist, rule tuning interface. Supports 100+ concurrent analysts.
+            </div>
+
+            <div class="accent-box">
+                <strong>Compliance Framework:</strong> POPIA (South Africa data residency), PCI-DSS Level 1, FICA AML integration, DPA documentation, audit logging (all fraud decisions logged immutably).
+            </div>
+
+            <div class="accent-box">
+                <strong>Signal API (TypeScript):</strong> REST API for ingesting fraud signals from external systems (partner fintech, payment processors). Extensible for custom signal types.
+            </div>
+
+            <h3>❌ Outstanding (25% Remaining)</h3>
+            <p style="color: #d29922; margin-bottom: 15px;">
+                <strong>Blockers preventing GA launch:</strong>
+            </p>
+
+            <div class="warning-box">
+                <strong>1. ML Model Training & Deployment (Critical)</strong>
+                <br>ai_fraud_rules.py contains stubs for XGBoost and Isolation Forest models. Must:
+                <ul style="margin: 10px 0 20px; color: #d0d9e0;">
+                    <li>Ingest 12-month historical transaction dataset (30M+ transactions, 500K+ labeled fraud cases)</li>
+                    <li>Feature engineering: velocity features, device features, behavioral features, ring membership score</li>
+                    <li>Train XGBoost for binary fraud classification (fraud/legitimate)</li>
+                    <li>Train Isolation Forest for anomaly scoring</li>
+                    <li>Validate model AUC >0.92 on holdout test set; false positive rate <3%</li>
+                    <li>Deploy models via MLflow with A/B testing framework</li>
+                    <li>Automate monthly retraining pipeline</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <strong>2. AML/Sanctions Database Integration (Regulatory)</strong>
+                <br>Rule 022 (sanctions check) is a placeholder. Must:
+                <ul style="margin: 10px 0 20px; color: #d0d9e0;">
+                    <li>Integrate with OFAC SDN list (US sanctions), FSCA PEP list (SA politically exposed persons)</li>
+                    <li>Real-time name matching with fuzzy matching (handles typos, name variations)</li>
+                    <li>Maintain weekly list updates</li>
+                    <li>Log all sanctions checks for audit compliance</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <strong>3. Anomaly Detection Expansion (Quality)</strong>
+                <br>Currently velocity-focused. Must expand to:
+                <ul style="margin: 10px 0 20px; color: #d0d9e0;">
+                    <li>Z-score based statistical outlier detection on amount, frequency, merchant category</li>
+                    <li>Isolation Forest on raw features to detect global outliers</li>
+                    <li>Local Outlier Factor (LOF) for local density anomalies</li>
+                    <li>Ensemble anomaly scoring with calibrated thresholds</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <strong>4. Load Testing & Performance Validation (Operational)</strong>
+                <br>Must validate production readiness:
+                <ul style="margin: 10px 0 20px; color: #d0d9e0;">
+                    <li>Kafka pipeline: 10,000 TPS sustained load, <100ms p99 latency, 0% message loss</li>
+                    <li>Scoring engine: <50ms p99 decision latency at 10,000 TPS</li>
+                    <li>Neo4j graph queries: <200ms p99 for ring detection (10M+ nodes)</li>
+                    <li>Dashboard: <2s page load, 100+ concurrent analysts without degradation</li>
+                    <li>Spike testing: handle 3x peak load for 5min without failure</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <strong>5. Internal Data Source Integration (Operational)</strong>
+                <br>Must connect to core banking systems:
+                <ul style="margin: 10px 0 20px; color: #d0d9e0;">
+                    <li>Kafka topics: user.created, user.kyc_updated, account.created, account.closed</li>
+                    <li>Enrichment data: customer demographics, account history, device registry</li>
+                    <li>Error handling: graceful degradation if upstream systems lag</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <strong>6. Model Explainability Layer (Governance)</strong>
+                <br>Analysts must understand why transactions are flagged:
+                <ul style="margin: 10px 0 20px; color: #d0d9e0;">
+                    <li>SHAP values: per-transaction feature attribution (which rules contributed to decision?)</li>
+                    <li>Rule-level tracing: which of 26 rules fired and contributed to risk score</li>
+                    <li>Ring membership visualization: show nodes and relationships in fraud ring</li>
+                    <li>Historical similar cases: find similar fraud cases analyst can reference</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>3. Target Users & Personas</h2>
+
+            <div class="persona-card">
+                <h4>🛡️ Fraud Analyst (Kwame Asante)</h4>
+                <div class="persona-detail">
+                    <div><strong>Role:</strong> Senior Fraud Analyst, 6 years fintech, South Africa-based</div>
+                </div>
+                <div class="persona-detail">
+                    <div><strong>Goals:</strong> Quickly triage alerts, identify rings, investigate cases, make disposition (approve/decline/review)</div>
+                </div>
+                <p><strong>Frustrations:</strong> 200+ alerts/day, cannot manually review all; false positives delay legitimate customer transactions; no visibility into fraud ring activity; SHAP/explainability missing.</p>
+                <p><strong>Usage Pattern:</strong> Full-time, 8+ hours/day. Needs dashboard responsive at <2s page load, real-time alert notifications, case search and filter capabilities.</p>
+            </div>
+
+            <div class="persona-card">
+                <h4>⚙️ Platform Engineer (Siviwe Mthembu)</h4>
+                <div class="persona-detail">
+                    <div><strong>Role:</strong> Backend engineer, responsible for Kafka pipeline, scoring engine deployment, ML model serving</div>
+                </div>
+                <div class="persona-detail">
+                    <div><strong>Goals:</strong> Deploy models, monitor latency, manage A/B testing, scale to 10,000 TPS</div>
+                </div>
+                <p><strong>Frustrations:</strong> No MLflow integration; model retraining manual; A/B test framework missing; performance monitoring gaps; deployment runbooks incomplete.</p>
+                <p><strong>Usage Pattern:</strong> 4–5 times/week. Critical during deployment and incident response windows.</p>
+            </div>
+
+            <div class="persona-card">
+                <h4>📋 Compliance Officer (Dr. Thandi Zuma)</h4>
+                <div class="persona-detail">
+                    <div><strong>Role:</strong> Head of Compliance, responsible for POPIA, FICA, PCI-DSS, SARB PS-017 adherence</div>
+                </div>
+                <div class="persona-detail">
+                    <div><strong>Goals:</strong> Maintain audit trail, prove sanctions checking, demonstrate AML controls, pass regulatory inspections</div>
+                </div>
+                <p><strong>Frustrations:</strong> Audit logging incomplete; sanctions checking placeholder; no evidence of AML rule effectiveness; DPA documentation stale; model bias concerns.</p>
+                <p><strong>Usage Pattern:</strong> 2–3 times/week. Critical before regulatory audits (quarterly/annual).</p>
+            </div>
+
+            <div class="persona-card">
+                <h4>👔 Risk Manager (Marcus Johnson)</h4>
+                <div class="persona-detail">
+                    <div><strong>Role:</strong> VP Risk & Operations, oversees fraud strategy, budgets, SLA management</div>
+                </div>
+                <div class="persona-detail">
+                    <div><strong>Goals:</strong> Reduce fraud loss rate, maintain SLA uptime, optimize analyst team sizing, support growth targets</div>
+                </div>
+                <p><strong>Frustrations:</strong> Fraud loss metrics not real-time; no predictive modeling for analyst capacity; ring detection performance not transparent; model explainability limits confidence in decisions.</p>
+                <p><strong>Usage Pattern:</strong> Weekly. Metrics-focused; needs executive dashboard with KPIs.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>4. User Stories</h2>
+
+            <div class="story-card">
+                <div class="story-id">US-01</div>
+                <div class="story-text">As a Fraud Analyst, I want the system to flag high-risk transactions in real-time with clear rule attribution, so that I can prioritize review and approve/decline quickly.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-02</div>
+                <div class="story-text">As a Platform Engineer, I want to deploy trained ML models with automated A/B testing and gradual rollout, so that I can validate model improvements before full production deployment.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-03</div>
+                <div class="story-text">As a Fraud Analyst, I want the system to visualize fraud rings and show shared attributes (devices, emails, phone numbers), so that I can identify coordinated fraud schemes.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-04</div>
+                <div class="story-text">As a Compliance Officer, I want all fraud decisions logged immutably with SHAP explanation (which rules contributed), so that I can prove to regulators that controls are evidence-based and not arbitrary.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-05</div>
+                <div class="story-text">As a Platform Engineer, I want to integrate with OFAC SDN and FSCA PEP lists, so that the system checks sanctions before approving transactions and documents checks for compliance audits.</div>
+                <div class="story-meta">
+                    <span class="badge badge-must-have">Must Have</span>
+                    <span style="color: #79c0ff;">Priority 1</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-06</div>
+                <div class="story-text">As a Risk Manager, I want real-time fraud loss metrics (% of volume, $ lost, detection rate), so that I can track performance and identify emerging fraud trends.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-07</div>
+                <div class="story-text">As a Fraud Analyst, I want to whitelist legitimate transactions and bulk-whitelist customers to reduce false positives, so that good customers are not blocked.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-08</div>
+                <div class="story-text">As a Platform Engineer, I want automated monthly model retraining with performance validation before deployment, so that models stay current with evolving fraud patterns.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-09</div>
+                <div class="story-text">As a Fraud Analyst, I want to search and filter cases by rule fired, amount range, merchant, customer segment, so that I can find patterns and investigate efficiently.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-10</div>
+                <div class="story-text">As a Compliance Officer, I want automated evidence export for regulatory audits (rule audit trail, model card, fairness metrics), so that I can quickly respond to audit requests.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-11</div>
+                <div class="story-text">As a Risk Manager, I want to configure fraud thresholds and rule weights, so that I can balance fraud loss vs. false positives to match business risk appetite.</div>
+                <div class="story-meta">
+                    <span class="badge badge-nice-to-have">Nice to Have</span>
+                    <span style="color: #79c0ff;">Priority 3</span>
+                </div>
+            </div>
+
+            <div class="story-card">
+                <div class="story-id">US-12</div>
+                <div class="story-text">As a Platform Engineer, I want detailed performance monitoring (latency, error rate, fraud model confidence), so that I can detect issues and optimize system performance.</div>
+                <div class="story-meta">
+                    <span class="badge badge-should-have">Should Have</span>
+                    <span style="color: #79c0ff;">Priority 2</span>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>5. Functional Requirements</h2>
+
+            <div class="req-item">
+                <span class="req-id">FR-01:</span>
+                System must ingest transactions from Kafka topics at >10,000 TPS with <100ms end-to-end latency, supporting backpressure and circuit breaker patterns.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-02:</span>
+                System must apply 26-rule scoring engine (velocity, device, geo, behavioral, network, account) and compute aggregated fraud risk score in <50ms p99 latency.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-03:</span>
+                System must detect fraud rings via Neo4j graph queries (shared devices, emails, phone numbers, beneficial owners) in <200ms p99 latency.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-04:</span>
+                System must bind accounts to devices via cryptographic device fingerprinting and flag account takeover attempts (device mismatch with grace period).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-05:</span>
+                System must train and deploy XGBoost fraud classifier (AUC >0.92) and Isolation Forest anomaly detector with automated monthly retraining.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-06:</span>
+                System must perform real-time sanctions checking against OFAC SDN and FSCA PEP lists with fuzzy name matching and weekly list updates.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-07:</span>
+                System must generate SHAP explanations for each fraud decision showing feature attribution (which rules/models contributed to risk score).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-08:</span>
+                System must immutably log all fraud decisions with timestamps, rule/model output, analyst actions (approve/decline/review), and rationale.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-09:</span>
+                System must present real-time fraud alerts to analysts via dashboard, sortable by risk score, rule fired, merchant, amount.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-10:</span>
+                System must support analyst case management: triage (risk level), investigation (case notes, rule detail, ring visualization), disposition (approve/decline/refer).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-11:</span>
+                System must allow analysts to create whitelists (customer-level, transaction-level) to suppress false positives and bulk-whitelist high-value segments.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-12:</span>
+                System must support A/B testing framework for ML models: gradual rollout (10% → 50% → 100% traffic), performance comparison, automatic fallback if degradation detected.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-13:</span>
+                System must compute anomaly scores via z-score, Isolation Forest, and LOF algorithms, with ensemble scoring and calibrated thresholds.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-14:</span>
+                System must expose REST API for external fraud signal ingestion (partner fintech, payment processors) with rate limiting and authentication.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-15:</span>
+                System must support rule tuning: analysts can adjust rule weights, thresholds, and enable/disable rules via dashboard with audit trail.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-16:</span>
+                System must integrate with Kafka topics for account enrichment (user.kyc_updated, account.closed) to refresh fraud risk context in real-time.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-17:</span>
+                System must generate compliance artifacts: rule audit trail, model card (architecture, training data, fairness metrics), DPA documentation, evidence exports for audit response.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">FR-18:</span>
+                System must visualize fraud ring topology: nodes (accounts, devices, emails, phone numbers), edges (shared attributes), ring risk score, member transaction history.
+            </div>
+        </section>
+
+        <section>
+            <h2>6. Non-Functional Requirements</h2>
+
+            <div class="req-item">
+                <span class="req-id">NFR-01:</span>
+                <strong>Performance (Critical):</strong> <50ms p99 latency for fraud decision at 10,000 TPS; <100ms p99 for Kafka ingestion; <200ms p99 for ring detection. Dashboard <2s page load.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-02:</span>
+                <strong>Availability:</strong> 99.9% uptime SLA with automated failover, circuit breakers, graceful degradation (fail open on latency spike; default to moderate-risk score).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-03:</span>
+                <strong>Security:</strong> AES-256 encryption for transaction data at rest; TLS 1.3 for data in transit; API authentication via OAuth2 and API keys; role-based access control (analyst, engineer, compliance officer).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-04:</span>
+                <strong>Data Privacy (Regulatory):</strong> POPIA compliance: data residency in South Africa (no EU transfer); right to deletion; audit logging; user consent for device fingerprinting.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-05:</span>
+                <strong>Compliance:</strong> PCI-DSS Level 1: encryption, access control, audit logging, quarterly penetration testing. FICA AML: sanctions checking, transaction monitoring, CTR reporting.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-06:</span>
+                <strong>Scalability:</strong> Auto-scaling Kafka consumers to handle 3x peak load (30,000 TPS); Neo4j cluster with replication for 10M+ nodes; ML model serving via load-balanced inference endpoints.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-07:</span>
+                <strong>Reliability:</strong> Automated backup of fraud decisions, audit logs, rule config daily; RPO <1h, RTO <4h. Message deduplication in Kafka (exactly-once semantics).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-08:</span>
+                <strong>Model Governance:</strong> Model versioning via MLflow; model card documentation (training data, fairness metrics, known limitations); bias testing (disparate impact, fairness for protected attributes). Monthly retraining validation.
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-09:</span>
+                <strong>Monitoring:</strong> Real-time alerts on latency >100ms, error rate >0.1%, fraud decision explainability (SHAP) availability, fraud loss trend (if >2σ from baseline).
+            </div>
+
+            <div class="req-item">
+                <span class="req-id">NFR-10:</span>
+                <strong>Cost Efficiency:</strong> Target <$0.001 per transaction scored (including ML inference, Kafka, storage). Use cost-optimized model serving (quantization, distillation) without sacrificing accuracy.
+            </div>
+        </section>
+
+        <section>
+            <h2>7. Acceptance Criteria</h2>
+
+            <h3>Core Story: Real-Time Fraud Flagging (US-01)</h3>
+            <div class="accent-box">
+                <strong>Given</strong> a transaction arrives at 5,000 TPS baseline and includes amount, merchant, customer, device, geolocation
+                <br><strong>When</strong> system processes transaction
+                <br><strong>Then</strong> fraud risk score is computed and decision (approve/challenge/decline) returned in <50ms p99
+                <br><strong>And</strong> risk score breakdown shows which rules fired (velocity: 8/10, device mismatch: 3/10, geo anomaly: 2/10)
+                <br><strong>And</strong> analyst receives alert in dashboard within 1 second
+            </div>
+
+            <h3>Core Story: Fraud Ring Detection (US-03)</h3>
+            <div class="accent-box">
+                <strong>Given</strong> 5 accounts sharing a device and email address (mule network)
+                <br><strong>When</strong> one account's transaction is flagged
+                <br><strong>Then</strong> system detects ring membership, shows all 5 accounts as connected nodes, shared attributes highlighted
+                <br><strong>And</strong> all 5 accounts get elevated risk score for ring participation
+                <br><strong>And</strong> analyst can visualize ring topology in <500ms
+            </div>
+
+            <h3>ML Model Story: A/B Testing & Deployment (US-02)</h3>
+            <div class="accent-box">
+                <strong>Given</strong> new XGBoost model trained on 12M transactions with AUC 0.93 (vs. baseline 0.91)
+                <br><strong>When</strong> engineer initiates deployment
+                <br><strong>Then</strong> system routes 10% of traffic to new model for 6 hours
+                <br><strong>And</strong> if false positive rate stays within 2% of baseline, automatically promote to 50%, then 100%
+                <br><strong>And</strong> if FP rate exceeds 3%, auto-rollback to previous model
+                <br><strong>And</strong> all decisions (model version, metrics, rollback events) logged immutably
+            </div>
+
+            <h3>Compliance Story: Sanctions Checking & Audit Trail (US-05)</h3>
+            <div class="accent-box">
+                <strong>Given</strong> transaction from customer whose name matches OFAC SDN list variant
+                <br><strong>When</strong> system performs sanctions check
+                <br><strong>Then</strong> transaction is blocked immediately
+                <br><strong>And</strong> audit log records: timestamp, customer name, matched list, confidence score (name distance), analyst decision
+                <br><strong>And</strong> compliance officer can export all sanctions checks from past 30 days as CSV for regulatory proof
+            </div>
+        </section>
+
+        <section>
+            <h2>8. Dependencies & Integrations</h2>
+
+            <h3>Built Components (In-House)</h3>
+            <ul>
+                <li><strong>Kafka Pipeline:</strong> Real-time transaction streaming, topic fan-out for fraud pipeline, rule engine, Neo4j graph builder</li>
+                <li><strong>Fraud Rule Engine:</strong> 26 rules, configurable weights, real-time rule tuning</li>
+                <li><strong>Neo4j Graph Database:</strong> Fraud ring detection, relationship queries</li>
+                <li><strong>Device Service:</strong> Fingerprinting, device binding, account-device cryptographic registry</li>
+                <li><strong>React Dashboard:</strong> Alert triage, case management, whitelisting, rule tuning</li>
+            </ul>
+
+            <h3>Outstanding Dependencies (Must Complete 25%)</h3>
+            <ul>
+                <li><strong>ML Model Training:</strong> XGBoost, Isolation Forest, scikit-learn (feature engineering, cross-validation)</li>
+                <li><strong>MLflow:</strong> Model versioning, A/B testing framework, automated retraining pipelines</li>
+                <li><strong>Sanctions Lists:</strong> OFAC SDN (weekly XML download), FSCA PEP list (South Africa AML)</li>
+                <li><strong>Fuzzy Matching:</strong> FuzzyWuzzy or levenshtein for name matching against sanctions lists</li>
+                <li><strong>SHAP/Model Explainability:</strong> SHAP library for feature attribution, per-transaction explanation</li>
+                <li><strong>Internal Kafka Topics:</strong> user.created, user.kyc_updated, account.created, account.closed for enrichment</li>
+                <li><strong>Monitoring/Observability:</strong> Prometheus (metrics), ELK stack (logging), Datadog/Grafana (dashboards)</li>
+            </ul>
+
+            <h3>Regulatory & External</h3>
+            <ul>
+                <li><strong>SARB (South African Reserve Bank):</strong> PS-017 Prudential Standard on fraud prevention compliance</li>
+                <li><strong>FIC (Financial Intelligence Centre):</strong> FICA AML guidance and suspicious transaction reporting (STR)</li>
+                <li><strong>Information Regulator (IR):</strong> POPIA enforcement for data residency and user rights</li>
+                <li><strong>Audit Firm:</strong> Annual SOC 2 Type II audit for PCI-DSS and data security validation</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>9. Assumptions & Constraints</h2>
+
+            <h3>Assumptions</h3>
+            <ul>
+                <li>12+ months of labeled historical transaction data (fraud/legitimate) available for model training (30M+ transactions, 500K+ fraud cases)</li>
+                <li>Kafka infrastructure (topics, consumer groups) already in place and stable</li>
+                <li>Neo4j cluster operational and capable of handling 10M+ nodes with <200ms query latency</li>
+                <li>Core banking systems provide enrichment data (KYC, account details) via Kafka in near-real-time</li>
+                <li>Analysts are available 24/7 for case review; not targeting 100% automated approval</li>
+                <li>Business is willing to accept 3–5% false positive rate (legitimate transactions blocked) as cost of fraud prevention</li>
+                <li>Regulatory environment (POPIA, FICA, PCI-DSS) requirements stable through v1.0 launch</li>
+            </ul>
+
+            <h3>Constraints</h3>
+            <ul>
+                <li><strong>Latency Budget:</strong> <50ms decision time leaves only 30–40ms for ML inference; may require model quantization or distillation</li>
+                <li><strong>Data Residency (POPIA):</strong> All customer data must remain in South Africa; no EU/US transfer limits cloud provider options</li>
+                <li><strong>Model Bias Risk:</strong> Historical fraud labels may be biased (e.g., certain demographics over-flagged); requires fairness testing before deployment</li>
+                <li><strong>Ring Detection Scalability:</strong> Neo4j graph grows continuously; may need sharding strategy for 100M+ nodes (v2+)</li>
+                <li><strong>False Positive Cost:</strong> Each blocked legitimate transaction generates customer support ticket (~$50 cost); FP rate impacts economics</li>
+                <li><strong>Integration Complexity:</strong> 26-rule scoring engine tightly coupled to core banking; refactoring in critical path</li>
+                <li><strong>Analyst Capacity:</strong> 200+ alerts/day with 3 analysts = 67 alerts/person/day; system must support prioritization and batching</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>10. Out of Scope (v1.0)</h2>
+
+            <ul>
+                <li>Behavioral biometrics (keystroke, swipe dynamics) — deferred to v2</li>
+                <li>Device binding on non-mobile platforms (desktop, tablet) — v1 mobile-only</li>
+                <li>Graph-based link prediction (predicting future fraud connections) — deferred to v2</li>
+                <li>Integration with third-party fraud data suppliers (LexisNexis, Threatmetrix) — v2</li>
+                <li>Automated decision execution (auto-approve, auto-decline) — v1 is analyst-assisted only</li>
+                <li>Multi-currency and cross-border transaction support — v1 South Africa ZAR only</li>
+                <li>Real-time retraining (continuous learning on analyst feedback) — batch monthly retraining only in v1</li>
+                <li>Mobile app (web-responsive dashboard only)</li>
+                <li>Integration with criminal justice agencies (SAPS, NPA) — regulatory, not technical scope</li>
+                <li>Automated fraud victim notification and recovery workflows — deferred to v2</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>11. Definition of Done</h2>
+
+            <ul class="checklist">
+                <li>All 18 functional requirements implemented, tested, and demonstrated to Risk Manager</li>
+                <li>All 10 non-functional requirements validated: latency tested at 10,000 TPS, security audit passed, POPIA compliance verified</li>
+                <li>ML models (XGBoost, Isolation Forest) trained with AUC >0.92, false positive rate <3% on holdout test set</li>
+                <li>MLflow integration complete with A/B testing framework; automated monthly retraining pipeline validated</li>
+                <li>AML/sanctions checking integrated with OFAC SDN and FSCA PEP lists; weekly list update process automated</li>
+                <li>Anomaly detection (z-score, Isolation Forest, LOF) implemented and ensemble scoring calibrated</li>
+                <li>Load testing completed: 10,000 TPS sustained load with <50ms p99 latency, <200ms p99 for ring detection</li>
+                <li>Internal Kafka topics (user.created, kyc_updated, account.created) integrated and enrichment data flowing</li>
+                <li>SHAP explainability layer operational: per-transaction explanations showing rule/model contributions</li>
+                <li>Audit logging 100% complete: immutable records of all fraud decisions with timestamps, rule output, analyst actions</li>
+                <li>React analyst dashboard tested with 100+ concurrent users; case management, whitelisting, rule tuning fully functional</li>
+                <li>Confluence and Notion integrations tested (if applicable); specs published and accessible</li>
+                <li>Compliance artifacts generated: rule audit trail, model card, fairness testing results, DPA documentation</li>
+                <li>Security audit (penetration test, code review) passed; encryption, authentication, RBAC validated</li>
+                <li>Operational runbooks written: deployment, incident response, model retraining, sanctions list updates</li>
+                <li>User documentation complete: analyst quick-start guide, engineer deployment guide, compliance evidence export process</li>
+                <li>Beta access granted to 2–3 customers; feedback incorporated, critical issues resolved</li>
+                <li>Monitoring configured: latency alerts, error rate alerts, fraud loss trend alerts, SHAP availability monitoring</li>
+                <li>v1.0 tagged in version control; known limitations documented (model retraining cadence, single-region deployment)</li>
+            </ul>
+        </section>
+
+        <section style="border: 2px solid #238636; background: rgba(35, 134, 54, 0.1);">
+            <h2 style="color: #3fb950;">Success Metrics (v1.0 → GA)</h2>
+            <ul>
+                <li><strong>Fraud Detection Rate:</strong> Capture 75%+ of fraud volume (vs. ~30% today with legacy rules)</li>
+                <li><strong>False Positive Rate:</strong> <3% of legitimate transactions incorrectly flagged</li>
+                <li><strong>Analyst Efficiency:</strong> Alert review time drops from 15min to 3min per case (80% improvement)</li>
+                <li><strong>Fraud Loss Reduction:</strong> Fraud loss as % of volume drops from 0.5% to 0.15% ($200K+/year savings)</li>
+                <li><strong>Customer Impact:</strong> Legitimate transaction decline rate drops from 2% to 0.5%</li>
+                <li><strong>System Reliability:</strong> >99.9% uptime; zero fraud decision data loss</li>
+                <li><strong>Regulatory Compliance:</strong> 100% audit-ready: zero findings on fraud controls, AML, PCI-DSS in annual audit</li>
+                <li><strong>Model Performance:</strong> ML models maintain AUC >0.90 in production; monthly retraining keeps pace with fraud evolution</li>
+            </ul>
+        </section>
+
+        <div class="footer">
+            <p>PayGuard Fraud Shield | UC-16 | Requirements Document v1.0 | May 2026</p>
+            <p>Owner: Peter Onu | Status: In Progress (75%) | Confidential - Internal Only</p>
+        </div>
+    </div>
+</body>
+</html>

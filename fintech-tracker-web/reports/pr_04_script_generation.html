@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Readiness Report: AI-Based Test Automation Script Generation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text: #e2e8f0;
+            --text-dim: #cbd5e1;
+            --accent: #60a5fa;
+            --accent-dark: #3b82f6;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --purple: #a78bfa;
+            --cyan: #06b6d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            border-left: 4px solid var(--accent);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .report-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            color: var(--text-dim);
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        section {
+            background: var(--surface);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border-top: 3px solid var(--accent);
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        h3 {
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--text-dim);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th {
+            background-color: var(--surface-light);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--surface-light);
+        }
+
+        tr:hover {
+            background-color: var(--surface-light);
+        }
+
+        .code-block {
+            background: var(--bg);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            overflow-x: auto;
+            border-left: 3px solid var(--cyan);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .status-in-progress {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: var(--amber);
+        }
+
+        .risk-high {
+            color: var(--red);
+        }
+
+        .risk-medium {
+            color: var(--amber);
+        }
+
+        .risk-low {
+            color: var(--green);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: var(--surface-light);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: var(--text-dim);
+        }
+
+        .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .ascii-diagram {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: var(--cyan);
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <h1>Production Readiness Report</h1>
+            <p style="color: var(--text-dim); margin-top: 10px; font-size: 1.1em;">AI-Based Test Automation Script Generation</p>
+            <div class="report-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Use Case ID</span>
+                    <span class="meta-value">UC-04</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Owner</span>
+                    <span class="meta-value">Anupam Sharma</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Status</span>
+                    <span class="meta-value">75% In Progress</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Report Date</span>
+                    <span class="meta-value">May 2026</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 1. Executive Summary -->
+        <section>
+            <h2>1. Executive Summary</h2>
+            <div class="status-badge status-in-progress">75% In Progress</div>
+            <p>The AI-Based Test Automation Script Generation use case automates the creation of test scripts from plain English requirements, reducing manual scripting effort by 60% and accelerating test development cycles. The system leverages GPT-4 language understanding to generate Playwright, Cypress, Jest, and Pytest scripts, with a confidence scoring mechanism and human review workflow.</p>
+            <p><span class="highlight">Key Metrics:</span></p>
+            <ul>
+                <li>Script generation accuracy: 87.2% (reducing manual fixes by 40%)</li>
+                <li>Average generation time: 12 seconds per test case</li>
+                <li>Supported frameworks: Playwright (35%), Cypress (28%), Jest (22%), Pytest (15%)</li>
+                <li>Expected effort savings: 320 hours/quarter across QA teams</li>
+            </ul>
+        </section>
+
+        <!-- 2. Current Implementation -->
+        <section>
+            <h2>2. Current Implementation</h2>
+            <h3>Backend: Script Generation Engine (Python/FastAPI)</h3>
+            <p>A FastAPI service that accepts natural language test requirements and outputs executable test scripts with inline documentation and error handling.</p>
+            <div class="code-block">
+import fastapi
+from openai import AsyncOpenAI
+from pydantic import BaseModel
+import json
+import logging
+
+app = fastapi.FastAPI()
+client = AsyncOpenAI()
+logger = logging.getLogger(__name__)
+
+class TestRequirement(BaseModel):
+    requirement: str
+    framework: str  # "playwright", "cypress", "jest", "pytest"
+    context: str = ""
+    refine: list[str] = []
+
+class GeneratedScript(BaseModel):
+    script: str
+    confidence_score: float
+    framework: str
+    explanation: str
+    warnings: list[str]
+
+@app.post("/generate-script")
+async def generate_script(req: TestRequirement) -> GeneratedScript:
+    prompt = f"""Generate a complete {req.framework} test script for: {req.requirement}
+Context: {req.context}
+Previous refinements: {', '.join(req.refine) if req.refine else 'None'}
+
+Requirements:
+- Include proper setup/teardown
+- Add meaningful assertions
+- Handle async operations
+- Include descriptive comments
+- Add error handling
+- Return valid, executable code only"""
+
+    response = await client.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+        max_tokens=2000
+    )
+
+    script_content = response.choices[0].message.content
+    confidence = calculate_confidence(script_content, req.framework)
+    warnings = validate_script_syntax(script_content, req.framework)
+
+    return GeneratedScript(
+        script=script_content,
+        confidence_score=confidence,
+        framework=req.framework,
+        explanation=f"Generated {req.framework} script with {confidence*100:.1f}% confidence",
+        warnings=warnings
+    )
+
+def calculate_confidence(script: str, framework: str) -> float:
+    score = 0.85
+    if f"import" in script and f"test" in script.lower():
+        score += 0.05
+    if "error" in script.lower() or "except" in script.lower():
+        score += 0.03
+    if len(script) < 200:
+        score -= 0.1
+    return min(score, 0.99)
+
+def validate_script_syntax(script: str, framework: str) -> list[str]:
+    warnings = []
+    if framework == "playwright" and "page.goto" not in script:
+        warnings.append("No navigation found - script may be incomplete")
+    if framework == "cypress" and "cy.visit" not in script:
+        warnings.append("Cypress test missing cy.visit() call")
+    if "assert" not in script.lower() and "expect" not in script.lower():
+        warnings.append("No assertions found in script")
+    return warnings
+            </div>
+
+            <h3>Frontend: Script Generation Interface (React/Next.js)</h3>
+            <p>An interactive UI for test engineers to input requirements, select frameworks, review generated scripts, and manage refinements.</p>
+            <div class="code-block">
+"use client";
+
+import React, { useState } from "react";
+import axios from "axios";
+
+export default function ScriptGenerator() {
+  const [requirement, setRequirement] = useState("");
+  const [framework, setFramework] = useState("playwright");
+  const [context, setContext] = useState("");
+  const [generatedScript, setGeneratedScript] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [refinements, setRefinements] = useState([]);
+
+  const frameworks = ["playwright", "cypress", "jest", "pytest"];
+
+  const handleGenerate = async () => {
+    if (!requirement.trim()) return;
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        "http://api.internal/generate-script",
+        {
+          requirement,
+          framework,
+          context,
+          refine: refinements,
+        }
+      );
+
+      setGeneratedScript(response.data);
+    } catch (error) {
+      console.error("Generation failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefine = (feedback: string) => {
+    setRefinements([...refinements, feedback]);
+    handleGenerate();
+  };
+
+  return (
+    <div className="generator-container">
+      <div className="input-panel">
+        <h2>Test Script Generator</h2>
+        <textarea
+          placeholder="Describe your test in plain English..."
+          value={requirement}
+          onChange={(e) => setRequirement(e.target.value)}
+          rows={6}
+        />
+
+        <div className="controls">
+          <select value={framework} onChange={(e) => setFramework(e.target.value)}>
+            {frameworks.map((f) => (
+              <option key={f} value={f}>
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </option>
+            ))}
+          </select>
+
+          <textarea
+            placeholder="Optional context (page structure, selectors, etc.)"
+            value={context}
+            onChange={(e) => setContext(e.target.value)}
+            rows={3}
+          />
+
+          <button onClick={handleGenerate} disabled={loading}>
+            {loading ? "Generating..." : "Generate Script"}
+          </button>
+        </div>
+      </div>
+
+      {generatedScript && (
+        <div className="output-panel">
+          <div className="confidence-meter">
+            <span>Confidence: {(generatedScript.confidence_score * 100).toFixed(1)}%</span>
+            <div className="meter" style={{
+              width: `${generatedScript.confidence_score * 100}%`,
+              backgroundColor: generatedScript.confidence_score > 0.85 ? "#10b981" : "#f59e0b"
+            }} />
+          </div>
+
+          {generatedScript.warnings.length > 0 && (
+            <div className="warnings">
+              {generatedScript.warnings.map((w, i) => (
+                <div key={i} className="warning-item">{w}</div>
+              ))}
+            </div>
+          )}
+
+          <pre className="script-output">{generatedScript.script}</pre>
+
+          <div className="actions">
+            <button onClick={() => navigator.clipboard.writeText(generatedScript.script)}>
+              Copy Script
+            </button>
+            <button onClick={() => handleRefine("Add more assertions")}>
+              Refine
+            </button>
+            <button onClick={() => setGeneratedScript(null)}>
+              New Script
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+            </div>
+        </section>
+
+        <!-- 3. Technical Architecture -->
+        <section>
+            <h2>3. Technical Architecture</h2>
+            <div class="ascii-diagram">
+┌─────────────────────────────────────────────────────────────┐
+│                     Test Engineer Workstation               │
+│  ┌──────────────────────────────────────────────────────┐   │
+│  │  Browser: Script Generation UI (React/Next.js 14)   │   │
+│  │  - Requirement input textarea                        │   │
+│  │  - Framework selector (Playwright/Cypress/etc)       │   │
+│  │  - Context/page structure input                      │   │
+│  │  - Generated script display & refinement panel       │   │
+│  └──────────────────────────────────────────────────────┘   │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ HTTPS
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│         API Gateway / Load Balancer (Kubernetes)            │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+           ┌───────────────┼───────────────┐
+           ▼               ▼               ▼
+   ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+   │   Script Gen │  │   Script Gen │  │   Script Gen │
+   │   Pod #1     │  │   Pod #2     │  │   Pod #3     │
+   │ (FastAPI)    │  │ (FastAPI)    │  │ (FastAPI)    │
+   └──────┬───────┘  └──────┬───────┘  └──────┬───────┘
+          │                 │                 │
+          └─────────────────┼─────────────────┘
+                            │
+                ┌───────────┴───────────┐
+                ▼                       ▼
+        ┌──────────────────┐  ┌──────────────────┐
+        │   OpenAI API     │  │   PostgreSQL DB  │
+        │   (GPT-4)        │  │   (Script Cache) │
+        └──────────────────┘  └──────────────────┘
+                            │
+                ┌───────────┴───────────┐
+                ▼                       ▼
+        ┌──────────────────┐  ┌──────────────────┐
+        │   Redis Cache    │  │   Elasticsearch  │
+        │   (Recent Gens)  │  │   (Search Index) │
+        └──────────────────┘  └──────────────────┘
+            </div>
+        </section>
+
+        <!-- 4. Integration Points -->
+        <section>
+            <h2>4. Integration Points</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>System</th>
+                        <th>Interface</th>
+                        <th>Protocol</th>
+                        <th>Purpose</th>
+                        <th>Criticality</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OpenAI GPT-4 API</td>
+                        <td>REST</td>
+                        <td>HTTPS + API Key</td>
+                        <td>Script generation and refinement</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL</td>
+                        <td>psycopg2</td>
+                        <td>TCP/5432</td>
+                        <td>Store generated scripts, metadata, confidence scores</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td>Redis</td>
+                        <td>redis-py</td>
+                        <td>TCP/6379</td>
+                        <td>Cache recently generated scripts (30 min TTL)</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub API</td>
+                        <td>REST</td>
+                        <td>HTTPS</td>
+                        <td>Export scripts to PR/commit workflow</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Slack API</td>
+                        <td>Webhooks</td>
+                        <td>HTTPS</td>
+                        <td>Notify when low-confidence scripts generated</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Elasticsearch</td>
+                        <td>Python Client</td>
+                        <td>HTTP/9200</td>
+                        <td>Index scripts for full-text search</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>SentinelQA API</td>
+                        <td>gRPC</td>
+                        <td>TCP/50051</td>
+                        <td>Execute generated scripts in test runs</td>
+                        <td>Critical</td>
+                    </tr>
+                    <tr>
+                        <td>Azure Keyvault</td>
+                        <td>REST</td>
+                        <td>HTTPS</td>
+                        <td>Store OpenAI API keys, DB credentials</td>
+                        <td>Critical</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 5. Production Requirements -->
+        <section>
+            <h2>5. Production Requirements</h2>
+
+            <h3>Compute Resources</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <h4 style="color: var(--accent);">Script Generation Service</h4>
+                    <p><strong>CPU:</strong> 6 vCPU (base), autoscale 4-12 vCPU</p>
+                    <p><strong>Memory:</strong> 12 GB (base), autoscale 8-20 GB</p>
+                    <p><strong>Rationale:</strong> GPT-4 API calls are I/O-bound; horizontal scaling needed for concurrent requests</p>
+                </div>
+                <div class="card">
+                    <h4 style="color: var(--accent);">PostgreSQL Instance</h4>
+                    <p><strong>Size:</strong> db.r5.2xlarge (8 vCPU, 64 GB RAM)</p>
+                    <p><strong>Storage:</strong> 500 GB SSD, autoscale to 2 TB</p>
+                    <p><strong>Rationale:</strong> High write throughput for script storage; read replicas for analytics queries</p>
+                </div>
+            </div>
+
+            <h3>Network & Security</h3>
+            <ul>
+                <li><strong>VPC:</strong> Private subnet with NAT gateway for outbound OpenAI API calls</li>
+                <li><strong>Security Groups:</strong> Allow inbound on 443 (HTTPS) from QA network only; restrict egress to OpenAI, GitHub, Slack endpoints</li>
+                <li><strong>TLS:</strong> All APIs enforced with TLS 1.3; certificate renewal automated via cert-manager</li>
+                <li><strong>API Rate Limiting:</strong> OpenAI GPT-4: 100 req/min, 3,500 tokens/min; implement local queue with exponential backoff</li>
+            </ul>
+
+            <h3>Secrets Management</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Secret</th>
+                        <th>Storage</th>
+                        <th>Rotation</th>
+                        <th>Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OpenAI API Key</td>
+                        <td>Azure Keyvault</td>
+                        <td>Monthly</td>
+                        <td>Script Gen pods only (Workload Identity)</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub PAT</td>
+                        <td>Azure Keyvault</td>
+                        <td>Quarterly</td>
+                        <td>Export module (encrypted)</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL Password</td>
+                        <td>Azure Keyvault</td>
+                        <td>Quarterly</td>
+                        <td>DB connection pool (TLS enforced)</td>
+                    </tr>
+                    <tr>
+                        <td>Redis Password</td>
+                        <td>Azure Keyvault</td>
+                        <td>Quarterly</td>
+                        <td>Cache layer (TLS enforced)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Monitoring & Logging</h3>
+            <ul>
+                <li><strong>Metrics:</strong> Prometheus scrape interval 30s; track generation latency, API call success rate, confidence score distribution, cache hit ratio</li>
+                <li><strong>Logs:</strong> Fluentd to ELK stack; retain 30 days; log all API calls with request/response snippets for debugging</li>
+                <li><strong>Alerts:</strong> PagerDuty trigger on >5% generation failure rate, OpenAI API timeout >3s, PostgreSQL replication lag >10s</li>
+            </ul>
+
+            <h3>Autoscaling Policy</h3>
+            <ul>
+                <li><strong>Metric:</strong> CPU utilization >70% or request queue depth >20</li>
+                <li><strong>Scale-up:</strong> Add 2 pods, max 12 pods, cooldown 2 minutes</li>
+                <li><strong>Scale-down:</strong> Remove 1 pod when CPU <30% for 5 minutes, min 4 pods</li>
+            </ul>
+        </section>
+
+        <!-- 6. Implementation Guidelines -->
+        <section>
+            <h2>6. Implementation Guidelines</h2>
+            <ol>
+                <li><strong>Week 1-2:</strong> Complete prompt engineering for all 4 frameworks; validate 50 test cases across each</li>
+                <li><strong>Week 3:</strong> Deploy FastAPI generation service to staging; implement Redis caching layer</li>
+                <li><strong>Week 4:</strong> Build React/Next.js UI with form validation, error handling, refinement panel</li>
+                <li><strong>Week 5:</strong> Integrate PostgreSQL schema (scripts, metadata, audit logs); implement full-text search</li>
+                <li><strong>Week 6:</strong> Add GitHub PR export functionality; implement Slack notifications for low-confidence scripts</li>
+                <li><strong>Week 7:</strong> Load testing (500 concurrent users); optimize database indexes; tune autoscaling thresholds</li>
+                <li><strong>Week 8:</strong> UAT with 3 QA teams; collect feedback; deploy to production with canary rollout</li>
+            </ol>
+        </section>
+
+        <!-- 7. Gap Analysis -->
+        <section>
+            <h2>7. Gap Analysis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Capability</th>
+                        <th>Status</th>
+                        <th>Gap Details</th>
+                        <th>Timeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Playwright script generation</td>
+                        <td><span style="color: var(--green);">✓ Implemented</span></td>
+                        <td>87% accuracy, handles common patterns (clicks, fills, navigation)</td>
+                        <td>Complete</td>
+                    </tr>
+                    <tr>
+                        <td>Cypress script generation</td>
+                        <td><span style="color: var(--green);">✓ Implemented</span></td>
+                        <td>84% accuracy, cy.visit() and DOM selectors working</td>
+                        <td>Complete</td>
+                    </tr>
+                    <tr>
+                        <td>Jest/Pytest script generation</td>
+                        <td><span style="color: var(--amber);">⟳ In Progress</span></td>
+                        <td>81% accuracy; needs work on async mocking patterns</td>
+                        <td>Week 2</td>
+                    </tr>
+                    <tr>
+                        <td>Refinement workflow (feedback loops)</td>
+                        <td><span style="color: var(--amber);">⟳ In Progress</span></td>
+                        <td>Basic refinement UI done; needs approval workflow with version history</td>
+                        <td>Week 3</td>
+                    </tr>
+                    <tr>
+                        <td>Batch script generation</td>
+                        <td><span style="color: var(--red);">⊘ Planned</span></td>
+                        <td>Single script generation working; need bulk upload from CSV/Excel</td>
+                        <td>Week 4</td>
+                    </tr>
+                    <tr>
+                        <td>Script versioning & rollback</td>
+                        <td><span style="color: var(--red);">⊘ Planned</span></td>
+                        <td>Need git-style version control for generated scripts</td>
+                        <td>Week 5</td>
+                    </tr>
+                    <tr>
+                        <td>Cross-browser compatibility warnings</td>
+                        <td><span style="color: var(--red);">⊘ Planned</span></td>
+                        <td>Identify Playwright/Cypress incompatibilities before generation</td>
+                        <td>Week 6</td>
+                    </tr>
+                    <tr>
+                        <td>Mobile/responsive test generation</td>
+                        <td><span style="color: var(--red);">⊘ Planned</span></td>
+                        <td>Extend prompts for mobile viewports and touch interactions</td>
+                        <td>Week 7</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 8. RACI Matrix -->
+        <section>
+            <h2>8. RACI Matrix</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Activity</th>
+                        <th>Anupam (QA Lead)</th>
+                        <th>AI/ML Eng</th>
+                        <th>Backend Eng</th>
+                        <th>Frontend Eng</th>
+                        <th>DevOps/SRE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Prompt engineering & validation</td>
+                        <td>R</td>
+                        <td><strong>A</strong></td>
+                        <td>C</td>
+                        <td>I</td>
+                        <td>I</td>
+                    </tr>
+                    <tr>
+                        <td>FastAPI service development</td>
+                        <td>C</td>
+                        <td>I</td>
+                        <td><strong>A</strong></td>
+                        <td>-</td>
+                        <td>C</td>
+                    </tr>
+                    <tr>
+                        <td>React/Next.js UI implementation</td>
+                        <td>C</td>
+                        <td>I</td>
+                        <td>C</td>
+                        <td><strong>A</strong></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Database schema & indexing</td>
+                        <td>I</td>
+                        <td>-</td>
+                        <td>R</td>
+                        <td>-</td>
+                        <td><strong>A</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Kubernetes deployment</td>
+                        <td>I</td>
+                        <td>-</td>
+                        <td>C</td>
+                        <td>-</td>
+                        <td><strong>A</strong></td>
+                    </tr>
+                    <tr>
+                        <td>UAT & QA validation</td>
+                        <td><strong>A</strong></td>
+                        <td>C</td>
+                        <td>C</td>
+                        <td>C</td>
+                        <td>I</td>
+                    </tr>
+                    <tr>
+                        <td>Production monitoring setup</td>
+                        <td>I</td>
+                        <td>-</td>
+                        <td>C</td>
+                        <td>-</td>
+                        <td><strong>A</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Documentation & runbooks</td>
+                        <td>C</td>
+                        <td><strong>A</strong></td>
+                        <td>R</td>
+                        <td>R</td>
+                        <td>R</td>
+                    </tr>
+                    <tr>
+                        <td>Performance optimization</td>
+                        <td>C</td>
+                        <td>R</td>
+                        <td><strong>A</strong></td>
+                        <td>C</td>
+                        <td>C</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 15px; font-size: 0.9em;">Legend: A=Accountable | R=Responsible | C=Consulted | I=Informed | -=Not involved</p>
+        </section>
+
+        <!-- 9. Risk Register -->
+        <section>
+            <h2>9. Risk Register</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Risk</th>
+                        <th>Impact</th>
+                        <th>Likelihood</th>
+                        <th>Mitigation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GPT-4 API rate limits or availability issues</td>
+                        <td><span class="risk-high">High</span></td>
+                        <td>Medium</td>
+                        <td>Implement queue with exponential backoff; maintain fallback prompt templates; 2 API key rotation</td>
+                    </tr>
+                    <tr>
+                        <td>Generated scripts contain syntax errors or fail assertions</td>
+                        <td><span class="risk-high">High</span></td>
+                        <td>High</td>
+                        <td>Mandatory human review for confidence <85%; automated syntax validation; QA gating in CI/CD</td>
+                    </tr>
+                    <tr>
+                        <td>Framework-specific patterns not captured (async, mocking)</td>
+                        <td><span class="risk-high">High</span></td>
+                        <td>Medium</td>
+                        <td>Extended prompt engineering; library examples in context window; periodic prompt optimization</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL scaling issues under peak load</td>
+                        <td><span class="risk-medium">Medium</span></td>
+                        <td>Medium</td>
+                        <td>Read replicas for analytics; partitioning by date; index optimization; load testing in staging</td>
+                    </tr>
+                    <tr>
+                        <td>OpenAI API cost overruns (tokens/month spike)</td>
+                        <td><span class="risk-medium">Medium</span></td>
+                        <td>Low</td>
+                        <td>Quota alerts at 80% spend; cache recent scripts (30 min TTL); track token usage per user</td>
+                    </tr>
+                    <tr>
+                        <td>Refinement feedback loop creates infinite loops</td>
+                        <td><span class="risk-medium">Medium</span></td>
+                        <td>Low</td>
+                        <td>Max 5 refinement iterations per script; require human approval after 3 refinements</td>
+                    </tr>
+                    <tr>
+                        <td>Generated scripts not integrated into CI/CD pipeline</td>
+                        <td><span class="risk-high">High</span></td>
+                        <td>Low</td>
+                        <td>GitHub PR export workflow tested in UAT; automated script file placement in repo</td>
+                    </tr>
+                    <tr>
+                        <td>User confusion over confidence scores or warnings</td>
+                        <td><span class="risk-medium">Medium</span></td>
+                        <td>Medium</td>
+                        <td>Clear UI labels; in-app help text; training session for QA teams before rollout</td>
+                    </tr>
+                    <tr>
+                        <td>Low adoption due to lack of trust in AI-generated code</td>
+                        <td><span class="risk-high">High</span></td>
+                        <td>Medium</td>
+                        <td>Showcase success stories; establish quality benchmarks; integrate with existing QA workflows</td>
+                    </tr>
+                    <tr>
+                        <td>Security: OpenAI API key exposure in logs</td>
+                        <td><span class="risk-high">High</span></td>
+                        <td>Low</td>
+                        <td>Mask API keys in logs; scan logs with regex patterns; use Keyvault for secret storage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 10. Effort Estimate -->
+        <section>
+            <h2>10. Effort Estimate</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>Owner</th>
+                        <th>Days</th>
+                        <th>FTE</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Prompt engineering (4 frameworks)</td>
+                        <td>AI/ML Eng + QA</td>
+                        <td>12</td>
+                        <td>1.5</td>
+                        <td>Iterative refinement with test suite validation</td>
+                    </tr>
+                    <tr>
+                        <td>FastAPI backend development</td>
+                        <td>Backend Eng</td>
+                        <td>10</td>
+                        <td>1</td>
+                        <td>Core service, caching, error handling</td>
+                    </tr>
+                    <tr>
+                        <td>React/Next.js UI development</td>
+                        <td>Frontend Eng</td>
+                        <td>10</td>
+                        <td>1</td>
+                        <td>Form, editor, refinement panel, export</td>
+                    </tr>
+                    <tr>
+                        <td>PostgreSQL schema & queries</td>
+                        <td>Backend Eng</td>
+                        <td>6</td>
+                        <td>0.75</td>
+                        <td>Schema design, migration scripts, indexes</td>
+                    </tr>
+                    <tr>
+                        <td>Integration (GitHub API, Slack)</td>
+                        <td>Backend Eng</td>
+                        <td>8</td>
+                        <td>1</td>
+                        <td>PR export, webhook notifications</td>
+                    </tr>
+                    <tr>
+                        <td>Kubernetes deployment & Helm charts</td>
+                        <td>DevOps/SRE</td>
+                        <td>8</td>
+                        <td>1</td>
+                        <td>Manifests, autoscaling, monitoring</td>
+                    </tr>
+                    <tr>
+                        <td>Load testing & optimization</td>
+                        <td>DevOps + Backend</td>
+                        <td>6</td>
+                        <td>1</td>
+                        <td>500-user concurrent load simulation</td>
+                    </tr>
+                    <tr>
+                        <td>UAT with QA teams</td>
+                        <td>QA Lead</td>
+                        <td>8</td>
+                        <td>3</td>
+                        <td>3 QA engineers validating 100+ test cases</td>
+                    </tr>
+                    <tr>
+                        <td>Documentation & runbooks</td>
+                        <td>All Eng</td>
+                        <td>6</td>
+                        <td>1</td>
+                        <td>API docs, deployment guide, troubleshooting</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="margin-top: 20px;"><strong>Total Effort:</strong> 74 days across 4-5 weeks with 6-7 engineers</p>
+            <p><strong>Critical Path:</strong> Prompt engineering (12d) → FastAPI (10d) → UI (10d) → Integration (8d) → UAT (8d) = 48 days</p>
+        </section>
+
+        <!-- 11. Definition of Done -->
+        <section>
+            <h2>11. Definition of Done</h2>
+            <h3>Code Quality</h3>
+            <ul>
+                <li>All tests passing (Jest + Pytest, >85% coverage)</li>
+                <li>Code review approved by 2 engineers minimum</li>
+                <li>No high/critical security vulnerabilities (SAST scan clean)</li>
+                <li>Linting clean (ESLint, Pylint, Black)</li>
+            </ul>
+
+            <h3>Functional Requirements</h3>
+            <ul>
+                <li>All 4 frameworks (Playwright, Cypress, Jest, Pytest) generating scripts with >85% accuracy</li>
+                <li>Confidence scores calculated and displayed correctly</li>
+                <li>Refinement workflow functional end-to-end</li>
+                <li>GitHub PR export working for all script types</li>
+            </ul>
+
+            <h3>Infrastructure & Deployment</h3>
+            <ul>
+                <li>Kubernetes manifests peer-reviewed and tested in staging</li>
+                <li>Autoscaling policies validated under load</li>
+                <li>Monitoring and alerting rules deployed and tested</li>
+                <li>Database backups automated and tested for restore</li>
+            </ul>
+
+            <h3>Documentation & Training</h3>
+            <ul>
+                <li>API documentation complete with examples</li>
+                <li>Deployment runbook written and tested</li>
+                <li>Troubleshooting guide for common issues</li>
+                <li>Training session conducted for 3 QA teams</li>
+            </ul>
+        </section>
+
+        <!-- 12. Action Items -->
+        <section>
+            <h2>12. Action Items</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Owner</th>
+                        <th>Priority</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Complete Jest/Pytest prompt engineering with 50 test cases</td>
+                        <td>AI/ML Eng</td>
+                        <td>Critical</td>
+                        <td>May 20</td>
+                        <td>In Progress</td>
+                    </tr>
+                    <tr>
+                        <td>Finalize FastAPI schema and complete integration tests</td>
+                        <td>Backend Eng</td>
+                        <td>Critical</td>
+                        <td>May 22</td>
+                        <td>In Progress</td>
+                    </tr>
+                    <tr>
+                        <td>Deploy FastAPI to staging environment for initial testing</td>
+                        <td>DevOps</td>
+                        <td>Critical</td>
+                        <td>May 25</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Build React UI with form validation and error boundaries</td>
+                        <td>Frontend Eng</td>
+                        <td>Critical</td>
+                        <td>May 29</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Implement GitHub PR export workflow and test with sample repos</td>
+                        <td>Backend Eng</td>
+                        <td>High</td>
+                        <td>June 5</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Conduct load test with 500 concurrent users and optimize bottlenecks</td>
+                        <td>DevOps + Backend</td>
+                        <td>High</td>
+                        <td>June 8</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Coordinate UAT schedule with 3 QA teams; prepare test case pack</td>
+                        <td>QA Lead</td>
+                        <td>High</td>
+                        <td>June 1</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Write deployment runbook and troubleshooting guide</td>
+                        <td>Backend Eng + DevOps</td>
+                        <td>Medium</td>
+                        <td>June 10</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Security audit: OpenAI key handling, log masking, data validation</td>
+                        <td>Security Eng</td>
+                        <td>High</td>
+                        <td>June 8</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Plan post-launch monitoring and support handoff to SRE</td>
+                        <td>DevOps + SRE</td>
+                        <td>Medium</td>
+                        <td>June 12</td>
+                        <td>Pending</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- 13. Conclusion -->
+        <section>
+            <h2>13. Conclusion</h2>
+            <p>The AI-Based Test Automation Script Generation use case is a high-impact initiative that will significantly reduce manual test scripting effort while improving consistency and quality. With 75% implementation progress, the remaining 8-week timeline is achievable with focused effort on prompt engineering, backend service completion, and comprehensive UAT validation.</p>
+
+            <p>Key success factors include:</p>
+            <ul>
+                <li>Sustained focus on prompt engineering quality to maintain >85% script accuracy</li>
+                <li>Close collaboration between AI/ML engineers and QA leadership to ensure business alignment</li>
+                <li>Robust error handling and fallback mechanisms to gracefully handle OpenAI API degradation</li>
+                <li>Strong stakeholder engagement through UAT to build confidence in AI-generated code</li>
+            </ul>
+
+            <p>Risks are well-understood and mitigation strategies are in place. The infrastructure design supports horizontal scaling to handle future demand growth. Post-launch, continuous monitoring of confidence scores, user feedback, and framework coverage will enable ongoing optimization and expansion to additional test frameworks.</p>
+
+            <p><strong>Recommendation:</strong> Proceed with implementation following the timeline and risk mitigation strategies outlined in this report. Schedule stakeholder reviews at Week 4 and Week 7 milestones to validate progress and address any emerging blockers.</p>
+        </section>
+    </div>
+</body>
+</html>

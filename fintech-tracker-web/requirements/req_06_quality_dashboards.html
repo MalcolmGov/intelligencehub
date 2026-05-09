@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-06: AI/ML-Powered Quality Dashboards - Requirements</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --border: #30363d;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-orange: #ffa657;
+            --accent-purple: #6e40aa;
+            --accent-light-blue: #79c0ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .meta-item {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .meta-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-p3 {
+            background-color: var(--accent-light-blue);
+            color: #0d1117;
+        }
+
+        .badge-in-progress {
+            background-color: var(--accent-green);
+            color: #0d1117;
+        }
+
+        section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: var(--accent-light-blue);
+        }
+
+        .persona-card {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-blue);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .persona-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .persona-role {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .user-story {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-purple);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .story-id {
+            font-weight: 700;
+            color: var(--accent-light-blue);
+            margin-bottom: 5px;
+        }
+
+        .story-text {
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .story-priority {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+
+        .requirement {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-green);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .req-id {
+            font-weight: 700;
+            color: var(--accent-light-blue);
+            margin-bottom: 5px;
+        }
+
+        .nfr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .nfr-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-orange);
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .nfr-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent-orange);
+        }
+
+        .acceptance-criteria {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent-green);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+
+        .criteria-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--accent-light-blue);
+        }
+
+        .given-when-then {
+            margin-left: 15px;
+            font-size: 0.95em;
+        }
+
+        .given-when-then > div {
+            margin-bottom: 6px;
+        }
+
+        .given {
+            color: var(--accent-light-blue);
+        }
+
+        .when {
+            color: var(--accent-green);
+        }
+
+        .then {
+            color: var(--accent-orange);
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+
+        code {
+            background: var(--bg-primary);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            color: var(--accent-light-blue);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 700;
+            color: var(--accent-light-blue);
+        }
+
+        tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+            }
+
+            .meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nfr-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div>
+                    <h1>AI/ML-Powered Quality Dashboards using BI</h1>
+                    <p style="color: var(--text-secondary); margin-top: 5px;">Centralized automation intelligence, failure analysis, and predictive quality scoring</p>
+                </div>
+                <div style="text-align: right;">
+                    <span class="badge badge-p3">P3: Medium</span>
+                    <span class="badge badge-in-progress">In Progress (25%)</span>
+                </div>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <div class="meta-label">Use Case ID</div>
+                    <div class="meta-value">UC-06</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Owner</div>
+                    <div class="meta-value">Anupam Sharma</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Version</div>
+                    <div class="meta-value">v1.0</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Last Updated</div>
+                    <div class="meta-value">May 2026</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Author</div>
+                    <div class="meta-value" style="color:#60a5fa;font-weight:700;">Malcolm Govender</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Role</div>
+                    <div class="meta-value" style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</div>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>Problem Statement</h2>
+            <p>Testing teams lack real-time visibility into test execution health, failure patterns, and quality trends. Currently, quality insights are scattered across multiple tools (CI/CD logs, test frameworks, bug trackers, spreadsheets), requiring manual aggregation. Teams cannot identify systemic quality issues quickly, predict which features will have bugs, or quantify the ROI of test automation investments. This fragmentation leads to late-stage defect discovery, longer release cycles, and inability to prioritize improvements. We need a centralized, AI-powered dashboard that correlates test failures with code changes, detects flaky tests, predicts quality risks, and visualizes automation ROI to enable data-driven quality decisions.</p>
+        </section>
+
+        <section>
+            <h2>Target Users & Personas</h2>
+            
+            <div class="persona-card">
+                <div class="persona-name">Sarah Chen</div>
+                <div class="persona-role">Engineering Manager / Tech Lead</div>
+                <p><strong>Goals:</strong> Understand test suite health, identify quality bottlenecks, forecast release readiness, justify automation investment to leadership.</p>
+                <p><strong>Frustrations:</strong> Spends 2 hours weekly aggregating test reports from multiple sources. Cannot predict which sprints will have quality issues. Lacks data to argue for automation budget increases.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Marcus Rodriguez</div>
+                <div class="persona-role">QA Lead</div>
+                <p><strong>Goals:</strong> Detect and fix flaky tests, identify patterns in failures, prioritize which test improvements deliver most ROI, reduce test maintenance time.</p>
+                <p><strong>Frustrations:</strong> Flaky tests in the pipeline block releases without clear metrics on impact. No visibility into which tests fail most often or consume most resources.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">Priya Desai</div>
+                <div class="persona-role">Data Analyst / Quality Insights</div>
+                <p><strong>Goals:</strong> Provide actionable analytics on test performance, correlation analysis between failures and code changes, predictive quality models, custom reporting.</p>
+                <p><strong>Frustrations:</strong> Manual correlation work takes days. Cannot build predictive models without clean, integrated data across systems.</p>
+            </div>
+
+            <div class="persona-card">
+                <div class="persona-name">James Wu</div>
+                <div class="persona-role">DevOps / SRE</div>
+                <p><strong>Goals:</strong> Ensure test infrastructure reliability, monitor execution performance, optimize resource allocation, detect infrastructure bottlenecks.</p>
+                <p><strong>Frustrations:</strong> No visibility into whether test slowdowns are due to test logic or infrastructure. Cannot predict resource needs for upcoming releases.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>User Stories</h2>
+
+            <div class="user-story">
+                <div class="story-id">US-01</div>
+                <div class="story-text">As a Engineering Manager, I want a real-time executive dashboard showing pass rates, failure trends, and flakiness metrics, so that I can assess test suite health at a glance and identify sprints needing remediation.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-02</div>
+                <div class="story-text">As a QA Lead, I want to drill down into failure patterns by feature, module, test type, and time period, so that I can identify which areas have the most stability issues.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-03</div>
+                <div class="story-text">As a QA Lead, I want the system to automatically identify and flag flaky tests (high variance in pass/fail across runs), so that I can prioritize fix efforts and reduce CI/CD noise.</div>
+                <div class="story-priority">Priority: Must Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-04</div>
+                <div class="story-text">As an Engineering Manager, I want to see correlation analysis between code changes and test failures (which commits impact which tests), so that I can understand failure root causes faster.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-05</div>
+                <div class="story-text">As a Data Analyst, I want to build custom BI reports and queries on test execution data using a query builder or SQL interface, so that I can create ad-hoc analyses and dashboards specific to business needs.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-06</div>
+                <div class="story-text">As a QA Lead, I want to visualize test execution cost by test, suite, and type (unit vs. integration vs. E2E), so that I can optimize resource allocation and identify expensive tests to optimize.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-07</div>
+                <div class="story-text">As an Engineering Manager, I want ML-powered quality predictions (e.g., feature readiness score, risk of defects in this release), so that I can make data-driven go/no-go release decisions.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-08</div>
+                <div class="story-text">As a DevOps Engineer, I want to monitor test infrastructure performance metrics (execution time, resource utilization, parallelization efficiency), so that I can optimize CI/CD pipelines and capacity planning.</div>
+                <div class="story-priority">Priority: Should Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-09</div>
+                <div class="story-text">As an Engineering Manager, I want to measure and visualize the ROI of test automation (defects caught, time saved, cost per defect detected), so that I can justify automation investment to stakeholders.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-10</div>
+                <div class="story-text">As a QA Lead, I want to set quality gates and SLOs (e.g., max 5% failure rate, 99% uptime for test infrastructure) and receive alerts when breached, so that I can proactively maintain test suite quality.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-11</div>
+                <div class="story-text">As a Data Analyst, I want to export dashboard data and reports in multiple formats (CSV, PDF, Parquet), so that I can share insights across teams and integrate with other business tools.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+
+            <div class="user-story">
+                <div class="story-id">US-12</div>
+                <div class="story-text">As an Engineering Manager, I want to compare quality metrics across releases, versions, and teams to track progress and identify best practices, so that I can drive continuous improvement initiatives.</div>
+                <div class="story-priority">Priority: Nice to Have</div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Functional Requirements</h2>
+
+            <div class="requirement">
+                <div class="req-id">FR-01: Real-Time Ingestion Pipeline</div>
+                <p>System must ingest test execution data from CI/CD systems (Jenkins, GitLab CI, GitHub Actions), test frameworks (pytest, JUnit, Cypress logs), and bug tracking (Jira, Linear). Data ingestion latency: <5 minutes from test completion to dashboard visibility.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-02: ClickHouse Integration</div>
+                <p>Leverage ClickHouse as analytics backend for storing and querying massive volumes of test execution data (100M+ test runs). Implement columnar storage for fast aggregations across time periods, test types, and modules.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-03: Executive Dashboard</div>
+                <p>Display high-level KPIs: overall pass rate (%), flakiness ratio, failure trends (7/30/90-day moving averages), last 10 failed test names, test execution timeline, and test suite health status (healthy/warning/critical).</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-04: Drill-Down Filters</div>
+                <p>Enable filtering and grouping by: time range, project, branch, commit, test type (unit/integration/E2E), feature/module, test owner, and environment. Support multi-select and custom date ranges.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-05: Flaky Test Detection</div>
+                <p>Automatic detection of tests with high failure variance (e.g., >15% variance in pass rate across 20+ recent runs). Highlight flaky tests with severity badge, recommendation for fix, and historical variance trend.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-06: Correlation Analysis</div>
+                <p>Analyze git commit diff to identify which tests failed after specific code changes. Display commit author, change files, and impacted test coverage. Use ML to predict which files have highest defect risk based on change history.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-07: Cost Visualization</div>
+                <p>Calculate and display per-test execution cost (compute time + infrastructure resources). Aggregate by test suite, test type, and team. Identify top 10 most expensive tests for optimization focus.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-08: Quality Predictions (ML)</div>
+                <p>Train models on historical test data to predict: feature/module readiness scores, probability of defects in upcoming release, expected failure rate for new code changes. Display confidence scores and model feature importance.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-09: Infrastructure Performance Metrics</div>
+                <p>Track and visualize: test execution duration trends, parallelization efficiency, infrastructure resource utilization (CPU, memory, network), and bottleneck identification. Alert on degradation.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-10: ROI Dashboard</div>
+                <p>Quantify automation ROI: defects caught by automation vs. manual, cost per defect detected, time saved (automation vs. manual testing), and automation coverage by feature. Generate executive reports for stakeholders.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-11: Quality Gates & SLOs</div>
+                <p>Allow users to define SLOs (e.g., max 5% failure rate, 99.9% infrastructure uptime, <1min avg test duration). Monitor adherence and trigger alerts (Slack, email, webhooks) when breached.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-12: BI Query Builder</div>
+                <p>Provide visual query builder for non-technical users to create custom reports without SQL. Support: grouping, filtering, time aggregation, and common metrics. Advanced users can use SQL for complex queries.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-13: Release Readiness Report</div>
+                <p>Generate automated release readiness assessment: quality metrics for this release, comparison to previous releases, identified risks, and recommended go/no-go decision with risk summary.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-14: Data Export & Sharing</div>
+                <p>Export dashboard snapshots, reports, and raw data in CSV, PDF, Parquet, JSON formats. Generate shareable report links with time-limited access. Support scheduled email delivery of reports.</p>
+            </div>
+
+            <div class="requirement">
+                <div class="req-id">FR-15: Cross-Release Benchmarking</div>
+                <p>Compare quality metrics across releases, versions, and teams. Identify trends, best-performing teams/features, and regression areas. Surface improvement opportunities based on peer performance.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Non-Functional Requirements</h2>
+
+            <div class="nfr-grid">
+                <div class="nfr-card">
+                    <div class="nfr-title">Performance</div>
+                    <ul style="margin: 0;">
+                        <li>Dashboard load time: <2 seconds for all views</li>
+                        <li>Aggregation queries on 100M+ records: <10 seconds</li>
+                        <li>Real-time data ingestion: <5 minute latency</li>
+                        <li>ClickHouse query response: <5 seconds for interactive filtering</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Scalability</div>
+                    <ul style="margin: 0;">
+                        <li>Support 500+ concurrent dashboard users</li>
+                        <li>Handle 100M+ test execution records per month</li>
+                        <li>ClickHouse cluster: auto-scale to handle 1000+ queries/sec</li>
+                        <li>Support data retention: 2-year rolling window</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Security & Compliance</div>
+                    <ul style="margin: 0;">
+                        <li>RBAC: team-level access control for dashboards</li>
+                        <li>Data encryption in transit (TLS 1.3) and at rest</li>
+                        <li>Audit logging: all data access and modifications</li>
+                        <li>PII redaction: automatically mask sensitive test data (passwords, keys)</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Reliability</div>
+                    <ul style="margin: 0;">
+                        <li>99.5% uptime SLA for dashboard and API</li>
+                        <li>Graceful degradation: show cached data if backend unavailable</li>
+                        <li>Data backup: daily snapshots, 7-day retention</li>
+                        <li>Alerting: automated on ingestion failures or query timeouts</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Observability & Analytics</div>
+                    <ul style="margin: 0;">
+                        <li>Prometheus metrics: ingest rate, query latency, cache hit ratio</li>
+                        <li>Distributed tracing: track data flow from ingestion to dashboard</li>
+                        <li>Debug mode: detailed query logs for troubleshooting</li>
+                        <li>Usage analytics: track most-used dashboards and features</li>
+                    </ul>
+                </div>
+
+                <div class="nfr-card">
+                    <div class="nfr-title">Usability & Accessibility</div>
+                    <ul style="margin: 0;">
+                        <li>Dark theme with high contrast (WCAG AA compliance)</li>
+                        <li>Mobile-responsive design (tablet, mobile views)</li>
+                        <li>Intuitive drill-down: click any metric to see details</li>
+                        <li>Tooltip help: context-sensitive guidance on all metrics</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Acceptance Criteria</h2>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-01: Real-Time Dashboard Data Accuracy</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a test completes in CI/CD pipeline</div>
+                    <div><span class="when">When</span> I navigate to the executive dashboard</div>
+                    <div><span class="then">Then</span> the result appears within 5 minutes with 100% accuracy matching CI/CD source system</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-02: Flaky Test Detection Accuracy</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a test with 15%+ variance in recent runs</div>
+                    <div><span class="when">When</span> the system analyzes the last 20 runs</div>
+                    <div><span class="then">Then</span> it flags the test as flaky with >95% accuracy (compared to manual review) and displays variance trend</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-03: Correlation Analysis Completeness</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> a commit with code changes and subsequent test failures</div>
+                    <div><span class="when">When</span> I view the correlation view for that commit</div>
+                    <div><span class="then">Then</span> I see: changed files, test impact list, correlation strength score, and commit author</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-04: ML Prediction Quality</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> historical test and defect data from 10+ releases</div>
+                    <div><span class="when">When</span> I view the quality readiness prediction for current release</div>
+                    <div><span class="then">Then</span> model achieves >85% accuracy on held-out test set and displays confidence intervals</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-05: Query Performance on Large Datasets</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> 100M+ test execution records in ClickHouse</div>
+                    <div><span class="when">When</span> I execute an aggregation query with filters and grouping</div>
+                    <div><span class="then">Then</span> query returns in <10 seconds with full accuracy and sub-second response for dashboard charts</div>
+                </div>
+            </div>
+
+            <div class="acceptance-criteria">
+                <div class="criteria-title">AC-06: Dashboard Responsiveness & Accessibility</div>
+                <div class="given-when-then">
+                    <div><span class="given">Given</span> the dashboard is open on mobile, tablet, or desktop</div>
+                    <div><span class="when">When</span> I interact with filters, drill-downs, and exports</div>
+                    <div><span class="then">Then</span> all actions complete in <2 seconds, UI remains responsive, and all content is accessible (WCAG AA)</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Dependencies & Integrations</h2>
+
+            <h3>External Systems</h3>
+            <ul>
+                <li><strong>CI/CD Platforms:</strong> Jenkins, GitLab CI, GitHub Actions (REST APIs for log fetching)</li>
+                <li><strong>Test Frameworks:</strong> pytest, JUnit, Cypress, Selenium (log parsing & result ingestion)</li>
+                <li><strong>Bug Tracking:</strong> Jira, Linear (defect data correlation)</li>
+                <li><strong>Git:</strong> GitHub, GitLab (commit diff analysis, change history)</li>
+                <li><strong>BI Tools:</strong> Grafana, Tableau (embed dashboards or export data)</li>
+            </ul>
+
+            <h3>Internal Systems</h3>
+            <ul>
+                <li><strong>ClickHouse Cluster:</strong> Backend OLAP database for analytics (min. 3-node cluster)</li>
+                <li><strong>Message Queue:</strong> Kafka/RabbitMQ for real-time test data streaming</li>
+                <li><strong>ML Pipeline:</strong> Training infrastructure (scikit-learn, XGBoost, or similar)</li>
+                <li><strong>Cache Layer:</strong> Redis for dashboard caching and query optimization</li>
+                <li><strong>Notification System:</strong> Email, Slack integration for alerts</li>
+            </ul>
+
+            <h3>Data Connectors</h3>
+            <ul>
+                <li>REST API adapters for each CI/CD system</li>
+                <li>Log parser/normalizer for multiple test framework formats</li>
+                <li>Git API client for commit analysis</li>
+                <li>Webhook receiver for real-time CI/CD event ingestion</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Assumptions & Constraints</h2>
+
+            <h3>Assumptions</h3>
+            <ul>
+                <li>Organizations have ClickHouse cluster or can provision one (managed service or self-hosted)</li>
+                <li>Test execution data is available via APIs/logs from CI/CD and test frameworks</li>
+                <li>Historical test data (at least 3 months) is available for model training</li>
+                <li>Teams follow consistent naming conventions for test suites, modules, and features</li>
+                <li>Git history and commit messages are accessible via API</li>
+            </ul>
+
+            <h3>Constraints</h3>
+            <ul>
+                <li><strong>Data Privacy:</strong> Cannot expose sensitive data (passwords, API keys) in dashboards; requires redaction</li>
+                <li><strong>Retention Policy:</strong> Data older than 2 years may be archived to cold storage for cost optimization</li>
+                <li><strong>Query Latency:</strong> Very large date ranges (1+ year) may require pre-aggregated summaries to meet <10s SLA</li>
+                <li><strong>ML Model Accuracy:</strong> Models trained on small datasets (<100 test runs) will have lower confidence; recommend >500 runs for reliable predictions</li>
+                <li><strong>Real-Time Ingestion Lag:</strong> 5-minute latency is acceptable for most use cases; sub-minute accuracy requires additional infrastructure investment</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Out of Scope (v1.0)</h2>
+
+            <ul>
+                <li><strong>Advanced ML:</strong> Deep learning models, anomaly detection on infrastructure metrics (v2.0)</li>
+                <li><strong>Custom Integrations:</strong> Integration with proprietary or legacy test tools (v2.0 prioritized per demand)</li>
+                <li><strong>Test Auto-Remediation:</strong> Automatic fixes for flaky tests or infrastructure issues (future feature)</li>
+                <li><strong>Multi-Tenant SaaS:</strong> Hosted version; initial release is on-premise or single-tenant cloud deployment</li>
+                <li><strong>Advanced BI Features:</strong> Predictive modeling UI, forecast visualization (available via SQL/API in v1, UI in v2)</li>
+                <li><strong>Workflow Automation:</strong> Auto-assignment of flaky test fixes, scheduled release gates (v2.0)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Definition of Done</h2>
+
+            <ul class="checklist">
+                <li>ClickHouse cluster provisioned and integrated; data ingestion pipeline operational</li>
+                <li>Real-time dashboard with all 15 executive KPIs implemented and tested on 100M+ records</li>
+                <li>Drill-down filters working across all dimensions; query response time <10 seconds</li>
+                <li>Flaky test detection algorithm implemented with >95% accuracy validation against manual review</li>
+                <li>Correlation analysis (code changes to test failures) fully functional with git integration</li>
+                <li>ML quality prediction models trained and deployed with >85% accuracy on validation set</li>
+                <li>Cost visualization and ROI dashboard implemented with accurate per-test cost calculation</li>
+                <li>Data export functionality (CSV, PDF, Parquet) working with scheduled email delivery</li>
+                <li>RBAC implemented; team-level access control tested and audit logging enabled</li>
+                <li>PII redaction filters in place; security review completed and approved</li>
+                <li>Dashboard responsive design tested on mobile, tablet, desktop; WCAG AA accessibility validated</li>
+                <li>Beta testing with 5 customer teams completed; feedback incorporated, issues resolved</li>
+                <li>Documentation: API docs, user guide, deployment guide, runbook completed</li>
+                <li>Product owner and engineering sign-off obtained</li>
+            </ul>
+        </section>
+    </div>
+</body>
+</html>
