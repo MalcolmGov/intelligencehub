@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UC-21 AI Threat Modelling Agent — Architecture Specification</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0f172a; --surface:#1e293b; --surface2:#263348; --surface3:#2e3f58;
+      --border:rgba(255,255,255,.07); --border-s:rgba(255,255,255,.12);
+      --text:#e2e8f0; --text-muted:#94a3b8;
+      --indigo:#818cf8; --violet:#a78bfa; --teal:#2dd4bf; --amber:#fbbf24; --rose:#f87171; --green:#34d399;
+    }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.65; min-height:100vh; }
+    .accent-bar { height:3px; background:linear-gradient(90deg,#818cf8 0%,#a78bfa 35%,#2dd4bf 70%,#fbbf24 100%); position:sticky; top:0; z-index:100; }
+    .page { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; }
+    .doc-header { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:2rem 2.5rem; margin-bottom:2rem; position:relative; overflow:hidden; }
+    .doc-header::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,#818cf8,#a78bfa,#2dd4bf); }
+    .header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+    .new-badge { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; background:linear-gradient(135deg,#818cf8,#a78bfa); color:#fff; border-radius:20px; padding:3px 12px; margin-bottom:10px; }
+    .doc-title { font-size:28px; font-weight:700; letter-spacing:-.5px; color:var(--text); margin-bottom:4px; }
+    .doc-subtitle { font-size:15px; color:var(--text-muted); }
+    .status-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(251,191,36,.12); border:1px solid rgba(251,191,36,.3); color:var(--amber); border-radius:20px; padding:4px 14px; font-size:11px; font-weight:600; letter-spacing:.04em; white-space:nowrap; }
+    .status-dot { width:7px; height:7px; border-radius:50%; background:var(--amber); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .header-meta { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; padding-top:1rem; border-top:1px solid var(--border); }
+    .owner-badge { display:flex; align-items:center; gap:10px; background:var(--surface2); border:1px solid var(--border-s); border-radius:8px; padding:8px 14px; }
+    .avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#818cf8,#a78bfa); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+    .owner-name { font-size:13px; font-weight:600; color:var(--text); }
+    .owner-role { font-size:11px; color:var(--text-muted); }
+    .meta-item { display:flex; flex-direction:column; gap:2px; }
+    .meta-label { font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); font-weight:600; }
+    .meta-value { font-size:13px; font-weight:600; color:var(--text); }
+    .section { margin-bottom:2.5rem; }
+    .section-title { font-size:18px; font-weight:700; color:var(--indigo); border-bottom:1px solid var(--border); padding-bottom:.75rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:10px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.25rem 1.5rem; margin-bottom:1rem; }
+    .card-title { font-size:14px; font-weight:600; color:var(--violet); margin-bottom:.5rem; }
+    .card p { color:var(--text-muted); font-size:13px; margin-bottom:.4rem; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+    @media(max-width:700px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+    .component-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.25rem; transition:border-color .2s; }
+    .component-card:hover { border-color:var(--indigo); }
+    .comp-icon { font-size:28px; margin-bottom:.5rem; }
+    .comp-name { font-size:13px; font-weight:700; color:var(--text); margin-bottom:.35rem; }
+    .comp-desc { font-size:12px; color:var(--text-muted); line-height:1.5; }
+    .comp-tech { margin-top:.6rem; display:flex; flex-wrap:wrap; gap:5px; }
+    .tech-pill { font-size:10px; font-weight:600; padding:2px 8px; border-radius:12px; border:1px solid var(--border-s); color:var(--teal); background:rgba(45,212,191,.08); }
+    .flow-container { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:2rem; overflow-x:auto; }
+    .flow-steps { display:flex; align-items:center; gap:0; flex-wrap:nowrap; min-width:700px; }
+    .flow-step { display:flex; flex-direction:column; align-items:center; text-align:center; flex:1; min-width:95px; }
+    .flow-box { background:var(--surface2); border:1px solid var(--border-s); border-radius:8px; padding:.6rem .7rem; font-size:11px; font-weight:600; color:var(--text); width:100%; text-align:center; }
+    .flow-box.trigger { border-color:var(--amber); color:var(--amber); }
+    .flow-box.process { border-color:var(--indigo); color:var(--indigo); }
+    .flow-box.output  { border-color:var(--teal); color:var(--teal); }
+    .flow-arrow { font-size:18px; color:var(--text-muted); padding:0 4px; flex-shrink:0; }
+    .flow-label { font-size:10px; color:var(--text-muted); margin-top:5px; }
+    .table-wrap { overflow-x:auto; border-radius:10px; border:1px solid var(--border); }
+    table { width:100%; border-collapse:collapse; }
+    thead { background:var(--surface2); }
+    th { padding:11px 14px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); border-bottom:1px solid var(--border); }
+    td { padding:10px 14px; font-size:13px; color:var(--text); border-bottom:1px solid var(--border); }
+    tr:last-child td { border-bottom:none; }
+    tr:nth-child(even) td { background:rgba(255,255,255,.015); }
+    tr:hover td { background:rgba(129,140,248,.05); }
+    .tag { display:inline-block; font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; border:1px solid; }
+    .tag-indigo { color:var(--indigo); border-color:rgba(129,140,248,.3); background:rgba(129,140,248,.08); }
+    .tag-teal   { color:var(--teal);   border-color:rgba(45,212,191,.3);  background:rgba(45,212,191,.08); }
+    .tag-violet { color:var(--violet); border-color:rgba(167,139,250,.3); background:rgba(167,139,250,.08); }
+    .tag-amber  { color:var(--amber);  border-color:rgba(251,191,36,.3);  background:rgba(251,191,36,.08); }
+    .tag-green  { color:var(--green);  border-color:rgba(52,211,153,.3);  background:rgba(52,211,153,.08); }
+    .tag-rose   { color:var(--rose);   border-color:rgba(248,113,113,.3); background:rgba(248,113,113,.08); }
+    .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+    @media(max-width:700px){ .metrics{ grid-template-columns:1fr 1fr; } }
+    .metric-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.2rem; text-align:center; }
+    .metric-value { font-size:26px; font-weight:700; color:var(--teal); }
+    .metric-label { font-size:11px; color:var(--text-muted); margin-top:3px; }
+    .endpoint { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:1rem 1.25rem; margin-bottom:.75rem; display:flex; align-items:flex-start; gap:12px; }
+    .method { font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; flex-shrink:0; margin-top:1px; }
+    .method.post { background:rgba(52,211,153,.15); color:var(--green); }
+    .method.get  { background:rgba(129,140,248,.15); color:var(--indigo); }
+    .endpoint-path { font-size:13px; font-weight:600; color:var(--text); font-family:monospace; margin-bottom:2px; }
+    .endpoint-desc { font-size:12px; color:var(--text-muted); }
+    .code-block { background:#0a111e; border:1px solid var(--border); border-radius:8px; padding:1.25rem; font-family:'SF Mono','Fira Code',monospace; font-size:12px; color:#93c5fd; line-height:1.7; overflow-x:auto; white-space:pre; }
+    .deploy-box { border:1px solid var(--border-s); border-radius:10px; padding:1rem; background:var(--surface2); }
+    .deploy-box-title { font-size:12px; font-weight:700; color:var(--violet); margin-bottom:.5rem; text-transform:uppercase; letter-spacing:.05em; }
+    .deploy-box p { font-size:12px; color:var(--text-muted); }
+    .doc-footer { margin-top:3rem; padding-top:1.5rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+    .footer-text { font-size:12px; color:var(--text-muted); }
+    .footer-brand { font-size:12px; color:var(--indigo); font-weight:600; }
+  </style>
+</head>
+<body>
+<div class="accent-bar"></div>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="header-top">
+      <div>
+        <div class="new-badge">&#10022; New &mdash; Gap Identified by Malcolm</div>
+        <div class="doc-title">UC-21 AI Threat Modelling Agent</div>
+        <div class="doc-subtitle">Architecture &amp; Technical Specification &mdash; STRIDE / DREAD / PASTA Auto-Generation Engine</div>
+      </div>
+      <div class="status-badge">
+        <span class="status-dot"></span>Not Started &mdash; Planning Phase
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="owner-badge">
+        <div class="avatar">MG</div>
+        <div>
+          <div class="owner-name">Malcolm Govender</div>
+          <div class="owner-role">Head of AI &amp; Engineering</div>
+        </div>
+      </div>
+      <div class="meta-item"><span class="meta-label">Document</span><span class="meta-value">Architecture Spec v1.0</span></div>
+      <div class="meta-item"><span class="meta-label">Compliance</span><span class="meta-value">PCI-DSS &middot; ISO 27001</span></div>
+      <div class="meta-item"><span class="meta-label">Stack</span><span class="meta-value">Python &middot; LangChain &middot; OpenAI</span></div>
+      <div class="meta-item"><span class="meta-label">Date</span><span class="meta-value">May 2026</span></div>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="metrics" style="margin-bottom:2rem;">
+    <div class="metric-card"><div class="metric-value">1,800</div><div class="metric-label">LOC Source (Python)</div></div>
+    <div class="metric-card"><div class="metric-value">360</div><div class="metric-label">LOC Tests</div></div>
+    <div class="metric-card"><div class="metric-value" style="color:var(--amber);">3 x 4mo</div><div class="metric-label">Traditional Estimate</div></div>
+    <div class="metric-card"><div class="metric-value" style="color:var(--violet);">6h</div><div class="metric-label">AI Delivery Target</div></div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section">
+    <div class="section-title">&#128269; 1. Executive Overview</div>
+    <div class="card">
+      <p>The <strong style="color:var(--text);">AI Threat Modelling Agent</strong> is an automated security analysis engine embedded directly into the SDLC. It activates on every pull request, ingesting architecture diagrams, Product Requirements Documents (PRDs), and OpenAPI / Swagger specifications to auto-generate comprehensive threat models using three industry-standard methodologies: <strong style="color:var(--indigo);">STRIDE</strong>, <strong style="color:var(--violet);">DREAD</strong>, and <strong style="color:var(--teal);">PASTA</strong>.</p>
+      <p style="margin-top:.75rem;">The agent produces a living, CVSS-scored <strong style="color:var(--text);">Threat Register</strong> that persists across releases, posts actionable security summaries as PR comments in GitHub and Azure DevOps, automatically creates and prioritises tickets in Jira and Linear, and generates executive-ready risk heat maps calibrated against the organisation's defined risk appetite. Compliance coverage spans <strong style="color:var(--amber);">PCI-DSS</strong> and <strong style="color:var(--amber);">ISO 27001</strong>.</p>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section">
+    <div class="section-title">&#127963; 2. System Architecture Components</div>
+    <div class="grid-2">
+      <div class="component-card">
+        <div class="comp-icon">&#128190;</div>
+        <div class="comp-name">Diagram Ingestion Engine</div>
+        <div class="comp-desc">Parses architecture diagrams from multiple formats (Mermaid, Draw.io XML, PlantUML, PNG via vision API). Extracts components, trust boundaries, data flows, and entry/exit points into a structured graph for downstream threat analysis.</div>
+        <div class="comp-tech"><span class="tech-pill">LangChain</span><span class="tech-pill">OpenAI Vision</span><span class="tech-pill">Mermaid Parser</span><span class="tech-pill">NetworkX</span></div>
+      </div>
+      <div class="component-card">
+        <div class="comp-icon">&#129302;</div>
+        <div class="comp-name">STRIDE/DREAD/PASTA Model Generator</div>
+        <div class="comp-desc">Core LLM-powered engine applying three threat frameworks against ingested artefacts. Generates per-component threats with evidence citations, attack narratives, and recommended mitigations. Outputs structured JSON for downstream consumers.</div>
+        <div class="comp-tech"><span class="tech-pill">GPT-4o</span><span class="tech-pill">LangChain Agents</span><span class="tech-pill">Pydantic v2</span><span class="tech-pill">STRIDE Engine</span></div>
+      </div>
+      <div class="component-card">
+        <div class="comp-icon">&#128290;</div>
+        <div class="comp-name">CVSS Scorer</div>
+        <div class="comp-desc">Automatically scores each identified threat using CVSS v3.1. Computes Base, Temporal, and Environmental scores using deployment context, asset criticality, and business impact data. Maps findings to CWE/CVE identifiers where applicable.</div>
+        <div class="comp-tech"><span class="tech-pill">CVSS v3.1</span><span class="tech-pill">NVD API</span><span class="tech-pill">CWE Mapping</span></div>
+      </div>
+      <div class="component-card">
+        <div class="comp-icon">&#128172;</div>
+        <div class="comp-name">PR Comment Publisher</div>
+        <div class="comp-desc">Formats and posts a structured security summary as a PR comment in GitHub or Azure DevOps. Includes threat count by severity, top 3 critical findings, and a link to the full Threat Register. Updates existing comment on re-run to avoid duplicates.</div>
+        <div class="comp-tech"><span class="tech-pill">GitHub API v3</span><span class="tech-pill">Azure DevOps REST</span><span class="tech-pill">Markdown</span></div>
+      </div>
+      <div class="component-card">
+        <div class="comp-icon">&#128203;</div>
+        <div class="comp-name">Jira / Linear Integrator</div>
+        <div class="comp-desc">Creates security tickets in Jira or Linear for all HIGH and CRITICAL threats automatically. Applies labels, severity, component, and sprint assignment based on configurable mapping rules. Links tickets back to the originating PR and Threat Register entry.</div>
+        <div class="comp-tech"><span class="tech-pill">Jira REST API</span><span class="tech-pill">Linear GraphQL</span><span class="tech-pill">OAuth 2.0</span></div>
+      </div>
+      <div class="component-card">
+        <div class="comp-icon">&#128200;</div>
+        <div class="comp-name">Risk Heat Map Generator</div>
+        <div class="comp-desc">Produces a 5x5 severity/likelihood matrix as SVG and PDF. Plots all current threats and overlays the organisation's risk appetite thresholds. Generates executive-ready reports with trend analysis comparing current PR to historical baseline.</div>
+        <div class="comp-tech"><span class="tech-pill">Matplotlib</span><span class="tech-pill">ReportLab</span><span class="tech-pill">SVG Generator</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section">
+    <div class="section-title">&#128257; 3. End-to-End Data Flow</div>
+    <div class="flow-container">
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="flow-box trigger">PR Opened / Updated</div>
+          <div class="flow-label">GitHub / Azure DevOps Webhook</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="flow-box process">GitHub Action Trigger</div>
+          <div class="flow-label">threat-model.yml workflow</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="flow-box process">Artefact Ingestion</div>
+          <div class="flow-label">Diagrams &middot; PRDs &middot; API Specs</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="flow-box process">Model Generation</div>
+          <div class="flow-label">STRIDE &middot; DREAD &middot; PASTA</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="flow-box process">CVSS Scoring</div>
+          <div class="flow-label">v3.1 Base + Context</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="flow-box output">Threat Register</div>
+          <div class="flow-label">Living JSON Store</div>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-step">
+          <div class="flow-box output">Multi-Channel Output</div>
+          <div class="flow-label">PR Comment &middot; Jira &middot; Heat Map</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:1rem;">
+      <div class="card-title">Trigger Conditions</div>
+      <p>The agent activates on: PR <code style="color:var(--teal)">opened</code>, PR <code style="color:var(--teal)">synchronize</code>, PR <code style="color:var(--teal)">ready_for_review</code>, and manual workflow dispatch. Runs only when changed files include: <code style="color:var(--teal)">*.yaml</code>, <code style="color:var(--teal)">*.json</code>, <code style="color:var(--teal)">*.md</code>, <code style="color:var(--teal)">*.drawio</code>, <code style="color:var(--teal)">*.puml</code>, <code style="color:var(--teal)">docs/**</code>, <code style="color:var(--teal)">arch/**</code>. Configured via <code style="color:var(--teal)">.threat-model.yml</code> in repository root.</p>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section">
+    <div class="section-title">&#128196; 4. Internal API Contracts</div>
+    <div class="endpoint">
+      <div class="method post">POST</div>
+      <div><div class="endpoint-path">/api/v1/analyse</div><div class="endpoint-desc">Trigger full threat model analysis. Accepts artefact URLs, repo context, and PR metadata. Returns job ID for async polling. Max payload: 10MB.</div></div>
+    </div>
+    <div class="endpoint">
+      <div class="method get">GET</div>
+      <div><div class="endpoint-path">/api/v1/jobs/{job_id}/status</div><div class="endpoint-desc">Poll analysis job status. Returns: <code style="color:var(--teal)">pending | running | complete | failed</code> with progress percentage and estimated completion time.</div></div>
+    </div>
+    <div class="endpoint">
+      <div class="method get">GET</div>
+      <div><div class="endpoint-path">/api/v1/jobs/{job_id}/results</div><div class="endpoint-desc">Retrieve full structured threat model results. Includes all threats, CVSS scores, STRIDE categories, mitigations, and compliance mappings.</div></div>
+    </div>
+    <div class="endpoint">
+      <div class="method get">GET</div>
+      <div><div class="endpoint-path">/api/v1/register/{repo_id}</div><div class="endpoint-desc">Retrieve the living Threat Register for a repository. Supports query params: <code style="color:var(--teal)">?severity=HIGH&amp;status=open&amp;since=2026-01-01</code>.</div></div>
+    </div>
+    <div class="endpoint">
+      <div class="method post">POST</div>
+      <div><div class="endpoint-path">/api/v1/register/{threat_id}/update</div><div class="endpoint-desc">Update threat status, mitigation notes, or owner. Used by Jira/Linear webhooks to sync ticket resolution back to the register.</div></div>
+    </div>
+    <div class="endpoint">
+      <div class="method get">GET</div>
+      <div><div class="endpoint-path">/api/v1/heatmap/{repo_id}</div><div class="endpoint-desc">Generate and return a risk heat map. Accepts <code style="color:var(--teal)">?format=svg|pdf</code> and <code style="color:var(--teal)">?baseline=PR_ID</code> for trend comparison.</div></div>
+    </div>
+
+    <div style="margin-top:1.25rem;">
+      <div style="font-size:14px;font-weight:600;color:var(--violet);margin-bottom:.75rem;">Sample Request / Response &mdash; POST /api/v1/analyse</div>
+      <div class="code-block">// Request Body
+{
+  "repo": "org/payment-service",
+  "pr_number": 342,
+  "artefacts": {
+    "diagrams": ["arch/payment-flow.drawio", "docs/system-context.puml"],
+    "prd": "docs/PRD-payment-v3.md",
+    "api_spec": "openapi/payment-api.yaml"
+  },
+  "config": {
+    "frameworks": ["STRIDE", "DREAD", "PASTA"],
+    "cvss_context": { "env": "production", "criticality": "HIGH" },
+    "publish_comment": true,
+    "create_tickets": "jira",
+    "fail_on_severity": "CRITICAL"
+  }
+}
+
+// Response
+{ "job_id": "tm-2026-05-abc123", "status": "pending", "eta_seconds": 45 }</div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 -->
+  <div class="section">
+    <div class="section-title">&#128736; 5. Technology Stack</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Layer</th><th>Technology</th><th>Version</th><th>Purpose</th><th>Licence</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tag tag-indigo">Core</span></td><td>Python</td><td>3.12+</td><td>Primary runtime language</td><td>PSF</td></tr>
+          <tr><td><span class="tag tag-indigo">Core</span></td><td>LangChain</td><td>0.2.x</td><td>Agent orchestration, tool use, prompt chains</td><td>MIT</td></tr>
+          <tr><td><span class="tag tag-violet">AI</span></td><td>OpenAI GPT-4o</td><td>Latest</td><td>Threat model generation, diagram interpretation</td><td>Commercial</td></tr>
+          <tr><td><span class="tag tag-violet">AI</span></td><td>OpenAI Embeddings</td><td>text-embedding-3-large</td><td>Semantic deduplication of threats across runs</td><td>Commercial</td></tr>
+          <tr><td><span class="tag tag-teal">Ingestion</span></td><td>Mermaid Parser</td><td>10.x</td><td>Parse Mermaid diagram syntax</td><td>MIT</td></tr>
+          <tr><td><span class="tag tag-teal">Ingestion</span></td><td>PyMuPDF</td><td>Latest</td><td>Extract diagrams from PDF artefacts</td><td>AGPL</td></tr>
+          <tr><td><span class="tag tag-teal">Ingestion</span></td><td>Swagger Parser</td><td>Latest</td><td>Parse OpenAPI 3.x specifications</td><td>Apache 2.0</td></tr>
+          <tr><td><span class="tag tag-amber">Integration</span></td><td>PyGitHub</td><td>2.x</td><td>GitHub API &mdash; PR comments, file access</td><td>LGPL</td></tr>
+          <tr><td><span class="tag tag-amber">Integration</span></td><td>Azure DevOps Python SDK</td><td>7.x</td><td>Azure DevOps PR comments, work items</td><td>MIT</td></tr>
+          <tr><td><span class="tag tag-amber">Integration</span></td><td>Jira REST API</td><td>v3</td><td>Create and update security tickets</td><td>Commercial</td></tr>
+          <tr><td><span class="tag tag-amber">Integration</span></td><td>Linear GraphQL API</td><td>Latest</td><td>Create Linear issues for threats</td><td>Commercial</td></tr>
+          <tr><td><span class="tag tag-green">Output</span></td><td>Matplotlib</td><td>3.8+</td><td>Risk heat map rendering</td><td>PSF</td></tr>
+          <tr><td><span class="tag tag-green">Output</span></td><td>ReportLab</td><td>4.x</td><td>PDF executive report generation</td><td>BSD</td></tr>
+          <tr><td><span class="tag tag-green">Output</span></td><td>Pydantic</td><td>v2</td><td>Data validation and structured output schemas</td><td>MIT</td></tr>
+          <tr><td><span class="tag tag-rose">Infra</span></td><td>FastAPI</td><td>0.110+</td><td>Internal REST API server</td><td>MIT</td></tr>
+          <tr><td><span class="tag tag-rose">Infra</span></td><td>Redis</td><td>7.x</td><td>Job queue and result caching</td><td>BSD</td></tr>
+          <tr><td><span class="tag tag-rose">Infra</span></td><td>Docker / GitHub Actions</td><td>Latest</td><td>Containerisation and CI/CD execution</td><td>Apache 2.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 6 -->
+  <div class="section">
+    <div class="section-title">&#9881; 6. GitHub Actions / Azure DevOps Integration</div>
+    <div class="grid-2" style="margin-bottom:1rem;">
+      <div class="card">
+        <div class="card-title">GitHub Actions Workflow</div>
+        <p>File: <code style="color:var(--teal)">.github/workflows/threat-model.yml</code></p>
+        <p style="margin-top:.5rem;">Triggers on <code style="color:var(--teal)">pull_request</code> events targeting <code style="color:var(--teal)">main</code> and <code style="color:var(--teal)">develop</code>. Uses <code style="color:var(--teal)">THREAT_MODEL_API_KEY</code> secret. Runs as a required status check &mdash; PRs cannot merge if CRITICAL threats remain unmitigated without a Security team override.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Azure DevOps Pipeline</div>
+        <p>File: <code style="color:var(--teal)">azure-pipelines/threat-model-stage.yml</code></p>
+        <p style="margin-top:.5rem;">Integrates as a pipeline stage using a Service Connection for auth. Posts results to PR threads and creates Work Items in the configured project. Supports branch policies to block completion on unmitigated CRITICAL threats.</p>
+      </div>
+    </div>
+    <div class="code-block"># .github/workflows/threat-model.yml (excerpt)
+name: AI Threat Modelling
+on:
+  pull_request:
+    branches: [main, develop]
+    paths: ['docs/**', 'arch/**', 'openapi/**', '*.md', '*.yaml']
+
+jobs:
+  threat-model:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Threat Modelling Agent
+        uses: org/threat-model-action@v1
+        with:
+          api-key: ${{ secrets.THREAT_MODEL_API_KEY }}
+          frameworks: STRIDE,DREAD,PASTA
+          publish-comment: true
+          create-tickets: jira
+          fail-on-severity: CRITICAL
+          risk-appetite: moderate</div>
+  </div>
+
+  <!-- SECTION 7 -->
+  <div class="section">
+    <div class="section-title">&#9729; 7. Deployment Model</div>
+    <div class="grid-3">
+      <div class="deploy-box">
+        <div class="deploy-box-title">GitHub Actions Runner</div>
+        <p>ubuntu-latest ephemeral runner. Docker image pulled from private ECR. Stateless execution &mdash; no persistent local state.</p>
+      </div>
+      <div class="deploy-box">
+        <div class="deploy-box-title">API Service (FastAPI)</div>
+        <p>AWS ECS Fargate task. Auto-scales 1&ndash;5 replicas. Private VPC endpoint only &mdash; not internet-facing. TLS 1.3 enforced.</p>
+      </div>
+      <div class="deploy-box">
+        <div class="deploy-box-title">Threat Register Store</div>
+        <p>AWS DynamoDB (on-demand). Encrypted at rest (AES-256). Per-repository partition key. TTL: 2 years for compliance retention.</p>
+      </div>
+      <div class="deploy-box">
+        <div class="deploy-box-title">Redis Job Queue</div>
+        <p>AWS ElastiCache Redis 7. Job queuing and result caching (TTL: 24h). In-transit encryption enabled.</p>
+      </div>
+      <div class="deploy-box">
+        <div class="deploy-box-title">Heat Map Storage</div>
+        <p>S3 private bucket. Pre-signed URLs with 1h expiry. Lifecycle: archive to Glacier after 90 days.</p>
+      </div>
+      <div class="deploy-box">
+        <div class="deploy-box-title">Secrets Management</div>
+        <p>All API keys stored in AWS Secrets Manager. Rotated every 90 days. Zero secrets in env vars or source code.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 8 -->
+  <div class="section">
+    <div class="section-title">&#128274; 8. Compliance &amp; Security Controls</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Control</th><th>Standard</th><th>Implementation</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Threat Modelling in SDLC</td><td><span class="tag tag-amber">PCI-DSS 6.3.2</span></td><td>Automated on every PR &mdash; no manual step required</td><td><span class="tag tag-green">Designed</span></td></tr>
+          <tr><td>Vulnerability Management</td><td><span class="tag tag-amber">PCI-DSS 6.3.3</span></td><td>CVSS scoring + Jira ticket creation + SLA tracking</td><td><span class="tag tag-green">Designed</span></td></tr>
+          <tr><td>Risk Assessment Process</td><td><span class="tag tag-indigo">ISO 27001 A.8.8</span></td><td>DREAD + PASTA risk ratings with risk appetite overlay on heat map</td><td><span class="tag tag-green">Designed</span></td></tr>
+          <tr><td>Information Classification</td><td><span class="tag tag-indigo">ISO 27001 A.5.12</span></td><td>Diagrams and PRDs classified; no PII or cardholder data sent to LLM</td><td><span class="tag tag-green">Designed</span></td></tr>
+          <tr><td>Audit Logging</td><td><span class="tag tag-amber">PCI-DSS 10.2</span></td><td>CloudTrail + structured JSON logs for all analysis runs and outputs</td><td><span class="tag tag-green">Designed</span></td></tr>
+          <tr><td>Access Control</td><td><span class="tag tag-indigo">ISO 27001 A.5.15</span></td><td>IAM roles + OAuth 2.0 &mdash; least-privilege principle enforced throughout</td><td><span class="tag tag-green">Designed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div>
+      <div class="footer-text">UC-21 &mdash; AI Threat Modelling Agent | Architecture Specification v1.0</div>
+      <div class="footer-text">Owner: Malcolm Govender &mdash; Head of AI &amp; Engineering | May 2026</div>
+    </div>
+    <div class="footer-brand">IntelligenceHub &mdash; AI Engineering Programme</div>
+  </div>
+
+</div>
+</body>
+</html>

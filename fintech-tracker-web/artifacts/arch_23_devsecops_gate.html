@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC23 — AI-Powered DevSecOps Security Gate — Architecture Specification</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:           #0f172a;
+            --surface:      #1e293b;
+            --surface2:     #263348;
+            --border:       rgba(255,255,255,0.07);
+            --border2:      rgba(255,255,255,0.12);
+            --text:         #e2e8f0;
+            --text-muted:   #94a3b8;
+            --text-dim:     #64748b;
+            --indigo:       #818cf8;
+            --violet:       #a78bfa;
+            --teal:         #2dd4bf;
+            --amber:        #fbbf24;
+            --amber-soft:   rgba(251,191,36,0.12);
+            --red:          #f87171;
+            --red-soft:     rgba(248,113,113,0.15);
+            --orange:       #fb923c;
+            --orange-soft:  rgba(251,146,60,0.12);
+            --green:        #4ade80;
+            --green-soft:   rgba(74,222,128,0.12);
+            --indigo-soft:  rgba(129,140,248,0.12);
+            --violet-soft:  rgba(167,139,250,0.12);
+            --teal-soft:    rgba(45,212,191,0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+            padding: 32px 24px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* Print Button */
+        .print-btn {
+            position: fixed;
+            top: 20px; right: 24px;
+            background: var(--indigo);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 100;
+        }
+        .print-btn:hover { background: var(--violet); }
+
+        /* Header */
+        .doc-header {
+            margin-bottom: 36px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border2);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .header-badge-new {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--amber-soft);
+            border: 1px solid rgba(251,191,36,0.4);
+            color: var(--amber);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+        .status-badge::before { content: "●"; font-size: 9px; }
+
+        .doc-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.4px;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .doc-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .meta-chip {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 3px 9px;
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+        }
+
+        .owner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 20px;
+            padding: 5px 12px 5px 5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .owner-avatar {
+            width: 24px; height: 24px;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700; color: #fff;
+            flex-shrink: 0;
+        }
+
+        /* Section */
+        .section { margin-bottom: 40px; }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--indigo);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }
+
+        h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--violet);
+            margin-bottom: 8px;
+            margin-top: 20px;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.65;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+        }
+
+        .card-icon {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .card-icon.indigo { background: var(--indigo-soft); }
+        .card-icon.violet { background: var(--violet-soft); }
+        .card-icon.teal   { background: var(--teal-soft); }
+        .card-icon.amber  { background: var(--amber-soft); }
+        .card-icon.red    { background: var(--red-soft); }
+        .card-icon.green  { background: var(--green-soft); }
+        .card-icon.orange { background: var(--orange-soft); }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        /* Flow Diagram */
+        .flow-diagram {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px 24px;
+            margin-top: 16px;
+            overflow-x: auto;
+        }
+
+        .flow-steps {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flow-node {
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: 10px 14px;
+            text-align: center;
+            min-width: 110px;
+        }
+
+        .flow-node.trigger { border-color: var(--indigo); background: var(--indigo-soft); }
+        .flow-node.scan    { border-color: var(--violet); background: var(--violet-soft); }
+        .flow-node.ml      { border-color: var(--teal);   background: var(--teal-soft); }
+        .flow-node.post    { border-color: var(--amber);  background: var(--amber-soft); }
+        .flow-node.block   { border-color: var(--red);    background: var(--red-soft); }
+        .flow-node.approve { border-color: var(--green);  background: var(--green-soft); }
+
+        .flow-node .fn-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 2px;
+        }
+        .flow-node .fn-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .flow-arrow {
+            color: var(--text-dim);
+            font-size: 18px;
+            padding: 0 4px;
+            line-height: 1;
+            align-self: center;
+            margin-top: -20px;
+        }
+
+        .flow-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-align: center;
+        }
+
+        /* Tables */
+        .table-wrapper {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 14px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead { background: rgba(0,0,0,0.25); border-bottom: 1px solid var(--border2); }
+
+        th {
+            padding: 11px 14px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(129,140,248,0.04); }
+
+        /* CVSS badge colours */
+        .pill {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .pill-critical { background: var(--red-soft);    color: var(--red);    border: 1px solid rgba(248,113,113,0.4); }
+        .pill-high     { background: var(--orange-soft); color: var(--orange); border: 1px solid rgba(251,146,60,0.4);  }
+        .pill-medium   { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.4);  }
+        .pill-low      { background: var(--indigo-soft); color: var(--indigo); border: 1px solid rgba(129,140,248,0.4); }
+        .pill-block    { background: var(--red-soft);    color: var(--red);    border: 1px solid rgba(248,113,113,0.4); }
+        .pill-warn     { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.4);  }
+        .pill-info     { background: var(--teal-soft);   color: var(--teal);   border: 1px solid rgba(45,212,191,0.4);  }
+        .pill-approve  { background: var(--green-soft);  color: var(--green);  border: 1px solid rgba(74,222,128,0.4);  }
+
+        .mono {
+            font-family: 'Courier New', 'SF Mono', monospace;
+            font-size: 12px;
+            color: var(--teal);
+            background: rgba(45,212,191,0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #0a0f1e;
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            font-family: 'Courier New', 'SF Mono', 'Fira Code', monospace;
+            font-size: 12px;
+            color: #a5b4fc;
+            line-height: 1.7;
+            white-space: pre;
+        }
+
+        .code-block .comment { color: #475569; }
+        .code-block .key     { color: #818cf8; }
+        .code-block .val     { color: #2dd4bf; }
+        .code-block .str     { color: #a78bfa; }
+        .code-block .kw      { color: #f472b6; }
+
+        /* Highlight row */
+        .row-critical td { background: rgba(248,113,113,0.04); }
+        .row-high     td { background: rgba(251,146,60,0.04);  }
+
+        /* Stats strip */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 18px;
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--teal);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Alert box */
+        .alert {
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-top: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .alert-info  { background: var(--indigo-soft); border-left: 3px solid var(--indigo); }
+        .alert-warn  { background: var(--amber-soft);  border-left: 3px solid var(--amber); }
+        .alert-icon  { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+        .alert-text  { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+
+        /* Divider */
+        hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+        /* Footer */
+        .doc-footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: gap;
+            gap: 12px;
+        }
+
+        .doc-footer-text {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        @media print {
+            body { background: #fff; color: #000; padding: 0; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Print / Export PDF</button>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="doc-header">
+        <div class="header-badge-new">&#10022; New — Gap Identified by Malcolm</div>
+        <div class="header-top">
+            <div>
+                <div class="doc-title">UC23 — AI-Powered DevSecOps Security Gate</div>
+                <div class="doc-subtitle">Architecture Specification &amp; Technical Design — CI/CD Pipeline Security Integration</div>
+            </div>
+            <div class="status-badge">Not Started — Planning Phase</div>
+        </div>
+        <div class="meta-row">
+            <span class="meta-chip">UC-23</span>
+            <span class="meta-chip">Architecture Spec</span>
+            <span class="meta-chip">v1.0 — 2026-05-09</span>
+            <span class="meta-chip">PCI-DSS · ISO 27001 · POPIA</span>
+        </div>
+        <div class="owner-badge">
+            <div class="owner-avatar">MG</div>
+            Malcolm Govender — Head of AI &amp; Engineering
+        </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="section">
+        <div class="section-title">Project Overview</div>
+        <p>An AI-powered security gate embedded directly into CI/CD pipelines (GitHub Actions &amp; Azure DevOps) that combines SAST analysis with ML-driven false-positive reduction, secret scanning, dependency vulnerability scoring, and container image analysis. Critical and high-severity CVEs are blocked at merge time, SBOMs are auto-generated, and actionable remediation guidance with severity-ranked fix suggestions is posted directly on pull requests.</p>
+        <div class="stats-strip">
+            <div class="stat-card">
+                <div class="stat-value">1,600</div>
+                <div class="stat-label">LOC Source</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">320</div>
+                <div class="stat-label">LOC Tests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Source Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">6h</div>
+                <div class="stat-label">AI Delivery Target</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">9mo</div>
+                <div class="stat-label">Traditional Estimate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color:var(--teal)">45×</div>
+                <div class="stat-label">Speed Multiplier</div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- System Architecture Components -->
+    <div class="section">
+        <div class="section-title">1. System Architecture Components</div>
+        <h2>Core Engine Components</h2>
+        <p>The security gate comprises eight integrated components operating as a coordinated pipeline. Each component is independently deployable and communicates via a shared scan results schema.</p>
+
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon indigo">&#128269;</div>
+                <div class="card-title">SAST Engine</div>
+                <div class="card-desc">Static Application Security Testing using Semgrep (Python, TypeScript, YAML) and Bandit (Python-specific). Runs CWE-mapped rule sets. Outputs structured JSON findings with file, line, severity, CWE, and CVSS data. Integrated with custom fintech rule packs.</div>
+            </div>
+            <div class="card">
+                <div class="card-icon violet">&#129302;</div>
+                <div class="card-title">ML False-Positive Reducer</div>
+                <div class="card-desc">Gradient-boosted classifier trained on historical PR scan data. Scores each SAST finding with a false-positive probability. Findings with confidence &gt; 0.85 are suppressed from blocking logic but retained in audit logs. Re-trains weekly on new labelled data.</div>
+            </div>
+            <div class="card">
+                <div class="card-icon red">&#128273;</div>
+                <div class="card-title">Secret Scanner</div>
+                <div class="card-desc">Entropy-based and pattern-matching detection for API keys, connection strings, private keys, and service account credentials. Uses Gitleaks rule sets augmented with custom fintech patterns. Scans full diff and all tracked file types.</div>
+            </div>
+            <div class="card">
+                <div class="card-icon amber">&#128202;</div>
+                <div class="card-title">Dependency Vulnerability Scorer</div>
+                <div class="card-desc">OWASP Dependency Check &amp; Safety CLI for Python; npm audit for TypeScript. Cross-references NVD CVE database, GitHub Advisory Database, and OSV. Computes an aggregate dependency risk score per package manifest. Supports pip, poetry, npm, and yarn lockfiles.</div>
+            </div>
+            <div class="card">
+                <div class="card-icon teal">&#128230;</div>
+                <div class="card-title">Container Image Analyser</div>
+                <div class="card-desc">Trivy scans Docker images for OS-level CVEs, misconfigurations, and secrets. Analyses base image provenance, USER instruction compliance, and image signing status. Supports Docker Hub, ECR, ACR, and local registry images.</div>
+            </div>
+            <div class="card">
+                <div class="card-icon green">&#128196;</div>
+                <div class="card-title">SBOM Generator</div>
+                <div class="card-desc">Syft generates SBOMs in SPDX 2.3 and CycloneDX 1.5 formats for every scanned build. SBOMs are attached as pipeline artifacts and committed to a dedicated SBOM repository. Satisfies PCI-DSS Requirement 6.3 and ISO 27001 A.14.2 controls.</div>
+            </div>
+            <div class="card">
+                <div class="card-icon orange">&#128172;</div>
+                <div class="card-title">PR Comment Publisher</div>
+                <div class="card-desc">Posts structured remediation guidance directly on GitHub PRs and Azure DevOps work items. Groups findings by severity, links to CVE advisories, and provides ranked fix suggestions with effort estimates. Supports @mention routing to service owners.</div>
+            </div>
+            <div class="card">
+                <div class="card-icon red">&#128683;</div>
+                <div class="card-title">Pipeline Blocker</div>
+                <div class="card-desc">Enforces CVSS threshold policy as final pipeline gate. Sets commit status to FAILURE for Critical/High findings that pass ML filter. Writes blocking rationale to structured JSON artefact consumed by reporting dashboards. Exemption bypass requires signed approval token.</div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- CI/CD Integration Flow -->
+    <div class="section">
+        <div class="section-title">2. CI/CD Integration Flow</div>
+        <h2>Pipeline Execution Sequence</h2>
+        <p>The security gate triggers on every pull request opened or updated against protected branches. The flow is sequential with parallel scan execution to minimise latency.</p>
+
+        <div class="flow-diagram">
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="flow-node trigger">
+                        <div class="fn-label">PR Opened / Updated</div>
+                        <div class="fn-sub">GitHub / Azure DevOps webhook</div>
+                    </div>
+                    <div class="flow-label">Webhook Event</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="flow-node trigger">
+                        <div class="fn-label">Security Gate Triggered</div>
+                        <div class="fn-sub">Pipeline job dispatched</div>
+                    </div>
+                    <div class="flow-label">Job Start</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="flow-node scan">
+                        <div class="fn-label">Parallel Scans</div>
+                        <div class="fn-sub">SAST · Secrets · Deps · Container</div>
+                    </div>
+                    <div class="flow-label">~90s avg</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="flow-node ml">
+                        <div class="fn-label">ML FP Filter</div>
+                        <div class="fn-sub">Confidence scoring</div>
+                    </div>
+                    <div class="flow-label">FP Reduction</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="flow-node post">
+                        <div class="fn-label">SBOM Generated</div>
+                        <div class="fn-sub">SPDX + CycloneDX artifacts</div>
+                    </div>
+                    <div class="flow-label">SBOM Artifact</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="flow-node post">
+                        <div class="fn-label">PR Comment Posted</div>
+                        <div class="fn-sub">Severity-ranked findings</div>
+                    </div>
+                    <div class="flow-label">Remediation Guidance</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="flow-node block">
+                        <div class="fn-label">Block / Approve</div>
+                        <div class="fn-sub">CVSS threshold policy</div>
+                    </div>
+                    <div class="flow-label">Gate Decision</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);">
+                    <div style="width:10px;height:10px;border-radius:2px;background:var(--red-soft);border:1px solid var(--red)"></div>
+                    BLOCK — Critical/High CVE detected
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);">
+                    <div style="width:10px;height:10px;border-radius:2px;background:var(--amber-soft);border:1px solid var(--amber)"></div>
+                    WARN — Medium severity findings
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);">
+                    <div style="width:10px;height:10px;border-radius:2px;background:var(--green-soft);border:1px solid var(--green)"></div>
+                    APPROVE — Clean / Low only
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- CVSS Blocking Thresholds -->
+    <div class="section">
+        <div class="section-title">3. CVSS Blocking Thresholds</div>
+        <h2>Severity Gate Policy</h2>
+        <p>The Pipeline Blocker enforces the following CVSS v3.1 thresholds. Thresholds are configurable per environment via <span class="mono">security-gate.yaml</span>.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Severity</th>
+                        <th>CVSS v3.1 Range</th>
+                        <th>Pipeline Action</th>
+                        <th>PR Status</th>
+                        <th>Notification</th>
+                        <th>Exemption Allowed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="row-critical">
+                        <td><span class="pill pill-critical">Critical</span></td>
+                        <td>≥ 9.0</td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>FAILURE — merge prevented</td>
+                        <td>Immediate CISO alert</td>
+                        <td>No (hardcoded)</td>
+                    </tr>
+                    <tr class="row-high">
+                        <td><span class="pill pill-high">High</span></td>
+                        <td>7.0 – 8.9</td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>FAILURE — merge prevented</td>
+                        <td>Security team Slack alert</td>
+                        <td>Yes (CISO approval)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pill pill-medium">Medium</span></td>
+                        <td>4.0 – 6.9</td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td>WARNING — merge allowed</td>
+                        <td>PR comment + Jira ticket</td>
+                        <td>Yes (Tech Lead)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pill pill-low">Low</span></td>
+                        <td>0.1 – 3.9</td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td>INFO — merge allowed</td>
+                        <td>PR comment only</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td><span class="pill pill-approve">None</span></td>
+                        <td>0.0</td>
+                        <td><span class="pill pill-approve">APPROVE</span></td>
+                        <td>SUCCESS — clean</td>
+                        <td>None</td>
+                        <td>N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-warn">
+            <div class="alert-icon">⚠</div>
+            <div class="alert-text">CVSS 9.0+ (Critical) blocks are hardcoded and cannot be exempted. Any attempt to bypass via force-push triggers an automatic CISO incident notification and audit log entry under PCI-DSS Requirement 10.7.</div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- GitHub Actions Workflow -->
+    <div class="section">
+        <div class="section-title">4. GitHub Actions Integration</div>
+        <h2>Workflow YAML Configuration</h2>
+        <p>The security gate runs as a required status check on protected branches. The workflow file lives at <span class="mono">.github/workflows/security-gate.yml</span>.</p>
+
+        <div class="code-block">
+<pre><span class="comment"># .github/workflows/security-gate.yml</span>
+<span class="comment"># UC23 — AI-Powered DevSecOps Security Gate</span>
+<span class="key">name:</span> <span class="str">Security Gate</span>
+
+<span class="key">on:</span>
+  <span class="key">pull_request:</span>
+    <span class="key">branches:</span> <span class="str">[ main, develop, release/* ]</span>
+  <span class="key">push:</span>
+    <span class="key">branches:</span> <span class="str">[ main ]</span>
+
+<span class="key">permissions:</span>
+  <span class="key">contents:</span>     <span class="str">read</span>
+  <span class="key">pull-requests:</span> <span class="str">write</span>
+  <span class="key">security-events:</span> <span class="str">write</span>
+
+<span class="key">jobs:</span>
+  <span class="key">security-gate:</span>
+    <span class="key">name:</span> <span class="str">AI Security Gate</span>
+    <span class="key">runs-on:</span> <span class="str">ubuntu-latest</span>
+    <span class="key">timeout-minutes:</span> <span class="str">15</span>
+
+    <span class="key">steps:</span>
+      - <span class="key">name:</span> <span class="str">Checkout code</span>
+        <span class="key">uses:</span> <span class="str">actions/checkout@v4</span>
+        <span class="key">with:</span>
+          <span class="key">fetch-depth:</span> <span class="str">0</span>
+
+      - <span class="key">name:</span> <span class="str">Set up Python</span>
+        <span class="key">uses:</span> <span class="str">actions/setup-python@v5</span>
+        <span class="key">with:</span>
+          <span class="key">python-version:</span> <span class="str">'3.11'</span>
+
+      - <span class="key">name:</span> <span class="str">Install Security Gate</span>
+        <span class="key">run:</span> <span class="str">pip install -r security-gate/requirements.txt</span>
+
+      - <span class="key">name:</span> <span class="str">Run SAST (Semgrep + Bandit)</span>
+        <span class="key">run:</span> <span class="str">python security-gate/sast_engine.py --output sast-results.json</span>
+        <span class="key">env:</span>
+          <span class="key">SEMGREP_RULES:</span> <span class="str">p/ci,p/python,p/fintech-custom</span>
+
+      - <span class="key">name:</span> <span class="str">Secret Scanning (Gitleaks)</span>
+        <span class="key">uses:</span> <span class="str">gitleaks/gitleaks-action@v2</span>
+        <span class="key">env:</span>
+          <span class="key">GITLEAKS_LICENSE:</span> <span class="str">${{ secrets.GITLEAKS_LICENSE }}</span>
+
+      - <span class="key">name:</span> <span class="str">Dependency Vulnerability Check</span>
+        <span class="key">run:</span> <span class="str">python security-gate/dep_scorer.py --manifest pyproject.toml</span>
+
+      - <span class="key">name:</span> <span class="str">Container Image Analysis (Trivy)</span>
+        <span class="key">uses:</span> <span class="str">aquasecurity/trivy-action@master</span>
+        <span class="key">with:</span>
+          <span class="key">image-ref:</span> <span class="str">${{ env.IMAGE_TAG }}</span>
+          <span class="key">format:</span>     <span class="str">json</span>
+          <span class="key">output:</span>     <span class="str">trivy-results.json</span>
+
+      - <span class="key">name:</span> <span class="str">ML False-Positive Reduction</span>
+        <span class="key">run:</span> <span class="str">python security-gate/ml_fp_reducer.py --input sast-results.json</span>
+
+      - <span class="key">name:</span> <span class="str">Generate SBOM (Syft)</span>
+        <span class="key">uses:</span> <span class="str">anchore/sbom-action@v0</span>
+        <span class="key">with:</span>
+          <span class="key">format:</span> <span class="str">spdx-json,cyclonedx-json</span>
+
+      - <span class="key">name:</span> <span class="str">Post PR Comment &amp; Enforce Gate</span>
+        <span class="key">run:</span> <span class="str">python security-gate/gate_enforcer.py --fail-on critical,high</span>
+        <span class="key">env:</span>
+          <span class="key">GITHUB_TOKEN:</span> <span class="str">${{ secrets.GITHUB_TOKEN }}</span>
+          <span class="key">CVSS_CRITICAL_THRESHOLD:</span> <span class="str">9.0</span>
+          <span class="key">CVSS_HIGH_THRESHOLD:</span>     <span class="str">7.0</span></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Azure DevOps Integration -->
+    <div class="section">
+        <div class="section-title">5. Azure DevOps Pipeline Integration</div>
+        <h2>Azure Pipelines YAML Configuration</h2>
+        <p>The security gate is implemented as a reusable Azure Pipeline template stored in a shared repository and referenced by product pipelines via <span class="mono">resources.repositories</span>.</p>
+
+        <div class="code-block">
+<pre><span class="comment"># azure-pipelines-security-gate.yml</span>
+<span class="comment"># UC23 — AI-Powered DevSecOps Security Gate (Azure DevOps)</span>
+
+<span class="key">trigger:</span>
+  <span class="key">branches:</span>
+    <span class="key">include:</span> <span class="str">[ main, develop, release/* ]</span>
+
+<span class="key">pr:</span>
+  <span class="key">branches:</span>
+    <span class="key">include:</span> <span class="str">[ '*' ]</span>
+
+<span class="key">pool:</span>
+  <span class="key">vmImage:</span> <span class="str">ubuntu-latest</span>
+
+<span class="key">variables:</span>
+  <span class="key">CVSS_CRITICAL_THRESHOLD:</span> <span class="str">'9.0'</span>
+  <span class="key">CVSS_HIGH_THRESHOLD:</span>     <span class="str">'7.0'</span>
+  <span class="key">PYTHON_VERSION:</span>          <span class="str">'3.11'</span>
+
+<span class="key">stages:</span>
+  - <span class="key">stage:</span> <span class="str">SecurityGate</span>
+    <span class="key">displayName:</span> <span class="str">AI Security Gate</span>
+    <span class="key">jobs:</span>
+      - <span class="key">job:</span> <span class="str">RunSecurityScans</span>
+        <span class="key">displayName:</span> <span class="str">Run Security Scans</span>
+        <span class="key">timeoutInMinutes:</span> <span class="str">15</span>
+        <span class="key">steps:</span>
+          - <span class="key">task:</span> <span class="str">UsePythonVersion@0</span>
+            <span class="key">inputs:</span>
+              <span class="key">versionSpec:</span> <span class="str">$(PYTHON_VERSION)</span>
+
+          - <span class="key">script:</span> <span class="str">pip install -r security-gate/requirements.txt</span>
+            <span class="key">displayName:</span> <span class="str">Install Security Gate</span>
+
+          - <span class="key">script:</span> <span class="str">python security-gate/sast_engine.py --output $(Agent.TempDirectory)/sast-results.json</span>
+            <span class="key">displayName:</span> <span class="str">SAST Analysis (Semgrep + Bandit)</span>
+
+          - <span class="key">task:</span> <span class="str">trivy@1</span>
+            <span class="key">displayName:</span> <span class="str">Container Image Analysis</span>
+            <span class="key">inputs:</span>
+              <span class="key">image:</span>         <span class="str">$(Build.Repository.Name):$(Build.BuildId)</span>
+              <span class="key">exitCode:</span>      <span class="str">false</span>
+              <span class="key">reportFormat:</span>  <span class="str">json</span>
+
+          - <span class="key">script:</span> <span class="str">python security-gate/gate_enforcer.py --fail-on critical,high --ado-mode</span>
+            <span class="key">displayName:</span>   <span class="str">Enforce Security Gate</span>
+            <span class="key">env:</span>
+              <span class="key">SYSTEM_ACCESSTOKEN:</span> <span class="str">$(System.AccessToken)</span>
+
+          - <span class="key">task:</span> <span class="str">PublishBuildArtifacts@1</span>
+            <span class="key">displayName:</span> <span class="str">Publish SBOM &amp; Scan Results</span>
+            <span class="key">inputs:</span>
+              <span class="key">PathtoPublish:</span> <span class="str">$(Agent.TempDirectory)/security-artifacts</span>
+              <span class="key">ArtifactName:</span>  <span class="str">security-gate-results</span></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Tool Integrations -->
+    <div class="section">
+        <div class="section-title">6. Tool Integrations</div>
+        <h2>Integrated Security Toolchain</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Category</th>
+                        <th>Languages / Scope</th>
+                        <th>Output Format</th>
+                        <th>Version</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Semgrep</strong></td>
+                        <td>SAST</td>
+                        <td>Python, TypeScript, YAML, Dockerfile</td>
+                        <td>SARIF, JSON</td>
+                        <td>1.x OSS</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bandit</strong></td>
+                        <td>SAST (Python-specific)</td>
+                        <td>Python</td>
+                        <td>JSON, CSV</td>
+                        <td>1.7.x</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gitleaks</strong></td>
+                        <td>Secret Scanning</td>
+                        <td>All file types, git history</td>
+                        <td>JSON, SARIF</td>
+                        <td>8.x</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OWASP Dependency Check</strong></td>
+                        <td>Dependency Scanning</td>
+                        <td>Python, Node.js, Java</td>
+                        <td>JSON, XML, HTML</td>
+                        <td>9.x</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Safety CLI</strong></td>
+                        <td>Python Dependency Scanning</td>
+                        <td>Python (pip, poetry)</td>
+                        <td>JSON</td>
+                        <td>3.x</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trivy</strong></td>
+                        <td>Container / IaC Scanning</td>
+                        <td>Docker, Kubernetes, Terraform</td>
+                        <td>JSON, SARIF, Table</td>
+                        <td>0.50.x</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Syft</strong></td>
+                        <td>SBOM Generation</td>
+                        <td>All ecosystems</td>
+                        <td>SPDX 2.3, CycloneDX 1.5</td>
+                        <td>1.x</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Tech Stack -->
+    <div class="section">
+        <div class="section-title">7. Technology Stack</div>
+        <h2>Implementation Stack</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Core Language</td>
+                        <td><span class="mono">Python 3.11</span></td>
+                        <td>Gate orchestration, ML inference, SBOM generation</td>
+                        <td>Virtual environment managed via poetry</td>
+                    </tr>
+                    <tr>
+                        <td>Pipeline Config</td>
+                        <td><span class="mono">YAML</span></td>
+                        <td>Workflow definitions, policy config</td>
+                        <td>GitHub Actions &amp; Azure DevOps native</td>
+                    </tr>
+                    <tr>
+                        <td>ML Framework</td>
+                        <td><span class="mono">scikit-learn 1.4</span></td>
+                        <td>False-positive classifier</td>
+                        <td>XGBoost model, joblib serialisation</td>
+                    </tr>
+                    <tr>
+                        <td>API Integration</td>
+                        <td><span class="mono">PyGitHub, azure-devops SDK</span></td>
+                        <td>PR commenting, commit status updates</td>
+                        <td>OAuth token authentication</td>
+                    </tr>
+                    <tr>
+                        <td>CVE Database</td>
+                        <td><span class="mono">NVD API 2.0 / OSV.dev</span></td>
+                        <td>CVSS score lookup, advisory details</td>
+                        <td>Cached locally with 6-hour TTL</td>
+                    </tr>
+                    <tr>
+                        <td>Configuration</td>
+                        <td><span class="mono">Pydantic v2</span></td>
+                        <td>Policy schema validation</td>
+                        <td>Strict mode, environment-specific overrides</td>
+                    </tr>
+                    <tr>
+                        <td>Testing</td>
+                        <td><span class="mono">pytest + pytest-cov</span></td>
+                        <td>Unit &amp; integration tests (320 LOC)</td>
+                        <td>Target 85% coverage</td>
+                    </tr>
+                    <tr>
+                        <td>Logging</td>
+                        <td><span class="mono">structlog</span></td>
+                        <td>Structured JSON audit logs</td>
+                        <td>Feeds SIEM via fluentbit</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Deployment Architecture -->
+    <div class="section">
+        <div class="section-title">8. Deployment Architecture</div>
+        <h2>Infrastructure &amp; Deployment Model</h2>
+        <p>The security gate is deployed as a stateless Python package executed within ephemeral pipeline runner environments. No persistent infrastructure is required for the core gate; auxiliary services use managed cloud offerings.</p>
+
+        <div class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(320px,1fr));">
+            <div class="card">
+                <div class="card-title" style="color:var(--indigo);margin-bottom:12px;">GitHub Actions (Cloud)</div>
+                <ul style="color:var(--text-muted);font-size:12px;line-height:2;padding-left:16px;">
+                    <li>Runs on <span class="mono">ubuntu-latest</span> hosted runners</li>
+                    <li>Security gate installed from PyPI / private package feed</li>
+                    <li>SBOM artifacts stored in GitHub Actions artifact store</li>
+                    <li>CVE cache stored in Actions Cache (S3-backed)</li>
+                    <li>Secrets managed via GitHub Secrets / OIDC federation</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-title" style="color:var(--violet);margin-bottom:12px;">Azure DevOps (Self-Hosted Option)</div>
+                <ul style="color:var(--text-muted);font-size:12px;line-height:2;padding-left:16px;">
+                    <li>Self-hosted agents on AKS node pool (security-hardened)</li>
+                    <li>Pipeline artifacts stored in Azure Artifacts feed</li>
+                    <li>Key Vault integration for secrets &amp; signing keys</li>
+                    <li>ML model hosted on Azure ML managed endpoint</li>
+                    <li>Audit logs shipped to Azure Monitor / Log Analytics</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-title" style="color:var(--teal);margin-bottom:12px;">Shared Services</div>
+                <ul style="color:var(--text-muted);font-size:12px;line-height:2;padding-left:16px;">
+                    <li>SBOM Repository — dedicated Git repo (sbom-registry)</li>
+                    <li>NVD mirror — refreshed every 6 hours via scheduled job</li>
+                    <li>SIEM integration — Splunk / Sentinel via syslog/HTTP</li>
+                    <li>Notification — Slack webhook + PagerDuty for Critical</li>
+                    <li>Dashboard — Grafana boards consuming gate metrics</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <div class="alert-icon">ℹ</div>
+            <div class="alert-text"><strong>Compliance Note:</strong> All scan results, SBOM artefacts, and gate decisions are retained for 12 months minimum in immutable storage to satisfy PCI-DSS Requirement 10.5 (audit log integrity) and ISO 27001 A.12.4 (logging &amp; monitoring). POPIA data minimisation rules are applied — no source code is persisted outside ephemeral runner environments.</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="doc-footer">
+        <div class="owner-badge">
+            <div class="owner-avatar">MG</div>
+            Malcolm Govender — Head of AI &amp; Engineering
+        </div>
+        <div class="doc-footer-text">UC23 · Architecture Specification · v1.0 · 2026-05-09 · Confidential — Internal Use Only</div>
+    </div>
+
+</div>
+</body>
+</html>

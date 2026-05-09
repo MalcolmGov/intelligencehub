@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UC20 — AI POPIA Compliance Scanner | Architecture Specification</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: #818cf8; text-decoration: none; }
+
+    /* ── HEADER ── */
+    .page-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%);
+      border-bottom: 1px solid rgba(129,140,248,0.3);
+      padding: 48px 40px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(129,140,248,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header-inner { max-width: 1100px; margin: 0 auto; }
+    .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .new-badge {
+      background: linear-gradient(90deg, #818cf8, #a78bfa);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .status-badge {
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.4);
+      color: #fbbf24;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .page-header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e2e8f0 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .page-header .doc-subtitle {
+      font-size: 1rem;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+    .header-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .owner-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(30,41,59,0.8);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 8px 14px;
+    }
+    .avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #818cf8, #a78bfa);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .owner-info { font-size: 12px; }
+    .owner-name { font-weight: 600; color: #e2e8f0; }
+    .owner-role { color: #64748b; }
+    .meta-pill {
+      background: rgba(30,41,59,0.6);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    .meta-pill span { color: #818cf8; font-weight: 600; }
+
+    /* ── LAYOUT ── */
+    .content { max-width: 1100px; margin: 0 auto; padding: 40px; }
+
+    /* ── SECTION HEADERS ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #818cf8;
+      margin-bottom: 6px;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 4px;
+    }
+    .section-desc { color: #64748b; font-size: 0.9rem; margin-bottom: 28px; }
+    .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 48px 0; }
+
+    /* ── CARDS ── */
+    .card {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #a78bfa;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title .icon {
+      width: 28px; height: 28px;
+      background: rgba(167,139,250,0.15);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .card p { color: #94a3b8; font-size: 0.88rem; }
+
+    /* ── GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    @media(max-width:768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* ── ARCH DIAGRAM ── */
+    .arch-diagram {
+      background: #0f172a;
+      border: 1px solid rgba(129,140,248,0.2);
+      border-radius: 12px;
+      padding: 32px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    .arch-diagram .layer-label { color: #818cf8; font-weight: 700; }
+    .arch-diagram .box { color: #2dd4bf; }
+    .arch-diagram .arrow { color: #475569; }
+    .arch-diagram .note { color: #64748b; font-size: 11px; }
+
+    /* ── TABLES ── */
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: rgba(129,140,248,0.1); }
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #818cf8;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    td {
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: top;
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    tbody tr:last-child td { border-bottom: none; }
+    td.highlight { color: #e2e8f0; font-weight: 600; }
+    td.teal { color: #2dd4bf; font-weight: 600; }
+    td.violet { color: #a78bfa; }
+    td.indigo { color: #818cf8; }
+
+    /* ── TAG ── */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      margin: 2px 2px 2px 0;
+    }
+    .tag-teal { background: rgba(45,212,191,0.1); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.25); }
+    .tag-violet { background: rgba(167,139,250,0.1); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+    .tag-indigo { background: rgba(129,140,248,0.1); color: #818cf8; border: 1px solid rgba(129,140,248,0.25); }
+    .tag-amber { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .tag-red { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+
+    /* ── METRIC CARDS ── */
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    @media(max-width:768px) { .metrics-row { grid-template-columns: 1fr 1fr; } }
+    .metric-card {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+    }
+    .metric-val { font-size: 2rem; font-weight: 700; color: #2dd4bf; }
+    .metric-label { font-size: 11px; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-left: 3px solid #818cf8;
+      background: rgba(129,140,248,0.06);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+      color: #94a3b8;
+    }
+    .callout strong { color: #818cf8; }
+
+    /* ── LIST ── */
+    ul.styled { list-style: none; padding: 0; }
+    ul.styled li {
+      padding: 7px 0;
+      color: #94a3b8;
+      font-size: 0.88rem;
+      padding-left: 18px;
+      position: relative;
+    }
+    ul.styled li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: #818cf8;
+    }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding: 28px 40px;
+      text-align: center;
+      color: #334155;
+      font-size: 12px;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ HEADER -->
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <div class="new-badge">New — Gap Identified by Malcolm</div>
+        <h1>UC20 — AI POPIA Compliance Scanner</h1>
+        <p class="doc-subtitle">Architecture Specification &amp; System Design Document &nbsp;|&nbsp; Document 1 of 3</p>
+        <div class="header-meta">
+          <div class="owner-badge">
+            <div class="avatar">MG</div>
+            <div class="owner-info">
+              <div class="owner-name">Malcolm Govender</div>
+              <div class="owner-role">Head of AI &amp; Engineering</div>
+            </div>
+          </div>
+          <div class="meta-pill">Version <span>1.0</span></div>
+          <div class="meta-pill">Date <span>9 May 2026</span></div>
+          <div class="meta-pill">LOC <span>2,400 src / 480 test</span></div>
+        </div>
+      </div>
+      <div class="status-badge">⬤ &nbsp;Not Started — Planning Phase</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ CONTENT -->
+<div class="content">
+
+  <!-- METRICS -->
+  <div class="metrics-row">
+    <div class="metric-card"><div class="metric-val">8h</div><div class="metric-label">AI Delivery Target</div></div>
+    <div class="metric-card"><div class="metric-val">3×5mo</div><div class="metric-label">Traditional Estimate</div></div>
+    <div class="metric-card"><div class="metric-val">11</div><div class="metric-label">Source Files</div></div>
+    <div class="metric-card"><div class="metric-val">2,880</div><div class="metric-label">Total LOC</div></div>
+  </div>
+
+  <!-- SECTION 1: OVERVIEW -->
+  <div class="section-label">Section 01</div>
+  <div class="section-title">Project Overview</div>
+  <p class="section-desc">AI-powered POPIA compliance scanner embedded in the SDLC pipeline.</p>
+
+  <div class="callout">
+    <strong>Mission:</strong> Detect PII exposure, missing consent flows and unlawful data retention across APIs, DB schemas and microservices — auto-generating POPIA gap reports, remediation tickets and a living data-flow map aligned to Information Regulator requirements, FSCA guidance and SARB supervisory expectations.
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon">🏗</div>Primary Stack</div>
+      <p>Python (scanner engine, NLP, PII detection) &amp; TypeScript (CI/CD integration, API gateway, report renderer). 11 source files spanning scanner, analyser, mapper and reporting modules.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">📋</div>Regulatory Scope</div>
+      <p>POPIA (sections 8–25), GDPR-adjacent controls, FSCA Conduct Standard requirements, SARB supervisory technology expectations and Information Regulator notification obligations.</p>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 2: ARCHITECTURE DIAGRAM -->
+  <div class="section-label">Section 02</div>
+  <div class="section-title">System Architecture Diagram</div>
+  <p class="section-desc">End-to-end data flow from code repository through compliance reporting.</p>
+
+  <div class="arch-diagram">
+<span class="layer-label">┌─────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="layer-label">│                         TRIGGER / CI-CD LAYER                              │</span>
+<span class="layer-label">└─────────────────────────────────────────────────────────────────────────────┘</span>
+    <span class="box">[ GitHub Actions / Azure DevOps ]</span>  <span class="arrow">──────►</span>  <span class="box">[ PR / Commit Webhook ]</span>
+                        │
+                        ▼
+<span class="layer-label">┌─────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="layer-label">│                        SCANNER ENGINE  (Python)                             │</span>
+<span class="layer-label">└─────────────────────────────────────────────────────────────────────────────┘</span>
+    ┌────────────────┐   ┌──────────────────┐   ┌─────────────────┐
+    │  PII Detector  │   │ Consent Analyser │   │ Retention       │
+    │  (spaCy / NER) │   │ (Flow Graph AST) │   │ Policy Checker  │
+    └───────┬────────┘   └────────┬─────────┘   └────────┬────────┘
+            │                    │                        │
+            └────────────────────┼────────────────────────┘
+                                 ▼
+                      <span class="box">[ Findings Aggregator ]</span>
+                                 │
+              ┌──────────────────┼──────────────────┐
+              ▼                  ▼                   ▼
+<span class="box">[ Data Flow Mapper ]</span>   <span class="box">[ Gap Report Gen ]</span>   <span class="box">[ Ticket Creator ]</span>
+    (living DFD)       (HTML / PDF / JSON)     (Jira REST API)
+              │                  │
+              └──────────────────▼
+                       <span class="box">[ Evidence Store ]</span>   <span class="arrow">──►</span>  <span class="box">[ IR Notification ]</span>
+                       (S3 / Azure Blob)            (Info Regulator)
+
+<span class="note">  * All data flows encrypted in transit (TLS 1.3) and at rest (AES-256)</span>
+<span class="note">  * Scanner runs in ephemeral container — no PII persisted beyond scan scope</span>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 3: COMPONENTS -->
+  <div class="section-label">Section 03</div>
+  <div class="section-title">Component Overview</div>
+  <p class="section-desc">Six primary subsystems and their responsibilities.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon">🔍</div>Scanner Engine</div>
+      <p>Core orchestrator written in Python. Accepts repository URL or file path, coordinates sub-analysers, aggregates findings and produces a structured findings manifest (JSON schema). Entry point: <code style="color:#2dd4bf">scanner/engine.py</code>.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🕵️</div>PII Detector</div>
+      <p>spaCy NER pipeline extended with South African identity patterns (SA ID number, passport, bank account, MSISDN). Scans API payloads, DB schema DDL, log configurations and environment variable references. Confidence scored 0–1.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">✅</div>Consent Flow Analyser</div>
+      <p>Parses AST of controllers and route handlers to detect data collection endpoints lacking explicit consent capture, purpose limitation declarations or lawful basis annotations. Reports missing consent mechanisms as POPIA section 11 violations.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🗺</div>Data Flow Mapper</div>
+      <p>Builds a living, auto-updated Data Flow Diagram (DFD) by tracing PII from collection through processing, storage and third-party transfer. Output: interactive SVG + JSON adjacency list. Aligned to Information Regulator DFD format requirements.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">📄</div>Report Generator</div>
+      <p>Produces POPIA gap reports in HTML, PDF and JSON. Each report includes: finding severity, POPIA section reference, responsible party, remediation guidance and estimated effort. Templated in TypeScript with Jinja2 hybrid rendering.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🔗</div>CI/CD Integration Layer</div>
+      <p>TypeScript GitHub Actions action and Azure DevOps extension. Exposes scanner as a pipeline step with configurable thresholds (block-on-critical, warn-on-high). Publishes SARIF format findings to GitHub Security tab and Azure Boards.</p>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 4: TECH STACK -->
+  <div class="section-label">Section 04</div>
+  <div class="section-title">Technology Stack</div>
+  <p class="section-desc">Full technology inventory with justification.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Technology</th>
+          <th>Version</th>
+          <th>Purpose</th>
+          <th>Justification</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="highlight">Scanner Core</td><td class="teal">Python 3.12</td><td>3.12.x</td><td>Engine, PII detection, AST parsing</td><td>Rich NLP ecosystem, spaCy, ast module</td></tr>
+        <tr><td class="highlight">NER / NLP</td><td class="teal">spaCy 3.7</td><td>3.7.x</td><td>Named entity recognition for PII</td><td>SA custom pipeline support, performance</td></tr>
+        <tr><td class="highlight">CI/CD Integration</td><td class="teal">TypeScript 5.4</td><td>5.4.x</td><td>Actions plugin, report renderer</td><td>Type-safe, native GitHub/ADO SDK support</td></tr>
+        <tr><td class="highlight">API Gateway</td><td class="teal">FastAPI 0.111</td><td>0.111</td><td>REST API for scanner invocation</td><td>Async, OpenAPI auto-docs, JWT support</td></tr>
+        <tr><td class="highlight">Containerisation</td><td class="violet">Docker + OCI</td><td>25.x</td><td>Ephemeral scan containers</td><td>Isolation, no PII persistence</td></tr>
+        <tr><td class="highlight">Orchestration</td><td class="violet">Kubernetes 1.30</td><td>1.30</td><td>Scanner job scheduling</td><td>Scale to zero, RBAC namespace isolation</td></tr>
+        <tr><td class="highlight">Evidence Store</td><td class="violet">Azure Blob / S3</td><td>—</td><td>Report artefact persistence</td><td>Compliant, encrypted, access-logged</td></tr>
+        <tr><td class="highlight">Ticket Creation</td><td class="violet">Jira REST API v3</td><td>v3</td><td>Auto-raise remediation tickets</td><td>Standard enterprise ITSM integration</td></tr>
+        <tr><td class="highlight">Secret Scanning</td><td class="violet">Gitleaks 8.x</td><td>8.x</td><td>Credential / secret detection</td><td>POPIA section 19 security safeguards</td></tr>
+        <tr><td class="highlight">Output Formats</td><td class="teal">HTML, PDF, JSON, SARIF</td><td>—</td><td>Multi-consumer reporting</td><td>SARIF for GitHub Security, PDF for IR</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 5: API CONTRACTS -->
+  <div class="section-label">Section 05</div>
+  <div class="section-title">API Contracts</div>
+  <p class="section-desc">Primary endpoints exposed by the Scanner Engine REST API.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Endpoint</th><th>Request Body</th><th>Response</th><th>Auth</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-teal">POST</span></td>
+          <td class="highlight"><code>/api/v1/scan</code></td>
+          <td class="violet"><code>{ repo_url, branch, config }</code></td>
+          <td><code>{ scan_id, status, eta_seconds }</code></td>
+          <td>JWT Bearer</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">GET</span></td>
+          <td class="highlight"><code>/api/v1/scan/{scan_id}</code></td>
+          <td>—</td>
+          <td><code>{ status, findings[], dfd_url }</code></td>
+          <td>JWT Bearer</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">GET</span></td>
+          <td class="highlight"><code>/api/v1/scan/{scan_id}/report</code></td>
+          <td>—</td>
+          <td>HTML / PDF / JSON (Accept header)</td>
+          <td>JWT Bearer</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">POST</span></td>
+          <td class="highlight"><code>/api/v1/scan/{scan_id}/tickets</code></td>
+          <td><code>{ jira_project, priority_map }</code></td>
+          <td><code>{ tickets_created[], errors[] }</code></td>
+          <td>JWT Bearer + Jira OAuth</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">GET</span></td>
+          <td class="highlight"><code>/api/v1/dfd/{scan_id}</code></td>
+          <td>—</td>
+          <td>Interactive SVG data-flow diagram</td>
+          <td>JWT Bearer</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">GET</span></td>
+          <td class="highlight"><code>/api/v1/health</code></td>
+          <td>—</td>
+          <td><code>{ status: "ok", version }</code></td>
+          <td>None</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 6: INTEGRATION POINTS -->
+  <div class="section-label">Section 06</div>
+  <div class="section-title">Integration Points</div>
+  <p class="section-desc">External system integrations required for full pipeline operation.</p>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><div class="icon">⚙️</div>GitHub Actions</div>
+      <p>Published as a marketplace Action (<code style="color:#2dd4bf">malcolm/popia-scanner@v1</code>). Triggers on PR open/push. Annotates PR with inline findings. Posts SARIF to GitHub Advanced Security.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">⚙️</div>Azure DevOps</div>
+      <p>VSIX extension installed via Azure DevOps Marketplace. Pipeline YAML task: <code style="color:#2dd4bf">- task: POPIAScan@1</code>. Publishes findings to Azure Boards work items and Security Insights tab.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🎫</div>Jira</div>
+      <p>OAuth 2.0 app integration. Auto-creates issues with: POPIA section reference, severity, assignee (from CODEOWNERS), remediation steps and compliance due-date based on regulatory timelines.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🏛</div>Information Regulator</div>
+      <p>Notification endpoint integration for section 22 breach notifications. Structured JSON payload aligned to IR prescribed format. Includes auto-population of sections 22(1)(a)–(d) from scan findings.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">📊</div>FSCA Reporting</div>
+      <p>Export of compliance posture data in FSCA Conduct Standard format. Quarterly automated report generation with trend analysis and gap closure tracking.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🏦</div>SARB Supervisory</div>
+      <p>Technology risk register export aligned to SARB Guidance Note 5 on Operational Risk. Scanner findings mapped to SARB IT risk taxonomy for supervisory reporting.</p>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 7: DEPLOYMENT ARCHITECTURE -->
+  <div class="section-label">Section 07</div>
+  <div class="section-title">Deployment Architecture</div>
+  <p class="section-desc">Target runtime topology across environments.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Environment</th><th>Infrastructure</th><th>Scanner Replicas</th><th>Data Residency</th><th>Backup / DR</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="highlight">Development</td><td>Docker Compose (local)</td><td>1</td><td>Developer workstation</td><td>N/A</td></tr>
+        <tr><td class="highlight">Staging</td><td>AKS / EKS (non-prod)</td><td>2</td><td>South Africa North (Azure)</td><td>Daily snapshot</td></tr>
+        <tr><td class="highlight">Production</td><td>AKS / EKS (prod)</td><td>3–10 (HPA)</td><td>South Africa North + West</td><td>Geo-redundant, RTO 1h, RPO 15min</td></tr>
+        <tr><td class="highlight">Air-gapped</td><td>On-prem K8s</td><td>2</td><td>Customer data centre (SA)</td><td>Local NFS snapshot</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 8: SECURITY -->
+  <div class="section-label">Section 08</div>
+  <div class="section-title">Security Considerations</div>
+  <p class="section-desc">Security controls built into the scanner architecture.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon">🔐</div>Zero PII Persistence</div>
+      <p>Scanner runs in ephemeral Kubernetes Jobs. Source code is cloned into <code>/tmp</code> on a tmpfs volume. All temporary data destroyed on pod termination. Only findings metadata (never raw PII) is persisted to the evidence store.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🔑</div>Authentication &amp; Authorisation</div>
+      <p>JWT RS256 tokens issued by corporate IdP (Azure AD / Okta). RBAC: Developer (submit scans), Compliance Officer (view reports), Admin (configuration). All tokens short-lived (15min access, 8h refresh).</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🌐</div>Network Controls</div>
+      <p>Scanner pods run in isolated K8s namespace with NetworkPolicy denying all egress except: evidence store endpoint, Jira, IR notification endpoint. No internet egress for scan pods.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🔒</div>Encryption</div>
+      <p>TLS 1.3 for all API communication. AES-256-GCM for evidence store. Secrets managed via HashiCorp Vault or Azure Key Vault. Git tokens scoped to read-only with 24h TTL per scan.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">📝</div>Audit Logging</div>
+      <p>All scan invocations, report accesses and ticket creations logged to immutable audit trail (Azure Monitor / CloudWatch). Logs retained 3 years per POPIA section 55 record-keeping obligations.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🛡</div>Supply Chain Security</div>
+      <p>Scanner Docker image built via signed GitHub Actions workflow. SBOM generated per build (Syft). Image signed with Cosign. Admission controller enforces signed images only in production namespace.</p>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<div class="page-footer">
+  UC20 — AI POPIA Compliance Scanner &nbsp;|&nbsp; Architecture Specification &nbsp;|&nbsp; Owner: Malcolm Govender — Head of AI &amp; Engineering &nbsp;|&nbsp; Classification: Internal — Confidential &nbsp;|&nbsp; v1.0 — 9 May 2026
+</div>
+
+</body>
+</html>

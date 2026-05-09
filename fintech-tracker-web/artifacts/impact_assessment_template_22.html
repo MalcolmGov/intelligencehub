@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC22 — Regulatory Impact Assessment Template | Regulatory Change Impact Radar</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface2: #253047;
+            --surface3: #2d3a52;
+            --border: rgba(255,255,255,0.07);
+            --text-1: #e2e8f0;
+            --text-2: #94a3b8;
+            --text-3: #4b607a;
+            --indigo: #818cf8;
+            --violet: #a78bfa;
+            --teal: #2dd4bf;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --green: #34d399;
+            --cyan: #38bdf8;
+            --orange: #fb923c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: var(--bg); color: var(--text-1); line-height: 1.6;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+        .back-nav {
+            position: fixed; top: 16px; left: 16px; z-index: 9999;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; border-radius: 8px;
+            background: #0a0f1e; border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-2); font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: all .15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,.5);
+        }
+        .back-nav:hover { background: var(--surface); color: var(--text-1); border-color: var(--indigo); }
+
+        /* Document header */
+        .doc-header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 44px; margin-bottom: 32px;
+            position: relative; overflow: hidden;
+        }
+        .doc-header::before {
+            content: ''; position: absolute; top: -60px; right: -60px;
+            width: 340px; height: 340px;
+            background: radial-gradient(circle, rgba(167,139,250,0.10) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .doc-header-content { position: relative; z-index: 1; }
+
+        .new-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            color: #fff; font-size: 0.75rem; font-weight: 700;
+            padding: 4px 12px; border-radius: 20px;
+            letter-spacing: 0.5px; margin-bottom: 16px; text-transform: uppercase;
+        }
+        .template-banner {
+            background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.25);
+            border-radius: 8px; padding: 10px 16px; margin-bottom: 20px;
+            font-size: 0.85rem; color: var(--teal); font-weight: 500;
+        }
+        .doc-header h1 {
+            font-size: 2rem; font-weight: 700; margin-bottom: 6px;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .doc-header-sub { color: var(--text-2); font-size: 0.95rem; margin-bottom: 24px; }
+
+        .doc-meta-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; margin-top: 24px; }
+        .doc-meta-item { display: flex; flex-direction: column; gap: 5px; }
+        .doc-meta-label { font-size: 0.75rem; color: var(--text-3); text-transform: uppercase; font-weight: 600; letter-spacing: 0.6px; }
+        .doc-meta-value { font-size: 0.95rem; font-weight: 600; color: var(--text-1); }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.4);
+            color: var(--amber); padding: 5px 12px; border-radius: 6px;
+            font-size: 0.82rem; font-weight: 600;
+        }
+        .owner-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(129,140,248,0.1); border: 1px solid rgba(129,140,248,0.25);
+            border-radius: 8px; padding: 8px 14px;
+        }
+        .owner-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .owner-name { font-size: 0.88rem; font-weight: 600; color: var(--text-1); }
+        .owner-title { font-size: 0.75rem; color: var(--text-2); }
+
+        /* Sections */
+        section { margin-bottom: 40px; }
+        h2 {
+            font-size: 1.4rem; font-weight: 700; color: var(--text-1);
+            margin-bottom: 18px; padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+        }
+        h2 .section-num {
+            width: 28px; height: 28px; border-radius: 6px;
+            background: linear-gradient(135deg, rgba(129,140,248,0.25), rgba(167,139,250,0.25));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.78rem; font-weight: 700; color: var(--indigo);
+            flex-shrink: 0;
+        }
+        h3 { font-size: 1rem; font-weight: 600; color: var(--indigo); margin: 18px 0 10px; }
+        p { color: var(--text-2); margin-bottom: 12px; line-height: 1.75; }
+
+        /* Info card grid */
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 16px 0; }
+        .info-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 16px;
+        }
+        .info-card-label { font-size: 0.75rem; color: var(--text-3); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .info-card-value { font-size: 0.95rem; font-weight: 600; color: var(--text-1); line-height: 1.4; }
+        .info-card-sub { font-size: 0.82rem; color: var(--text-2); margin-top: 4px; }
+
+        /* Severity banner */
+        .severity-banner {
+            border-radius: 10px; padding: 20px 24px; margin: 16px 0;
+            display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+        }
+        .severity-banner.critical { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.3); }
+        .severity-banner.high { background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.3); }
+        .severity-banner.medium { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.3); }
+        .severity-banner.low { background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.3); }
+        .sev-big {
+            font-size: 1.4rem; font-weight: 800; letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .sev-big.critical { color: var(--red); }
+        .sev-big.high { color: var(--orange); }
+        .sev-big.medium { color: var(--amber); }
+        .sev-big.low { color: var(--green); }
+        .sev-criteria ul { list-style: none; }
+        .sev-criteria ul li { font-size: 0.85rem; color: var(--text-2); padding: 3px 0; }
+        .sev-criteria ul li::before { content: '✓ '; color: var(--teal); font-weight: 700; }
+
+        /* Tables */
+        .table-wrapper { overflow-x: auto; border-radius: 10px; margin: 16px 0; }
+        table {
+            width: 100%; border-collapse: collapse;
+            background: var(--surface); border: 1px solid var(--border);
+        }
+        thead { background: rgba(129,140,248,0.12); border-bottom: 1px solid var(--border); }
+        th {
+            padding: 11px 14px; text-align: left;
+            font-size: 0.78rem; font-weight: 600; color: var(--indigo);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-2); font-size: 0.88rem; vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        td strong { color: var(--text-1); }
+
+        /* Gantt chart */
+        .gantt { margin: 20px 0; }
+        .gantt-header {
+            display: grid; grid-template-columns: 200px repeat(12, 1fr);
+            gap: 0; margin-bottom: 6px;
+        }
+        .gantt-header div {
+            font-size: 0.72rem; color: var(--text-3); font-weight: 600;
+            text-transform: uppercase; text-align: center; letter-spacing: 0.4px; padding: 6px 2px;
+            border-right: 1px solid var(--border);
+        }
+        .gantt-header div:first-child { text-align: left; border-right: 2px solid rgba(129,140,248,0.3); padding-left: 0; }
+        .gantt-row {
+            display: grid; grid-template-columns: 200px repeat(12, 1fr);
+            gap: 0; margin-bottom: 4px; align-items: center;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+        }
+        .gantt-label {
+            padding: 10px 12px; font-size: 0.82rem; font-weight: 600; color: var(--text-1);
+            border-right: 2px solid rgba(129,140,248,0.2);
+        }
+        .gantt-label small { display: block; font-size: 0.72rem; font-weight: 400; color: var(--text-3); margin-top: 2px; }
+        .gantt-cell { height: 36px; border-right: 1px solid var(--border); position: relative; }
+        .gantt-bar {
+            position: absolute; top: 6px; bottom: 6px; border-radius: 4px;
+            left: 2px; right: 2px;
+        }
+        .gantt-bar.indigo { background: linear-gradient(90deg, var(--indigo), var(--violet)); }
+        .gantt-bar.teal { background: var(--teal); }
+        .gantt-bar.amber { background: var(--amber); }
+        .gantt-bar.green { background: var(--green); }
+        .gantt-bar.violet { background: var(--violet); }
+        .gantt-bar.red { background: var(--red); }
+
+        /* Cost breakdown */
+        .cost-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 16px 0; }
+        .cost-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 18px;
+        }
+        .cost-label { font-size: 0.78rem; color: var(--text-3); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .cost-amount { font-size: 1.5rem; font-weight: 700; }
+        .cost-detail { font-size: 0.8rem; color: var(--text-3); margin-top: 6px; }
+        .cost-card.dev .cost-amount { color: var(--indigo); }
+        .cost-card.test .cost-amount { color: var(--violet); }
+        .cost-card.train .cost-amount { color: var(--teal); }
+        .cost-card.ongoing .cost-amount { color: var(--amber); }
+        .cost-card.total {
+            background: rgba(129,140,248,0.08); border: 1px solid rgba(129,140,248,0.3);
+            grid-column: 1 / -1;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .cost-card.total .cost-amount { font-size: 2rem; color: var(--text-1); }
+
+        /* Risk section */
+        .risk-card {
+            background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2);
+            border-radius: 10px; padding: 20px; margin: 16px 0;
+        }
+        .risk-card h3 { color: var(--red); margin-top: 0; }
+        .risk-item { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+        .risk-badge {
+            background: rgba(248,113,113,0.15); color: var(--red);
+            font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px;
+            white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+        }
+        .risk-text { font-size: 0.88rem; color: var(--text-2); line-height: 1.6; }
+
+        /* Actions */
+        .action-row {
+            display: grid; grid-template-columns: 1fr 1fr 1fr 140px;
+            gap: 12px; padding: 14px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px;
+            align-items: start;
+        }
+        .action-label { font-size: 0.72rem; color: var(--text-3); text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .action-value { font-size: 0.88rem; color: var(--text-1); font-weight: 500; }
+
+        /* Pill */
+        .pill {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px; border-radius: 12px;
+            font-size: 0.78rem; font-weight: 600; white-space: nowrap;
+        }
+        .pill-green { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3); color: var(--green); }
+        .pill-amber { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.3); color: var(--amber); }
+        .pill-red { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3); color: var(--red); }
+        .pill-indigo { background: rgba(129,140,248,0.12); border: 1px solid rgba(129,140,248,0.3); color: var(--indigo); }
+        .pill-teal { background: rgba(45,212,191,0.12); border: 1px solid rgba(45,212,191,0.3); color: var(--teal); }
+        .pill-violet { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); color: var(--violet); }
+
+        /* Sign-off */
+        .signoff-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 20px 0; }
+        .signoff-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px;
+        }
+        .signoff-role { font-size: 0.75rem; color: var(--text-3); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .signoff-name { font-size: 0.95rem; font-weight: 600; color: var(--text-1); margin-bottom: 6px; }
+        .signoff-line {
+            border-bottom: 1px dashed rgba(255,255,255,0.15);
+            height: 32px; margin-bottom: 8px;
+        }
+        .signoff-date { font-size: 0.78rem; color: var(--text-3); }
+        .signoff-status { font-size: 0.78rem; margin-top: 6px; }
+
+        footer {
+            margin-top: 60px; padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+        }
+        footer span { font-size: 0.82rem; color: var(--text-3); }
+
+        @media (max-width: 768px) {
+            .doc-header h1 { font-size: 1.5rem; }
+            .gantt-header, .gantt-row { grid-template-columns: 140px repeat(12, 1fr); }
+            .gantt-label { font-size: 0.72rem; padding: 8px; }
+            .action-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="javascript:history.back()" class="back-nav">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+    Back to Tracker
+</a>
+
+<div class="container">
+
+    <!-- DOCUMENT HEADER -->
+    <div class="doc-header">
+        <div class="doc-header-content">
+            <span class="new-badge">New — Gap Identified by Malcolm</span>
+            <div class="template-banner">
+                Reusable Board-Ready Template — Auto-generated by UC22 Regulatory Change Impact Radar | Pre-populated with example: Hypothetical POPIA Section 72 Amendment (2026)
+            </div>
+            <h1>Regulatory Impact Assessment</h1>
+            <p class="doc-header-sub">UC22 — Regulatory Change Impact Radar | Board Submission Template v1.0</p>
+
+            <div class="doc-meta-row">
+                <div class="doc-meta-item">
+                    <div class="doc-meta-label">Document Type</div>
+                    <div class="doc-meta-value">Impact Assessment</div>
+                </div>
+                <div class="doc-meta-item">
+                    <div class="doc-meta-label">UC Status</div>
+                    <div class="status-badge">&#9679;&nbsp;Not Started — Planning Phase</div>
+                </div>
+                <div class="doc-meta-item">
+                    <div class="doc-meta-label">Use Case Owner</div>
+                    <div class="owner-badge">
+                        <div class="owner-avatar">MG</div>
+                        <div>
+                            <div class="owner-name">Malcolm Govender</div>
+                            <div class="owner-title">Head of AI &amp; Engineering</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="doc-meta-item">
+                    <div class="doc-meta-label">Report ID</div>
+                    <div class="doc-meta-value" style="color:var(--teal);">RIA-2026-047</div>
+                </div>
+                <div class="doc-meta-item">
+                    <div class="doc-meta-label">Generated</div>
+                    <div class="doc-meta-value">09 May 2026, 14:32 SAST</div>
+                </div>
+                <div class="doc-meta-item">
+                    <div class="doc-meta-label">Classification</div>
+                    <div class="doc-meta-value">Confidential — Board Only</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 1: EXECUTIVE SUMMARY -->
+    <section>
+        <h2><span class="section-num">01</span>Executive Summary</h2>
+
+        <div style="background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:18px; border-left: 3px solid var(--violet);">
+            <p style="color:var(--text-1); font-size:1rem; margin-bottom:0; line-height:1.8;">
+                The Information Regulator has published a proposed amendment to POPIA Section 72 (Cross-Border Transfers) introducing mandatory real-time consent verification for all personal information transfers to third-party processors outside South Africa. This amendment, with a proposed effective date of <strong style="color:var(--amber);">01 March 2027</strong>, has been classified as <strong style="color:var(--red);">HIGH</strong> impact and will require significant changes to our API gateway, third-party data sharing contracts, customer consent management system, and data governance framework. Estimated implementation cost is <strong style="color:var(--teal);">R2.4M</strong> with a recommended implementation window of <strong>Q3–Q4 2026</strong> to achieve compliance three months ahead of the effective date.
+            </p>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card" style="border-left:3px solid var(--red);">
+                <div class="info-card-label">Impact Classification</div>
+                <div class="info-card-value" style="color:var(--red);">HIGH</div>
+                <div class="info-card-sub">Mandatory compliance by March 2027</div>
+            </div>
+            <div class="info-card" style="border-left:3px solid var(--amber);">
+                <div class="info-card-label">Effective Date</div>
+                <div class="info-card-value">01 March 2027</div>
+                <div class="info-card-sub">Subject to final gazette (expected Aug 2026)</div>
+            </div>
+            <div class="info-card" style="border-left:3px solid var(--teal);">
+                <div class="info-card-label">Estimated Cost</div>
+                <div class="info-card-value" style="color:var(--teal);">R 2,400,000</div>
+                <div class="info-card-sub">Development + Testing + Training</div>
+            </div>
+            <div class="info-card" style="border-left:3px solid var(--indigo);">
+                <div class="info-card-label">Systems Affected</div>
+                <div class="info-card-value">6 Systems</div>
+                <div class="info-card-sub">2 Critical, 3 High, 1 Medium</div>
+            </div>
+            <div class="info-card" style="border-left:3px solid var(--violet);">
+                <div class="info-card-label">Implementation Timeline</div>
+                <div class="info-card-value">6 Months</div>
+                <div class="info-card-sub">July 2026 — December 2026</div>
+            </div>
+            <div class="info-card" style="border-left:3px solid var(--orange);">
+                <div class="info-card-label">Non-Compliance Penalty</div>
+                <div class="info-card-value" style="color:var(--orange);">Up to R10M</div>
+                <div class="info-card-sub">Per Section 107 POPIA or criminal liability</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 2: REGULATORY CHANGE DETAILS -->
+    <section>
+        <h2><span class="section-num">02</span>Regulatory Change Details</h2>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-card-label">Regulatory Body</div>
+                <div class="info-card-value">Information Regulator (South Africa)</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-label">Reference</div>
+                <div class="info-card-value">POPIA Amendment Notice 2026/047</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-label">Publication Date</div>
+                <div class="info-card-value">05 May 2026</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-label">Effective Date</div>
+                <div class="info-card-value">01 March 2027</div>
+                <div class="info-card-sub">300 days from publication</div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-label">Change Type</div>
+                <div class="info-card-value"><span class="pill pill-red">Directive</span></div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-label">Consultation Deadline</div>
+                <div class="info-card-value">30 June 2026</div>
+                <div class="info-card-sub">Industry submissions close</div>
+            </div>
+        </div>
+
+        <h3>Change Summary</h3>
+        <p>The Information Regulator has proposed a material amendment to Section 72 of POPIA (Protection of Personal Information Act 4 of 2013), which governs the transfer of personal information to third parties in foreign countries. The amendment introduces three new mandatory requirements:</p>
+
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:18px; margin:14px 0;">
+            <div style="margin-bottom:12px; display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:24px; height:24px; border-radius:50%; background:rgba(129,140,248,0.2); border:1px solid var(--indigo); display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:var(--indigo); flex-shrink:0; margin-top:2px;">1</div>
+                <div><strong style="color:var(--text-1);">Real-Time Consent Verification:</strong><span style="color:var(--text-2);"> All transfers of personal information to third-party processors domiciled outside South Africa must be preceded by a real-time, machine-readable consent confirmation from the data subject. Bulk or standing consents are no longer sufficient for ongoing automated transfers.</span></div>
+            </div>
+            <div style="margin-bottom:12px; display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:24px; height:24px; border-radius:50%; background:rgba(129,140,248,0.2); border:1px solid var(--indigo); display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:var(--indigo); flex-shrink:0; margin-top:2px;">2</div>
+                <div><strong style="color:var(--text-1);">Transfer Logging and Audit Trail:</strong><span style="color:var(--text-2);"> A complete, tamper-proof audit log of all cross-border transfers must be maintained for a minimum of 5 years and made available to the Information Regulator within 24 hours of request. Logs must include: data subject ID (pseudonymised), data categories transferred, receiving country, recipient identity, and consent reference.</span></div>
+            </div>
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+                <div style="width:24px; height:24px; border-radius:50%; background:rgba(129,140,248,0.2); border:1px solid var(--indigo); display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:var(--indigo); flex-shrink:0; margin-top:2px;">3</div>
+                <div><strong style="color:var(--text-1);">Binding Third-Party Agreements:</strong><span style="color:var(--text-2);"> All third-party processor agreements must be updated to include mandatory POPIA-equivalent privacy protections, certified by the responsible party (us) before the first transfer under the new regime.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: IMPACT CLASSIFICATION -->
+    <section>
+        <h2><span class="section-num">03</span>Impact Classification</h2>
+
+        <div class="severity-banner high">
+            <div>
+                <div class="sev-big high">HIGH</div>
+                <div style="font-size:0.78rem; color:var(--text-3); margin-top:3px;">AI-Classified · Confidence 94%</div>
+            </div>
+            <div class="sev-criteria">
+                <ul>
+                    <li>Mandatory compliance with 22-month window (classified as High, not Critical)</li>
+                    <li>Significant process and system changes across 4+ teams</li>
+                    <li>Penalty exposure up to R10M under Section 107 POPIA</li>
+                    <li>Affects all customers with cross-border data sharing (estimated 68% of base)</li>
+                    <li>Requires board awareness, legal review, and budget approval</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Classification Evidence</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>Classification Criterion</th><th>Assessment</th><th>Evidence</th><th>Contribution to Rating</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Compliance Deadline</td>
+                        <td><span class="pill pill-amber">22 Months</span></td>
+                        <td>Effective date 01 March 2027 from publication 05 May 2026</td>
+                        <td>High (not Critical)</td>
+                    </tr>
+                    <tr>
+                        <td>Penalty Exposure</td>
+                        <td><span class="pill pill-red">Up to R10M</span></td>
+                        <td>POPIA Section 107 — fine or up to 10 years imprisonment for responsible party</td>
+                        <td>High+</td>
+                    </tr>
+                    <tr>
+                        <td>Customer Impact</td>
+                        <td><span class="pill pill-amber">68% of base</span></td>
+                        <td>Cross-border data sharing active for all international payment and cloud-processed customers</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>System Change Depth</td>
+                        <td><span class="pill pill-amber">6 Systems</span></td>
+                        <td>API gateway, consent management, audit logging, third-party integrations, data catalogue, contract management</td>
+                        <td>High</td>
+                    </tr>
+                    <tr>
+                        <td>Existing Coverage</td>
+                        <td><span class="pill pill-teal">Partial (40%)</span></td>
+                        <td>Standing consent framework exists; real-time verification and transfer audit logs not implemented</td>
+                        <td>Reduces to High from Critical</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SECTION 4: AFFECTED SYSTEMS -->
+    <section>
+        <h2><span class="section-num">04</span>Affected Systems &amp; Processes</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>System / Process</th><th>Owner Team</th><th>Impact Level</th><th>Current State</th><th>Required Change</th><th>Effort (Person-Days)</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>API Gateway</strong><br><span style="font-size:0.78rem;color:var(--text-3);">Kong / custom middleware</span></td>
+                        <td>Platform Engineering</td>
+                        <td><span class="pill pill-red">Critical</span></td>
+                        <td>No consent verification layer on outbound calls</td>
+                        <td>Build real-time consent check interceptor for all cross-border API calls. Block transfer if no valid consent token.</td>
+                        <td style="color:var(--indigo); font-weight:600;">35</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Consent Management System</strong><br><span style="font-size:0.78rem;color:var(--text-3);">Internal CMS module</span></td>
+                        <td>Product Engineering</td>
+                        <td><span class="pill pill-red">Critical</span></td>
+                        <td>Stores standing consents; no real-time event capability</td>
+                        <td>Add real-time consent query API (sub-200ms SLA). Add consent event streaming for audit. Extend schema for cross-border consent type.</td>
+                        <td style="color:var(--indigo); font-weight:600;">28</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cross-Border Transfer Audit Log</strong><br><span style="font-size:0.78rem;color:var(--text-3);">New component required</span></td>
+                        <td>Data &amp; Compliance Eng</td>
+                        <td><span class="pill pill-orange">High</span></td>
+                        <td>Does not exist</td>
+                        <td>Build tamper-proof immutable audit log service. 5-year retention. Regulator API endpoint for 24-hour access requests. Pseudonymised data subject IDs.</td>
+                        <td style="color:var(--indigo); font-weight:600;">22</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Third-Party Integration Layer</strong><br><span style="font-size:0.78rem;color:var(--text-3);">14 external integrations</span></td>
+                        <td>Integrations Team</td>
+                        <td><span class="pill pill-orange">High</span></td>
+                        <td>No POPIA binding clauses in processor agreements</td>
+                        <td>Legal review and update of all 14 third-party processor agreements. Technical flag added to each integration for cross-border transfer classification.</td>
+                        <td style="color:var(--indigo); font-weight:600;">18</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Catalogue</strong><br><span style="font-size:0.78rem;color:var(--text-3);">Collibra / internal</span></td>
+                        <td>Data Governance</td>
+                        <td><span class="pill pill-orange">High</span></td>
+                        <td>Data categories documented but cross-border flows not mapped</td>
+                        <td>Map all cross-border data flows. Tag each dataset with destination country and processor. Feed into audit log automatically.</td>
+                        <td style="color:var(--indigo); font-weight:600;">12</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Customer Portal — Consent UI</strong><br><span style="font-size:0.78rem;color:var(--text-3);">React / Next.js</span></td>
+                        <td>Product (Customer)</td>
+                        <td><span class="pill pill-amber">Medium</span></td>
+                        <td>Consent screens exist for POPIA onboarding</td>
+                        <td>Add granular cross-border consent preference screens. Allow customers to manage per-processor consent. Add consent history view.</td>
+                        <td style="color:var(--indigo); font-weight:600;">15</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p style="font-size:0.85rem; color:var(--text-3); margin-top:8px;">Total estimated development effort: <strong style="color:var(--indigo);">130 person-days</strong> across 5 teams.</p>
+    </section>
+
+    <!-- SECTION 5: IMPLEMENTATION TIMELINE -->
+    <section>
+        <h2><span class="section-num">05</span>Implementation Timeline</h2>
+        <p>Recommended implementation window: July 2026 — December 2026 (6 months), achieving compliance 90 days before the March 2027 effective date. Buffer period allows for user acceptance testing, compliance validation, and regulator engagement.</p>
+
+        <div class="gantt">
+            <div class="gantt-header">
+                <div>Workstream</div>
+                <div>Jul</div><div>Aug</div><div>Sep</div><div>Oct</div>
+                <div>Nov</div><div>Dec</div><div>Jan</div><div>Feb</div>
+                <div>Mar</div><div>Apr</div><div>May</div><div>Jun</div>
+            </div>
+
+            <div class="gantt-row">
+                <div class="gantt-label">API Gateway Consent Layer<small>Platform Engineering</small></div>
+                <div class="gantt-cell"><div class="gantt-bar indigo"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar indigo"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar indigo"></div></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+
+            <div class="gantt-row">
+                <div class="gantt-label">Consent Management API<small>Product Engineering</small></div>
+                <div class="gantt-cell"><div class="gantt-bar violet"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar violet"></div></div>
+                <div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+
+            <div class="gantt-row">
+                <div class="gantt-label">Cross-Border Audit Log<small>Data &amp; Compliance Eng</small></div>
+                <div class="gantt-cell"></div>
+                <div class="gantt-cell"><div class="gantt-bar teal"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar teal"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar teal"></div></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+
+            <div class="gantt-row">
+                <div class="gantt-label">Third-Party Agreements<small>Legal / Integrations</small></div>
+                <div class="gantt-cell"><div class="gantt-bar amber"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar amber"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar amber"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar amber"></div></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+
+            <div class="gantt-row">
+                <div class="gantt-label">Data Catalogue Mapping<small>Data Governance</small></div>
+                <div class="gantt-cell"><div class="gantt-bar green"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar green"></div></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+
+            <div class="gantt-row">
+                <div class="gantt-label">Customer Consent UI<small>Product (Customer)</small></div>
+                <div class="gantt-cell"></div>
+                <div class="gantt-cell"></div>
+                <div class="gantt-cell"><div class="gantt-bar violet"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar violet"></div></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+
+            <div class="gantt-row">
+                <div class="gantt-label">Integration Testing<small>QA / All Teams</small></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"><div class="gantt-bar indigo"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar indigo"></div></div>
+                <div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+
+            <div class="gantt-row">
+                <div class="gantt-label">UAT + Compliance Validation<small>Legal / Compliance</small></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div>
+                <div class="gantt-cell"><div class="gantt-bar teal"></div></div>
+                <div class="gantt-cell"><div class="gantt-bar teal"></div></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+
+            <div class="gantt-row" style="background:rgba(52,211,153,0.04); border-color:rgba(52,211,153,0.2);">
+                <div class="gantt-label" style="color:var(--green);">GO-LIVE <small>Target: 01 Jan 2027</small></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell" style="background:rgba(52,211,153,0.15); border:1px solid rgba(52,211,153,0.4);"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div>
+                <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+            </div>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-3); margin-top:8px;">Go-live target: 01 January 2027 — 90 days before regulatory effective date. Buffer period accommodates post-go-live monitoring and any regulator feedback.</p>
+    </section>
+
+    <!-- SECTION 6: COST ESTIMATES -->
+    <section>
+        <h2><span class="section-num">06</span>Cost Estimate Breakdown</h2>
+        <p>Cost estimates are based on internal team blended day rates (R15,000/person-day for engineering, R12,000/person-day for legal, R8,000/person-day for QA) with a 20% contingency buffer applied across all categories.</p>
+
+        <div class="cost-grid">
+            <div class="cost-card dev">
+                <div class="cost-label">Development</div>
+                <div class="cost-amount">R 1,170,000</div>
+                <div class="cost-detail">78 person-days @ avg R15,000/pd<br>API gateway, consent system, audit log, UI</div>
+            </div>
+            <div class="cost-card test">
+                <div class="cost-label">Testing &amp; QA</div>
+                <div class="cost-amount">R 240,000</div>
+                <div class="cost-detail">30 person-days @ R8,000/pd<br>Integration testing, UAT, compliance validation</div>
+            </div>
+            <div class="cost-card train">
+                <div class="cost-label">Legal &amp; Training</div>
+                <div class="cost-amount">R 420,000</div>
+                <div class="cost-detail">25 legal days @ R12,000/pd + staff training<br>14 third-party agreement reviews + compliance training</div>
+            </div>
+            <div class="cost-card ongoing">
+                <div class="cost-label">Ongoing (per year)</div>
+                <div class="cost-amount">R 180,000</div>
+                <div class="cost-detail">Audit log storage + regulator reporting ops<br>Annual third-party agreement review cycle</div>
+            </div>
+            <div class="cost-card total">
+                <div>
+                    <div class="cost-label">Total One-Off Investment (incl. 20% contingency)</div>
+                    <div class="cost-detail" style="margin-top:4px;">Development + Testing + Legal/Training + 20% contingency buffer</div>
+                </div>
+                <div class="cost-amount">R 2,436,000</div>
+            </div>
+        </div>
+
+        <h3>Cost vs. Non-Compliance</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:12px;">
+            <div style="background:rgba(52,211,153,0.06); border:1px solid rgba(52,211,153,0.2); border-radius:8px; padding:16px;">
+                <div style="font-size:0.78rem; color:var(--green); font-weight:600; text-transform:uppercase; margin-bottom:8px;">Compliance Investment</div>
+                <div style="font-size:1.6rem; font-weight:700; color:var(--green);">R 2.4M</div>
+                <div style="font-size:0.82rem; color:var(--text-3); margin-top:4px;">One-off + R180K/year ongoing</div>
+            </div>
+            <div style="background:rgba(248,113,113,0.06); border:1px solid rgba(248,113,113,0.2); border-radius:8px; padding:16px;">
+                <div style="font-size:0.78rem; color:var(--red); font-weight:600; text-transform:uppercase; margin-bottom:8px;">Non-Compliance Exposure</div>
+                <div style="font-size:1.6rem; font-weight:700; color:var(--red);">R 10M+</div>
+                <div style="font-size:0.82rem; color:var(--text-3); margin-top:4px;">Fine + reputational damage + potential criminal liability</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 7: RISK IF NON-COMPLIANT -->
+    <section>
+        <h2><span class="section-num">07</span>Risk If Non-Compliant</h2>
+        <div class="risk-card">
+            <h3>Non-Compliance Risk Register</h3>
+
+            <div class="risk-item">
+                <div class="risk-badge">Financial</div>
+                <div class="risk-text"><strong style="color:var(--text-1);">Regulatory Fine:</strong> Section 107 of POPIA provides for fines up to R10 million and/or imprisonment of up to 10 years for the responsible party. The Information Regulator has demonstrated an increasing willingness to pursue enforcement actions since its 2022 enforcement powers activation.</div>
+            </div>
+            <div class="risk-item">
+                <div class="risk-badge">Operational</div>
+                <div class="risk-text"><strong style="color:var(--text-1);">Suspension of Cross-Border Transfers:</strong> The Information Regulator may issue a prohibition notice halting all cross-border data transfers pending compliance. This would immediately impact our international payment processing (estimated 34% of transaction volume) and cloud-hosted systems in Ireland and Germany.</div>
+            </div>
+            <div class="risk-item">
+                <div class="risk-badge">Reputational</div>
+                <div class="risk-text"><strong style="color:var(--text-1);">Public Enforcement Notice:</strong> Enforcement notices are published publicly on the Information Regulator's website. A published enforcement action against the organisation would materially harm customer trust, investor confidence, and our financial services licence standing.</div>
+            </div>
+            <div class="risk-item">
+                <div class="risk-badge">Strategic</div>
+                <div class="risk-text"><strong style="color:var(--text-1);">Third-Party Processor Risk:</strong> Failure to update third-party processor agreements as required by the amendment creates a cascading liability — the organisation remains legally responsible as the responsible party for all data processing performed by non-compliant processors on our behalf.</div>
+            </div>
+            <div class="risk-item">
+                <div class="risk-badge">Licence</div>
+                <div class="risk-text"><strong style="color:var(--text-1);">FSP Licence Conditions:</strong> FSCA has indicated in recent guidance that material POPIA non-compliance may be considered a conduct breach affecting FSP licence conditions. A POPIA enforcement action could trigger a concurrent FSCA investigation.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 8: RECOMMENDED ACTIONS -->
+    <section>
+        <h2><span class="section-num">08</span>Recommended Actions</h2>
+
+        <div class="action-row" style="background:rgba(248,113,113,0.06); border-color:rgba(248,113,113,0.2);">
+            <div><div class="action-label">Action</div><div class="action-value" style="color:var(--text-1);">Appoint cross-functional POPIA S72 Compliance Project Steering Committee</div></div>
+            <div><div class="action-label">Owner</div><div class="action-value">Malcolm Govender (AI &amp; Eng) + CLO + CPO</div></div>
+            <div><div class="action-label">Priority</div><div class="action-value"><span class="pill pill-red">Immediate</span></div></div>
+            <div><div class="action-label">Due Date</div><div class="action-value">23 May 2026</div></div>
+        </div>
+
+        <div class="action-row">
+            <div><div class="action-label">Action</div><div class="action-value">Submit industry consultation response to Information Regulator</div></div>
+            <div><div class="action-label">Owner</div><div class="action-value">Chief Legal Officer + Compliance Lead</div></div>
+            <div><div class="action-label">Priority</div><div class="action-value"><span class="pill pill-red">Critical</span></div></div>
+            <div><div class="action-label">Due Date</div><div class="action-value">28 Jun 2026</div></div>
+        </div>
+
+        <div class="action-row">
+            <div><div class="action-label">Action</div><div class="action-value">Complete cross-border data flow mapping via Data Catalogue (all 14 integrations)</div></div>
+            <div><div class="action-label">Owner</div><div class="action-value">Data Governance Lead</div></div>
+            <div><div class="action-label">Priority</div><div class="action-value"><span class="pill pill-amber">High</span></div></div>
+            <div><div class="action-label">Due Date</div><div class="action-value">15 Jul 2026</div></div>
+        </div>
+
+        <div class="action-row">
+            <div><div class="action-label">Action</div><div class="action-value">Board approval of compliance investment budget (R2.4M)</div></div>
+            <div><div class="action-label">Owner</div><div class="action-value">CEO + CFO (board resolution)</div></div>
+            <div><div class="action-label">Priority</div><div class="action-value"><span class="pill pill-red">Critical</span></div></div>
+            <div><div class="action-label">Due Date</div><div class="action-value">30 Jun 2026</div></div>
+        </div>
+
+        <div class="action-row">
+            <div><div class="action-label">Action</div><div class="action-value">Kick off API Gateway consent interceptor development sprint</div></div>
+            <div><div class="action-label">Owner</div><div class="action-value">Malcolm Govender — Head of AI &amp; Engineering</div></div>
+            <div><div class="action-label">Priority</div><div class="action-value"><span class="pill pill-amber">High</span></div></div>
+            <div><div class="action-label">Due Date</div><div class="action-value">01 Jul 2026</div></div>
+        </div>
+
+        <div class="action-row">
+            <div><div class="action-label">Action</div><div class="action-value">Legal review and update of all 14 third-party processor agreements</div></div>
+            <div><div class="action-label">Owner</div><div class="action-value">Chief Legal Officer + Procurement</div></div>
+            <div><div class="action-label">Priority</div><div class="action-value"><span class="pill pill-amber">High</span></div></div>
+            <div><div class="action-label">Due Date</div><div class="action-value">31 Oct 2026</div></div>
+        </div>
+
+        <div class="action-row">
+            <div><div class="action-label">Action</div><div class="action-value">Deploy and complete UAT of all technical changes in staging environment</div></div>
+            <div><div class="action-label">Owner</div><div class="action-value">QA Lead + Compliance Lead</div></div>
+            <div><div class="action-label">Priority</div><div class="action-value"><span class="pill pill-indigo">Planned</span></div></div>
+            <div><div class="action-label">Due Date</div><div class="action-value">30 Nov 2026</div></div>
+        </div>
+
+        <div class="action-row">
+            <div><div class="action-label">Action</div><div class="action-value">Go-live: All compliant systems in production, compliance attestation signed</div></div>
+            <div><div class="action-label">Owner</div><div class="action-value">CEO + Malcolm Govender (Technical sign-off)</div></div>
+            <div><div class="action-label">Priority</div><div class="action-value"><span class="pill pill-indigo">Planned</span></div></div>
+            <div><div class="action-label">Due Date</div><div class="action-value">01 Jan 2027</div></div>
+        </div>
+    </section>
+
+    <!-- SECTION 9: BOARD SIGN-OFF -->
+    <section>
+        <h2><span class="section-num">09</span>Board Sign-Off</h2>
+        <p>This impact assessment requires the following board-level approvals before the compliance programme may be initiated. Sign-off constitutes authorisation of budget allocation and delegation of implementation authority to the named project steering committee.</p>
+
+        <div style="background:rgba(129,140,248,0.05); border:1px solid rgba(129,140,248,0.2); border-radius:10px; padding:20px; margin-bottom:20px;">
+            <div style="font-size:0.85rem; color:var(--text-2); margin-bottom:4px;"><strong style="color:var(--text-1);">Resolution Required:</strong> The Board of Directors of [Organisation Name] hereby authorises: (a) capital expenditure of R2,436,000 for the POPIA Section 72 Compliance Programme, (b) delegation of implementation authority to the POPIA S72 Compliance Steering Committee chaired by Malcolm Govender — Head of AI &amp; Engineering, and (c) delegation to the Chief Legal Officer to execute revised third-party processor agreements on behalf of the organisation.</div>
+        </div>
+
+        <div class="signoff-grid">
+            <div class="signoff-card">
+                <div class="signoff-role">Chief Executive Officer</div>
+                <div class="signoff-name">[Name]</div>
+                <div class="signoff-line"></div>
+                <div class="signoff-date">Date: ____________________</div>
+                <div class="signoff-status"><span class="pill pill-amber">Pending</span></div>
+            </div>
+            <div class="signoff-card">
+                <div class="signoff-role">Chief Financial Officer</div>
+                <div class="signoff-name">[Name]</div>
+                <div class="signoff-line"></div>
+                <div class="signoff-date">Date: ____________________</div>
+                <div class="signoff-status"><span class="pill pill-amber">Pending</span></div>
+            </div>
+            <div class="signoff-card">
+                <div class="signoff-role">Chief Legal Officer</div>
+                <div class="signoff-name">[Name]</div>
+                <div class="signoff-line"></div>
+                <div class="signoff-date">Date: ____________________</div>
+                <div class="signoff-status"><span class="pill pill-amber">Pending</span></div>
+            </div>
+            <div class="signoff-card">
+                <div class="signoff-role">Chief Risk Officer</div>
+                <div class="signoff-name">[Name]</div>
+                <div class="signoff-line"></div>
+                <div class="signoff-date">Date: ____________________</div>
+                <div class="signoff-status"><span class="pill pill-amber">Pending</span></div>
+            </div>
+            <div class="signoff-card">
+                <div class="signoff-role">Head of AI &amp; Engineering (Technical Sponsor)</div>
+                <div class="signoff-name">Malcolm Govender</div>
+                <div class="signoff-line"></div>
+                <div class="signoff-date">Date: ____________________</div>
+                <div class="signoff-status"><span class="pill pill-amber">Pending</span></div>
+            </div>
+            <div class="signoff-card">
+                <div class="signoff-role">Board Chair</div>
+                <div class="signoff-name">[Name]</div>
+                <div class="signoff-line"></div>
+                <div class="signoff-date">Date: ____________________</div>
+                <div class="signoff-status"><span class="pill pill-amber">Pending</span></div>
+            </div>
+        </div>
+
+        <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px; margin-top:16px;">
+            <div style="font-size:0.78rem; color:var(--text-3); margin-bottom:6px; text-transform:uppercase; font-weight:600; letter-spacing:0.5px;">Document Control</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+                <div><div style="font-size:0.75rem; color:var(--text-3);">Report ID</div><div style="font-size:0.88rem; color:var(--text-1); font-weight:600;">RIA-2026-047</div></div>
+                <div><div style="font-size:0.75rem; color:var(--text-3);">Generated By</div><div style="font-size:0.88rem; color:var(--text-1); font-weight:600;">UC22 Regulatory Impact Radar (AI)</div></div>
+                <div><div style="font-size:0.75rem; color:var(--text-3);">Generated At</div><div style="font-size:0.88rem; color:var(--text-1); font-weight:600;">09 May 2026, 14:32 SAST</div></div>
+                <div><div style="font-size:0.75rem; color:var(--text-3);">Reviewed By</div><div style="font-size:0.88rem; color:var(--text-1); font-weight:600;">Malcolm Govender</div></div>
+                <div><div style="font-size:0.75rem; color:var(--text-3);">Version</div><div style="font-size:0.88rem; color:var(--text-1); font-weight:600;">v1.0 — Draft for Board Review</div></div>
+                <div><div style="font-size:0.75rem; color:var(--text-3);">Classification</div><div style="font-size:0.88rem; color:var(--text-1); font-weight:600;">Confidential — Board Only</div></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <span>UC22 — Regulatory Change Impact Radar | Impact Assessment Template v1.0</span>
+        <span>Malcolm Govender — Head of AI &amp; Engineering | May 2026</span>
+        <span>Confidential — Board Distribution Only</span>
+    </footer>
+
+</div>
+</body>
+</html>

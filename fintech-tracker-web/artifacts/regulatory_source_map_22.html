@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC22 — Regulatory Source Map | Regulatory Change Impact Radar</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface2: #253047;
+            --surface3: #2d3a52;
+            --border: rgba(255,255,255,0.07);
+            --text-1: #e2e8f0;
+            --text-2: #94a3b8;
+            --text-3: #4b607a;
+            --indigo: #818cf8;
+            --violet: #a78bfa;
+            --teal: #2dd4bf;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --green: #34d399;
+            --cyan: #38bdf8;
+            --orange: #fb923c;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            background: var(--bg); color: var(--text-1); line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+
+        .back-nav {
+            position: fixed; top: 16px; left: 16px; z-index: 9999;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; border-radius: 8px;
+            background: #0a0f1e; border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-2); font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: all .15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,.5);
+        }
+        .back-nav:hover { background: var(--surface); color: var(--text-1); border-color: var(--indigo); }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 44px; margin-bottom: 40px;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -80px; right: -80px;
+            width: 360px; height: 360px;
+            background: radial-gradient(circle, rgba(45,212,191,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; }
+
+        .new-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            color: #fff; font-size: 0.75rem; font-weight: 700;
+            padding: 4px 12px; border-radius: 20px;
+            letter-spacing: 0.5px; margin-bottom: 16px; text-transform: uppercase;
+        }
+        .hero h1 {
+            font-size: 2.2rem; font-weight: 700; margin-bottom: 8px;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero-subtitle { color: var(--text-2); font-size: 1rem; margin-bottom: 28px; }
+        .hero-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 24px; }
+        .meta-label { font-size: 0.78rem; color: var(--text-3); text-transform: uppercase; font-weight: 600; letter-spacing: 0.6px; }
+        .meta-value { font-size: 1rem; font-weight: 600; color: var(--text-1); margin-top: 4px; }
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.4);
+            color: var(--amber); padding: 5px 12px; border-radius: 6px;
+            font-size: 0.85rem; font-weight: 600;
+        }
+        .owner-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(129,140,248,0.1); border: 1px solid rgba(129,140,248,0.25);
+            border-radius: 8px; padding: 8px 14px;
+        }
+        .owner-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .owner-name { font-size: 0.9rem; font-weight: 600; color: var(--text-1); }
+        .owner-title { font-size: 0.78rem; color: var(--text-2); }
+
+        section { margin-bottom: 44px; }
+        h2 {
+            font-size: 1.5rem; font-weight: 700; color: var(--text-1);
+            margin-bottom: 20px; padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+        }
+        h2 .section-icon {
+            width: 28px; height: 28px; border-radius: 6px;
+            background: linear-gradient(135deg, rgba(129,140,248,0.2), rgba(167,139,250,0.2));
+            display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+        }
+        h3 { font-size: 1.1rem; font-weight: 600; color: var(--indigo); margin: 24px 0 14px; }
+        p { color: var(--text-2); margin-bottom: 14px; line-height: 1.75; }
+
+        /* Wide scrollable table wrapper */
+        .table-wrapper { overflow-x: auto; border-radius: 10px; margin: 20px 0; }
+        table {
+            width: 100%; border-collapse: collapse;
+            background: var(--surface); border: 1px solid var(--border);
+        }
+        thead { background: rgba(129,140,248,0.12); border-bottom: 1px solid var(--border); }
+        th {
+            padding: 12px 14px; text-align: left;
+            font-size: 0.78rem; font-weight: 600; color: var(--indigo);
+            text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+        }
+        td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text-2); font-size: 0.88rem; vertical-align: top; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        td strong { color: var(--text-1); font-weight: 600; }
+
+        /* Status pills */
+        .pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 9px; border-radius: 12px;
+            font-size: 0.78rem; font-weight: 600; white-space: nowrap;
+        }
+        .pill-green { background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3); color: var(--green); }
+        .pill-amber { background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.3); color: var(--amber); }
+        .pill-red { background: rgba(248,113,113,0.12); border: 1px solid rgba(248,113,113,0.3); color: var(--red); }
+        .pill-indigo { background: rgba(129,140,248,0.12); border: 1px solid rgba(129,140,248,0.3); color: var(--indigo); }
+        .pill-teal { background: rgba(45,212,191,0.12); border: 1px solid rgba(45,212,191,0.3); color: var(--teal); }
+        .pill-violet { background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.3); color: var(--violet); }
+        .pill-cyan { background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); color: var(--cyan); }
+        .pill-orange { background: rgba(251,146,60,0.12); border: 1px solid rgba(251,146,60,0.3); color: var(--orange); }
+
+        /* Severity taxonomy */
+        .taxonomy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+        .taxonomy-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px;
+        }
+        .taxonomy-card .sev-label {
+            font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .sev-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .taxonomy-card ul { list-style: none; }
+        .taxonomy-card ul li {
+            font-size: 0.85rem; color: var(--text-2); padding: 5px 0;
+            border-bottom: 1px solid var(--border); line-height: 1.5;
+        }
+        .taxonomy-card ul li:last-child { border-bottom: none; }
+
+        /* Calendar */
+        .calendar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 20px 0; }
+        .cal-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 16px;
+        }
+        .cal-month {
+            font-size: 0.75rem; font-weight: 700; color: var(--indigo);
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+        }
+        .cal-event {
+            display: flex; flex-direction: column; gap: 3px;
+            padding: 8px 0; border-bottom: 1px solid var(--border);
+        }
+        .cal-event:last-child { border-bottom: none; }
+        .cal-event-name { font-size: 0.82rem; font-weight: 600; color: var(--text-1); }
+        .cal-event-body { font-size: 0.75rem; color: var(--text-3); }
+
+        /* System matrix */
+        .matrix-container { overflow-x: auto; margin: 20px 0; }
+        .matrix-table { border-collapse: collapse; min-width: 900px; width: 100%; }
+        .matrix-table th, .matrix-table td { padding: 10px 12px; border: 1px solid var(--border); font-size: 0.82rem; }
+        .matrix-table thead th { background: rgba(129,140,248,0.12); color: var(--indigo); font-size: 0.75rem; text-transform: uppercase; font-weight: 600; }
+        .matrix-table tbody th { background: var(--surface2); color: var(--text-1); font-weight: 600; text-align: left; }
+        .matrix-table td { text-align: center; color: var(--text-2); }
+        .matrix-dot { width: 20px; height: 20px; border-radius: 50%; margin: 0 auto; }
+        .matrix-dot.primary { background: var(--indigo); }
+        .matrix-dot.secondary { background: rgba(129,140,248,0.35); border: 1px solid var(--indigo); }
+        .matrix-dot.none { background: transparent; }
+
+        /* Summary stats */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 20px 0; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 16px; text-align: center;
+        }
+        .stat-num { font-size: 1.8rem; font-weight: 700; }
+        .stat-label { font-size: 0.75rem; color: var(--text-3); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card.indigo .stat-num { color: var(--indigo); }
+        .stat-card.teal .stat-num { color: var(--teal); }
+        .stat-card.violet .stat-num { color: var(--violet); }
+        .stat-card.amber .stat-num { color: var(--amber); }
+        .stat-card.green .stat-num { color: var(--green); }
+
+        /* Feed type legend */
+        .legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-2); }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+        footer {
+            margin-top: 60px; padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+        }
+        footer span { font-size: 0.82rem; color: var(--text-3); }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.6rem; }
+            .hero-meta { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="javascript:history.back()" class="back-nav">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+    Back to Tracker
+</a>
+
+<div class="container">
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-content">
+            <span class="new-badge">New — Gap Identified by Malcolm</span>
+            <h1>UC22 — Regulatory Source Map</h1>
+            <p class="hero-subtitle">Comprehensive registry of all regulatory bodies monitored by the Regulatory Change Impact Radar — feeds, jurisdictions, update frequencies, and classification taxonomy.</p>
+
+            <div class="hero-meta">
+                <div>
+                    <div class="meta-label">Document Type</div>
+                    <div class="meta-value">Regulatory Source Map</div>
+                </div>
+                <div>
+                    <div class="meta-label">Status</div>
+                    <div class="status-badge">&#9679;&nbsp;Not Started — Planning Phase</div>
+                </div>
+                <div>
+                    <div class="meta-label">Use Case Owner</div>
+                    <div class="owner-badge">
+                        <div class="owner-avatar">MG</div>
+                        <div>
+                            <div class="owner-name">Malcolm Govender</div>
+                            <div class="owner-title">Head of AI &amp; Engineering</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="meta-label">Sources Monitored</div>
+                    <div class="meta-value" style="color:var(--teal);">7 Regulatory Bodies</div>
+                </div>
+                <div>
+                    <div class="meta-label">Last Updated</div>
+                    <div class="meta-value">May 2026</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUMMARY STATS -->
+    <div class="stats-row">
+        <div class="stat-card indigo"><div class="stat-num">7</div><div class="stat-label">Regulatory Bodies</div></div>
+        <div class="stat-card teal"><div class="stat-num">5</div><div class="stat-label">Active Feeds</div></div>
+        <div class="stat-card violet"><div class="stat-num">2</div><div class="stat-label">Manual Sources</div></div>
+        <div class="stat-card amber"><div class="stat-num">12</div><div class="stat-label">Key Regulations</div></div>
+        <div class="stat-card green"><div class="stat-num">4</div><div class="stat-label">Frameworks</div></div>
+    </div>
+
+    <!-- FEED TYPE LEGEND -->
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--teal);"></div> RSS Feed — Automated polling</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--indigo);"></div> Web Scrape — Playwright automated</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--violet);"></div> API — Direct REST integration</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber);"></div> Manual Upload — Compliance team submission</div>
+    </div>
+
+    <!-- REGULATORY BODIES TABLE -->
+    <section>
+        <h2><span class="section-icon">&#9679;</span>Regulatory Bodies Registry</h2>
+        <p>The following table provides a comprehensive overview of all regulatory bodies monitored by the Regulatory Change Impact Radar. Monitoring status reflects the current configuration at the time of architecture planning — all feeds will be live upon platform deployment.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Regulatory Body</th>
+                        <th>Jurisdiction</th>
+                        <th>Update Frequency</th>
+                        <th>Feed Type</th>
+                        <th>Key Regulations Monitored</th>
+                        <th>Impact Areas</th>
+                        <th>Monitoring Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>SARB</strong><br>
+                            <span style="font-size:0.78rem;color:var(--text-3);">South African Reserve Bank</span>
+                        </td>
+                        <td>South Africa — National</td>
+                        <td>Weekly + Ad hoc</td>
+                        <td><span class="pill pill-indigo">Web Scrape</span><br><span class="pill pill-amber" style="margin-top:4px;">Manual (Gazette)</span></td>
+                        <td>Prudential Standards, Directive 7/2018, Regulation 9, BA 700 returns, IFRS 9 guidance, Liquidity coverage ratio updates</td>
+                        <td>Capital adequacy, Liquidity management, Reporting systems, Risk models</td>
+                        <td><span class="pill pill-amber">&#9679; Planned</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>FSCA</strong><br>
+                            <span style="font-size:0.78rem;color:var(--text-3);">Financial Sector Conduct Authority</span>
+                        </td>
+                        <td>South Africa — National</td>
+                        <td>2–3× per month</td>
+                        <td><span class="pill pill-indigo">Web Scrape</span></td>
+                        <td>COFI Act, Conduct Standards, FAIS amendments, POPI-linked conduct requirements, TCF (Treating Customers Fairly), Product provider standards</td>
+                        <td>Customer onboarding, Product disclosure, Sales processes, Complaint handling systems</td>
+                        <td><span class="pill pill-amber">&#9679; Planned</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Information Regulator</strong><br>
+                            <span style="font-size:0.78rem;color:var(--text-3);">POPIA Information Regulator of SA</span>
+                        </td>
+                        <td>South Africa — National</td>
+                        <td>Monthly + Ad hoc</td>
+                        <td><span class="pill pill-teal">RSS Feed</span><br><span class="pill pill-indigo" style="margin-top:4px;">Web Scrape</span></td>
+                        <td>POPIA (Act 4 of 2013), PAIA amendments, Guidance notes on processing, Cross-border transfer conditions, Enforcement notices, Code of conduct approvals</td>
+                        <td>Data governance, Customer data systems, Marketing systems, Third-party data sharing, DPO responsibilities</td>
+                        <td><span class="pill pill-amber">&#9679; Planned</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>PCI-SSC</strong><br>
+                            <span style="font-size:0.78rem;color:var(--text-3);">PCI Security Standards Council</span>
+                        </td>
+                        <td>International</td>
+                        <td>Quarterly</td>
+                        <td><span class="pill pill-teal">RSS Feed</span></td>
+                        <td>PCI-DSS v4.0, PA-DSS retirement notices, PTS POI requirements, Software-based PIN standards, Tokenisation guidelines, SAQ updates</td>
+                        <td>Payment processing, Card data systems, API security, Tokenisation layer, QSA audit scope</td>
+                        <td><span class="pill pill-amber">&#9679; Planned</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>FIC</strong><br>
+                            <span style="font-size:0.78rem;color:var(--text-3);">Financial Intelligence Centre (FICA)</span>
+                        </td>
+                        <td>South Africa — National</td>
+                        <td>Monthly</td>
+                        <td><span class="pill pill-indigo">Web Scrape</span><br><span class="pill pill-amber" style="margin-top:4px;">Manual Upload</span></td>
+                        <td>FICA (Act 38 of 2001), AML/CFT directives, Targeted financial sanctions, Guidance Note 7, Customer due diligence standards, Suspicious transaction reporting</td>
+                        <td>KYC/AML systems, Transaction monitoring, Sanctions screening, Reporting workflows, Customer risk rating</td>
+                        <td><span class="pill pill-amber">&#9679; Planned</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>NCR</strong><br>
+                            <span style="font-size:0.78rem;color:var(--text-3);">National Credit Regulator</span>
+                        </td>
+                        <td>South Africa — National</td>
+                        <td>Bi-monthly</td>
+                        <td><span class="pill pill-teal">RSS Feed</span></td>
+                        <td>National Credit Act (NCA), Affordability assessment regulations, Interest rate caps, Credit bureau standards, Reckless lending guidelines</td>
+                        <td>Credit origination systems, Affordability models, Interest rate engines, Credit bureau integration</td>
+                        <td><span class="pill pill-amber">&#9679; Planned</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>NT / Treasury</strong><br>
+                            <span style="font-size:0.78rem;color:var(--text-3);">National Treasury of South Africa</span>
+                        </td>
+                        <td>South Africa — National</td>
+                        <td>Quarterly (Budget) + Ad hoc</td>
+                        <td><span class="pill pill-indigo">Web Scrape</span><br><span class="pill pill-amber" style="margin-top:4px;">Manual (Budget docs)</span></td>
+                        <td>Financial Sector Laws Amendment Act, Twin peaks implementation, Retirement fund regulation, Draft policy papers with fintech implications</td>
+                        <td>Strategic compliance posture, Licensing, Pension fund products, Tax reporting systems</td>
+                        <td><span class="pill pill-amber">&#9679; Planned</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- CHANGE CLASSIFICATION TAXONOMY -->
+    <section>
+        <h2><span class="section-icon">&#9670;</span>Change Classification Taxonomy</h2>
+        <p>The Regulatory Change Impact Radar classifies every detected regulatory change across four severity levels. Classification is performed by the LangChain / Claude pipeline using structured prompt engineering with the criteria below. Human review is required for all Critical-classified changes before report distribution.</p>
+
+        <div class="taxonomy-grid">
+            <div class="taxonomy-card" style="border-left: 3px solid var(--red);">
+                <div class="sev-label" style="color:var(--red);"><div class="sev-dot" style="background:var(--red);"></div>CRITICAL</div>
+                <ul>
+                    <li>Mandatory compliance by a defined date with penalty exposure &gt; R5M or licence revocation risk</li>
+                    <li>Requires fundamental system re-architecture or new capability build</li>
+                    <li>Affects all customer accounts or all payment flows</li>
+                    <li>SARB Prudential directive or FSCA enforcement notice</li>
+                    <li>New Act or amendment with &lt; 6-month implementation window</li>
+                    <li><strong>Response SLA:</strong> Impact assessment within 24 hours</li>
+                </ul>
+            </div>
+            <div class="taxonomy-card" style="border-left: 3px solid var(--orange);">
+                <div class="sev-label" style="color:var(--orange);"><div class="sev-dot" style="background:var(--orange);"></div>HIGH</div>
+                <ul>
+                    <li>Mandatory compliance with 6–18 month window</li>
+                    <li>Significant process or system changes required across 3+ teams</li>
+                    <li>Penalty exposure R500K–R5M for non-compliance</li>
+                    <li>Affects a major product line or customer segment</li>
+                    <li>Requires board awareness and budget approval</li>
+                    <li><strong>Response SLA:</strong> Impact assessment within 72 hours</li>
+                </ul>
+            </div>
+            <div class="taxonomy-card" style="border-left: 3px solid var(--amber);">
+                <div class="sev-label" style="color:var(--amber);"><div class="sev-dot" style="background:var(--amber);"></div>MEDIUM</div>
+                <ul>
+                    <li>Compliance required within 18 months or more</li>
+                    <li>Process or policy updates required in 1–2 teams</li>
+                    <li>Penalty exposure &lt; R500K or reputational risk</li>
+                    <li>Guidance note or interpretive communication</li>
+                    <li>Updates to existing controls, not net-new capability</li>
+                    <li><strong>Response SLA:</strong> Impact assessment within 5 business days</li>
+                </ul>
+            </div>
+            <div class="taxonomy-card" style="border-left: 3px solid var(--green);">
+                <div class="sev-label" style="color:var(--green);"><div class="sev-dot" style="background:var(--green);"></div>LOW</div>
+                <ul>
+                    <li>Informational, consultation papers, or industry guidance</li>
+                    <li>No mandatory compliance deadline</li>
+                    <li>Future-watch items for strategic awareness</li>
+                    <li>Minor policy clarification with no operational impact</li>
+                    <li>International standards with voluntary adoption only</li>
+                    <li><strong>Response SLA:</strong> Monthly digest inclusion</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Change Type Sub-Classification</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>Change Type</th><th>Description</th><th>Typical Source</th><th>Default Severity Uplift</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><span class="pill pill-red">New Act / Amendment</span></td><td>Primary legislation enacted or substantially amended in Parliament</td><td>Government Gazette</td><td>+1 level (min High)</td></tr>
+                    <tr><td><span class="pill pill-orange">Directive / Circular</span></td><td>Binding directive from SARB, FSCA, or FIC requiring direct compliance action</td><td>Regulator website</td><td>+1 level (min High)</td></tr>
+                    <tr><td><span class="pill pill-amber">Guidance Note</span></td><td>Non-binding interpretive guidance from a regulatory body</td><td>Regulator website</td><td>No uplift</td></tr>
+                    <tr><td><span class="pill pill-violet">Consultation Paper</span></td><td>Pre-decisional consultation — future-watch, response opportunity</td><td>Regulator website</td><td>-1 level (max Medium)</td></tr>
+                    <tr><td><span class="pill pill-teal">Standard Update</span></td><td>International standard body update (PCI-SSC, FATF, Basel)</td><td>RSS / Web</td><td>Case by case</td></tr>
+                    <tr><td><span class="pill pill-indigo">Enforcement Notice</span></td><td>Public enforcement action — signals regulatory scrutiny area</td><td>Regulator website</td><td>+1 level (min High)</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- AFFECTED SYSTEM CATEGORIES MATRIX -->
+    <section>
+        <h2><span class="section-icon">&#9632;</span>Affected System Categories Matrix</h2>
+        <p>The matrix below maps each regulatory body to the system categories most likely to be affected by changes they publish. Filled circles indicate primary impact areas (direct regulatory requirements for these systems). Outlined circles indicate secondary impact (indirect process or reporting dependencies). This matrix drives the System Mapper component's initial relevance scoring.</p>
+
+        <div class="matrix-container">
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; min-width:160px;">Regulatory Body</th>
+                        <th>Core Banking</th>
+                        <th>KYC / AML</th>
+                        <th>Payment Processing</th>
+                        <th>Data Governance</th>
+                        <th>Credit Origination</th>
+                        <th>Customer Portal</th>
+                        <th>Fraud Detection</th>
+                        <th>Reporting / BI</th>
+                        <th>API Gateway</th>
+                        <th>Identity &amp; Access</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>SARB</th>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                    </tr>
+                    <tr>
+                        <th>FSCA</th>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                    </tr>
+                    <tr>
+                        <th>POPIA Info Regulator</th>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                    </tr>
+                    <tr>
+                        <th>PCI-SSC</th>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                    </tr>
+                    <tr>
+                        <th>FIC (FICA)</th>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                    </tr>
+                    <tr>
+                        <th>NCR</th>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                    </tr>
+                    <tr>
+                        <th>National Treasury</th>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot secondary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot primary"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                        <td><div class="matrix-dot none"></div></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top:12px; display:flex; gap:20px; flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text-2);">
+                <div class="matrix-dot primary" style="width:14px;height:14px;"></div> Primary impact — direct regulatory requirements
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:var(--text-2);">
+                <div class="matrix-dot secondary" style="width:14px;height:14px;"></div> Secondary impact — indirect process or reporting dependency
+            </div>
+        </div>
+    </section>
+
+    <!-- REGULATORY CALENDAR -->
+    <section>
+        <h2><span class="section-icon">&#9651;</span>Regulatory Calendar — Key Annual Dates</h2>
+        <p>The regulatory calendar tracks known recurring compliance deadlines and key annual regulatory events. The system automatically monitors for date confirmations and updates the compliance team in advance at T-90, T-30, T-14, and T-7 day intervals.</p>
+
+        <div class="calendar-grid">
+            <div class="cal-card">
+                <div class="cal-month">January</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">SARB BA 700 Returns</div>
+                    <div class="cal-event-body">SARB — Monthly prudential return submission deadline (15th)</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">FIC Annual Report Period</div>
+                    <div class="cal-event-body">FIC — Annual compliance reporting window opens</div>
+                </div>
+            </div>
+            <div class="cal-card">
+                <div class="cal-month">February</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">National Budget</div>
+                    <div class="cal-event-body">National Treasury — Annual Budget with regulatory implications</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">FSCA Conduct Review</div>
+                    <div class="cal-event-body">FSCA — Annual financial sector conduct review publication</div>
+                </div>
+            </div>
+            <div class="cal-card">
+                <div class="cal-month">March</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">POPIA Annual Review</div>
+                    <div class="cal-event-body">Information Regulator — Annual POPIA compliance report</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">PCI-DSS Audit Window</div>
+                    <div class="cal-event-body">PCI-SSC — Q1 QSA assessment period</div>
+                </div>
+            </div>
+            <div class="cal-card">
+                <div class="cal-month">April / May</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">SARB Stress Tests</div>
+                    <div class="cal-event-body">SARB — Annual stress testing scenarios released</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">AML/CFT Assessment</div>
+                    <div class="cal-event-body">FIC — Annual AML/CFT risk assessment deadline</div>
+                </div>
+            </div>
+            <div class="cal-card">
+                <div class="cal-month">June</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">FSCA Mid-Year Review</div>
+                    <div class="cal-event-body">FSCA — Mid-year conduct standards review</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">NCR Annual Compliance</div>
+                    <div class="cal-event-body">NCR — Credit provider compliance report submission</div>
+                </div>
+            </div>
+            <div class="cal-card">
+                <div class="cal-month">July / August</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">PCI-DSS Self-Assessment</div>
+                    <div class="cal-event-body">PCI-SSC — SAQ submission deadline (August 31)</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">SARB Capital Adequacy</div>
+                    <div class="cal-event-body">SARB — Mid-year capital adequacy reporting</div>
+                </div>
+            </div>
+            <div class="cal-card">
+                <div class="cal-month">September</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">FATF Review Period</div>
+                    <div class="cal-event-body">International — FATF mutual evaluation follow-up</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">Info Regulator Returns</div>
+                    <div class="cal-event-body">POPIA — Annual information officer return deadline</div>
+                </div>
+            </div>
+            <div class="cal-card">
+                <div class="cal-month">October / November</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">FSCA Licensing Renewal</div>
+                    <div class="cal-event-body">FSCA — FSP licence renewal window opens</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">SARB Prudential Review</div>
+                    <div class="cal-event-body">SARB — Year-end prudential standard review publication</div>
+                </div>
+            </div>
+            <div class="cal-card">
+                <div class="cal-month">December</div>
+                <div class="cal-event">
+                    <div class="cal-event-name">Year-End Compliance Sign-off</div>
+                    <div class="cal-event-body">All bodies — Compliance officer attestation to board (31 Dec)</div>
+                </div>
+                <div class="cal-event">
+                    <div class="cal-event-name">Regulatory Horizon Scan</div>
+                    <div class="cal-event-body">Internal — Annual regulatory change horizon planning session</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MONITORING CONFIGURATION -->
+    <section>
+        <h2><span class="section-icon">&#9711;</span>Feed Monitoring Configuration</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Source ID</th>
+                        <th>Source URL / Endpoint</th>
+                        <th>Poll Interval</th>
+                        <th>Parser Type</th>
+                        <th>Alert Threshold</th>
+                        <th>Notification Channel</th>
+                        <th>Backup Method</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code style="color:var(--teal);font-size:0.82rem;">sarb_prudential</code></td>
+                        <td style="font-size:0.8rem;">resbank.co.za/regulation-supervision</td>
+                        <td>4 hours</td>
+                        <td>Playwright HTML + PDF</td>
+                        <td>High+</td>
+                        <td>Slack, Email</td>
+                        <td>Manual gazette upload</td>
+                    </tr>
+                    <tr>
+                        <td><code style="color:var(--teal);font-size:0.82rem;">fsca_communications</code></td>
+                        <td style="font-size:0.8rem;">fsca.co.za/regulatory-frameworks</td>
+                        <td>4 hours</td>
+                        <td>Playwright HTML</td>
+                        <td>Medium+</td>
+                        <td>Slack, Email</td>
+                        <td>Manual upload</td>
+                    </tr>
+                    <tr>
+                        <td><code style="color:var(--teal);font-size:0.82rem;">popia_inforeg</code></td>
+                        <td style="font-size:0.8rem;">inforegulator.org.za/feed</td>
+                        <td>6 hours</td>
+                        <td>RSS + Playwright fallback</td>
+                        <td>Medium+</td>
+                        <td>Slack, Email</td>
+                        <td>Email subscription</td>
+                    </tr>
+                    <tr>
+                        <td><code style="color:var(--teal);font-size:0.82rem;">pcissc_updates</code></td>
+                        <td style="font-size:0.8rem;">pcisecuritystandards.org/feed</td>
+                        <td>24 hours</td>
+                        <td>RSS</td>
+                        <td>High+</td>
+                        <td>Slack, Email</td>
+                        <td>Manual upload</td>
+                    </tr>
+                    <tr>
+                        <td><code style="color:var(--teal);font-size:0.82rem;">fic_guidance</code></td>
+                        <td style="font-size:0.8rem;">fic.gov.za/notices-and-guidance</td>
+                        <td>12 hours</td>
+                        <td>Playwright HTML</td>
+                        <td>High+</td>
+                        <td>Slack, Email</td>
+                        <td>Manual upload</td>
+                    </tr>
+                    <tr>
+                        <td><code style="color:var(--teal);font-size:0.82rem;">ncr_publications</code></td>
+                        <td style="font-size:0.8rem;">ncr.org.za/publications</td>
+                        <td>24 hours</td>
+                        <td>Playwright HTML + RSS</td>
+                        <td>Medium+</td>
+                        <td>Email</td>
+                        <td>Manual upload</td>
+                    </tr>
+                    <tr>
+                        <td><code style="color:var(--teal);font-size:0.82rem;">nt_policy</code></td>
+                        <td style="font-size:0.8rem;">treasury.gov.za/legislation</td>
+                        <td>24 hours</td>
+                        <td>Playwright HTML + PDF</td>
+                        <td>Medium+</td>
+                        <td>Email</td>
+                        <td>Manual upload</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <footer>
+        <span>UC22 — Regulatory Change Impact Radar | Regulatory Source Map v1.0</span>
+        <span>Malcolm Govender — Head of AI &amp; Engineering | May 2026</span>
+        <span>Confidential — Internal Use Only</span>
+    </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UC20 — AI POPIA Compliance Scanner | Compliance Mapping</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    /* HEADER */
+    .page-header {
+      background: linear-gradient(135deg, #0f172a 0%, #042f2e 60%, #0f172a 100%);
+      border-bottom: 1px solid rgba(45,212,191,0.3);
+      padding: 48px 40px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(45,212,191,0.07) 0%, transparent 70%);
+    }
+    .header-inner { max-width: 1100px; margin: 0 auto; }
+    .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .new-badge {
+      background: linear-gradient(90deg, #818cf8, #a78bfa);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .status-badge {
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.4);
+      color: #fbbf24;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .page-header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e2e8f0 0%, #2dd4bf 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .page-header .doc-subtitle { font-size: 1rem; color: #94a3b8; margin-bottom: 24px; }
+    .header-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .owner-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(30,41,59,0.8);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 8px 14px;
+    }
+    .avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #818cf8, #a78bfa);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+    }
+    .owner-info { font-size: 12px; }
+    .owner-name { font-weight: 600; color: #e2e8f0; }
+    .owner-role { color: #64748b; }
+    .meta-pill {
+      background: rgba(30,41,59,0.6);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    .meta-pill span { color: #2dd4bf; font-weight: 600; }
+
+    /* LAYOUT */
+    .content { max-width: 1100px; margin: 0 auto; padding: 40px; }
+
+    /* SECTIONS */
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #2dd4bf; margin-bottom: 6px; }
+    .section-title { font-size: 1.5rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+    .section-desc { color: #64748b; font-size: 0.9rem; margin-bottom: 28px; }
+    .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 48px 0; }
+
+    /* CARDS */
+    .card { background: #1e293b; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .card-title { font-size: 1rem; font-weight: 700; color: #2dd4bf; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-title .icon { width: 28px; height: 28px; background: rgba(45,212,191,0.12); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .card p { color: #94a3b8; font-size: 0.88rem; }
+
+    /* GRID */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    @media(max-width:768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* TABLES */
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: rgba(45,212,191,0.06); }
+    th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #2dd4bf; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    td { padding: 11px 16px; font-size: 0.83rem; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    tbody tr:last-child td { border-bottom: none; }
+    td.highlight { color: #e2e8f0; font-weight: 600; }
+    td.teal { color: #2dd4bf; font-weight: 600; }
+    td.violet { color: #a78bfa; }
+    td.indigo { color: #818cf8; }
+    td.red { color: #f87171; }
+
+    /* TAGS */
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin: 2px 2px 2px 0; }
+    .tag-done { background: rgba(45,212,191,0.1); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.25); }
+    .tag-partial { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+    .tag-gap { background: rgba(248,113,113,0.1); color: #f87171; border: 1px solid rgba(248,113,113,0.25); }
+    .tag-na { background: rgba(100,116,139,0.15); color: #64748b; border: 1px solid rgba(100,116,139,0.2); }
+    .tag-violet { background: rgba(167,139,250,0.1); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+    .tag-indigo { background: rgba(129,140,248,0.1); color: #818cf8; border: 1px solid rgba(129,140,248,0.25); }
+    .tag-teal { background: rgba(45,212,191,0.1); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.25); }
+
+    /* METRICS */
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    @media(max-width:768px) { .metrics-row { grid-template-columns: 1fr 1fr; } }
+    .metric-card { background: #1e293b; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 20px; text-align: center; }
+    .metric-val { font-size: 2rem; font-weight: 700; color: #2dd4bf; }
+    .metric-label { font-size: 11px; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* CALLOUT */
+    .callout { border-left: 3px solid #2dd4bf; background: rgba(45,212,191,0.05); border-radius: 0 8px 8px 0; padding: 14px 20px; margin-bottom: 20px; font-size: 0.88rem; color: #94a3b8; }
+    .callout strong { color: #2dd4bf; }
+    .callout-warn { border-left: 3px solid #fbbf24; background: rgba(251,191,36,0.05); }
+    .callout-warn strong { color: #fbbf24; }
+
+    /* CHECKLIST */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.87rem; color: #94a3b8; }
+    .checklist li:last-child { border-bottom: none; }
+    .check-done { color: #2dd4bf; font-size: 16px; flex-shrink: 0; }
+    .check-gap { color: #f87171; font-size: 16px; flex-shrink: 0; }
+    .check-partial { color: #fbbf24; font-size: 16px; flex-shrink: 0; }
+    .check-label { flex: 1; }
+    .check-ref { font-size: 11px; color: #475569; }
+
+    /* EVIDENCE LIST */
+    .evidence-list { list-style: none; padding: 0; }
+    .evidence-list li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.87rem; }
+    .evidence-list li:last-child { border-bottom: none; }
+    .ev-icon { width: 32px; height: 32px; background: rgba(45,212,191,0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .ev-name { color: #e2e8f0; font-weight: 600; }
+    .ev-desc { color: #64748b; font-size: 12px; }
+
+    /* LIST */
+    ul.styled { list-style: none; padding: 0; }
+    ul.styled li { padding: 6px 0; color: #94a3b8; font-size: 0.88rem; padding-left: 18px; position: relative; }
+    ul.styled li::before { content: '▸'; position: absolute; left: 0; color: #2dd4bf; }
+
+    /* FOOTER */
+    .page-footer { border-top: 1px solid rgba(255,255,255,0.07); padding: 28px 40px; text-align: center; color: #334155; font-size: 12px; margin-top: 40px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER -->
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <div class="new-badge">New — Gap Identified by Malcolm</div>
+        <h1>UC20 — AI POPIA Compliance Scanner</h1>
+        <p class="doc-subtitle">Compliance Mapping &amp; Gap Analysis &nbsp;|&nbsp; Document 3 of 3</p>
+        <div class="header-meta">
+          <div class="owner-badge">
+            <div class="avatar">MG</div>
+            <div class="owner-info">
+              <div class="owner-name">Malcolm Govender</div>
+              <div class="owner-role">Head of AI &amp; Engineering</div>
+            </div>
+          </div>
+          <div class="meta-pill">Version <span>1.0</span></div>
+          <div class="meta-pill">Date <span>9 May 2026</span></div>
+          <div class="meta-pill">Act <span>POPIA §§ 8–25</span></div>
+        </div>
+      </div>
+      <div class="status-badge">⬤ &nbsp;Not Started — Planning Phase</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- METRICS -->
+  <div class="metrics-row">
+    <div class="metric-card"><div class="metric-val">18</div><div class="metric-label">POPIA Sections Mapped</div></div>
+    <div class="metric-card"><div class="metric-val" style="color:#fbbf24">7</div><div class="metric-label">Gaps Identified</div></div>
+    <div class="metric-card"><div class="metric-val">3</div><div class="metric-label">Regulatory Bodies</div></div>
+    <div class="metric-card"><div class="metric-val">12</div><div class="metric-label">Evidence Artifacts</div></div>
+  </div>
+
+  <!-- SECTION 1: INTRO -->
+  <div class="section-label">Section 01</div>
+  <div class="section-title">Regulatory Context</div>
+  <p class="section-desc">Applicable regulatory frameworks and their relationship to the UC20 scanner.</p>
+
+  <div class="callout">
+    <strong>Note:</strong> This document maps POPIA sections 8–25 (Processing conditions) to implementation approaches within the AI POPIA Compliance Scanner. The scanner both enforces these provisions in scanned codebases AND must itself comply with POPIA in its own operation. Both dimensions are addressed below.
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title"><div class="icon">🇿🇦</div>POPIA</div>
+      <p>Protection of Personal Information Act, No. 4 of 2013. Commenced 1 July 2021. Enforced by the Information Regulator (South Africa). Primary framework for the scanner's detection rules and output reports.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🏦</div>FSCA</div>
+      <p>Financial Sector Conduct Authority. Conduct Standard obligations for financial institutions. Scanner maps FSCA requirements for PII handling, consent in financial products, and customer data retention rules.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">🏛</div>SARB</div>
+      <p>South African Reserve Bank. Guidance Note 5 on operational risk and IT risk. Prudential Standard PA 17. Scanner outputs feed SARB technology risk register and supervisory reporting requirements.</p>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 2: POPIA SECTION MAPPING -->
+  <div class="section-label">Section 02</div>
+  <div class="section-title">POPIA Section-by-Section Mapping (§§ 8–25)</div>
+  <p class="section-desc">Each POPIA processing condition mapped to scanner detection capability, GDPR equivalence, FSCA/SARB requirements and implementation approach.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>POPIA Section</th>
+          <th>Condition / Right</th>
+          <th>Scanner Detection</th>
+          <th>GDPR Equivalent</th>
+          <th>FSCA / SARB Req</th>
+          <th>Implementation Approach</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="highlight">§ 8</td>
+          <td>Accountability — Responsible party must ensure compliance</td>
+          <td>Generates compliance posture report attributable to system owner. Identifies responsible party per CODEOWNERS.</td>
+          <td>Art. 5(2) — Controller accountability</td>
+          <td>FSCA: Board-level accountability for conduct standards</td>
+          <td>Scanner reads CODEOWNERS to attribute findings to accountable team. Report header includes responsible party name.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 9</td>
+          <td>Processing limitation — Lawful, minimised, purpose-limited</td>
+          <td>Detects API endpoints collecting more personal info than declared purpose requires. Flags over-collection.</td>
+          <td>Art. 5(1)(b)(c) — Purpose limitation, data minimisation</td>
+          <td>FSCA: Customer data collected only for declared product purpose</td>
+          <td>AST analysis of request/response schemas vs. declared data processing purpose annotations. Flag unexplained fields.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 10</td>
+          <td>Purpose specification — Explicit, specific purpose before collection</td>
+          <td>Checks for purpose declaration annotations on data collection endpoints. Flags missing @DataPurpose annotations.</td>
+          <td>Art. 5(1)(b) — Purpose limitation</td>
+          <td>FSCA: Product disclosure requirements for data use</td>
+          <td>Custom annotation scanner for @DataPurpose, @CollectionBasis decorators. Config-driven pattern for purpose declaration patterns.</td>
+          <td><span class="tag tag-partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 11</td>
+          <td>Consent — Lawful basis for processing; consent must be voluntary, specific, informed</td>
+          <td>Consent Flow Analyser detects data collection without consent mechanism. Checks for double-opt-in patterns.</td>
+          <td>Art. 6 — Lawfulness of processing; Art. 7 — Conditions for consent</td>
+          <td>FSCA: Informed consent for marketing and profiling</td>
+          <td>Control flow analysis traces user data collection paths. Flags paths where personal info is stored without consent checkpoint. Detects pre-ticked consent boxes.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 12</td>
+          <td>Collection directly from data subject</td>
+          <td>Flags third-party data broker integrations and indirect collection patterns without subject awareness disclosure.</td>
+          <td>Art. 14 — Information where data not obtained from data subject</td>
+          <td>SARB: Third-party data sourcing risk</td>
+          <td>Detects SDK imports and HTTP client calls to known data broker domains. Flags indirect collection patterns in API integrations.</td>
+          <td><span class="tag tag-partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 13</td>
+          <td>Records of processing — Responsible party must maintain records</td>
+          <td>Checks for Record of Processing Activities (ROPA) references in code comments or linked documentation.</td>
+          <td>Art. 30 — Records of processing activities</td>
+          <td>FSCA: Data governance documentation requirements</td>
+          <td>Scanner checks for ROPA annotation in service headers. Data Flow Mapper auto-updates ROPA entries. Flags services with no ROPA reference.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 14</td>
+          <td>Information quality — Personal info must be complete, accurate, up-to-date</td>
+          <td>Detects absence of data validation logic on personal info fields (e.g., SA ID checksum, email format, date ranges).</td>
+          <td>Art. 5(1)(d) — Accuracy</td>
+          <td>FSCA: KYC data quality requirements</td>
+          <td>Static analysis of form validation and model validation logic. Flags personal info fields without appropriate validation rules.</td>
+          <td><span class="tag tag-partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 15</td>
+          <td>Openness — Responsible party must maintain documentation and notify IR</td>
+          <td>Checks for Privacy Policy link in API responses. Verifies IR registration status reference in config.</td>
+          <td>Art. 13/14 — Transparency and privacy notices</td>
+          <td>FSCA: TCF Outcome 4 — product transparency</td>
+          <td>Scans HTTP response headers for Privacy-Policy link. Checks service config for IR registration number. Flags missing transparency artefacts.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 16</td>
+          <td>Notification to data subject — Must notify subject of collection</td>
+          <td>Traces collection flows for presence of notification trigger — email, in-app notice, or SMS dispatch on first collection.</td>
+          <td>Art. 13 — Information to be provided at collection time</td>
+          <td>FSCA: Welcome pack and product disclosure requirements</td>
+          <td>Control flow analysis to detect notification dispatch in collection path. Checks for notification template references in code.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 17</td>
+          <td>Security safeguards — Appropriate technical and organisational measures</td>
+          <td>Detects: hardcoded secrets, unencrypted PII fields, missing field-level encryption, HTTP (non-HTTPS) endpoints handling PII.</td>
+          <td>Art. 25, 32 — Data protection by design, security of processing</td>
+          <td>SARB: IT security controls for supervisory reporting; FSCA: Cybersecurity conduct standards</td>
+          <td>Gitleaks integration for secrets. Schema analyser for unencrypted PII columns. HTTP endpoint detector. TLS certificate validation checks.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 18</td>
+          <td>Notification of security compromises — Must notify IR and data subjects within prescribed period</td>
+          <td>Checks for breach notification workflow in codebase. Validates IR notification endpoint is configured and tested.</td>
+          <td>Art. 33/34 — Notification of personal data breach (72hr to SA, without undue delay to subjects)</td>
+          <td>SARB: Operational incident reporting within 24h; FSCA: Material event reporting</td>
+          <td>Scanner checks for breach detection module, IR API configuration and automated notification trigger. Validates section 22 notification fields are complete.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 19</td>
+          <td>Operator must comply — Third-party processors bound by responsible party obligations</td>
+          <td>Detects third-party SDK integrations and checks for Data Processing Agreement (DPA) references in config or README.</td>
+          <td>Art. 28 — Processor obligations and contracts</td>
+          <td>FSCA: Outsourcing risk management; SARB: Third-party risk</td>
+          <td>Detects known third-party SDKs (analytics, marketing, cloud providers). Checks for DPA configuration reference. Flags integrations without DPA evidence.</td>
+          <td><span class="tag tag-partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 20</td>
+          <td>Retention and restriction — Must not retain beyond purpose; must destroy or de-identify</td>
+          <td>Detects DB schemas and cron jobs. Checks for retention policy annotations and automated purge jobs for PII tables.</td>
+          <td>Art. 5(1)(e) — Storage limitation</td>
+          <td>FSCA: FAIS record retention (5 years); SARB: Banking records retention</td>
+          <td>Schema analyser checks for retention_period column or TTL annotations. Detects absence of scheduled purge jobs for PII tables. Cross-references with declared retention policy.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 21</td>
+          <td>Prohibition on processing of special personal information</td>
+          <td>Flags any processing of special PI (race, religion, health, biometrics, sex life, criminal) without explicit lawful basis or consent.</td>
+          <td>Art. 9 — Processing of special categories of personal data</td>
+          <td>FSCA: Health and biometric data in financial products</td>
+          <td>Extended PII detector with special category entity types. Any match requires lawful basis annotation in code. Automatic escalation to critical severity finding.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 22</td>
+          <td>Notification to Information Regulator of security compromise</td>
+          <td>Validates IR notification module is present, configured and tested. Checks notification payload completeness against § 22(1)(a)–(d).</td>
+          <td>Art. 33 — Notification within 72 hours</td>
+          <td>SARB: Incident reporting PA 17; FSCA: Reportable irregularities</td>
+          <td>Scanner checks for: IR API endpoint config, required notification fields (nature of breach, categories affected, approximate number, contact details, measures taken). Generates section 22 compliant payload template.</td>
+          <td><span class="tag tag-done">Implemented</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 23</td>
+          <td>Access to personal information — Data subject right to access own data</td>
+          <td>Checks for subject access request (SAR) endpoint in API. Detects absence of data export functionality for personal data.</td>
+          <td>Art. 15 — Right of access; Art. 20 — Right to data portability</td>
+          <td>FSCA: Customer data access rights for financial products</td>
+          <td>API route scanner checks for SAR endpoints. Checks for data export format support (JSON, CSV, PDF). Flags missing identity verification before SAR fulfillment.</td>
+          <td><span class="tag tag-partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 24</td>
+          <td>Correction of personal information — Data subject right to rectify</td>
+          <td>Checks for data correction endpoints and audit trail of changes to personal data records.</td>
+          <td>Art. 16 — Right to rectification</td>
+          <td>FSCA: KYC data update obligations</td>
+          <td>Detects PATCH/PUT endpoints on PII models. Checks for change audit log on personal data fields. Flags missing correction acknowledgement workflows.</td>
+          <td><span class="tag tag-partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 25</td>
+          <td>Objection and erasure — Right to object and right to erasure (within POPIA limits)</td>
+          <td>Detects presence of erasure/anonymisation workflow. Checks for right-to-object mechanism on direct marketing processing.</td>
+          <td>Art. 17 — Right to erasure; Art. 21 — Right to object</td>
+          <td>FSCA: Marketing opt-out obligations; SARB: Customer data deletion in banking systems</td>
+          <td>Scanner checks for DELETE endpoints on personal data, anonymisation jobs, and marketing opt-out flags. Validates erasure confirmation email flow. Checks retention overrides for legal hold.</td>
+          <td><span class="tag tag-partial">Partial</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 3: GAP ANALYSIS -->
+  <div class="section-label">Section 03</div>
+  <div class="section-title">Gap Analysis — Current State vs Target State</div>
+  <p class="section-desc">Identified gaps between current detection capabilities and full compliance coverage.</p>
+
+  <div class="callout callout-warn">
+    <strong>Gap Analysis Basis:</strong> Current state represents the scanner capabilities as designed at planning phase (UC20 v1.0). Target state represents full compliance with POPIA processing conditions and Information Regulator expectations. Gaps will be resolved during the 8h AI-assisted development sprint.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Gap ID</th>
+          <th>POPIA Section</th>
+          <th>Current State</th>
+          <th>Target State</th>
+          <th>Gap Description</th>
+          <th>Priority</th>
+          <th>Remediation Approach</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="highlight">GAP-001</td>
+          <td>§ 10 Purpose Specification</td>
+          <td>Scanner checks for @DataPurpose annotations only</td>
+          <td>Detect all purpose specification patterns across Python/TS codebases</td>
+          <td>No support for JSDoc @purpose tags, OpenAPI extensions, or inline comment-based purpose declarations. Only custom annotation supported.</td>
+          <td><span class="tag tag-gap">High</span></td>
+          <td>Extend pattern library to cover JSDoc, OpenAPI x-data-purpose extension, and inline comment regex. Add TS AST parser for decorator patterns.</td>
+        </tr>
+        <tr>
+          <td class="highlight">GAP-002</td>
+          <td>§ 12 Indirect Collection</td>
+          <td>Detects known data broker SDK domains</td>
+          <td>Full third-party data flow tracing with provenance</td>
+          <td>Domain allow/block list must be manually maintained. No automatic detection of novel or unlisted data brokers. No cross-service data lineage tracing.</td>
+          <td><span class="tag tag-gap">High</span></td>
+          <td>Integrate with network policy analysis. Add ML classifier for novel data broker API patterns. Implement cross-service data lineage via OpenTelemetry trace analysis.</td>
+        </tr>
+        <tr>
+          <td class="highlight">GAP-003</td>
+          <td>§ 14 Information Quality</td>
+          <td>Detects presence/absence of validation decorators</td>
+          <td>Validate correctness of validation logic (e.g., SA ID checksum algorithm)</td>
+          <td>Scanner flags missing validation but cannot verify that the validation logic is correct (e.g., a field has @Validates but the validator is a no-op or incorrect implementation).</td>
+          <td><span class="tag tag-partial">Medium</span></td>
+          <td>Add symbolic execution for common validation functions. Unit test validator correctness with SA-specific test vectors. Flag validators with 0% code coverage in test reports.</td>
+        </tr>
+        <tr>
+          <td class="highlight">GAP-004</td>
+          <td>§ 19 Operator / DPA</td>
+          <td>Flags integrations without DPA config reference</td>
+          <td>Verify DPA is current, signed and covers actual processing activities</td>
+          <td>Scanner cannot verify that a referenced DPA document actually exists, is signed, covers the relevant processing activities or has not expired. Reference only — no document validation.</td>
+          <td><span class="tag tag-partial">Medium</span></td>
+          <td>Integrate with document management system (SharePoint/Confluence) to verify DPA document existence and expiry date. Add DPA validity check to report.</td>
+        </tr>
+        <tr>
+          <td class="highlight">GAP-005</td>
+          <td>§ 23 Data Subject Access</td>
+          <td>Detects SAR endpoint presence</td>
+          <td>Verify SAR response completeness and identity verification strength</td>
+          <td>Scanner confirms a /sar or /data-access endpoint exists but cannot verify that the response is complete (covers all PII held), delivered within the 30-day period, or that identity verification is sufficiently robust.</td>
+          <td><span class="tag tag-gap">High</span></td>
+          <td>Add SAR response schema validation. Check for response deadline tracking mechanism. Verify identity verification strength (MFA required for SAR fulfillment).</td>
+        </tr>
+        <tr>
+          <td class="highlight">GAP-006</td>
+          <td>§ 24 Correction Right</td>
+          <td>Detects PATCH/PUT on PII models</td>
+          <td>Verify correction propagation to downstream systems and third parties</td>
+          <td>Scanner detects correction endpoints but cannot verify that corrections are propagated to all downstream systems, third-party processors and partner integrations that hold copies of the personal information.</td>
+          <td><span class="tag tag-partial">Medium</span></td>
+          <td>Trace data flow from correction endpoint through all downstream event publishers. Check for correction propagation events in message queues. Flag orphaned data copies.</td>
+        </tr>
+        <tr>
+          <td class="highlight">GAP-007</td>
+          <td>§ 25 Erasure / Right to Object</td>
+          <td>Detects DELETE endpoints and anonymisation jobs</td>
+          <td>Verify cascading erasure across all data stores including backups</td>
+          <td>Scanner confirms erasure endpoint exists but cannot verify that the erasure cascades to: read replicas, data warehouses, backups, analytics stores, and third-party copies held by operators/partners.</td>
+          <td><span class="tag tag-gap">High</span></td>
+          <td>Implement data store inventory from infrastructure-as-code (Terraform/Bicep). Cross-check erasure job against all known data stores. Flag data stores not covered by erasure procedure.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 4: DATA SUBJECT RIGHTS CHECKLIST -->
+  <div class="section-label">Section 04</div>
+  <div class="section-title">Data Subject Rights Implementation Checklist</div>
+  <p class="section-desc">Implementation status of all POPIA data subject rights as detected by the scanner.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon">👤</div>Rights Detection Checklist</div>
+      <ul class="checklist">
+        <li>
+          <span class="check-done">✓</span>
+          <div class="check-label">
+            Right to be notified — § 16 collection notification<br>
+            <span class="check-ref">Scanner: Detects notification dispatch in collection flow</span>
+          </div>
+        </li>
+        <li>
+          <span class="check-done">✓</span>
+          <div class="check-label">
+            Right of access — § 23 SAR endpoint<br>
+            <span class="check-ref">Scanner: API route analysis for /sar, /data-access, /my-data patterns</span>
+          </div>
+        </li>
+        <li>
+          <span class="check-partial">~</span>
+          <div class="check-label">
+            Right to correction — § 24 data rectification<br>
+            <span class="check-ref">Scanner: Detects endpoint; cannot verify propagation (GAP-006)</span>
+          </div>
+        </li>
+        <li>
+          <span class="check-partial">~</span>
+          <div class="check-label">
+            Right to erasure / deletion — § 25<br>
+            <span class="check-ref">Scanner: Detects DELETE endpoint; backup cascade gap (GAP-007)</span>
+          </div>
+        </li>
+        <li>
+          <span class="check-done">✓</span>
+          <div class="check-label">
+            Right to object to processing — § 25 opt-out<br>
+            <span class="check-ref">Scanner: Checks for marketing opt-out mechanism and processing objection flow</span>
+          </div>
+        </li>
+        <li>
+          <span class="check-done">✓</span>
+          <div class="check-label">
+            Right to withdraw consent — § 11(3)<br>
+            <span class="check-ref">Scanner: Consent withdrawal mechanism detection in consent flows</span>
+          </div>
+        </li>
+        <li>
+          <span class="check-done">✓</span>
+          <div class="check-label">
+            Right not to be subject to automated decision-making — § 71<br>
+            <span class="check-ref">Scanner: Flags ML model inference on personal data without human review option</span>
+          </div>
+        </li>
+        <li>
+          <span class="check-partial">~</span>
+          <div class="check-label">
+            Right to data portability — § 23 (GDPR-adjacent)<br>
+            <span class="check-ref">Scanner: Checks for export endpoint; format validation partial (GAP-005)</span>
+          </div>
+        </li>
+        <li>
+          <span class="check-done">✓</span>
+          <div class="check-label">
+            Right to complain to Information Regulator — § 74<br>
+            <span class="check-ref">Scanner: Checks privacy policy for IR contact details and complaint pathway</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">📊</div>Rights Coverage Summary</div>
+      <p style="margin-bottom:16px">Scanner detection coverage across all POPIA data subject rights.</p>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#94a3b8">Fully detected</span><span style="font-size:12px;color:#2dd4bf;font-weight:600">6 / 9 rights</span></div>
+        <div style="background:#0f172a;border-radius:4px;height:8px;overflow:hidden"><div style="width:66%;height:100%;background:linear-gradient(90deg,#2dd4bf,#0d9488)"></div></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#94a3b8">Partial detection</span><span style="font-size:12px;color:#fbbf24;font-weight:600">3 / 9 rights</span></div>
+        <div style="background:#0f172a;border-radius:4px;height:8px;overflow:hidden"><div style="width:33%;height:100%;background:linear-gradient(90deg,#fbbf24,#d97706)"></div></div>
+      </div>
+      <div style="margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#94a3b8">Not detected</span><span style="font-size:12px;color:#f87171;font-weight:600">0 / 9 rights</span></div>
+        <div style="background:#0f172a;border-radius:4px;height:8px;overflow:hidden"><div style="width:0%;height:100%;background:#f87171"></div></div>
+      </div>
+      <div style="background:#0f172a;border-radius:8px;padding:14px;border:1px solid rgba(255,255,255,0.05)">
+        <p style="font-size:12px;color:#64748b;margin-bottom:6px">Post-gap-remediation target (v2.0)</p>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#94a3b8">Full detection target</span><span style="font-size:12px;color:#2dd4bf;font-weight:600">9 / 9 rights</span></div>
+        <div style="background:#1e293b;border-radius:4px;height:8px;overflow:hidden"><div style="width:100%;height:100%;background:linear-gradient(90deg,#818cf8,#2dd4bf)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 5: IR NOTIFICATION REQUIREMENTS -->
+  <div class="section-label">Section 05</div>
+  <div class="section-title">Information Regulator Notification Requirements</div>
+  <p class="section-desc">Section 22 breach notification implementation within the scanner system.</p>
+
+  <div class="callout">
+    <strong>Section 22 Obligation:</strong> A responsible party who reasonably believes that the personal information of a data subject has been accessed or acquired by any unauthorised person must notify the Information Regulator and the data subject, unless a public body responsible for detection, prevention or investigation of offences directs that notification must be delayed.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>§ 22 Requirement</th><th>Prescribed Content</th><th>Scanner Implementation</th><th>Auto-populated?</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="highlight">§ 22(1)(a)</td>
+          <td>Description of the possible consequences of the security compromise</td>
+          <td>Scanner maps finding type to consequence library. Auto-generates consequence description from PII categories exposed.</td>
+          <td><span class="tag tag-done">Yes</span></td>
+          <td><span class="tag tag-done">Ready</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 22(1)(b)</td>
+          <td>Description of the measures taken or proposed to be taken by responsible party</td>
+          <td>Remediation ticket summary auto-included. Links to Jira tickets created during scan. Includes architectural mitigations from report.</td>
+          <td><span class="tag tag-done">Yes</span></td>
+          <td><span class="tag tag-done">Ready</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 22(1)(c)</td>
+          <td>Recommendation of measures to be taken by data subjects to mitigate the effects</td>
+          <td>Configurable recommendation templates per PII category (e.g., SA ID exposure → credit bureau alert, bank account → card replacement guidance).</td>
+          <td><span class="tag tag-partial">Semi</span></td>
+          <td><span class="tag tag-partial">Partial</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 22(1)(d)</td>
+          <td>If known, identity of the unauthorised person who may have accessed or acquired information</td>
+          <td>Scanner cannot auto-detect perpetrator identity. Field left blank with prompt for manual completion by DPO before submission.</td>
+          <td><span class="tag tag-gap">No — Manual</span></td>
+          <td><span class="tag tag-partial">Manual Field</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 22(3)</td>
+          <td>Notification must be in writing</td>
+          <td>Generated notification payload is a signed JSON document and PDF. Both provided to DPO for IR submission via secure channel.</td>
+          <td><span class="tag tag-done">Yes</span></td>
+          <td><span class="tag tag-done">Ready</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 22 Timing</td>
+          <td>As soon as reasonably possible after discovery — IR guidance: within 72 hours</td>
+          <td>Scanner auto-triggers notification workflow on critical finding detection. Sends DPO alert immediately. Tracks 72h countdown from finding timestamp.</td>
+          <td><span class="tag tag-done">Yes</span></td>
+          <td><span class="tag tag-done">Ready</span></td>
+        </tr>
+        <tr>
+          <td class="highlight">§ 22 Record</td>
+          <td>Responsible party must keep record of all security compromises</td>
+          <td>All notifications stored in WORM evidence store with timestamp, delivery receipt, IR reference number and DPO acknowledgement.</td>
+          <td><span class="tag tag-done">Yes</span></td>
+          <td><span class="tag tag-done">Ready</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 6: EVIDENCE ARTIFACTS -->
+  <div class="section-label">Section 06</div>
+  <div class="section-title">Compliance Evidence Artifacts</div>
+  <p class="section-desc">Artifacts produced by the scanner to constitute the compliance evidence pack.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon">📦</div>Auto-generated Evidence Artifacts</div>
+      <ul class="evidence-list">
+        <li>
+          <div class="ev-icon">📊</div>
+          <div>
+            <div class="ev-name">POPIA Gap Report (HTML/PDF)</div>
+            <div class="ev-desc">Per-scan findings report with POPIA section references, severity, responsible team and remediation guidance. Signed and archived to evidence store on each scan.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">🗺</div>
+          <div>
+            <div class="ev-name">Living Data Flow Diagram (SVG/JSON)</div>
+            <div class="ev-desc">Auto-updated DFD showing PII flows through all microservices. Versioned per scan. Aligned to IR DFD format requirements. Exportable as PDF for regulatory submission.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">📋</div>
+          <div>
+            <div class="ev-name">Record of Processing Activities (ROPA)</div>
+            <div class="ev-desc">Auto-updated ROPA derived from code-level data annotations. Includes: purpose, lawful basis, categories of data subjects, recipients, retention periods. GDPR Art. 30 aligned.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">📝</div>
+          <div>
+            <div class="ev-name">Scan Audit Log</div>
+            <div class="ev-desc">Immutable log of every scan invocation: who triggered, repo, branch, timestamp, findings count by severity, report download events. Retained 3 years per § 55.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">🎫</div>
+          <div>
+            <div class="ev-name">Jira Remediation Ticket Export</div>
+            <div class="ev-desc">Snapshot of all auto-created remediation tickets with status, assignee, due date and resolution notes. Demonstrates corrective action management to IR.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">🏛</div>
+          <div>
+            <div class="ev-name">Section 22 Notification Record</div>
+            <div class="ev-desc">Complete record of all breach notifications: draft, sent copy, IR delivery receipt, 72h timer, DPO sign-off. Retained 5 years for regulatory purposes.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">📁</div>Manual Evidence Artifacts (DPO Maintained)</div>
+      <ul class="evidence-list">
+        <li>
+          <div class="ev-icon">📜</div>
+          <div>
+            <div class="ev-name">Information Regulator Registration</div>
+            <div class="ev-desc">IR registration certificate as responsible party. Reference number referenced in scanner config. Annual renewal tracked.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">🤝</div>
+          <div>
+            <div class="ev-name">Data Processing Agreements (DPAs)</div>
+            <div class="ev-desc">Signed DPAs with all third-party processors identified by scanner. DPA reference linked in scanner config per integration. Expiry date monitored.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">👔</div>
+          <div>
+            <div class="ev-name">DPO Appointment Record</div>
+            <div class="ev-desc">Formal DPO appointment documentation. DPO contact details referenced in all scanner-generated notifications. IR notification of appointment.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">📚</div>
+          <div>
+            <div class="ev-name">POPIA Training Records</div>
+            <div class="ev-desc">Developer POPIA awareness training completion records. Required before scan result access is granted. Completion verified by IdP role assignment.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">🔍</div>
+          <div>
+            <div class="ev-name">Annual Compliance Self-Assessment</div>
+            <div class="ev-desc">Annual review of scanner effectiveness against POPIA processing conditions. Produced by DPO using scanner trend data. Submitted to Board Risk Committee.</div>
+          </div>
+        </li>
+        <li>
+          <div class="ev-icon">📊</div>
+          <div>
+            <div class="ev-name">FSCA / SARB Regulatory Submissions</div>
+            <div class="ev-desc">Quarterly compliance posture exports in FSCA and SARB prescribed formats. Derived from scanner aggregate data. Reviewed and signed by Malcolm Govender before submission.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 7: FSCA / SARB REQUIREMENTS -->
+  <div class="section-label">Section 07</div>
+  <div class="section-title">FSCA &amp; SARB Requirements Mapping</div>
+  <p class="section-desc">Specific FSCA and SARB obligations addressed by the scanner beyond base POPIA requirements.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Regulator</th><th>Requirement</th><th>Reference</th><th>Scanner Coverage</th><th>Output</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="highlight">FSCA</td>
+          <td>Treating Customers Fairly (TCF) — Outcome 4: Suitable advice, transparent communications</td>
+          <td>FSCA Conduct Standard 2020/1</td>
+          <td>Scanner checks for PII used in profiling/scoring without transparency disclosure. Flags missing data use explanations in customer-facing APIs.</td>
+          <td>TCF Outcome 4 Compliance Section in gap report</td>
+        </tr>
+        <tr>
+          <td class="highlight">FSCA</td>
+          <td>FAIS record retention — 5 years for financial advice records</td>
+          <td>FAIS Act § 18; Board Notice 80 of 2003</td>
+          <td>Scanner checks retention annotations on financial advice data models. Flags any retention period below 5 years for FAIS-classified records.</td>
+          <td>Retention compliance table in gap report</td>
+        </tr>
+        <tr>
+          <td class="highlight">FSCA</td>
+          <td>Cybersecurity — Minimum cybersecurity controls for FSPs</td>
+          <td>FSCA Guidance Note 1 of 2021</td>
+          <td>Scanner detects: missing encryption, hardcoded credentials, unpatched dependency references (via SBOM diff). Maps to FSCA minimum controls checklist.</td>
+          <td>FSCA Cybersecurity Checklist Appendix</td>
+        </tr>
+        <tr>
+          <td class="highlight">SARB</td>
+          <td>Operational Risk — IT risk management and reporting</td>
+          <td>SARB Guidance Note 5; BA 300 returns</td>
+          <td>Scanner finding severity mapped to SARB IT risk taxonomy (Availability, Integrity, Confidentiality). Aggregate risk scores exported for BA 300 return population.</td>
+          <td>SARB IT Risk Register Export (CSV/JSON)</td>
+        </tr>
+        <tr>
+          <td class="highlight">SARB</td>
+          <td>Incident reporting — Material operational incidents within 24h</td>
+          <td>SARB Prudential Standard PA 17</td>
+          <td>Critical scanner findings trigger immediate DPO and CTO alert. Incident management integration creates PA 17 notification draft within 1h of critical finding.</td>
+          <td>PA 17 Notification Draft in evidence store</td>
+        </tr>
+        <tr>
+          <td class="highlight">SARB</td>
+          <td>Third-party risk — Outsourcing to cloud / technology providers</td>
+          <td>SARB Guidance Note 4 on Outsourcing</td>
+          <td>Scanner identifies cloud provider integrations and checks for SARB-required controls: data residency (SA), exit planning, audit rights provisions in contracts.</td>
+          <td>Third-party Risk Annex in gap report</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  UC20 — AI POPIA Compliance Scanner &nbsp;|&nbsp; Compliance Mapping &nbsp;|&nbsp; Owner: Malcolm Govender — Head of AI &amp; Engineering &nbsp;|&nbsp; Classification: Internal — Confidential &nbsp;|&nbsp; v1.0 — 9 May 2026
+</div>
+
+</body>
+</html>

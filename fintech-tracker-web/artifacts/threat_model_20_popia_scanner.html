@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UC20 — AI POPIA Compliance Scanner | Threat Model</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      line-height: 1.6;
+    }
+
+    /* HEADER */
+    .page-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%);
+      border-bottom: 1px solid rgba(129,140,248,0.3);
+      padding: 48px 40px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(248,113,113,0.06) 0%, transparent 70%);
+    }
+    .header-inner { max-width: 1100px; margin: 0 auto; }
+    .header-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
+    .new-badge {
+      background: linear-gradient(90deg, #818cf8, #a78bfa);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+    .status-badge {
+      background: rgba(245,158,11,0.15);
+      border: 1px solid rgba(245,158,11,0.4);
+      color: #fbbf24;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .page-header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e2e8f0 0%, #f87171 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .page-header .doc-subtitle { font-size: 1rem; color: #94a3b8; margin-bottom: 24px; }
+    .header-meta { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .owner-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(30,41,59,0.8);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 8px;
+      padding: 8px 14px;
+    }
+    .avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #818cf8, #a78bfa);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+    }
+    .owner-info { font-size: 12px; }
+    .owner-name { font-weight: 600; color: #e2e8f0; }
+    .owner-role { color: #64748b; }
+    .meta-pill {
+      background: rgba(30,41,59,0.6);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: #94a3b8;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+    .meta-pill span { color: #818cf8; font-weight: 600; }
+
+    /* LAYOUT */
+    .content { max-width: 1100px; margin: 0 auto; padding: 40px; }
+
+    /* SECTIONS */
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #f87171; margin-bottom: 6px; }
+    .section-title { font-size: 1.5rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+    .section-desc { color: #64748b; font-size: 0.9rem; margin-bottom: 28px; }
+    .section-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 48px 0; }
+
+    /* CARDS */
+    .card { background: #1e293b; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    .card-title { font-size: 1rem; font-weight: 700; color: #a78bfa; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .card-title .icon { width: 28px; height: 28px; background: rgba(167,139,250,0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .card p { color: #94a3b8; font-size: 0.88rem; }
+
+    /* GRID */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    @media(max-width:768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* TABLES */
+    .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: rgba(248,113,113,0.08); }
+    th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #f87171; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    td { padding: 12px 16px; font-size: 0.85rem; color: #94a3b8; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    tbody tr:last-child td { border-bottom: none; }
+    td.highlight { color: #e2e8f0; font-weight: 600; }
+    td.teal { color: #2dd4bf; font-weight: 600; }
+    td.violet { color: #a78bfa; }
+    td.red { color: #f87171; }
+
+    /* TAGS */
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin: 2px 2px 2px 0; }
+    .tag-critical { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .tag-high { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+    .tag-medium { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
+    .tag-low { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+    .tag-teal { background: rgba(45,212,191,0.1); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.25); }
+    .tag-violet { background: rgba(167,139,250,0.1); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+
+    /* METRICS */
+    .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    @media(max-width:768px) { .metrics-row { grid-template-columns: 1fr 1fr; } }
+    .metric-card { background: #1e293b; border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 20px; text-align: center; }
+    .metric-val { font-size: 2rem; font-weight: 700; }
+    .metric-val.red { color: #f87171; }
+    .metric-val.orange { color: #fb923c; }
+    .metric-val.teal { color: #2dd4bf; }
+    .metric-val.violet { color: #a78bfa; }
+    .metric-label { font-size: 11px; color: #64748b; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* CALLOUT */
+    .callout { border-left: 3px solid #f87171; background: rgba(248,113,113,0.06); border-radius: 0 8px 8px 0; padding: 14px 20px; margin-bottom: 20px; font-size: 0.88rem; color: #94a3b8; }
+    .callout strong { color: #f87171; }
+
+    /* TRUST BOUNDARY */
+    .trust-diagram {
+      background: #0f172a;
+      border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 12px;
+      padding: 28px;
+      font-family: 'Courier New', monospace;
+      font-size: 12.5px;
+      color: #94a3b8;
+      line-height: 1.9;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    .trust-diagram .boundary { color: #f87171; font-weight: 700; }
+    .trust-diagram .trusted { color: #2dd4bf; }
+    .trust-diagram .untrusted { color: #fb923c; }
+    .trust-diagram .note { color: #475569; font-size: 11px; }
+
+    /* SEVERITY MATRIX */
+    .matrix { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 16px 0; }
+    .matrix-cell { padding: 10px 6px; text-align: center; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .m-critical { background: rgba(239,68,68,0.4); color: #fca5a5; }
+    .m-high { background: rgba(249,115,22,0.35); color: #fdba74; }
+    .m-medium { background: rgba(234,179,8,0.25); color: #fde047; }
+    .m-low { background: rgba(34,197,94,0.15); color: #86efac; }
+    .m-info { background: rgba(129,140,248,0.1); color: #a5b4fc; }
+    .matrix-axis { background: rgba(255,255,255,0.05); color: #64748b; font-size: 10px; }
+
+    /* LIST */
+    ul.styled { list-style: none; padding: 0; }
+    ul.styled li { padding: 6px 0; color: #94a3b8; font-size: 0.88rem; padding-left: 18px; position: relative; }
+    ul.styled li::before { content: '▸'; position: absolute; left: 0; color: #f87171; }
+
+    /* FOOTER */
+    .page-footer { border-top: 1px solid rgba(255,255,255,0.07); padding: 28px 40px; text-align: center; color: #334155; font-size: 12px; margin-top: 40px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER -->
+<div class="page-header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <div class="new-badge">New — Gap Identified by Malcolm</div>
+        <h1>UC20 — AI POPIA Compliance Scanner</h1>
+        <p class="doc-subtitle">Threat Model &amp; Security Risk Assessment &nbsp;|&nbsp; Document 2 of 3</p>
+        <div class="header-meta">
+          <div class="owner-badge">
+            <div class="avatar">MG</div>
+            <div class="owner-info">
+              <div class="owner-name">Malcolm Govender</div>
+              <div class="owner-role">Head of AI &amp; Engineering</div>
+            </div>
+          </div>
+          <div class="meta-pill">Version <span>1.0</span></div>
+          <div class="meta-pill">Date <span>9 May 2026</span></div>
+          <div class="meta-pill">Framework <span>STRIDE + CVSS 3.1</span></div>
+        </div>
+      </div>
+      <div class="status-badge">⬤ &nbsp;Not Started — Planning Phase</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- METRICS -->
+  <div class="metrics-row">
+    <div class="metric-card"><div class="metric-val red">4</div><div class="metric-label">Critical Threats</div></div>
+    <div class="metric-card"><div class="metric-val orange">8</div><div class="metric-label">High Threats</div></div>
+    <div class="metric-card"><div class="metric-val violet">6</div><div class="metric-label">Medium Threats</div></div>
+    <div class="metric-card"><div class="metric-val teal">3</div><div class="metric-label">Low Threats</div></div>
+  </div>
+
+  <!-- SECTION 1: SCOPE -->
+  <div class="section-label">Section 01</div>
+  <div class="section-title">Threat Model Scope &amp; Methodology</div>
+  <p class="section-desc">Scope, assumptions and threat modelling approach.</p>
+
+  <div class="callout">
+    <strong>Important:</strong> This threat model covers the POPIA Scanner system itself — the scanner that analyses source code for compliance issues. The scanner has privileged read access to source repositories and processes potentially sensitive data schemas, making it a high-value target that must be secured to the same standard it enforces.
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="icon">🎯</div>Scope</div>
+      <p>Scanner Engine API, PII Detector, Consent Analyser, Data Flow Mapper, Report Generator, CI/CD Integration Layer, evidence store, Jira integration, IR notification endpoint, and all trust boundaries between components.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">📐</div>Methodology</div>
+      <p>STRIDE threat categorisation applied per component. CVSS 3.1 base score calculated for each threat. Risk register maintained with residual risk after mitigation. Reviewed against OWASP Top 10 and NIST SP 800-30.</p>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 2: TRUST BOUNDARIES -->
+  <div class="section-label">Section 02</div>
+  <div class="section-title">Trust Boundaries Diagram</div>
+  <p class="section-desc">Trust zones and data flows across system boundaries.</p>
+
+  <div class="trust-diagram">
+<span class="boundary">╔═══════════════════════════════════════════════════════════════════════════╗</span>
+<span class="boundary">║  TRUST ZONE 0 — UNTRUSTED EXTERNAL  (Internet / Third-Party Systems)    ║</span>
+<span class="boundary">╚═══════════════════════════════════════════════════════════════════════════╝</span>
+  <span class="untrusted">[ GitHub / Azure DevOps ]</span>     <span class="untrusted">[ Jira Cloud ]</span>     <span class="untrusted">[ Info Regulator API ]</span>
+          │                           │                      │
+          │  ◄── TLS 1.3 + JWT ──────►│◄── TLS + OAuth2 ────►│
+          │                           │                      │
+<span class="boundary">┌─────────────────────────────────────────────────────────────────────────┐</span>
+<span class="boundary">│  TRUST ZONE 1 — DMZ / API GATEWAY  (WAF + Rate Limiting + mTLS)        │</span>
+<span class="boundary">└─────────────────────────────────────────────────────────────────────────┘</span>
+              <span class="trusted">[ FastAPI Gateway ]</span>  ◄── <span class="note">JWT RS256 validation, RBAC enforcement</span>
+                      │
+          ┌───────────▼───────────┐
+<span class="boundary">┌─────────────────────────────────────────────────────────────────────────┐</span>
+<span class="boundary">│  TRUST ZONE 2 — SCANNER NAMESPACE  (K8s NetworkPolicy, PodSecurityCtx) │</span>
+<span class="boundary">└─────────────────────────────────────────────────────────────────────────┘</span>
+   <span class="trusted">[ Scanner Engine ]</span> ──► <span class="trusted">[ PII Detector ]</span>
+          │                    │
+          ▼                    ▼
+   <span class="trusted">[ Consent Analyser ]</span>    <span class="trusted">[ Data Flow Mapper ]</span>
+          │
+          ▼
+<span class="boundary">┌─────────────────────────────────────────────────────────────────────────┐</span>
+<span class="boundary">│  TRUST ZONE 3 — DATA STORE  (Encrypted, Access-Logged, Immutable)      │</span>
+<span class="boundary">└─────────────────────────────────────────────────────────────────────────┘</span>
+   <span class="trusted">[ Evidence Store ]</span>    <span class="trusted">[ Audit Log (immutable) ]</span>    <span class="trusted">[ Report Archive ]</span>
+
+<span class="note">  ◄─── Arrows indicate data flow direction | All cross-zone flows require explicit allow-list</span>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 3: STRIDE ANALYSIS -->
+  <div class="section-label">Section 03</div>
+  <div class="section-title">STRIDE Threat Analysis</div>
+  <p class="section-desc">Full STRIDE analysis applied to each component of the POPIA Scanner system.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>STRIDE Category</th>
+          <th>Component</th>
+          <th>Threat Description</th>
+          <th>CVSS 3.1</th>
+          <th>Severity</th>
+          <th>Mitigation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- SPOOFING -->
+        <tr>
+          <td class="highlight">TM-001</td>
+          <td class="red"><strong>Spoofing</strong></td>
+          <td>API Gateway</td>
+          <td>Attacker forges JWT token to impersonate a privileged Compliance Officer account and exfiltrate all scan reports containing sensitive schema metadata.</td>
+          <td><span class="tag tag-critical">9.1</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td>RS256 JWT with short TTL (15min), IdP token validation, refresh token rotation, anomaly detection on access patterns.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-002</td>
+          <td class="red"><strong>Spoofing</strong></td>
+          <td>CI/CD Integration</td>
+          <td>Malicious GitHub Actions workflow spoofs the POPIA scanner action, injecting a backdoored scanner that suppresses findings or exfiltrates source code.</td>
+          <td><span class="tag tag-high">8.2</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Pin action to SHA hash (not tag), Cosign signature verification, OIDC token for action identity, branch protection rules.</td>
+        </tr>
+        <!-- TAMPERING -->
+        <tr>
+          <td class="highlight">TM-003</td>
+          <td class="violet"><strong>Tampering</strong></td>
+          <td>Scanner Engine</td>
+          <td>Attacker with write access to scanner config tampers with PII detection patterns to exclude SA ID numbers or bank account patterns from detection, creating compliance blind spots.</td>
+          <td><span class="tag tag-critical">9.3</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td>Config stored in signed, immutable ConfigMaps. Config changes require dual approval. HMAC integrity check on pattern files at load time. Audit log all config changes.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-004</td>
+          <td class="violet"><strong>Tampering</strong></td>
+          <td>Evidence Store</td>
+          <td>Post-scan report tampering to remove critical findings before regulatory submission — creating a falsified compliance record.</td>
+          <td><span class="tag tag-critical">9.8</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td>Reports content-addressed (SHA-256 hash). Evidence store write-once WORM policy. S3 Object Lock / Azure Immutable Blob Storage. Independent hash verification before IR submission.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-005</td>
+          <td class="violet"><strong>Tampering</strong></td>
+          <td>Jira Integration</td>
+          <td>Attacker intercepts Jira API call to downgrade severity of automatically-created remediation tickets, delaying compliance fixes.</td>
+          <td><span class="tag tag-medium">6.1</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td>mTLS for Jira API calls. Ticket severity derived from immutable findings manifest. Jira webhook verification for any severity changes. Compliance Officer notification on ticket modification.</td>
+        </tr>
+        <!-- REPUDIATION -->
+        <tr>
+          <td class="highlight">TM-006</td>
+          <td><strong style="color:#818cf8">Repudiation</strong></td>
+          <td>Audit Trail</td>
+          <td>Developer denies initiating a scan that exposed a compliance gap, or Compliance Officer denies acknowledging a critical finding — no non-repudiation mechanism in place.</td>
+          <td><span class="tag tag-high">7.5</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Immutable audit log (Azure Monitor / CloudWatch) with user identity from IdP. Digital signatures on report acknowledgement actions. SIEM alert on audit log deletion attempts.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-007</td>
+          <td><strong style="color:#818cf8">Repudiation</strong></td>
+          <td>IR Notification</td>
+          <td>Organisation denies having sent (or not sent) a section 22 breach notification to the Information Regulator — no timestamped delivery receipt.</td>
+          <td><span class="tag tag-high">8.0</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Signed notification payloads. Store IR API response with timestamp and status code. Notification attempt logged to immutable audit trail. Email confirmation to DPO on send.</td>
+        </tr>
+        <!-- INFORMATION DISCLOSURE -->
+        <tr>
+          <td class="highlight">TM-008</td>
+          <td><span class="tag tag-critical">Info Disclosure</span></td>
+          <td>PII Detector</td>
+          <td>PII detector logs raw matched strings (SA ID, bank account numbers) to application logs during debugging, creating a secondary exposure of the very PII it was scanning for.</td>
+          <td><span class="tag tag-critical">9.6</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td>Structured logging with explicit PII redaction layer. Log level enforcement (never DEBUG in prod). Log scanning on egress. Automated test to assert no PII appears in log output.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-009</td>
+          <td><span class="tag tag-critical">Info Disclosure</span></td>
+          <td>Report Generator</td>
+          <td>Generated reports include raw code snippets containing actual PII values (e.g., sample data in unit tests) — report becomes a PII disclosure document.</td>
+          <td><span class="tag tag-high">8.4</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Reports include only: file path, line number, pattern type, confidence score — never raw matched text. Masking enforced at findings aggregator layer. Report content review checklist.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-010</td>
+          <td><span class="tag tag-critical">Info Disclosure</span></td>
+          <td>API Gateway</td>
+          <td>Verbose API error messages expose internal system architecture, database schema names, or file system paths — enabling targeted attacks.</td>
+          <td><span class="tag tag-medium">5.3</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td>Generic error responses to clients. Full error details logged server-side only. Custom exception handler strips internal context. WAF blocks response containing internal IP/path patterns.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-011</td>
+          <td><span class="tag tag-critical">Info Disclosure</span></td>
+          <td>Git Clone</td>
+          <td>Source code cloned for scanning contains .env files or hardcoded secrets — scanner worker has read access to secrets not relevant to POPIA compliance.</td>
+          <td><span class="tag tag-high">7.8</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Scanner pod has no internet egress. Secrets detected are reported as findings but never stored. Gitleaks integrated as pre-processing step. Pod filesystem wiped on completion.</td>
+        </tr>
+        <!-- DENIAL OF SERVICE -->
+        <tr>
+          <td class="highlight">TM-012</td>
+          <td><strong style="color:#fb923c">Denial of Service</strong></td>
+          <td>Scanner Engine</td>
+          <td>Attacker submits scan job against a repository with millions of files, exhausting scanner compute/memory resources and blocking legitimate compliance scans.</td>
+          <td><span class="tag tag-high">7.5</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Scan job resource limits (CPU/memory via K8s ResourceQuota). Max file count and repo size enforced pre-clone. Rate limiting on /api/v1/scan endpoint. Queue depth monitoring with alert.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-013</td>
+          <td><strong style="color:#fb923c">Denial of Service</strong></td>
+          <td>Report Generator</td>
+          <td>ReDoS attack — maliciously crafted source code with pathological regex backtracking patterns causes PII detection regex engine to hang indefinitely.</td>
+          <td><span class="tag tag-medium">6.5</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td>Timeout wrapper around all regex operations (5s max per file). Use linear-time regex engine (Google RE2 via Python). Fuzz testing of regex patterns in CI pipeline.</td>
+        </tr>
+        <!-- ELEVATION OF PRIVILEGE -->
+        <tr>
+          <td class="highlight">TM-014</td>
+          <td><strong style="color:#a78bfa">Elevation of Privilege</strong></td>
+          <td>K8s Deployment</td>
+          <td>Scanner pod escapes container namespace due to misconfigured securityContext (e.g., running as root, privileged:true), gaining node-level access to all namespaces.</td>
+          <td><span class="tag tag-critical">9.0</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td>PodSecurityContext: runAsNonRoot, readOnlyRootFilesystem, drop ALL capabilities. OPA Gatekeeper policy enforcement. Regular K8s CIS benchmark scan. No privileged pods allowed in scanner namespace.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-015</td>
+          <td><strong style="color:#a78bfa">Elevation of Privilege</strong></td>
+          <td>API Gateway</td>
+          <td>Insecure direct object reference (IDOR) on /api/v1/scan/{scan_id} — Developer can access scan results from other teams by enumerating scan IDs.</td>
+          <td><span class="tag tag-high">7.6</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Scan IDs are UUIDs (not sequential). Ownership check enforced server-side: scan result returned only if requesting user's org matches scan owner org. Unit and integration tests for IDOR.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-016</td>
+          <td><strong style="color:#a78bfa">Elevation of Privilege</strong></td>
+          <td>CI/CD Integration</td>
+          <td>GitHub Actions workflow with GITHUB_TOKEN has excessive permissions — scanner action reads GITHUB_TOKEN and uses it to push code or modify branch protection rules.</td>
+          <td><span class="tag tag-medium">6.8</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td>GITHUB_TOKEN permissions scoped to minimum required (contents:read, security-events:write). Actions use OIDC instead of long-lived tokens. Permissions audited in workflow YAML.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-017</td>
+          <td><strong style="color:#4ade80">Low Risk</strong></td>
+          <td>Report Download</td>
+          <td>Compliance report download URL is guessable and shared externally, allowing unauthorised parties to view compliance gap reports.</td>
+          <td><span class="tag tag-low">3.5</span></td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Pre-signed URLs with 1-hour expiry and IP binding. Download logged with requester identity. Reports not publicly accessible without authentication.</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-018</td>
+          <td><strong style="color:#4ade80">Low Risk</strong></td>
+          <td>Health Endpoint</td>
+          <td>Unauthenticated /api/v1/health endpoint reveals version information that could assist in targeted vulnerability exploitation.</td>
+          <td><span class="tag tag-low">2.3</span></td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Health endpoint returns only status:ok — no version in production response. Version exposed only on internal health endpoint (cluster-internal only, not externally routed).</td>
+        </tr>
+        <tr>
+          <td class="highlight">TM-019</td>
+          <td><strong style="color:#4ade80">Low Risk</strong></td>
+          <td>Audit Logs</td>
+          <td>Audit logs consume excessive storage over time due to high scan volume, causing log rotation that deletes compliance-relevant records before 3-year retention period.</td>
+          <td><span class="tag tag-low">3.1</span></td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Audit logs archived to low-cost storage (Glacier / Azure Archive) after 90 days. Retention policy enforced by platform. Alert when log storage exceeds 80% capacity.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 4: DATA SENSITIVITY -->
+  <div class="section-label">Section 04</div>
+  <div class="section-title">Data Sensitivity Classification</div>
+  <p class="section-desc">Data types processed by the scanner and their sensitivity classifications.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Data Type</th><th>Classification</th><th>POPIA Category</th><th>Processed By</th><th>Stored?</th><th>Retention</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="highlight">SA ID Numbers (detected)</td><td><span class="tag tag-critical">Special Personal Info</span></td><td>Section 26 — Special conditions</td><td>PII Detector</td><td>No — metadata only</td><td>Not stored</td></tr>
+        <tr><td class="highlight">Bank Account Numbers</td><td><span class="tag tag-critical">Special Personal Info</span></td><td>Section 11 — Lawful basis</td><td>PII Detector</td><td>No — metadata only</td><td>Not stored</td></tr>
+        <tr><td class="highlight">Source Code (cloned)</td><td><span class="tag tag-high">Confidential</span></td><td>Section 19 — Security safeguards</td><td>Scanner Engine</td><td>Ephemeral only</td><td>Deleted on scan completion</td></tr>
+        <tr><td class="highlight">Findings Manifest</td><td><span class="tag tag-high">Confidential</span></td><td>Section 22 — Notification</td><td>Report Generator</td><td>Yes — evidence store</td><td>3 years (section 55)</td></tr>
+        <tr><td class="highlight">Compliance Reports</td><td><span class="tag tag-high">Confidential</span></td><td>Section 18 — Documentation</td><td>Report Generator</td><td>Yes — evidence store</td><td>3 years</td></tr>
+        <tr><td class="highlight">Audit Logs</td><td><span class="tag tag-medium">Internal</span></td><td>Section 55 — Record keeping</td><td>API Gateway</td><td>Yes — immutable log</td><td>3 years</td></tr>
+        <tr><td class="highlight">JWT Tokens</td><td><span class="tag tag-high">Confidential</span></td><td>Section 19 — Security safeguards</td><td>API Gateway</td><td>No — in-memory only</td><td>15 min TTL</td></tr>
+        <tr><td class="highlight">IR Notification Payloads</td><td><span class="tag tag-high">Confidential</span></td><td>Section 22 — Notification</td><td>Notification Service</td><td>Yes — sent copy</td><td>5 years (regulatory)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 5: RISK REGISTER -->
+  <div class="section-label">Section 05</div>
+  <div class="section-title">Risk Register</div>
+  <p class="section-desc">Consolidated risk register with likelihood, severity and residual risk after mitigation.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Risk ID</th><th>Risk Description</th><th>Likelihood</th><th>Severity</th><th>Inherent Risk</th><th>Mitigations Applied</th><th>Residual Risk</th><th>Owner</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="highlight">R-001</td>
+          <td>PII exposure via scanner log output</td>
+          <td><span class="tag tag-high">High</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td>PII redaction layer, structured logging, log egress scanning</td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Malcolm Govender</td>
+        </tr>
+        <tr>
+          <td class="highlight">R-002</td>
+          <td>Tampered reports submitted to IR</td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td>WORM storage, content hashing, independent verification</td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Malcolm Govender</td>
+        </tr>
+        <tr>
+          <td class="highlight">R-003</td>
+          <td>Container escape from scanner pod</td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td><span class="tag tag-critical">Critical</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Restrictive securityContext, OPA Gatekeeper, CIS benchmark</td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Malcolm Govender</td>
+        </tr>
+        <tr>
+          <td class="highlight">R-004</td>
+          <td>False negative — PII not detected</td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td>Quarterly pattern review, recall-focused evaluation, SA-specific corpus</td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td>Malcolm Govender</td>
+        </tr>
+        <tr>
+          <td class="highlight">R-005</td>
+          <td>Scanner unavailability blocks deployments</td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td>HPA, multiple replicas, graceful degradation mode (warn-only fallback)</td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Malcolm Govender</td>
+        </tr>
+        <tr>
+          <td class="highlight">R-006</td>
+          <td>Regulatory non-compliance of scanner itself</td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td><span class="tag tag-high">High</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td>Annual compliance self-assessment, DPO review, IR engagement</td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Malcolm Govender</td>
+        </tr>
+        <tr>
+          <td class="highlight">R-007</td>
+          <td>ReDoS causing scan engine hang</td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td><span class="tag tag-medium">Medium</span></td>
+          <td>RE2 engine, per-file timeout, fuzz testing in CI</td>
+          <td><span class="tag tag-low">Low</span></td>
+          <td>Malcolm Govender</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- SECTION 6: SEVERITY/LIKELIHOOD MATRIX -->
+  <div class="section-label">Section 06</div>
+  <div class="section-title">Severity × Likelihood Risk Matrix</div>
+  <p class="section-desc">Risk rating matrix used for all threat categorisation in this document.</p>
+
+  <div class="card">
+    <div style="overflow-x:auto">
+      <table style="min-width:500px">
+        <thead>
+          <tr>
+            <th style="color:#64748b">Likelihood ↓ / Severity →</th>
+            <th style="color:#4ade80">Low</th>
+            <th style="color:#eab308">Medium</th>
+            <th style="color:#fb923c">High</th>
+            <th style="color:#f87171">Critical</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#4ade80;font-weight:600">Low</td>
+            <td><span class="tag tag-low">Low</span></td>
+            <td><span class="tag tag-low">Low</span></td>
+            <td><span class="tag tag-medium">Medium</span></td>
+            <td><span class="tag tag-high">High</span></td>
+          </tr>
+          <tr>
+            <td style="color:#eab308;font-weight:600">Medium</td>
+            <td><span class="tag tag-low">Low</span></td>
+            <td><span class="tag tag-medium">Medium</span></td>
+            <td><span class="tag tag-high">High</span></td>
+            <td><span class="tag tag-critical">Critical</span></td>
+          </tr>
+          <tr>
+            <td style="color:#fb923c;font-weight:600">High</td>
+            <td><span class="tag tag-medium">Medium</span></td>
+            <td><span class="tag tag-high">High</span></td>
+            <td><span class="tag tag-critical">Critical</span></td>
+            <td><span class="tag tag-critical">Critical</span></td>
+          </tr>
+          <tr>
+            <td style="color:#f87171;font-weight:600">Critical</td>
+            <td><span class="tag tag-high">High</span></td>
+            <td><span class="tag tag-critical">Critical</span></td>
+            <td><span class="tag tag-critical">Critical</span></td>
+            <td><span class="tag tag-critical">Critical</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  UC20 — AI POPIA Compliance Scanner &nbsp;|&nbsp; Threat Model &nbsp;|&nbsp; Owner: Malcolm Govender — Head of AI &amp; Engineering &nbsp;|&nbsp; Classification: Internal — Restricted &nbsp;|&nbsp; v1.0 — 9 May 2026
+</div>
+
+</body>
+</html>

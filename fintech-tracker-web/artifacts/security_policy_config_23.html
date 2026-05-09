@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC23 — Security Policy Configuration Reference</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:           #0f172a;
+            --surface:      #1e293b;
+            --surface2:     #263348;
+            --border:       rgba(255,255,255,0.07);
+            --border2:      rgba(255,255,255,0.12);
+            --text:         #e2e8f0;
+            --text-muted:   #94a3b8;
+            --text-dim:     #64748b;
+            --indigo:       #818cf8;
+            --violet:       #a78bfa;
+            --teal:         #2dd4bf;
+            --amber:        #fbbf24;
+            --amber-soft:   rgba(251,191,36,0.12);
+            --red:          #f87171;
+            --red-soft:     rgba(248,113,113,0.15);
+            --orange:       #fb923c;
+            --orange-soft:  rgba(251,146,60,0.12);
+            --green:        #4ade80;
+            --green-soft:   rgba(74,222,128,0.12);
+            --indigo-soft:  rgba(129,140,248,0.12);
+            --violet-soft:  rgba(167,139,250,0.12);
+            --teal-soft:    rgba(45,212,191,0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+            padding: 32px 24px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .print-btn {
+            position: fixed; top: 20px; right: 24px;
+            background: var(--indigo); color: #fff;
+            border: none; border-radius: 6px;
+            padding: 8px 18px; font-size: 13px; font-weight: 600;
+            cursor: pointer; z-index: 100;
+        }
+        .print-btn:hover { background: var(--violet); }
+
+        /* Header */
+        .doc-header {
+            margin-bottom: 36px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border2);
+        }
+
+        .header-badge-new {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.6px; text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .header-top {
+            display: flex; align-items: flex-start;
+            justify-content: space-between; gap: 20px;
+            margin-bottom: 16px; flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--amber-soft);
+            border: 1px solid rgba(251,191,36,0.4);
+            color: var(--amber);
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.4px;
+        }
+        .status-badge::before { content: "●"; font-size: 9px; }
+
+        .doc-title {
+            font-size: 28px; font-weight: 700;
+            color: #f1f5f9; letter-spacing: -0.4px;
+            line-height: 1.2; margin-bottom: 6px;
+        }
+
+        .doc-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+
+        .meta-row {
+            display: flex; align-items: center;
+            gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+        }
+
+        .meta-chip {
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 3px 9px;
+            border: 1px solid var(--border2); border-radius: 4px;
+        }
+
+        .owner-badge {
+            display: inline-flex; align-items: center;
+            gap: 8px; background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 20px; padding: 5px 12px 5px 5px;
+            font-size: 12px; font-weight: 600; color: var(--text);
+        }
+
+        .owner-avatar {
+            width: 24px; height: 24px;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin-bottom: 36px;
+        }
+
+        .toc-title {
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--indigo); margin-bottom: 14px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 6px;
+        }
+
+        .toc-list li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .toc-list li a:hover { color: var(--indigo); }
+
+        .toc-num {
+            font-size: 11px; font-weight: 700;
+            color: var(--indigo); min-width: 22px;
+        }
+
+        /* Sections */
+        .section { margin-bottom: 44px; }
+
+        .section-title {
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--indigo); margin-bottom: 14px;
+            padding-bottom: 8px; border-bottom: 1px solid var(--border);
+        }
+
+        h2 { font-size: 20px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+        h3 { font-size: 15px; font-weight: 600; color: var(--violet); margin-bottom: 8px; margin-top: 22px; }
+        h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 16px; margin-bottom: 6px; }
+
+        p { color: var(--text-muted); margin-bottom: 12px; line-height: 1.65; }
+
+        /* Tables */
+        .table-wrapper {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; overflow: hidden; margin-top: 14px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: rgba(0,0,0,0.25); border-bottom: 1px solid var(--border2); }
+
+        th {
+            padding: 11px 14px; text-align: left;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.6px; text-transform: uppercase;
+            color: var(--text-muted); white-space: nowrap;
+        }
+
+        td {
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px; color: var(--text);
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(129,140,248,0.04); }
+
+        /* Pills */
+        .pill {
+            display: inline-block; padding: 3px 9px;
+            border-radius: 12px; font-size: 11px; font-weight: 700;
+        }
+        .pill-block   { background: var(--red-soft);    color: var(--red);    border: 1px solid rgba(248,113,113,0.4); }
+        .pill-warn    { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.4); }
+        .pill-info    { background: var(--teal-soft);   color: var(--teal);   border: 1px solid rgba(45,212,191,0.4); }
+        .pill-approve { background: var(--green-soft);  color: var(--green);  border: 1px solid rgba(74,222,128,0.4); }
+        .pill-enabled { background: var(--green-soft);  color: var(--green);  border: 1px solid rgba(74,222,128,0.4); }
+        .pill-disabled{ background: rgba(100,116,139,0.15); color: var(--text-dim); border: 1px solid rgba(100,116,139,0.3); }
+        .pill-required{ background: var(--indigo-soft); color: var(--indigo); border: 1px solid rgba(129,140,248,0.4); }
+        .pill-amber   { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.4); }
+        .pill-ciso    { background: var(--violet-soft); color: var(--violet); border: 1px solid rgba(167,139,250,0.4); }
+
+        .check { color: var(--green); font-weight: 700; }
+        .cross { color: var(--red);   font-weight: 700; }
+
+        /* Code */
+        .mono {
+            font-family: 'Courier New', 'SF Mono', monospace;
+            font-size: 12px; color: var(--teal);
+            background: rgba(45,212,191,0.08);
+            padding: 2px 6px; border-radius: 4px;
+        }
+
+        /* Alert */
+        .alert {
+            border-radius: 8px; padding: 14px 18px;
+            margin-top: 14px; display: flex;
+            align-items: flex-start; gap: 10px;
+        }
+        .alert-info { background: var(--indigo-soft); border-left: 3px solid var(--indigo); }
+        .alert-warn { background: var(--amber-soft);  border-left: 3px solid var(--amber); }
+        .alert-crit { background: var(--red-soft);    border-left: 3px solid var(--red); }
+        .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+        .alert-text { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+
+        /* Pattern box */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px; margin-top: 14px;
+        }
+
+        .pattern-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 16px 18px;
+        }
+
+        .pattern-card-title {
+            font-size: 12px; font-weight: 700;
+            color: var(--red); margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .pattern-card-title::before { content: "⚑"; }
+
+        .pattern-item {
+            font-size: 12px; color: var(--text-muted);
+            padding: 4px 0; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .pattern-item:last-child { border-bottom: none; }
+
+        .pattern-redacted {
+            font-family: 'Courier New', monospace;
+            font-size: 11px; color: var(--text-dim);
+            background: rgba(100,116,139,0.12);
+            padding: 1px 6px; border-radius: 3px;
+        }
+
+        /* Process steps */
+        .process-steps { list-style: none; margin-top: 14px; }
+        .process-steps li {
+            display: flex; gap: 14px; align-items: flex-start;
+            padding: 12px 0; border-bottom: 1px solid var(--border);
+        }
+        .process-steps li:last-child { border-bottom: none; }
+
+        .step-num {
+            width: 24px; height: 24px; flex-shrink: 0;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; color: #fff;
+        }
+
+        .step-body { flex: 1; }
+        .step-title { font-size: 13px; font-weight: 700; color: #f1f5f9; margin-bottom: 3px; }
+        .step-desc  { font-size: 12px; color: var(--text-muted); }
+
+        /* Approval chain */
+        .approval-chain {
+            display: flex; align-items: center;
+            gap: 0; flex-wrap: wrap; margin-top: 14px;
+        }
+
+        .approval-node {
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: 8px; padding: 10px 16px;
+            text-align: center; min-width: 130px;
+        }
+
+        .approval-node .an-role {
+            font-size: 11px; font-weight: 700;
+            color: var(--indigo); margin-bottom: 2px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .approval-node .an-desc { font-size: 11px; color: var(--text-muted); }
+
+        .approval-arrow {
+            color: var(--text-dim); font-size: 18px;
+            padding: 0 8px; flex-shrink: 0;
+        }
+
+        /* Version history */
+        .version-table { font-size: 13px; }
+
+        hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+        .doc-footer {
+            margin-top: 48px; padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+
+        .doc-footer-text { font-size: 12px; color: var(--text-dim); }
+
+        @media print {
+            body { background: #fff; color: #000; padding: 0; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Print / Export PDF</button>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="doc-header">
+        <div class="header-badge-new">&#10022; New — Gap Identified by Malcolm</div>
+        <div class="header-top">
+            <div>
+                <div class="doc-title">UC23 — Security Policy Configuration Reference</div>
+                <div class="doc-subtitle">AI-Powered DevSecOps Security Gate — Policy Definitions, Thresholds &amp; Enforcement Rules</div>
+            </div>
+            <div class="status-badge">Not Started — Planning Phase</div>
+        </div>
+        <div class="meta-row">
+            <span class="meta-chip">UC-23</span>
+            <span class="meta-chip">Security Policy</span>
+            <span class="meta-chip">Policy Version 1.0 — 2026-05-09</span>
+            <span class="meta-chip">Review Cadence: Quarterly</span>
+            <span class="meta-chip">PCI-DSS · ISO 27001 · POPIA</span>
+        </div>
+        <div class="owner-badge">
+            <div class="owner-avatar">MG</div>
+            Malcolm Govender — Head of AI &amp; Engineering
+        </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <div class="toc-title">Table of Contents</div>
+        <ul class="toc-list">
+            <li><a href="#s1"><span class="toc-num">1.</span> CVSS Threshold Policy by Environment</a></li>
+            <li><a href="#s2"><span class="toc-num">2.</span> SAST Rules Configuration</a></li>
+            <li><a href="#s3"><span class="toc-num">3.</span> Secret Detection Patterns</a></li>
+            <li><a href="#s4"><span class="toc-num">4.</span> Dependency Policy</a></li>
+            <li><a href="#s5"><span class="toc-num">5.</span> Container Policy</a></li>
+            <li><a href="#s6"><span class="toc-num">6.</span> Exemption Process</a></li>
+            <li><a href="#s7"><span class="toc-num">7.</span> Policy Versioning &amp; Review Cadence</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: CVSS Threshold Policy -->
+    <div class="section" id="s1">
+        <div class="section-title">1. CVSS Threshold Policy by Environment</div>
+        <h2>Environment-Specific Severity Gates</h2>
+        <p>The security gate applies CVSS v3.1 blocking thresholds on a per-environment basis. Production environments enforce the most restrictive policy. Thresholds are defined in <span class="mono">security-gate.yaml</span> under the <span class="mono">environments</span> key and are validated at startup by the policy schema engine.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>CVSS Severity</th>
+                        <th>Score Range</th>
+                        <th>Development</th>
+                        <th>Staging</th>
+                        <th>Production</th>
+                        <th>Hotfix Branch</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="pill" style="background:var(--red-soft);color:var(--red);border:1px solid rgba(248,113,113,0.4)">Critical</span></td>
+                        <td>≥ 9.0</td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="pill" style="background:var(--orange-soft);color:var(--orange);border:1px solid rgba(251,146,60,0.4)">High</span></td>
+                        <td>7.0 – 8.9</td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="pill" style="background:var(--amber-soft);color:var(--amber);border:1px solid rgba(251,191,36,0.4)">Medium</span></td>
+                        <td>4.0 – 6.9</td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="pill" style="background:var(--indigo-soft);color:var(--indigo);border:1px solid rgba(129,140,248,0.4)">Low</span></td>
+                        <td>0.1 – 3.9</td>
+                        <td><span class="pill pill-approve">PASS</span></td>
+                        <td><span class="pill pill-approve">PASS</span></td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="pill" style="background:var(--green-soft);color:var(--green);border:1px solid rgba(74,222,128,0.4)">None</span></td>
+                        <td>0.0</td>
+                        <td><span class="pill pill-approve">PASS</span></td>
+                        <td><span class="pill pill-approve">PASS</span></td>
+                        <td><span class="pill pill-approve">PASS</span></td>
+                        <td><span class="pill pill-approve">PASS</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-crit">
+            <div class="alert-icon">⛔</div>
+            <div class="alert-text"><strong>Hardcoded Rule:</strong> Critical severity (CVSS ≥ 9.0) is blocked on ALL branches including hotfix branches. This cannot be overridden via configuration — it is enforced at the code level and the bypass token system does not accept Critical-level exemption requests. Any attempt triggers a CISO P1 incident alert within 60 seconds.</div>
+        </div>
+
+        <h3>Secret Detection Override Policy</h3>
+        <p>Secrets are treated as CRITICAL regardless of CVSS score — a detected secret always blocks the pipeline on all environments. There is no CVSS threshold for secrets; the detection of any secret pattern constitutes an automatic Critical finding.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Finding Type</th>
+                        <th>Effective Severity</th>
+                        <th>All Environments</th>
+                        <th>Exemptable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Detected Secret / Credential</td>
+                        <td><span class="pill pill-block">Critical Override</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="cross">No</span></td>
+                    </tr>
+                    <tr>
+                        <td>Hardcoded Password</td>
+                        <td><span class="pill pill-block">Critical Override</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="cross">No</span></td>
+                    </tr>
+                    <tr>
+                        <td>High-Entropy String in Config File</td>
+                        <td><span class="pill pill-warn">High</span></td>
+                        <td>Env-based threshold</td>
+                        <td><span class="check">Yes</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 2: SAST Rules -->
+    <div class="section" id="s2">
+        <div class="section-title">2. SAST Rules Configuration</div>
+        <h2>Static Analysis Rule Sets by Language</h2>
+        <p>The SAST Engine runs Semgrep and Bandit with language-specific rule packs. Rule set enablement is configured per language in <span class="mono">security-gate.yaml</span> under the <span class="mono">sast.rulesets</span> key. All enabled rules produce CWE-mapped findings.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rule Set</th>
+                        <th>Engine</th>
+                        <th>Python</th>
+                        <th>TypeScript</th>
+                        <th>YAML</th>
+                        <th>Dockerfile</th>
+                        <th>CWE Coverage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="mono">p/python</span></td>
+                        <td>Semgrep</td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td>CWE-89, 78, 22, 134</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">p/javascript</span></td>
+                        <td>Semgrep</td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td>CWE-79, 89, 22, 1321</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">p/typescript</span></td>
+                        <td>Semgrep</td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td>CWE-79, 119, 601</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">p/ci</span></td>
+                        <td>Semgrep</td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td>Pipeline injection, script injection</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">p/dockerfile</span></td>
+                        <td>Semgrep</td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td>CIS Docker Benchmark</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">p/owasp-top-ten</span></td>
+                        <td>Semgrep</td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-disabled">Disabled</span></td>
+                        <td><span class="pill pill-disabled">Disabled</span></td>
+                        <td>OWASP A01–A10 (2021)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">p/fintech-custom</span></td>
+                        <td>Semgrep</td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-disabled">Disabled</span></td>
+                        <td>PCI-DSS CHD, PAN masking, crypto</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">bandit-all</span></td>
+                        <td>Bandit</td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td>B1xx–B7xx full rule set</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">bandit-crypto</span></td>
+                        <td>Bandit</td>
+                        <td><span class="pill pill-enabled">Enabled</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td><span class="pill pill-disabled">N/A</span></td>
+                        <td>Weak cipher, MD5, SHA1 usage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Rule Suppression Policy</h3>
+        <p>Individual findings may be suppressed inline using approved suppression comments. Suppression comments are audited and reviewed quarterly. Mass suppression of entire rule sets requires CISO approval and is logged as a policy exception.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Suppression Type</th>
+                        <th>Mechanism</th>
+                        <th>Approval Required</th>
+                        <th>Audit Log Entry</th>
+                        <th>Expiry</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Single finding, single line</td>
+                        <td><span class="mono"># nosec B101</span> / <span class="mono"># nosemgrep</span></td>
+                        <td>Tech Lead review</td>
+                        <td><span class="check">Yes</span></td>
+                        <td>90 days</td>
+                    </tr>
+                    <tr>
+                        <td>File-level suppression</td>
+                        <td><span class="mono"># nosec</span> at file top</td>
+                        <td>Security team + Tech Lead</td>
+                        <td><span class="check">Yes</span></td>
+                        <td>30 days</td>
+                    </tr>
+                    <tr>
+                        <td>Rule set disable</td>
+                        <td><span class="mono">security-gate.yaml</span> config</td>
+                        <td>CISO approval required</td>
+                        <td><span class="check">Yes</span></td>
+                        <td>Reviewed quarterly</td>
+                    </tr>
+                    <tr>
+                        <td>ML false-positive override</td>
+                        <td>Confidence score &gt; 0.85</td>
+                        <td>Automatic (audited)</td>
+                        <td><span class="check">Yes — full record</span></td>
+                        <td>Model retrain window</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 3: Secret Detection -->
+    <div class="section" id="s3">
+        <div class="section-title">3. Secret Detection Patterns</div>
+        <h2>Detected Secret Categories &amp; Patterns</h2>
+        <p>The Secret Scanner uses Gitleaks v8 rule sets augmented with custom fintech patterns. All actual regex patterns are stored in the internal secrets management vault and are not included in this document. Example values below are REDACTED for security. Detection applies to the full git diff, environment files, and all tracked file types.</p>
+
+        <div class="alert alert-warn">
+            <div class="alert-icon">⚠</div>
+            <div class="alert-text">Pattern specifications are maintained in the internal Vault at <span class="mono">vault/security-gate/secret-patterns</span>. Access is restricted to the Security team and is audited. Do not add secret detection patterns to source code repositories.</div>
+        </div>
+
+        <div class="pattern-grid">
+            <div class="pattern-card">
+                <div class="pattern-card-title">API Keys &amp; Tokens</div>
+                <div class="pattern-item">
+                    <span>Generic API Key</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>AWS Access Key ID</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Azure Subscription Key</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>GCP Service Account Key</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>GitHub Personal Access Token</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Slack Webhook URL</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+            </div>
+            <div class="pattern-card">
+                <div class="pattern-card-title">Connection Strings</div>
+                <div class="pattern-item">
+                    <span>PostgreSQL URI (with credentials)</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>MongoDB Connection String</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Redis URL (with password)</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Azure Storage Connection String</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>SQL Server Connection String</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>JDBC URL (with credentials)</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+            </div>
+            <div class="pattern-card">
+                <div class="pattern-card-title">Private Keys &amp; Certificates</div>
+                <div class="pattern-item">
+                    <span>PEM Private Key Header</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>RSA Private Key</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>EC Private Key</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>PKCS#8 Private Key</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>SSH Private Key (OpenSSH)</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>PFX/PKCS#12 Passphrase</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+            </div>
+            <div class="pattern-card">
+                <div class="pattern-card-title">Service Account Credentials</div>
+                <div class="pattern-item">
+                    <span>GCP Service Account JSON</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Azure Service Principal Secret</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Kubernetes Service Account Token</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Docker Registry Credentials</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>CI/CD Runner Token</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Vault AppRole Secret ID</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+            </div>
+            <div class="pattern-card">
+                <div class="pattern-card-title">Fintech-Specific Patterns</div>
+                <div class="pattern-item">
+                    <span>Payment Gateway API Key</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Card Holder Data (PAN pattern)</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Bank Account Number</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>SWIFT / BIC Code + Credentials</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>FICA Reference Token</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+                <div class="pattern-item">
+                    <span>SA ID Number Pattern (POPIA)</span>
+                    <span class="pattern-redacted">REDACTED</span>
+                </div>
+            </div>
+            <div class="pattern-card">
+                <div class="pattern-card-title">Entropy-Based Detection</div>
+                <div class="pattern-item">
+                    <span>High-entropy base64 string (&gt; 4.5 bits/char)</span>
+                    <span class="pattern-redacted">ALGORITHMIC</span>
+                </div>
+                <div class="pattern-item">
+                    <span>High-entropy hex string (&gt; 3.5 bits/char, len &gt; 20)</span>
+                    <span class="pattern-redacted">ALGORITHMIC</span>
+                </div>
+                <div class="pattern-item">
+                    <span>JWT token structure</span>
+                    <span class="pattern-redacted">ALGORITHMIC</span>
+                </div>
+                <div class="pattern-item">
+                    <span>Password variable assignment</span>
+                    <span class="pattern-redacted">ALGORITHMIC</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 4: Dependency Policy -->
+    <div class="section" id="s4">
+        <div class="section-title">4. Dependency Policy</div>
+        <h2>Package Licence, Age &amp; Risk Controls</h2>
+        <p>All third-party dependencies are subject to licence compliance checks, vulnerability scoring, and age thresholds. Policy is enforced at the <span class="mono">dep_scorer.py</span> component level for both Python (pip/poetry) and TypeScript (npm/yarn) manifests.</p>
+
+        <h3>4.1 Allowed Licences</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Licence</th>
+                        <th>SPDX Identifier</th>
+                        <th>Status</th>
+                        <th>Commercial Use</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MIT</td>
+                        <td><span class="mono">MIT</span></td>
+                        <td><span class="pill pill-enabled">Allowed</span></td>
+                        <td><span class="check">Yes</span></td>
+                        <td>Preferred licence</td>
+                    </tr>
+                    <tr>
+                        <td>Apache 2.0</td>
+                        <td><span class="mono">Apache-2.0</span></td>
+                        <td><span class="pill pill-enabled">Allowed</span></td>
+                        <td><span class="check">Yes</span></td>
+                        <td>Patent protection included</td>
+                    </tr>
+                    <tr>
+                        <td>BSD 2-Clause</td>
+                        <td><span class="mono">BSD-2-Clause</span></td>
+                        <td><span class="pill pill-enabled">Allowed</span></td>
+                        <td><span class="check">Yes</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>BSD 3-Clause</td>
+                        <td><span class="mono">BSD-3-Clause</span></td>
+                        <td><span class="pill pill-enabled">Allowed</span></td>
+                        <td><span class="check">Yes</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>ISC</td>
+                        <td><span class="mono">ISC</span></td>
+                        <td><span class="pill pill-enabled">Allowed</span></td>
+                        <td><span class="check">Yes</span></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Python Software Foundation</td>
+                        <td><span class="mono">PSF-2.0</span></td>
+                        <td><span class="pill pill-enabled">Allowed</span></td>
+                        <td><span class="check">Yes</span></td>
+                        <td>Standard library dependencies</td>
+                    </tr>
+                    <tr>
+                        <td>LGPL v2.1</td>
+                        <td><span class="mono">LGPL-2.1</span></td>
+                        <td><span class="pill pill-amber">Review Required</span></td>
+                        <td><span class="check">Conditional</span></td>
+                        <td>Legal sign-off required per dependency</td>
+                    </tr>
+                    <tr>
+                        <td>GPL v2 / v3</td>
+                        <td><span class="mono">GPL-2.0 / GPL-3.0</span></td>
+                        <td><span class="pill pill-block">Blocked</span></td>
+                        <td><span class="cross">No</span></td>
+                        <td>Copyleft — not permitted in proprietary product</td>
+                    </tr>
+                    <tr>
+                        <td>AGPL</td>
+                        <td><span class="mono">AGPL-3.0</span></td>
+                        <td><span class="pill pill-block">Blocked</span></td>
+                        <td><span class="cross">No</span></td>
+                        <td>Strong copyleft — absolutely prohibited</td>
+                    </tr>
+                    <tr>
+                        <td>Commercial / Proprietary</td>
+                        <td>Various</td>
+                        <td><span class="pill pill-amber">Review Required</span></td>
+                        <td><span class="cross">Varies</span></td>
+                        <td>Procurement &amp; Legal approval required</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>4.2 Blocked Packages</h3>
+        <p>The following packages are permanently blocked due to known security issues, abandoned maintenance, or licence incompatibility. The block list is maintained in <span class="mono">security-gate/blocked_packages.json</span>.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Package</th>
+                        <th>Ecosystem</th>
+                        <th>Reason</th>
+                        <th>Replacement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="mono">pycrypto</span></td>
+                        <td>Python</td>
+                        <td>Abandoned, multiple CVEs</td>
+                        <td><span class="mono">cryptography</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">M2Crypto</span></td>
+                        <td>Python</td>
+                        <td>Maintenance concerns, prefer native</td>
+                        <td><span class="mono">cryptography</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">pickle</span> (untrusted input)</td>
+                        <td>Python stdlib</td>
+                        <td>Deserialization RCE risk</td>
+                        <td><span class="mono">json / msgpack</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">node-serialize</span></td>
+                        <td>npm</td>
+                        <td>RCE via serialized functions (CVE-2017-5941)</td>
+                        <td><span class="mono">JSON.parse</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">event-stream</span></td>
+                        <td>npm</td>
+                        <td>Supply chain compromise history</td>
+                        <td>Manual stream handling</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">flatmap-stream</span></td>
+                        <td>npm</td>
+                        <td>Supply chain compromise — malicious code injected</td>
+                        <td>N/A — do not use</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono">md5</span></td>
+                        <td>npm</td>
+                        <td>Cryptographically broken hash</td>
+                        <td><span class="mono">crypto (SHA-256)</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>4.3 Age &amp; Maintenance Thresholds</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Policy Rule</th>
+                        <th>Threshold</th>
+                        <th>Action</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Maximum package age (no update)</td>
+                        <td>3 years</td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td>Flagged in dependency report</td>
+                    </tr>
+                    <tr>
+                        <td>Abandoned package (no release in 5y)</td>
+                        <td>5 years</td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>Treat as unmaintained — high supply chain risk</td>
+                    </tr>
+                    <tr>
+                        <td>Pre-release version in production</td>
+                        <td>alpha/beta/rc</td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>Production pinning to stable releases only</td>
+                    </tr>
+                    <tr>
+                        <td>Pinned to deprecated major version</td>
+                        <td>EOL version</td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td>Migration plan required within 90 days</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 5: Container Policy -->
+    <div class="section" id="s5">
+        <div class="section-title">5. Container Policy</div>
+        <h2>Docker Image &amp; Container Security Requirements</h2>
+        <p>Container images are scanned by Trivy. The following policy rules are evaluated in addition to CVE thresholds. Non-compliance blocks the pipeline on staging and production environments.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Policy Rule</th>
+                        <th>Requirement</th>
+                        <th>Dev</th>
+                        <th>Staging</th>
+                        <th>Production</th>
+                        <th>Rationale</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Base Image — Allowed Registries</td>
+                        <td>ECR Public Gallery, Docker Official Images, MCR</td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>Supply chain integrity</td>
+                    </tr>
+                    <tr>
+                        <td>Non-root USER instruction</td>
+                        <td>Dockerfile must set <span class="mono">USER</span> to non-root UID</td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>Principle of least privilege</td>
+                    </tr>
+                    <tr>
+                        <td>No running as root (UID 0)</td>
+                        <td>Runtime UID must not be 0</td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>Container escape risk mitigation</td>
+                    </tr>
+                    <tr>
+                        <td>Image Signing (Cosign / Notary)</td>
+                        <td>Production images must be signed</td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>Supply chain attestation (SLSA Level 2)</td>
+                    </tr>
+                    <tr>
+                        <td>Base Image — Latest Tag Prohibited</td>
+                        <td>Pin to specific digest or version tag</td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>Reproducible builds &amp; drift prevention</td>
+                    </tr>
+                    <tr>
+                        <td>HEALTHCHECK instruction present</td>
+                        <td>Dockerfile must include HEALTHCHECK</td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td>Operational reliability</td>
+                    </tr>
+                    <tr>
+                        <td>No secrets in layers</td>
+                        <td>Trivy secret scan of all image layers</td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td><span class="pill pill-block">BLOCK</span></td>
+                        <td>PCI-DSS Requirement 3.5 — no CHD in image</td>
+                    </tr>
+                    <tr>
+                        <td>Distroless / Minimal base image</td>
+                        <td>Prefer distroless or alpine for production</td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td><span class="pill pill-info">INFO</span></td>
+                        <td><span class="pill pill-warn">WARN</span></td>
+                        <td>Reduced attack surface</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 6: Exemption Process -->
+    <div class="section" id="s6">
+        <div class="section-title">6. Exemption Process</div>
+        <h2>Security Gate Exemption Request &amp; Approval Workflow</h2>
+        <p>An exemption allows a pipeline to merge despite a policy-blocking finding. Exemptions are time-limited, logged immutably, and are not available for Critical severity findings or detected secrets. All exemptions require a documented business justification and a remediation plan with a committed delivery date.</p>
+
+        <h3>6.1 Exemption Request Steps</h3>
+        <ul class="process-steps">
+            <li>
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <div class="step-title">Identify Blocking Finding</div>
+                    <div class="step-desc">Review the PR security gate comment to identify the specific CVE, rule ID, or policy violation causing the block. Confirm the finding is a genuine block (not a false positive — if FP, submit via ML training feedback instead).</div>
+                </div>
+            </li>
+            <li>
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <div class="step-title">Raise Exemption Request in Jira</div>
+                    <div class="step-desc">Create a Jira issue in the SECU project using the <em>Security Gate Exemption Request</em> template. Include: CVE ID / rule ID, CVSS score, affected component, business justification, risk acceptance statement, proposed remediation date (max 30 days), and requesting engineer name.</div>
+                </div>
+            </li>
+            <li>
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <div class="step-title">Tech Lead Preliminary Review</div>
+                    <div class="step-desc">The requesting engineer's Tech Lead reviews the request within 1 business day. Tech Lead confirms the finding cannot be resolved before the required merge date and approves the escalation to the Security team.</div>
+                </div>
+            </li>
+            <li>
+                <div class="step-num">4</div>
+                <div class="step-body">
+                    <div class="step-title">Security Team Risk Assessment</div>
+                    <div class="step-desc">Security team reviews the CVSS score, exploitability (CVSS AV, AC, PR, UI vectors), existing compensating controls, and business context. Assesses whether compensating controls (WAF rule, network isolation, runtime protection) adequately reduce risk.</div>
+                </div>
+            </li>
+            <li>
+                <div class="step-num">5</div>
+                <div class="step-body">
+                    <div class="step-title">Approval Based on Severity</div>
+                    <div class="step-desc">High severity (7.0–8.9): CISO approval required. Medium (4.0–6.9): Security Lead approval. Low: Tech Lead approval. Critical severity exemptions are not accepted — the request will be rejected. Approval generates a signed bypass token valid for the specified duration only.</div>
+                </div>
+            </li>
+            <li>
+                <div class="step-num">6</div>
+                <div class="step-body">
+                    <div class="step-title">Bypass Token Issued &amp; Applied</div>
+                    <div class="step-desc">The bypass token is added to the PR description as a structured comment <span class="mono">SECURITY_GATE_BYPASS: &lt;token&gt;</span>. The gate enforcer validates the token signature and expiry before allowing the merge. The token is single-use and expires at the specified date or when the fixing PR is merged.</div>
+                </div>
+            </li>
+            <li>
+                <div class="step-num">7</div>
+                <div class="step-body">
+                    <div class="step-title">Remediation &amp; Closure</div>
+                    <div class="step-desc">The fixing PR must be merged before the exemption expiry date. The Jira SECU ticket is linked to the remediation PR and auto-closed on merge. Expired unresolved exemptions trigger a CISO notification and automatic escalation to P2 incident.</div>
+                </div>
+            </li>
+        </ul>
+
+        <h3>6.2 Approval Chain by Severity</h3>
+        <div class="approval-chain">
+            <div class="approval-node">
+                <div class="an-role">Requesting Engineer</div>
+                <div class="an-desc">Raises Jira SECU ticket</div>
+            </div>
+            <div class="approval-arrow">→</div>
+            <div class="approval-node">
+                <div class="an-role">Tech Lead</div>
+                <div class="an-desc">Preliminary review · Low approver</div>
+            </div>
+            <div class="approval-arrow">→</div>
+            <div class="approval-node">
+                <div class="an-role">Security Lead</div>
+                <div class="an-desc">Risk assessment · Medium approver</div>
+            </div>
+            <div class="approval-arrow">→</div>
+            <div class="approval-node">
+                <div class="an-role">CISO</div>
+                <div class="an-desc">Final sign-off · High approver</div>
+            </div>
+            <div class="approval-arrow">→</div>
+            <div class="approval-node" style="border-color:var(--red);">
+                <div class="an-role" style="color:var(--red)">Critical</div>
+                <div class="an-desc">NOT EXEMPTABLE — no bypass issued</div>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <div class="alert-icon">ℹ</div>
+            <div class="alert-text">All exemption requests, approvals, bypass tokens, and expiry events are written to the immutable audit log. These records satisfy PCI-DSS Requirement 12.3.2 (risk-targeted analysis of security controls) and ISO 27001 A.18.2.2 (compliance with security policies). Exemption history is reviewed quarterly by the CISO and Head of Engineering.</div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 7: Policy Versioning -->
+    <div class="section" id="s7">
+        <div class="section-title">7. Policy Versioning &amp; Review Cadence</div>
+        <h2>Policy Governance &amp; Change Management</h2>
+        <p>This policy document is version-controlled in the <span class="mono">security-policy</span> Git repository. Changes to threshold values or rule set enablement constitute a policy change and require the approval process defined below.</p>
+
+        <h3>7.1 Review Cadence</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Review Type</th>
+                        <th>Frequency</th>
+                        <th>Trigger Conditions</th>
+                        <th>Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Full Policy Review</td>
+                        <td>Quarterly</td>
+                        <td>Scheduled — Q1, Q2, Q3, Q4</td>
+                        <td>CISO + Malcolm Govender</td>
+                    </tr>
+                    <tr>
+                        <td>CVSS Threshold Review</td>
+                        <td>Quarterly or on new CVSS standard release</td>
+                        <td>CVSS major version release, NVD schema change</td>
+                        <td>Security Lead</td>
+                    </tr>
+                    <tr>
+                        <td>Secret Pattern Update</td>
+                        <td>Monthly</td>
+                        <td>New service integration, vendor API change</td>
+                        <td>Security Team</td>
+                    </tr>
+                    <tr>
+                        <td>Blocked Package List</td>
+                        <td>Ongoing (automated)</td>
+                        <td>New CVE disclosure, NVD advisory, GitHub advisory</td>
+                        <td>Automated + Security Team</td>
+                    </tr>
+                    <tr>
+                        <td>Container Policy</td>
+                        <td>Quarterly</td>
+                        <td>New base image EOL, CIS Benchmark update</td>
+                        <td>Platform Team + Security Lead</td>
+                    </tr>
+                    <tr>
+                        <td>Exemption Log Review</td>
+                        <td>Quarterly</td>
+                        <td>Scheduled — all active &amp; expired exemptions reviewed</td>
+                        <td>CISO + Head of Engineering</td>
+                    </tr>
+                    <tr>
+                        <td>Emergency Policy Update</td>
+                        <td>Ad hoc</td>
+                        <td>CVSS ≥ 9.0 zero-day, active exploit in production ecosystem</td>
+                        <td>CISO (immediate authority)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>7.2 Version History</h3>
+        <div class="table-wrapper">
+            <table class="version-table">
+                <thead>
+                    <tr>
+                        <th>Version</th>
+                        <th>Date</th>
+                        <th>Author</th>
+                        <th>Change Summary</th>
+                        <th>Approved By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="mono">1.0</span></td>
+                        <td>2026-05-09</td>
+                        <td>Malcolm Govender</td>
+                        <td>Initial policy document — UC23 DevSecOps Gate baseline</td>
+                        <td>Pending CISO sign-off</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3>7.3 Policy Change Approval Process</h3>
+        <p>Any change to threshold values, rule set enablement, or blocked package lists must follow the change management process:</p>
+        <ul style="color:var(--text-muted);font-size:13px;padding-left:20px;line-height:2.2;">
+            <li>Threshold changes (more permissive) — require CISO approval + board notification if PCI-DSS scoped</li>
+            <li>Threshold changes (more restrictive) — require Security Lead approval + Head of Engineering notification</li>
+            <li>New rule set enablement — require Security Lead approval</li>
+            <li>New blocked package — automated on confirmed CVE; Security Lead reviews within 24h</li>
+            <li>Secret pattern additions — Security Team authority; no external approval required</li>
+            <li>Exemption process changes — require CISO approval</li>
+        </ul>
+    </div>
+
+    <!-- Footer -->
+    <div class="doc-footer">
+        <div class="owner-badge">
+            <div class="owner-avatar">MG</div>
+            Malcolm Govender — Head of AI &amp; Engineering
+        </div>
+        <div class="doc-footer-text">UC23 · Security Policy Configuration · v1.0 · 2026-05-09 · CONFIDENTIAL — INTERNAL USE ONLY</div>
+    </div>
+
+</div>
+</body>
+</html>

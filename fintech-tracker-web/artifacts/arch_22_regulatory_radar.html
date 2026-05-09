@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC22 — Regulatory Change Impact Radar | Architecture Specification</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface2: #253047;
+            --surface3: #2d3a52;
+            --border: rgba(255,255,255,0.07);
+            --text-1: #e2e8f0;
+            --text-2: #94a3b8;
+            --text-3: #4b607a;
+            --indigo: #818cf8;
+            --violet: #a78bfa;
+            --teal: #2dd4bf;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --green: #34d399;
+            --cyan: #38bdf8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text-1);
+            line-height: 1.6;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+        /* Back nav */
+        .back-nav {
+            position: fixed; top: 16px; left: 16px; z-index: 9999;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 14px; border-radius: 8px;
+            background: #0a0f1e; border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-2); font-size: 12px; font-weight: 600;
+            text-decoration: none; transition: all .15s;
+            box-shadow: 0 2px 8px rgba(0,0,0,.5);
+        }
+        .back-nav:hover { background: var(--surface); color: var(--text-1); border-color: var(--indigo); }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 44px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: -60px; right: -60px;
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(129,140,248,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute; bottom: -40px; left: 30%;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; }
+
+        .new-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, #818cf8, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-subtitle { color: var(--text-2); font-size: 1.05rem; margin-bottom: 28px; }
+
+        .hero-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 28px; }
+        .meta-item { display: flex; flex-direction: column; gap: 5px; }
+        .meta-label { font-size: 0.78rem; color: var(--text-3); text-transform: uppercase; font-weight: 600; letter-spacing: 0.6px; }
+        .meta-value { font-size: 1rem; font-weight: 600; color: var(--text-1); }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(251,191,36,0.12); border: 1px solid rgba(251,191,36,0.4);
+            color: var(--amber); padding: 5px 12px; border-radius: 6px;
+            font-size: 0.85rem; font-weight: 600;
+        }
+        .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--amber); }
+
+        .owner-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(129,140,248,0.1); border: 1px solid rgba(129,140,248,0.25);
+            border-radius: 8px; padding: 8px 14px;
+        }
+        .owner-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #818cf8, #a78bfa);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; color: #fff;
+            flex-shrink: 0;
+        }
+        .owner-name { font-size: 0.9rem; font-weight: 600; color: var(--text-1); }
+        .owner-title { font-size: 0.78rem; color: var(--text-2); }
+
+        .tech-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+        .tech-tag {
+            background: var(--surface3); border: 1px solid var(--border);
+            color: var(--text-2); padding: 4px 10px;
+            border-radius: 4px; font-size: 0.82rem; font-weight: 500;
+        }
+
+        /* Sections */
+        section { margin-bottom: 44px; }
+        h2 {
+            font-size: 1.55rem; font-weight: 700; color: var(--text-1);
+            margin-bottom: 20px; padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+        }
+        h2 .section-icon {
+            width: 28px; height: 28px; border-radius: 6px;
+            background: linear-gradient(135deg, rgba(129,140,248,0.2), rgba(167,139,250,0.2));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+        }
+        h3 { font-size: 1.1rem; font-weight: 600; color: var(--indigo); margin: 22px 0 12px; }
+        h4 { font-size: 0.95rem; font-weight: 600; color: var(--violet); margin: 16px 0 8px; }
+        p { color: var(--text-2); margin-bottom: 14px; line-height: 1.75; }
+
+        /* Cards */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0; }
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px;
+        }
+        .card h4 { margin-top: 0; color: var(--indigo); font-size: 0.95rem; }
+        .card p { margin-bottom: 0; font-size: 0.9rem; }
+        .card-accent-teal { border-left: 3px solid var(--teal); }
+        .card-accent-indigo { border-left: 3px solid var(--indigo); }
+        .card-accent-violet { border-left: 3px solid var(--violet); }
+        .card-accent-amber { border-left: 3px solid var(--amber); }
+        .card-accent-cyan { border-left: 3px solid var(--cyan); }
+
+        /* Architecture Flow */
+        .arch-flow {
+            display: flex; flex-wrap: wrap; align-items: center;
+            gap: 8px; padding: 24px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; margin: 24px 0;
+        }
+        .flow-box {
+            flex: 1; min-width: 120px;
+            background: rgba(129,140,248,0.1);
+            border: 1px solid rgba(129,140,248,0.3);
+            border-radius: 8px; padding: 12px 10px;
+            text-align: center;
+        }
+        .flow-box .fb-title { font-size: 0.82rem; font-weight: 700; color: var(--indigo); }
+        .flow-box .fb-sub { font-size: 0.72rem; color: var(--text-3); margin-top: 3px; }
+        .flow-arrow { color: var(--text-3); font-size: 1.3rem; flex-shrink: 0; }
+
+        /* Data flow pipeline */
+        .pipeline {
+            display: flex; flex-direction: column; gap: 0;
+            margin: 20px 0;
+        }
+        .pipeline-step {
+            display: flex; align-items: flex-start; gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .pipeline-step:last-child { border-bottom: none; }
+        .pipeline-num {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.82rem; font-weight: 700; color: #fff;
+            flex-shrink: 0; margin-top: 2px;
+        }
+        .pipeline-content h4 { margin: 0 0 4px; font-size: 0.95rem; }
+        .pipeline-content p { margin: 0; font-size: 0.88rem; }
+
+        /* Tables */
+        table {
+            width: 100%; border-collapse: collapse;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; overflow: hidden;
+            margin: 20px 0;
+        }
+        thead { background: rgba(129,140,248,0.12); border-bottom: 1px solid var(--border); }
+        th {
+            padding: 12px 14px; text-align: left;
+            font-size: 0.8rem; font-weight: 600; color: var(--indigo);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text-2); font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Code block */
+        .code-block {
+            background: #0a0f1e; border-left: 3px solid var(--teal);
+            border-radius: 8px; padding: 16px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.85rem; line-height: 1.6;
+            color: var(--teal); overflow-x: auto; margin: 16px 0;
+        }
+        .code-comment { color: var(--text-3); }
+        .code-key { color: var(--indigo); }
+        .code-str { color: var(--violet); }
+
+        /* Metrics row */
+        .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin: 20px 0; }
+        .metric-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 18px; text-align: center;
+        }
+        .metric-num { font-size: 2rem; font-weight: 700; }
+        .metric-label { font-size: 0.78rem; color: var(--text-3); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric-card.indigo .metric-num { color: var(--indigo); }
+        .metric-card.teal .metric-num { color: var(--teal); }
+        .metric-card.violet .metric-num { color: var(--violet); }
+        .metric-card.amber .metric-num { color: var(--amber); }
+
+        /* Integration pill */
+        .integration-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+        .int-pill {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 8px; padding: 10px 16px;
+            display: flex; flex-direction: column; gap: 3px;
+        }
+        .int-pill-name { font-size: 0.88rem; font-weight: 600; color: var(--text-1); }
+        .int-pill-type { font-size: 0.75rem; color: var(--teal); }
+
+        footer {
+            margin-top: 60px; padding-top: 24px;
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+        }
+        footer span { font-size: 0.82rem; color: var(--text-3); }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 1.7rem; }
+            .hero-meta { grid-template-columns: 1fr; }
+            .arch-flow { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+
+<a href="javascript:history.back()" class="back-nav">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+    Back to Tracker
+</a>
+
+<div class="container">
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-content">
+            <span class="new-badge">New — Gap Identified by Malcolm</span>
+            <h1>UC22 — Regulatory Change Impact Radar</h1>
+            <p class="hero-subtitle">Architecture Specification — AI-Powered Regulatory Intelligence Platform for South African Fintech Compliance</p>
+
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Document Type</div>
+                    <div class="meta-value">Architecture Specification</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Status</div>
+                    <div class="status-badge"><div class="status-dot"></div>Not Started — Planning Phase</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Use Case Owner</div>
+                    <div class="owner-badge">
+                        <div class="owner-avatar">MG</div>
+                        <div>
+                            <div class="owner-name">Malcolm Govender</div>
+                            <div class="owner-title">Head of AI &amp; Engineering</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">AI Delivery Target</div>
+                    <div class="meta-value" style="color:var(--teal);">8 hours</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Traditional Estimate</div>
+                    <div class="meta-value">3 devs × 6 months</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Version</div>
+                    <div class="meta-value">v1.0 — May 2026</div>
+                </div>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-tag">Python 3.12</div>
+                <div class="tech-tag">TypeScript / Next.js</div>
+                <div class="tech-tag">LangChain</div>
+                <div class="tech-tag">Claude API</div>
+                <div class="tech-tag">FastAPI</div>
+                <div class="tech-tag">PostgreSQL</div>
+                <div class="tech-tag">Redis</div>
+                <div class="tech-tag">Playwright (scrapers)</div>
+                <div class="tech-tag">Docker / K8s</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERVIEW METRICS -->
+    <div class="metrics-row">
+        <div class="metric-card indigo">
+            <div class="metric-num">2,800</div>
+            <div class="metric-label">Source LOC</div>
+        </div>
+        <div class="metric-card violet">
+            <div class="metric-num">420</div>
+            <div class="metric-label">Test LOC</div>
+        </div>
+        <div class="metric-card teal">
+            <div class="metric-num">13</div>
+            <div class="metric-label">Source Files</div>
+        </div>
+        <div class="metric-card amber">
+            <div class="metric-num">5</div>
+            <div class="metric-label">Regulatory Feeds</div>
+        </div>
+        <div class="metric-card indigo">
+            <div class="metric-num">6</div>
+            <div class="metric-label">Core Components</div>
+        </div>
+    </div>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <section>
+        <h2><span class="section-icon">&#9679;</span>Executive Summary</h2>
+        <p>The Regulatory Change Impact Radar is an AI-powered regulatory intelligence platform that continuously monitors South African and international regulatory bodies — including SARB, FSCA, the POPIA Information Regulator, PCI-SSC, and FICA — for published amendments, gazettes, and guidance notes. The system automatically classifies each regulatory change by impact severity, maps it to affected internal systems and business processes, and generates board-ready impact assessments complete with implementation timelines and cost estimates for the compliance and legal teams.</p>
+        <p>This use case addresses a critical gap in the organisation's compliance posture: regulatory changes are currently tracked manually via email alerts and spreadsheets, leading to delayed response times, inconsistent impact classification, and missed implementation deadlines. The Regulatory Change Impact Radar replaces this manual process with a fully automated, AI-driven intelligence pipeline that delivers structured outputs within minutes of a regulatory update being published.</p>
+
+        <div class="card-grid">
+            <div class="card card-accent-indigo">
+                <h4>Problem Solved</h4>
+                <p>Manual monitoring of 7+ regulatory bodies across multiple jurisdictions. Inconsistent impact classification leading to under- or over-resourcing of compliance efforts. Average 2–3 week lag between regulatory publication and internal awareness.</p>
+            </div>
+            <div class="card card-accent-teal">
+                <h4>AI Approach</h4>
+                <p>LangChain-orchestrated pipeline combining web scraping, LLM-based classification, system mapping via internal API registry, and structured report generation — all triggered automatically on new regulatory content detection.</p>
+            </div>
+            <div class="card card-accent-violet">
+                <h4>Compliance Frameworks</h4>
+                <p>POPIA, FICA, PCI-DSS, SARB Prudential Standards, National Credit Act, FSCA Conduct Standards. Extensible to additional frameworks via configuration.</p>
+            </div>
+            <div class="card card-accent-amber">
+                <h4>Key Deliverable</h4>
+                <p>Board-ready impact assessment PDFs auto-generated within 30 minutes of regulatory publication, replacing a process that currently takes 3–4 weeks of analyst time per significant change.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SYSTEM ARCHITECTURE -->
+    <section>
+        <h2><span class="section-icon">&#9651;</span>System Architecture</h2>
+        <p>The platform is composed of six core components arranged in a sequential intelligence pipeline, from raw regulatory feed ingestion through to board-ready report delivery.</p>
+
+        <div class="arch-flow">
+            <div class="flow-box">
+                <div class="fb-title">Feed Aggregator</div>
+                <div class="fb-sub">RSS / Scraper / API</div>
+            </div>
+            <div class="flow-arrow">&#8594;</div>
+            <div class="flow-box">
+                <div class="fb-title">Change Classifier</div>
+                <div class="fb-sub">LangChain + Claude</div>
+            </div>
+            <div class="flow-arrow">&#8594;</div>
+            <div class="flow-box">
+                <div class="fb-title">Impact Analyser</div>
+                <div class="fb-sub">LLM reasoning</div>
+            </div>
+            <div class="flow-arrow">&#8594;</div>
+            <div class="flow-box">
+                <div class="fb-title">System Mapper</div>
+                <div class="fb-sub">Internal registry</div>
+            </div>
+            <div class="flow-arrow">&#8594;</div>
+            <div class="flow-box">
+                <div class="fb-title">Report Generator</div>
+                <div class="fb-sub">Structured output</div>
+            </div>
+            <div class="flow-arrow">&#8594;</div>
+            <div class="flow-box">
+                <div class="fb-title">Board Dashboard</div>
+                <div class="fb-sub">TypeScript / Next.js</div>
+            </div>
+        </div>
+
+        <h3>Component 1 — Feed Aggregator</h3>
+        <p>The Feed Aggregator is a Python-based service responsible for continuously polling all configured regulatory sources and normalising raw content into a standard document schema. It uses Playwright for web scraping (FSCA website, Government Gazette), native RSS parsing for structured feeds, and scheduled polling via APScheduler.</p>
+        <div class="card card-accent-indigo">
+            <h4>Key Responsibilities</h4>
+            <p>Source polling at configurable intervals (default: 4-hourly for critical sources, 24-hourly for low-frequency sources). Content deduplication via SHA-256 hashing. PDF parsing for gazette documents (PyMuPDF). Raw content stored in PostgreSQL with full audit trail. Change detection triggering downstream pipeline.</p>
+        </div>
+
+        <h3>Component 2 — Change Classifier</h3>
+        <p>The Change Classifier uses a LangChain pipeline with Claude as the reasoning engine to classify each new regulatory document across multiple dimensions: impact severity (Critical / High / Medium / Low), affected compliance framework, change type (amendment / new requirement / guidance / consultation), and effective date extraction.</p>
+        <div class="card card-accent-violet">
+            <h4>Classification Dimensions</h4>
+            <p>Impact Severity | Compliance Framework | Change Type | Affected Jurisdiction | Effective Date | Implementation Deadline | Penalty Exposure. All classifications stored with confidence scores and supporting evidence for audit purposes.</p>
+        </div>
+
+        <h3>Component 3 — Impact Analyser</h3>
+        <p>The Impact Analyser takes classified regulatory changes and performs deep reasoning against the organisation's known system inventory and process catalogue. It identifies which internal systems, APIs, data stores, and business processes are materially affected by each change, and estimates implementation complexity and effort.</p>
+
+        <h3>Component 4 — System Mapper</h3>
+        <p>The System Mapper maintains an internal registry of all production systems, their compliance tags, owning teams, and data categories they process. It uses vector embeddings (pgvector) to perform semantic matching between regulatory requirements and system capabilities, surfacing non-obvious compliance dependencies.</p>
+
+        <h3>Component 5 — Report Generator</h3>
+        <p>The Report Generator produces structured, board-ready impact assessment documents in HTML and PDF format. Reports include executive summary, impact classification, affected systems table, implementation timeline, cost estimates, risk-if-non-compliant analysis, and recommended action plan with owners and due dates.</p>
+
+        <h3>Component 6 — Board Dashboard</h3>
+        <p>A Next.js TypeScript dashboard providing real-time visibility into the regulatory change pipeline, outstanding compliance actions, upcoming regulatory deadlines calendar, and historical change tracking. Role-based access for compliance officers, legal team, and executive leadership.</p>
+    </section>
+
+    <!-- DATA FLOW -->
+    <section>
+        <h2><span class="section-icon">&#9654;</span>Data Flow</h2>
+        <p>The complete intelligence pipeline from regulatory feed to board report follows eight discrete steps, each with defined inputs, outputs, and SLA targets.</p>
+
+        <div class="pipeline">
+            <div class="pipeline-step">
+                <div class="pipeline-num">1</div>
+                <div class="pipeline-content">
+                    <h4>Regulatory Source Polling</h4>
+                    <p>APScheduler triggers feed aggregator jobs per source configuration. Playwright scrapes HTML/PDF content from web sources. RSS parser ingests structured feeds. New content flagged for processing.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-num">2</div>
+                <div class="pipeline-content">
+                    <h4>Content Normalisation &amp; Deduplication</h4>
+                    <p>Raw content normalised to standard schema (title, body, source, publication date, document type). SHA-256 hash computed. Duplicates discarded. New documents stored in PostgreSQL <code style="color:var(--teal);">regulatory_documents</code> table.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-num">3</div>
+                <div class="pipeline-content">
+                    <h4>LLM Classification</h4>
+                    <p>LangChain pipeline invoked with structured prompt. Claude analyses document and returns JSON classification: severity, framework, change type, affected entities, effective date, implementation deadline. Confidence scores attached. Stored in <code style="color:var(--teal);">regulatory_classifications</code>.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-num">4</div>
+                <div class="pipeline-content">
+                    <h4>Impact Analysis</h4>
+                    <p>Claude performs chain-of-thought reasoning over classification + system registry. Produces impact analysis: affected systems list, per-system impact severity, estimated LOE (person-days), compliance gap assessment.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-num">5</div>
+                <div class="pipeline-content">
+                    <h4>System Mapping via Vector Search</h4>
+                    <p>Regulatory requirements embedded via text-embedding-3-large. pgvector similarity search against system registry embeddings. Top-k systems retrieved and ranked by relevance score + compliance tag match.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-num">6</div>
+                <div class="pipeline-content">
+                    <h4>Cost &amp; Timeline Estimation</h4>
+                    <p>LOE estimates converted to cost using configured team rate cards. Implementation timeline generated with dependencies. Board-ready Gantt data structured for report template.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-num">7</div>
+                <div class="pipeline-content">
+                    <h4>Report Generation</h4>
+                    <p>Jinja2 templates populated with all analysis outputs. HTML report rendered. PDF generated via Playwright headless Chrome. Reports stored in S3-compatible object storage. Email notifications dispatched to configured stakeholders.</p>
+                </div>
+            </div>
+            <div class="pipeline-step">
+                <div class="pipeline-num">8</div>
+                <div class="pipeline-content">
+                    <h4>Dashboard Update</h4>
+                    <p>FastAPI backend event broadcast via WebSocket to Next.js dashboard. Compliance action items created in task system. Regulatory calendar updated with upcoming deadlines. Slack notification to #compliance-alerts channel.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTEGRATION POINTS -->
+    <section>
+        <h2><span class="section-icon">&#9632;</span>Integration Points</h2>
+        <p>The Regulatory Change Impact Radar integrates with five primary external regulatory sources and multiple internal platform systems.</p>
+
+        <h3>External Regulatory Sources</h3>
+        <div class="integration-list">
+            <div class="int-pill">
+                <div class="int-pill-name">SARB — South African Reserve Bank</div>
+                <div class="int-pill-type">Web Scrape + PDF Parse (Government Gazette)</div>
+            </div>
+            <div class="int-pill">
+                <div class="int-pill-name">FSCA — Financial Sector Conduct Authority</div>
+                <div class="int-pill-type">Web Scrape (fsca.co.za communications)</div>
+            </div>
+            <div class="int-pill">
+                <div class="int-pill-name">POPIA Information Regulator</div>
+                <div class="int-pill-type">RSS Feed + Web Scrape (inforegulator.org.za)</div>
+            </div>
+            <div class="int-pill">
+                <div class="int-pill-name">PCI Security Standards Council</div>
+                <div class="int-pill-type">RSS Feed (pcisecuritystandards.org)</div>
+            </div>
+            <div class="int-pill">
+                <div class="int-pill-name">FICA / FIC — Financial Intelligence Centre</div>
+                <div class="int-pill-type">Web Scrape + Manual Upload (fic.gov.za)</div>
+            </div>
+        </div>
+
+        <h3>Internal System Integrations</h3>
+        <table>
+            <thead>
+                <tr><th>System</th><th>Integration Type</th><th>Purpose</th><th>Auth</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>System Registry API</td><td>REST GET</td><td>Fetch system inventory for impact mapping</td><td>Internal mTLS</td></tr>
+                <tr><td>PostgreSQL</td><td>Direct connection pool</td><td>Primary data store for documents and classifications</td><td>Service account</td></tr>
+                <tr><td>pgvector extension</td><td>SQL + vector ops</td><td>Semantic similarity search for system mapping</td><td>Inherited</td></tr>
+                <tr><td>Object Storage (S3)</td><td>AWS SDK / boto3</td><td>Report PDF archival and delivery</td><td>IAM role</td></tr>
+                <tr><td>Slack API</td><td>Webhook POST</td><td>Compliance alerts to #compliance-alerts</td><td>Bot token</td></tr>
+                <tr><td>Email (SendGrid)</td><td>REST API</td><td>Stakeholder notifications with report attachments</td><td>API key</td></tr>
+                <tr><td>Task Management API</td><td>REST POST</td><td>Auto-create compliance action items</td><td>OAuth 2.0</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- API CONTRACTS -->
+    <section>
+        <h2><span class="section-icon">&#9670;</span>API Contracts</h2>
+        <p>The Regulatory Radar exposes a FastAPI REST interface for dashboard consumption and external integration. All endpoints are versioned under <code style="color:var(--teal);">/api/v1/</code>.</p>
+
+        <h3>Core Endpoints</h3>
+        <div class="code-block">
+<span class="code-comment"># POST /api/v1/regulatory/trigger — Force re-scan of all sources</span>
+<span class="code-key">Request:</span>  <span class="code-str">{ "source_ids": ["sarb", "fsca", "popia"], "force": true }</span>
+<span class="code-key">Response:</span> <span class="code-str">{ "job_id": "uuid", "status": "queued", "sources": 3 }</span>
+
+<span class="code-comment"># GET /api/v1/regulatory/changes — List classified regulatory changes</span>
+<span class="code-key">Params:</span>   <span class="code-str">severity, framework, from_date, to_date, status, limit, offset</span>
+<span class="code-key">Response:</span> <span class="code-str">{ "total": 47, "items": [ { "id", "title", "source", "severity", "framework", "effective_date", "report_url" } ] }</span>
+
+<span class="code-comment"># GET /api/v1/regulatory/changes/{id}/report — Retrieve impact assessment</span>
+<span class="code-key">Response:</span> <span class="code-str">{ "id", "html_url", "pdf_url", "generated_at", "affected_systems": [], "timeline": {}, "cost_estimate": {} }</span>
+
+<span class="code-comment"># GET /api/v1/regulatory/calendar — Upcoming compliance deadlines</span>
+<span class="code-key">Params:</span>   <span class="code-str">days_ahead (default 90), framework, severity</span>
+<span class="code-key">Response:</span> <span class="code-str">{ "deadlines": [ { "date", "framework", "description", "change_id", "days_remaining" } ] }</span>
+
+<span class="code-comment"># POST /api/v1/regulatory/sources — Register new regulatory source</span>
+<span class="code-key">Request:</span>  <span class="code-str">{ "name", "url", "feed_type": "rss|scrape|api|manual", "poll_interval_hours", "frameworks": [] }</span>
+        </div>
+
+        <h3>Webhook Events</h3>
+        <table>
+            <thead>
+                <tr><th>Event</th><th>Trigger</th><th>Payload</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code style="color:var(--teal);">regulatory.change.detected</code></td><td>New document ingested</td><td>source, title, url, detected_at</td></tr>
+                <tr><td><code style="color:var(--teal);">regulatory.change.classified</code></td><td>Classification complete</td><td>change_id, severity, framework, effective_date</td></tr>
+                <tr><td><code style="color:var(--teal);">regulatory.report.ready</code></td><td>Impact assessment generated</td><td>change_id, report_url, pdf_url, affected_systems_count</td></tr>
+                <tr><td><code style="color:var(--teal);">regulatory.deadline.approaching</code></td><td>T-30, T-14, T-7 before effective date</td><td>change_id, deadline, days_remaining</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- DEPLOYMENT ARCHITECTURE -->
+    <section>
+        <h2><span class="section-icon">&#9741;</span>Deployment Architecture</h2>
+        <p>The platform is containerised with Docker and deployed to Kubernetes. Each component runs as an independent service to enable independent scaling and fault isolation.</p>
+
+        <table>
+            <thead>
+                <tr><th>Service</th><th>Language / Runtime</th><th>K8s Replicas</th><th>CPU / Memory</th><th>Scaling Trigger</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>feed-aggregator</td><td>Python 3.12</td><td>2</td><td>500m / 512Mi</td><td>Cron schedule</td></tr>
+                <tr><td>change-classifier</td><td>Python 3.12 + LangChain</td><td>2–4</td><td>1000m / 1Gi</td><td>Queue depth</td></tr>
+                <tr><td>impact-analyser</td><td>Python 3.12</td><td>2–4</td><td>1000m / 1Gi</td><td>Queue depth</td></tr>
+                <tr><td>system-mapper</td><td>Python 3.12</td><td>1</td><td>500m / 512Mi</td><td>On demand</td></tr>
+                <tr><td>report-generator</td><td>Python 3.12 + Playwright</td><td>2</td><td>1000m / 2Gi</td><td>Queue depth</td></tr>
+                <tr><td>api-gateway</td><td>FastAPI / Uvicorn</td><td>2–6</td><td>500m / 256Mi</td><td>Request rate</td></tr>
+                <tr><td>board-dashboard</td><td>Next.js / Node 20</td><td>2</td><td>500m / 512Mi</td><td>Request rate</td></tr>
+                <tr><td>postgres</td><td>PostgreSQL 16 + pgvector</td><td>1 (+ replica)</td><td>2000m / 4Gi</td><td>Manual</td></tr>
+                <tr><td>redis</td><td>Redis 7</td><td>1</td><td>250m / 256Mi</td><td>Manual</td></tr>
+            </tbody>
+        </table>
+
+        <div class="card-grid">
+            <div class="card card-accent-teal">
+                <h4>Messaging &amp; Queueing</h4>
+                <p>Redis Streams used as the inter-service message bus. Each pipeline stage publishes events consumed by the next stage. Dead letter queue for failed processing with configurable retry (max 3 attempts).</p>
+            </div>
+            <div class="card card-accent-indigo">
+                <h4>Secret Management</h4>
+                <p>Kubernetes Secrets for database credentials and API keys. External Secrets Operator syncing from HashiCorp Vault. Rotation policy: 90 days for API keys, 30 days for DB passwords.</p>
+            </div>
+            <div class="card card-accent-violet">
+                <h4>Observability</h4>
+                <p>OpenTelemetry instrumentation across all services. Prometheus metrics exported. Grafana dashboards for pipeline throughput, classification latency, and LLM token usage. Alerting via PagerDuty for SLA breaches.</p>
+            </div>
+            <div class="card card-accent-amber">
+                <h4>Data Retention</h4>
+                <p>Raw regulatory documents: 7 years (compliance requirement). Classified changes: indefinite. Generated reports: 10 years. Pipeline processing logs: 90 days. All data encrypted at rest (AES-256).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLA TARGETS -->
+    <section>
+        <h2><span class="section-icon">&#9711;</span>SLA Targets</h2>
+        <table>
+            <thead>
+                <tr><th>Metric</th><th>Target</th><th>Measurement</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Time to detection (critical sources)</td><td>&lt; 4 hours</td><td>From publication to ingestion</td></tr>
+                <tr><td>Time to classification</td><td>&lt; 5 minutes</td><td>From ingestion to classified</td></tr>
+                <tr><td>Time to impact assessment</td><td>&lt; 30 minutes</td><td>From classification to report ready</td></tr>
+                <tr><td>Dashboard availability</td><td>99.5% uptime</td><td>Monthly rolling average</td></tr>
+                <tr><td>Classification accuracy</td><td>&gt; 95%</td><td>Human review sample (5% random)</td></tr>
+                <tr><td>False critical alert rate</td><td>&lt; 2%</td><td>Monthly review by compliance team</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <span>UC22 — Regulatory Change Impact Radar | Architecture Specification v1.0</span>
+        <span>Malcolm Govender — Head of AI &amp; Engineering | May 2026</span>
+        <span>Confidential — Internal Use Only</span>
+    </footer>
+
+</div>
+</body>
+</html>

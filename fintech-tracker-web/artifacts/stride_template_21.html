@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UC-21 STRIDE Threat Modelling Template</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0f172a; --surface:#1e293b; --surface2:#263348; --surface3:#2e3f58;
+      --border:rgba(255,255,255,.07); --border-s:rgba(255,255,255,.12);
+      --text:#e2e8f0; --text-muted:#94a3b8;
+      --indigo:#818cf8; --violet:#a78bfa; --teal:#2dd4bf; --amber:#fbbf24; --rose:#f87171; --green:#34d399; --sky:#38bdf8;
+    }
+    body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',Roboto,sans-serif; background:var(--bg); color:var(--text); font-size:14px; line-height:1.65; }
+    .accent-bar { height:3px; background:linear-gradient(90deg,#818cf8 0%,#a78bfa 35%,#2dd4bf 70%,#fbbf24 100%); position:sticky; top:0; z-index:100; }
+    .page { max-width:1100px; margin:0 auto; padding:2.5rem 2rem 4rem; }
+    .doc-header { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:2rem 2.5rem; margin-bottom:2rem; position:relative; overflow:hidden; }
+    .doc-header::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,#818cf8,#a78bfa,#2dd4bf); }
+    .header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:1.5rem; flex-wrap:wrap; margin-bottom:1.25rem; }
+    .new-badge { display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; background:linear-gradient(135deg,#818cf8,#a78bfa); color:#fff; border-radius:20px; padding:3px 12px; margin-bottom:10px; }
+    .doc-title { font-size:28px; font-weight:700; letter-spacing:-.5px; color:var(--text); margin-bottom:4px; }
+    .doc-subtitle { font-size:15px; color:var(--text-muted); }
+    .status-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(251,191,36,.12); border:1px solid rgba(251,191,36,.3); color:var(--amber); border-radius:20px; padding:4px 14px; font-size:11px; font-weight:600; letter-spacing:.04em; white-space:nowrap; }
+    .status-dot { width:7px; height:7px; border-radius:50%; background:var(--amber); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .header-meta { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; padding-top:1rem; border-top:1px solid var(--border); }
+    .owner-badge { display:flex; align-items:center; gap:10px; background:var(--surface2); border:1px solid var(--border-s); border-radius:8px; padding:8px 14px; }
+    .avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#818cf8,#a78bfa); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+    .owner-name { font-size:13px; font-weight:600; color:var(--text); }
+    .owner-role { font-size:11px; color:var(--text-muted); }
+    .meta-item { display:flex; flex-direction:column; gap:2px; }
+    .meta-label { font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); font-weight:600; }
+    .meta-value { font-size:13px; font-weight:600; color:var(--text); }
+    .section { margin-bottom:2.5rem; }
+    .section-title { font-size:18px; font-weight:700; color:var(--indigo); border-bottom:1px solid var(--border); padding-bottom:.75rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:10px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1.25rem 1.5rem; margin-bottom:1rem; }
+    .card p { color:var(--text-muted); font-size:13px; margin-bottom:.5rem; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+    @media(max-width:700px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+
+    /* STRIDE category cards */
+    .stride-card { border-radius:12px; border:1px solid var(--border); margin-bottom:1.5rem; overflow:hidden; }
+    .stride-header { padding:1rem 1.5rem; display:flex; align-items:center; gap:12px; }
+    .stride-letter { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; flex-shrink:0; }
+    .stride-header-text { flex:1; }
+    .stride-name { font-size:16px; font-weight:700; }
+    .stride-full { font-size:12px; opacity:.8; margin-top:1px; }
+    .stride-body { background:var(--surface); padding:1.25rem 1.5rem; }
+    .stride-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:.75rem; }
+    @media(max-width:700px){ .stride-grid{ grid-template-columns:1fr; } }
+    .stride-col-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:.5rem; }
+    .stride-col ul { list-style:none; padding:0; }
+    .stride-col ul li { font-size:12px; color:var(--text-muted); padding:.25rem 0; border-bottom:1px solid var(--border); display:flex; gap:6px; }
+    .stride-col ul li::before { content:'›'; color:var(--teal); font-weight:700; }
+    .stride-col ul li:last-child { border-bottom:none; }
+    .def-text { font-size:13px; color:var(--text-muted); }
+
+    /* Colour scheme for each letter */
+    .s-s { background:rgba(248,113,113,.12); border-color:rgba(248,113,113,.3); }
+    .s-s .stride-letter { background:rgba(248,113,113,.2); color:#f87171; }
+    .s-s .stride-name { color:#f87171; }
+    .s-t { background:rgba(251,191,36,.12); border-color:rgba(251,191,36,.3); }
+    .s-t .stride-letter { background:rgba(251,191,36,.2); color:#fbbf24; }
+    .s-t .stride-name { color:#fbbf24; }
+    .s-r { background:rgba(167,139,250,.12); border-color:rgba(167,139,250,.3); }
+    .s-r .stride-letter { background:rgba(167,139,250,.2); color:#a78bfa; }
+    .s-r .stride-name { color:#a78bfa; }
+    .s-i { background:rgba(56,189,248,.12); border-color:rgba(56,189,248,.3); }
+    .s-i .stride-letter { background:rgba(56,189,248,.2); color:#38bdf8; }
+    .s-i .stride-name { color:#38bdf8; }
+    .s-d { background:rgba(129,140,248,.12); border-color:rgba(129,140,248,.3); }
+    .s-d .stride-letter { background:rgba(129,140,248,.2); color:#818cf8; }
+    .s-d .stride-name { color:#818cf8; }
+    .s-e { background:rgba(45,212,191,.12); border-color:rgba(45,212,191,.3); }
+    .s-e .stride-letter { background:rgba(45,212,191,.2); color:#2dd4bf; }
+    .s-e .stride-name { color:#2dd4bf; }
+
+    /* DREAD table */
+    .table-wrap { overflow-x:auto; border-radius:10px; border:1px solid var(--border); }
+    table { width:100%; border-collapse:collapse; }
+    thead { background:var(--surface2); }
+    th { padding:11px 14px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); border-bottom:1px solid var(--border); }
+    td { padding:10px 14px; font-size:13px; color:var(--text); border-bottom:1px solid var(--border); vertical-align:top; }
+    tr:last-child td { border-bottom:none; }
+    tr:nth-child(even) td { background:rgba(255,255,255,.015); }
+    tr:hover td { background:rgba(129,140,248,.05); }
+    .tag { display:inline-block; font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; border:1px solid; }
+    .tag-indigo { color:var(--indigo); border-color:rgba(129,140,248,.3); background:rgba(129,140,248,.08); }
+    .tag-teal   { color:var(--teal);   border-color:rgba(45,212,191,.3);  background:rgba(45,212,191,.08); }
+    .tag-violet { color:var(--violet); border-color:rgba(167,139,250,.3); background:rgba(167,139,250,.08); }
+    .tag-amber  { color:var(--amber);  border-color:rgba(251,191,36,.3);  background:rgba(251,191,36,.08); }
+    .tag-green  { color:var(--green);  border-color:rgba(52,211,153,.3);  background:rgba(52,211,153,.08); }
+    .tag-rose   { color:var(--rose);   border-color:rgba(248,113,113,.3); background:rgba(248,113,113,.08); }
+    .tag-sky    { color:var(--sky);    border-color:rgba(56,189,248,.3);  background:rgba(56,189,248,.08); }
+
+    /* Score bar */
+    .score-bar { display:flex; gap:3px; margin-top:4px; }
+    .score-pip { width:16px; height:6px; border-radius:2px; background:var(--surface3); }
+    .score-pip.filled { background:var(--rose); }
+    .score-pip.med { background:var(--amber); }
+    .score-pip.low { background:var(--green); }
+
+    /* PASTA stages */
+    .pasta-stages { display:flex; flex-direction:column; gap:.75rem; }
+    .pasta-stage { display:flex; align-items:flex-start; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1rem 1.25rem; }
+    .stage-num { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#818cf8,#a78bfa); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; flex-shrink:0; }
+    .stage-content { flex:1; }
+    .stage-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:2px; }
+    .stage-desc { font-size:12px; color:var(--text-muted); }
+
+    /* Example threat model table */
+    .example-header { background:linear-gradient(135deg,rgba(129,140,248,.15),rgba(167,139,250,.1)); border:1px solid rgba(129,140,248,.25); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1rem; }
+    .example-header-title { font-size:14px; font-weight:700; color:var(--violet); margin-bottom:2px; }
+    .example-header-sub { font-size:12px; color:var(--text-muted); }
+
+    /* Blank template */
+    .blank-table td { color:var(--surface3); font-style:italic; }
+    .blank-table td input-hint { color:var(--surface3); }
+
+    .doc-footer { margin-top:3rem; padding-top:1.5rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+    .footer-text { font-size:12px; color:var(--text-muted); }
+    .footer-brand { font-size:12px; color:var(--indigo); font-weight:600; }
+
+    .info-box { background:rgba(45,212,191,.06); border:1px solid rgba(45,212,191,.2); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.25rem; }
+    .info-box p { font-size:13px; color:var(--text-muted); }
+    .info-box strong { color:var(--teal); }
+  </style>
+</head>
+<body>
+<div class="accent-bar"></div>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div class="header-top">
+      <div>
+        <div class="new-badge">&#10022; New &mdash; Gap Identified by Malcolm</div>
+        <div class="doc-title">UC-21 STRIDE Threat Modelling Template</div>
+        <div class="doc-subtitle">Reusable STRIDE / DREAD / PASTA Template for Fintech AI Systems &mdash; AI Threat Modelling Agent</div>
+      </div>
+      <div class="status-badge">
+        <span class="status-dot"></span>Not Started &mdash; Planning Phase
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="owner-badge">
+        <div class="avatar">MG</div>
+        <div>
+          <div class="owner-name">Malcolm Govender</div>
+          <div class="owner-role">Head of AI &amp; Engineering</div>
+        </div>
+      </div>
+      <div class="meta-item"><span class="meta-label">Document</span><span class="meta-value">STRIDE Template v1.0</span></div>
+      <div class="meta-item"><span class="meta-label">Methodology</span><span class="meta-value">STRIDE &middot; DREAD &middot; PASTA</span></div>
+      <div class="meta-item"><span class="meta-label">Compliance</span><span class="meta-value">PCI-DSS &middot; ISO 27001</span></div>
+      <div class="meta-item"><span class="meta-label">Date</span><span class="meta-value">May 2026</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: STRIDE OVERVIEW -->
+  <div class="section">
+    <div class="section-title">&#128269; 1. STRIDE Methodology Overview</div>
+    <div class="info-box">
+      <p><strong>STRIDE</strong> is a threat modelling framework developed by Microsoft that categorises threats into six types: <strong>Spoofing</strong>, <strong>Tampering</strong>, <strong>Repudiation</strong>, <strong>Information Disclosure</strong>, <strong>Denial of Service</strong>, and <strong>Elevation of Privilege</strong>. Applied systematically to each component and data flow in a system, STRIDE ensures comprehensive security coverage across the attack surface. In the UC-21 AI Threat Modelling Agent, STRIDE analysis is auto-generated by the LLM on every PR.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <p><strong style="color:var(--rose);">S</strong> &mdash; Spoofing identity of a user, component, or service</p>
+      </div>
+      <div class="card">
+        <p><strong style="color:var(--amber);">T</strong> &mdash; Tampering with data at rest or in transit</p>
+      </div>
+      <div class="card">
+        <p><strong style="color:var(--violet);">R</strong> &mdash; Repudiation &mdash; denying actions without proof</p>
+      </div>
+      <div class="card">
+        <p><strong style="color:var(--sky);">I</strong> &mdash; Information Disclosure of sensitive or confidential data</p>
+      </div>
+      <div class="card">
+        <p><strong style="color:var(--indigo);">D</strong> &mdash; Denial of Service &mdash; degrading system availability</p>
+      </div>
+      <div class="card">
+        <p><strong style="color:var(--teal);">E</strong> &mdash; Elevation of Privilege &mdash; gaining unauthorised access</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: STRIDE CATEGORIES -->
+  <div class="section">
+    <div class="section-title">&#128737; 2. STRIDE Category Detail &mdash; Fintech Context</div>
+
+    <!-- SPOOFING -->
+    <div class="stride-card s-s">
+      <div class="stride-header">
+        <div class="stride-letter">S</div>
+        <div class="stride-header-text">
+          <div class="stride-name">Spoofing</div>
+          <div class="stride-full">Pretending to be someone or something else to gain access or trust</div>
+        </div>
+        <span class="tag tag-rose">ISO 27001 A.5.15</span>
+      </div>
+      <div class="stride-body">
+        <p class="def-text">An attacker impersonates a legitimate user, service, or API client to gain unauthorised access to financial systems or data.</p>
+        <div class="stride-grid">
+          <div class="stride-col">
+            <div class="stride-col-title">Fintech Threat Examples</div>
+            <ul>
+              <li>Stolen JWT token used to impersonate payment API consumer</li>
+              <li>Fake OAuth client registered to intercept auth codes</li>
+              <li>DNS spoofing redirecting payment webhooks to attacker server</li>
+              <li>AI model receiving spoofed architecture diagram input</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Questions to Ask</div>
+            <ul>
+              <li>How is the caller's identity verified at each API boundary?</li>
+              <li>Are service-to-service calls mutually authenticated?</li>
+              <li>Can tokens be replayed? What is the token lifetime?</li>
+              <li>Are diagram sources verified before LLM ingestion?</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Example Mitigations</div>
+            <ul>
+              <li>mTLS for service-to-service communication</li>
+              <li>Short-lived JWTs (&lt;15 min) with refresh rotation</li>
+              <li>DNSSEC and certificate pinning for webhook endpoints</li>
+              <li>Cryptographic signing of diagram artefacts at source</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAMPERING -->
+    <div class="stride-card s-t">
+      <div class="stride-header">
+        <div class="stride-letter">T</div>
+        <div class="stride-header-text">
+          <div class="stride-name">Tampering</div>
+          <div class="stride-full">Maliciously modifying data, code, or configuration without authorisation</div>
+        </div>
+        <span class="tag tag-amber">PCI-DSS 6.3.3</span>
+      </div>
+      <div class="stride-body">
+        <p class="def-text">An attacker modifies data in transit, at rest, or in process to alter system behaviour, corrupt records, or manipulate AI outputs.</p>
+        <div class="stride-grid">
+          <div class="stride-col">
+            <div class="stride-col-title">Fintech Threat Examples</div>
+            <ul>
+              <li>MITM attack altering transaction amounts in API payloads</li>
+              <li>Prompt injection in PRD causing malicious threat model output</li>
+              <li>Threat register entries modified to suppress critical findings</li>
+              <li>Malicious draw.io diagram injecting script into threat report</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Questions to Ask</div>
+            <ul>
+              <li>Is all data validated and sanitised before LLM ingestion?</li>
+              <li>Are threat register writes authenticated and audit-logged?</li>
+              <li>Is TLS enforced on all API endpoints (no HTTP fallback)?</li>
+              <li>Can PR artefacts be modified after analysis starts?</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Example Mitigations</div>
+            <ul>
+              <li>TLS 1.3 with HSTS for all data-in-transit</li>
+              <li>HMAC signing of Threat Register entries</li>
+              <li>Input sanitisation and prompt injection detection layer</li>
+              <li>Immutable artefact snapshots pinned to git commit SHA</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPUDIATION -->
+    <div class="stride-card s-r">
+      <div class="stride-header">
+        <div class="stride-letter">R</div>
+        <div class="stride-header-text">
+          <div class="stride-name">Repudiation</div>
+          <div class="stride-full">Denying having performed an action when no proof exists to refute the claim</div>
+        </div>
+        <span class="tag tag-violet">PCI-DSS 10.2</span>
+      </div>
+      <div class="stride-body">
+        <p class="def-text">A user or process denies taking an action (e.g., approving a PR with critical threats, overriding a security gate) because there is insufficient audit evidence.</p>
+        <div class="stride-grid">
+          <div class="stride-col">
+            <div class="stride-col-title">Fintech Threat Examples</div>
+            <ul>
+              <li>Developer denies overriding CRITICAL threat gate on a PR</li>
+              <li>Security analyst claims threat register was never updated</li>
+              <li>AI agent run log deleted before incident investigation</li>
+              <li>Jira ticket closure not linked back to threat register entry</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Questions to Ask</div>
+            <ul>
+              <li>Are all override actions logged with user identity and reason?</li>
+              <li>Is audit log storage tamper-evident and access-controlled?</li>
+              <li>Can logs be deleted by the same users who generate them?</li>
+              <li>Is there a complete chain of custody for each threat finding?</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Example Mitigations</div>
+            <ul>
+              <li>Immutable CloudTrail logs with integrity validation</li>
+              <li>Require written justification for all security gate overrides</li>
+              <li>Separate log storage role from developer/operations roles</li>
+              <li>Automated audit report generation for compliance reviews</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFORMATION DISCLOSURE -->
+    <div class="stride-card s-i">
+      <div class="stride-header">
+        <div class="stride-letter">I</div>
+        <div class="stride-header-text">
+          <div class="stride-name">Information Disclosure</div>
+          <div class="stride-full">Exposing information to individuals who are not authorised to see it</div>
+        </div>
+        <span class="tag tag-sky">PCI-DSS 3.x</span>
+      </div>
+      <div class="stride-body">
+        <p class="def-text">Sensitive data (cardholder data, PII, proprietary architecture, API keys) is exposed to unauthorised parties through system vulnerabilities, misconfiguration, or AI model outputs.</p>
+        <div class="stride-grid">
+          <div class="stride-col">
+            <div class="stride-col-title">Fintech Threat Examples</div>
+            <ul>
+              <li>PRD containing card data sent to OpenAI API without redaction</li>
+              <li>Threat model reports containing internal IP ranges exposed via pre-signed URL</li>
+              <li>Error messages leaking internal stack traces in PR comments</li>
+              <li>LLM training on sensitive threat data via data exfiltration</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Questions to Ask</div>
+            <ul>
+              <li>Is cardholder and PII data scrubbed before LLM API calls?</li>
+              <li>Are pre-signed URL expiry times appropriate (&lt;1h)?</li>
+              <li>Do error responses contain internal system details?</li>
+              <li>Is OpenAI opt-out from training configured for our org?</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Example Mitigations</div>
+            <ul>
+              <li>PII/PAN detection and redaction before any LLM call</li>
+              <li>Pre-signed URL TTL &lt;1h; no public S3 buckets</li>
+              <li>Generic error messages in all external-facing responses</li>
+              <li>OpenAI API with zero-data-retention agreement</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DENIAL OF SERVICE -->
+    <div class="stride-card s-d">
+      <div class="stride-header">
+        <div class="stride-letter">D</div>
+        <div class="stride-header-text">
+          <div class="stride-name">Denial of Service</div>
+          <div class="stride-full">Degrading or denying service availability to legitimate users</div>
+        </div>
+        <span class="tag tag-indigo">ISO 27001 A.8.6</span>
+      </div>
+      <div class="stride-body">
+        <p class="def-text">An attacker overwhelms the threat modelling service, exhausts API rate limits, or forces expensive LLM operations causing delays in the SDLC pipeline and PR blockages.</p>
+        <div class="stride-grid">
+          <div class="stride-col">
+            <div class="stride-col-title">Fintech Threat Examples</div>
+            <ul>
+              <li>Adversarial PR with 100MB diagram file exhausting analysis budget</li>
+              <li>Rapid PR spam triggering runaway OpenAI API cost</li>
+              <li>Redis queue flood blocking all other PR analyses</li>
+              <li>Recursive diagram references causing infinite parser loop</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Questions to Ask</div>
+            <ul>
+              <li>Are input file sizes and counts capped per run?</li>
+              <li>Is there a per-repository LLM token budget limit?</li>
+              <li>Can a single repo's job queue flood affect other repos?</li>
+              <li>Is there a timeout and circuit breaker on LLM calls?</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Example Mitigations</div>
+            <ul>
+              <li>Max input: 10MB total, 5 files per run</li>
+              <li>Per-repo daily token budget with hard cut-off and alert</li>
+              <li>Isolated job queues per repository (Redis keyspace)</li>
+              <li>LLM call timeout: 30s; circuit breaker on 3 consecutive failures</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ELEVATION OF PRIVILEGE -->
+    <div class="stride-card s-e">
+      <div class="stride-header">
+        <div class="stride-letter">E</div>
+        <div class="stride-header-text">
+          <div class="stride-name">Elevation of Privilege</div>
+          <div class="stride-full">Gaining capabilities beyond what is authorised, escalating from low to high privilege</div>
+        </div>
+        <span class="tag tag-teal">ISO 27001 A.8.2</span>
+      </div>
+      <div class="stride-body">
+        <p class="def-text">An attacker (or compromised AI agent) gains access to resources or capabilities beyond their authorisation, potentially taking control of the threat modelling pipeline or downstream systems.</p>
+        <div class="stride-grid">
+          <div class="stride-col">
+            <div class="stride-col-title">Fintech Threat Examples</div>
+            <ul>
+              <li>Prompt injection causing the agent to call Jira API as admin</li>
+              <li>GitHub Actions workflow with overly broad GITHUB_TOKEN scope</li>
+              <li>Compromised API key used to modify the threat register directly</li>
+              <li>Container escape from the analysis runner to host systems</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Questions to Ask</div>
+            <ul>
+              <li>Does the agent's GitHub token follow least-privilege?</li>
+              <li>Can the agent make calls outside of its defined tool set?</li>
+              <li>Are Jira/Linear API keys scoped to specific projects?</li>
+              <li>Is the container run as non-root with read-only filesystem?</li>
+            </ul>
+          </div>
+          <div class="stride-col">
+            <div class="stride-col-title">Example Mitigations</div>
+            <ul>
+              <li>GITHUB_TOKEN: contents=read, pull-requests=write only</li>
+              <li>LangChain tool allowlist &mdash; no arbitrary code execution</li>
+              <li>Jira API key scoped to single project + issue create/edit only</li>
+              <li>Docker: non-root user, seccomp profile, no privilege escalation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: DREAD SCORING -->
+  <div class="section">
+    <div class="section-title">&#128290; 3. DREAD Risk Scoring Model</div>
+    <div class="info-box">
+      <p>DREAD provides a quantitative risk score for each threat, rated 1&ndash;10 across five dimensions. Total DREAD score = average of all five dimensions. <strong>High Risk: 7&ndash;10 | Medium: 4&ndash;6 | Low: 1&ndash;3</strong>. The AI agent auto-calculates DREAD scores for every identified threat.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dimension</th><th>Abbrev.</th><th>Definition</th><th>Score 1 (Low)</th><th>Score 5 (Medium)</th><th>Score 10 (High)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--rose);">Damage</strong></td><td>D</td>
+            <td>Potential damage if the threat is exploited</td>
+            <td>Minor data exposure, no financial impact</td>
+            <td>Partial service outage, limited data breach</td>
+            <td>Full system compromise, cardholder data breach, regulatory fine</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--amber);">Reproducibility</strong></td><td>R</td>
+            <td>How easily the attack can be repeated</td>
+            <td>Nearly impossible; requires specific timing or conditions</td>
+            <td>Reproducible with effort; requires authenticated access</td>
+            <td>Trivially reproducible; any unauthenticated user can reproduce</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--violet);">Exploitability</strong></td><td>E</td>
+            <td>Skill and resources needed to exploit</td>
+            <td>Nation-state actor with months of effort</td>
+            <td>Skilled attacker with moderate tooling</td>
+            <td>Script kiddie with public exploit code</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--sky);">Affected Users</strong></td><td>A</td>
+            <td>Proportion of users impacted if exploited</td>
+            <td>Single user or admin account only</td>
+            <td>A team or department (&lt;20% of users)</td>
+            <td>All users / all customers / entire platform</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--teal);">Discoverability</strong></td><td>D</td>
+            <td>How easily the vulnerability can be found</td>
+            <td>Requires deep insider knowledge and source access</td>
+            <td>Discoverable via network scanning or fuzzing</td>
+            <td>Publicly documented, listed on exploit-db or CVE</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:1.25rem;">
+      <div style="font-size:14px;font-weight:600;color:var(--violet);margin-bottom:.75rem;">Example DREAD Scoring &mdash; Payment API JWT Spoofing</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Dimension</th><th>Score</th><th>Rationale</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="color:var(--rose);">Damage</strong></td><td><span class="tag tag-rose">8</span></td><td>Allows impersonation of any user; access to transaction history and initiation capabilities</td></tr>
+            <tr><td><strong style="color:var(--amber);">Reproducibility</strong></td><td><span class="tag tag-amber">7</span></td><td>If a long-lived token is stolen, attack is repeatable until token expires or is revoked</td></tr>
+            <tr><td><strong style="color:var(--violet);">Exploitability</strong></td><td><span class="tag tag-violet">6</span></td><td>Requires token theft; several public tools available for JWT manipulation</td></tr>
+            <tr><td><strong style="color:var(--sky);">Affected Users</strong></td><td><span class="tag tag-sky">5</span></td><td>Impact limited to the specific user whose token is stolen, but any user could be targeted</td></tr>
+            <tr><td><strong style="color:var(--teal);">Discoverability</strong></td><td><span class="tag tag-teal">7</span></td><td>Long-lived JWTs in browser storage are a well-known vulnerability class; easily discoverable</td></tr>
+            <tr><td><strong>DREAD Total</strong></td><td><span class="tag tag-rose">6.6 / HIGH</span></td><td>Average of all five dimensions &mdash; requires immediate mitigation</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: PASTA -->
+  <div class="section">
+    <div class="section-title">&#127837; 4. PASTA Methodology &mdash; 7-Stage Process</div>
+    <div class="info-box">
+      <p><strong>PASTA</strong> (Process for Attack Simulation and Threat Analysis) is a risk-centric threat modelling framework that aligns security analysis with business objectives. Unlike STRIDE (component-focused), PASTA is attacker-centric and simulates realistic attack paths. The UC-21 agent applies PASTA as a complementary methodology to STRIDE for high-criticality systems.</p>
+    </div>
+    <div class="pasta-stages">
+      <div class="pasta-stage">
+        <div class="stage-num">1</div>
+        <div class="stage-content">
+          <div class="stage-title">Define Business Objectives</div>
+          <div class="stage-desc">Identify the business goals that security must protect. For fintech: regulatory compliance (PCI-DSS), customer trust, transaction integrity, 99.99% payment uptime, and zero cardholder data breaches. These objectives drive threat prioritisation.</div>
+        </div>
+      </div>
+      <div class="pasta-stage">
+        <div class="stage-num">2</div>
+        <div class="stage-content">
+          <div class="stage-title">Define Technical Scope</div>
+          <div class="stage-desc">Enumerate all systems, APIs, data stores, and third-party integrations within scope. For the AI Threat Modelling Agent: GitHub/Azure DevOps, OpenAI API, LangChain runtime, Jira/Linear, DynamoDB, Redis, and the Fargate execution environment.</div>
+        </div>
+      </div>
+      <div class="pasta-stage">
+        <div class="stage-num">3</div>
+        <div class="stage-content">
+          <div class="stage-title">Application Decomposition</div>
+          <div class="stage-desc">Break the application into components, data flows, trust boundaries, and entry points. This maps directly to the Diagram Ingestion Engine output, providing the structured graph used for threat enumeration in subsequent stages.</div>
+        </div>
+      </div>
+      <div class="pasta-stage">
+        <div class="stage-num">4</div>
+        <div class="stage-content">
+          <div class="stage-title">Threat Analysis</div>
+          <div class="stage-desc">Identify relevant threat agents (cybercriminals, nation-states, malicious insiders, compromised AI model inputs) and their capabilities, motivations, and likely targets. Enumerate threat scenarios from the attacker's perspective for each identified entry point.</div>
+        </div>
+      </div>
+      <div class="pasta-stage">
+        <div class="stage-num">5</div>
+        <div class="stage-content">
+          <div class="stage-title">Vulnerability and Weakness Analysis</div>
+          <div class="stage-desc">Map threats to specific vulnerabilities in the system using CVSS scoring, OWASP Top 10, and CWE identifiers. For the AI agent context, include AI-specific vulnerabilities: prompt injection (CWE-20), model poisoning, and hallucination-driven false negatives in threat reports.</div>
+        </div>
+      </div>
+      <div class="pasta-stage">
+        <div class="stage-num">6</div>
+        <div class="stage-content">
+          <div class="stage-title">Attack Modelling and Simulation</div>
+          <div class="stage-desc">Construct attack trees and attack paths for the highest-risk scenarios identified. Simulate how an attacker would chain multiple vulnerabilities to achieve their objective. Generate attack narratives that demonstrate exploitability in realistic conditions.</div>
+        </div>
+      </div>
+      <div class="pasta-stage">
+        <div class="stage-num">7</div>
+        <div class="stage-content">
+          <div class="stage-title">Risk and Impact Analysis</div>
+          <div class="stage-desc">Quantify residual risk after proposed mitigations. Map findings against the organisation's risk appetite. Output executive risk heat map showing current threat landscape vs. acceptable risk thresholds. Feed high-risk findings into the Threat Register for tracking and remediation.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: EXAMPLE COMPLETED THREAT MODEL -->
+  <div class="section">
+    <div class="section-title">&#128203; 5. Example Completed Threat Model &mdash; Payment API</div>
+    <div class="example-header">
+      <div class="example-header-title">System: Real-Time Payment Processing API &mdash; v2.3</div>
+      <div class="example-header-sub">Modelled by: UC-21 AI Threat Modelling Agent &middot; Trigger: PR #342 &middot; Date: 09 May 2026</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Component</th><th>Threat</th><th>STRIDE</th><th>DREAD</th><th>CVSS</th><th>Mitigation</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TM-001</td><td>Auth Service</td>
+            <td>JWT token stolen from browser localStorage used to impersonate merchant</td>
+            <td><span class="tag tag-rose">Spoofing</span></td>
+            <td><span class="tag tag-rose">6.6</span></td>
+            <td><span class="tag tag-rose">8.1</span></td>
+            <td>Migrate to httpOnly cookies; reduce token TTL to 15 min</td>
+          </tr>
+          <tr>
+            <td>TM-002</td><td>Payment API</td>
+            <td>Adversarial payload in amount field bypasses decimal validation</td>
+            <td><span class="tag tag-amber">Tampering</span></td>
+            <td><span class="tag tag-rose">7.2</span></td>
+            <td><span class="tag tag-amber">7.5</span></td>
+            <td>Server-side decimal precision validation; reject values outside permitted range</td>
+          </tr>
+          <tr>
+            <td>TM-003</td><td>Webhook Receiver</td>
+            <td>Missing HMAC signature verification allows forged payment status callbacks</td>
+            <td><span class="tag tag-amber">Tampering</span></td>
+            <td><span class="tag tag-rose">8.0</span></td>
+            <td><span class="tag tag-rose">9.1</span></td>
+            <td>Implement HMAC-SHA256 signature verification on all webhook endpoints</td>
+          </tr>
+          <tr>
+            <td>TM-004</td><td>Audit Log Store</td>
+            <td>Developers can delete their own transaction audit log entries</td>
+            <td><span class="tag tag-violet">Repudiation</span></td>
+            <td><span class="tag tag-amber">5.4</span></td>
+            <td><span class="tag tag-amber">6.5</span></td>
+            <td>Write-once S3 with Object Lock; separate log admin role</td>
+          </tr>
+          <tr>
+            <td>TM-005</td><td>Error Responses</td>
+            <td>API error messages expose internal database schema and stack traces</td>
+            <td><span class="tag tag-sky">Info Disclosure</span></td>
+            <td><span class="tag tag-amber">5.0</span></td>
+            <td><span class="tag tag-amber">5.3</span></td>
+            <td>Generic error responses externally; full detail in internal logs only</td>
+          </tr>
+          <tr>
+            <td>TM-006</td><td>Rate Limiter</td>
+            <td>No per-IP rate limit on payment initiation endpoint enables transaction flooding</td>
+            <td><span class="tag tag-indigo">Denial of Service</span></td>
+            <td><span class="tag tag-amber">6.0</span></td>
+            <td><span class="tag tag-amber">6.9</span></td>
+            <td>Implement 100 req/min per IP with exponential backoff on breach</td>
+          </tr>
+          <tr>
+            <td>TM-007</td><td>Admin Dashboard</td>
+            <td>Horizontal privilege escalation allows viewing other merchants' transactions</td>
+            <td><span class="tag tag-teal">Elevation</span></td>
+            <td><span class="tag tag-rose">7.8</span></td>
+            <td><span class="tag tag-rose">8.8</span></td>
+            <td>Enforce merchant_id ownership check on every data access query</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 6: BLANK TEMPLATE -->
+  <div class="section">
+    <div class="section-title">&#128196; 6. Blank STRIDE Template &mdash; For Team Use</div>
+    <div class="card">
+      <p>Copy this template for each system under review. Complete one row per identified threat. The UC-21 AI agent auto-populates this table on every PR. Teams should review and validate AI-generated entries, adding context or overriding scores where needed.</p>
+    </div>
+
+    <div style="font-size:13px;font-weight:600;color:var(--violet);margin-bottom:.75rem;margin-top:1rem;">System: _________________________________ &nbsp;&nbsp; Date: _____________ &nbsp;&nbsp; Reviewed by: _________________</div>
+
+    <div class="table-wrap">
+      <table class="blank-table">
+        <thead>
+          <tr><th>#</th><th>Component / Data Flow</th><th>Threat Description</th><th>STRIDE Category</th><th>DREAD Score</th><th>CVSS Score</th><th>Severity</th><th>Proposed Mitigation</th><th>Owner</th><th>Due Date</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>TM-001</td><td style="color:var(--surface3);font-style:italic;">[e.g. Auth Service]</td><td style="color:var(--surface3);font-style:italic;">[Describe the threat scenario]</td><td style="color:var(--surface3);font-style:italic;">[S/T/R/I/D/E]</td><td style="color:var(--surface3);font-style:italic;">[1-10]</td><td style="color:var(--surface3);font-style:italic;">[0.0-10.0]</td><td style="color:var(--surface3);font-style:italic;">[CRITICAL/HIGH/MED/LOW]</td><td style="color:var(--surface3);font-style:italic;">[Mitigation action]</td><td style="color:var(--surface3);font-style:italic;">[Name]</td><td style="color:var(--surface3);font-style:italic;">[Date]</td></tr>
+          <tr><td>TM-002</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>TM-003</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>TM-004</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>TM-005</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>TM-006</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>TM-007</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>TM-008</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>TM-009</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+          <tr><td>TM-010</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:1.25rem;">
+      <div style="font-size:13px;font-weight:600;color:var(--violet);margin-bottom:.75rem;">DREAD Scoring Breakdown (fill per threat)</div>
+      <div class="table-wrap">
+        <table class="blank-table">
+          <thead><tr><th>Threat ID</th><th>Damage (D)</th><th>Reproducibility (R)</th><th>Exploitability (E)</th><th>Affected Users (A)</th><th>Discoverability (D)</th><th>Total (avg)</th></tr></thead>
+          <tbody>
+            <tr><td>TM-001</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td></tr>
+            <tr><td>TM-002</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td></tr>
+            <tr><td>TM-003</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td></tr>
+            <tr><td>TM-004</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td></tr>
+            <tr><td>TM-005</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td><td>/10</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div>
+      <div class="footer-text">UC-21 &mdash; AI Threat Modelling Agent | STRIDE Template v1.0</div>
+      <div class="footer-text">Owner: Malcolm Govender &mdash; Head of AI &amp; Engineering | May 2026</div>
+    </div>
+    <div class="footer-brand">IntelligenceHub &mdash; AI Engineering Programme</div>
+  </div>
+
+</div>
+</body>
+</html>

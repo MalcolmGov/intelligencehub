@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC23 — Software Bill of Materials (SBOM) Template</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg:           #0f172a;
+            --surface:      #1e293b;
+            --surface2:     #263348;
+            --border:       rgba(255,255,255,0.07);
+            --border2:      rgba(255,255,255,0.12);
+            --text:         #e2e8f0;
+            --text-muted:   #94a3b8;
+            --text-dim:     #64748b;
+            --indigo:       #818cf8;
+            --violet:       #a78bfa;
+            --teal:         #2dd4bf;
+            --amber:        #fbbf24;
+            --amber-soft:   rgba(251,191,36,0.12);
+            --red:          #f87171;
+            --red-soft:     rgba(248,113,113,0.15);
+            --orange:       #fb923c;
+            --orange-soft:  rgba(251,146,60,0.12);
+            --green:        #4ade80;
+            --green-soft:   rgba(74,222,128,0.12);
+            --indigo-soft:  rgba(129,140,248,0.12);
+            --violet-soft:  rgba(167,139,250,0.12);
+            --teal-soft:    rgba(45,212,191,0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+            padding: 32px 24px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        .print-btn {
+            position: fixed; top: 20px; right: 24px;
+            background: var(--indigo); color: #fff;
+            border: none; border-radius: 6px;
+            padding: 8px 18px; font-size: 13px; font-weight: 600;
+            cursor: pointer; z-index: 100;
+        }
+        .print-btn:hover { background: var(--violet); }
+
+        /* Header */
+        .doc-header {
+            margin-bottom: 36px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border2);
+        }
+
+        .header-badge-new {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            color: #fff; padding: 4px 14px; border-radius: 20px;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 12px;
+        }
+
+        .header-top {
+            display: flex; align-items: flex-start;
+            justify-content: space-between; gap: 20px;
+            margin-bottom: 16px; flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--amber-soft);
+            border: 1px solid rgba(251,191,36,0.4);
+            color: var(--amber); padding: 5px 14px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; letter-spacing: 0.4px;
+        }
+        .status-badge::before { content: "●"; font-size: 9px; }
+
+        .doc-title { font-size: 28px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.4px; line-height: 1.2; margin-bottom: 6px; }
+        .doc-subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+
+        .meta-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+
+        .meta-chip {
+            font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+            text-transform: uppercase; color: var(--text-muted);
+            padding: 3px 9px; border: 1px solid var(--border2); border-radius: 4px;
+        }
+
+        .owner-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--surface2); border: 1px solid var(--border2);
+            border-radius: 20px; padding: 5px 12px 5px 5px;
+            font-size: 12px; font-weight: 600; color: var(--text);
+        }
+
+        .owner-avatar {
+            width: 24px; height: 24px;
+            background: linear-gradient(135deg, var(--indigo), var(--violet));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 20px 24px; margin-bottom: 36px;
+        }
+        .toc-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--indigo); margin-bottom: 14px;
+        }
+        .toc-list {
+            list-style: none;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 6px;
+        }
+        .toc-list li a { color: var(--text-muted); text-decoration: none; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+        .toc-list li a:hover { color: var(--indigo); }
+        .toc-num { font-size: 11px; font-weight: 700; color: var(--indigo); min-width: 22px; }
+
+        /* Sections */
+        .section { margin-bottom: 44px; }
+        .section-title {
+            font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+            color: var(--indigo); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+        }
+        h2 { font-size: 20px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+        h3 { font-size: 15px; font-weight: 600; color: var(--violet); margin-bottom: 8px; margin-top: 22px; }
+        h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 16px; margin-bottom: 6px; }
+        p { color: var(--text-muted); margin-bottom: 12px; line-height: 1.65; }
+
+        /* Tables */
+        .table-wrapper {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; overflow: hidden; margin-top: 14px;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        thead { background: rgba(0,0,0,0.25); border-bottom: 1px solid var(--border2); }
+        th {
+            padding: 11px 14px; text-align: left;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.6px;
+            text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
+        }
+        td {
+            padding: 10px 14px; border-bottom: 1px solid var(--border);
+            font-size: 12px; color: var(--text);
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: rgba(129,140,248,0.04); }
+
+        /* Pills */
+        .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+        .pill-critical { background: var(--red-soft);    color: var(--red);    border: 1px solid rgba(248,113,113,0.4); }
+        .pill-high     { background: var(--orange-soft); color: var(--orange); border: 1px solid rgba(251,146,60,0.4);  }
+        .pill-medium   { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.4);  }
+        .pill-low      { background: var(--indigo-soft); color: var(--indigo); border: 1px solid rgba(129,140,248,0.4); }
+        .pill-clean    { background: var(--green-soft);  color: var(--green);  border: 1px solid rgba(74,222,128,0.4);  }
+        .pill-fixed    { background: var(--teal-soft);   color: var(--teal);   border: 1px solid rgba(45,212,191,0.4);  }
+        .pill-open     { background: var(--amber-soft);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.4);  }
+        .pill-mitigated{ background: var(--violet-soft); color: var(--violet); border: 1px solid rgba(167,139,250,0.4); }
+        .pill-mit { background: var(--green-soft); color: var(--green); border: 1px solid rgba(74,222,128,0.4); }
+        .pill-lic-ok  { background: var(--green-soft); color: var(--green); border: 1px solid rgba(74,222,128,0.4); }
+        .pill-lic-rev { background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(251,191,36,0.4); }
+
+        .mono {
+            font-family: 'Courier New', 'SF Mono', monospace;
+            font-size: 11px; color: var(--teal);
+            background: rgba(45,212,191,0.08);
+            padding: 1px 5px; border-radius: 3px;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #080d1a;
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+        .code-block pre {
+            font-family: 'Courier New', 'SF Mono', 'Fira Code', monospace;
+            font-size: 11px; color: #a5b4fc; line-height: 1.75; white-space: pre;
+        }
+        .code-block .cm  { color: #475569; }
+        .code-block .ck  { color: #818cf8; }
+        .code-block .cv  { color: #2dd4bf; }
+        .code-block .cs  { color: #a78bfa; }
+        .code-block .cn  { color: #4ade80; }
+        .code-block .cc  { color: #fbbf24; }
+
+        /* Code tabs */
+        .code-tabs { display: flex; gap: 0; margin-top: 14px; }
+        .code-tab {
+            padding: 8px 18px; font-size: 12px; font-weight: 600;
+            color: var(--text-muted); cursor: pointer;
+            border: 1px solid var(--border2); border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            background: var(--surface2); margin-right: 4px;
+        }
+        .code-tab.active { color: var(--indigo); background: #080d1a; border-color: var(--indigo); }
+
+        /* Stats strip */
+        .stats-strip {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px; margin-top: 16px;
+        }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 16px 18px;
+        }
+        .stat-value { font-size: 24px; font-weight: 700; color: var(--teal); line-height: 1; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Alert */
+        .alert {
+            border-radius: 8px; padding: 14px 18px; margin-top: 14px;
+            display: flex; align-items: flex-start; gap: 10px;
+        }
+        .alert-info { background: var(--indigo-soft); border-left: 3px solid var(--indigo); }
+        .alert-warn { background: var(--amber-soft);  border-left: 3px solid var(--amber); }
+        .alert-teal { background: var(--teal-soft);   border-left: 3px solid var(--teal); }
+        .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+        .alert-text { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+
+        /* Compliance mapping cards */
+        .compliance-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px; margin-top: 14px;
+        }
+        .compliance-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px;
+        }
+        .compliance-header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+        }
+        .compliance-icon {
+            width: 32px; height: 32px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .compliance-icon.pci  { background: var(--red-soft); }
+        .compliance-icon.iso  { background: var(--indigo-soft); }
+        .compliance-icon.popia{ background: var(--teal-soft); }
+
+        .compliance-title { font-size: 13px; font-weight: 700; color: #f1f5f9; }
+        .compliance-sub   { font-size: 11px; color: var(--text-muted); }
+
+        .compliance-row {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+        .compliance-row:last-child { border-bottom: none; }
+        .comp-field { color: var(--text-muted); flex: 1; }
+        .comp-control { color: var(--indigo); font-weight: 600; text-align: right; font-size: 11px; }
+
+        /* Lifecycle steps */
+        .lifecycle {
+            display: flex; gap: 0; flex-wrap: wrap;
+            margin-top: 16px; align-items: stretch;
+        }
+        .lifecycle-step {
+            flex: 1; min-width: 160px;
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 16px 14px; position: relative;
+        }
+        .lifecycle-step:first-child { border-radius: 8px 0 0 8px; }
+        .lifecycle-step:last-child  { border-radius: 0 8px 8px 0; }
+        .lifecycle-step + .lifecycle-step { border-left: none; }
+
+        .lc-step-num {
+            font-size: 10px; font-weight: 700; color: var(--indigo);
+            letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px;
+        }
+        .lc-step-title { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+        .lc-step-desc  { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+        /* Format comparison table specific */
+        .format-badge {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 6px; font-size: 11px; font-weight: 700;
+        }
+        .format-spdx    { background: var(--indigo-soft); color: var(--indigo); border: 1px solid rgba(129,140,248,0.4); }
+        .format-cdx     { background: var(--teal-soft);   color: var(--teal);   border: 1px solid rgba(45,212,191,0.4); }
+        .format-swid    { background: var(--orange-soft);  color: var(--orange); border: 1px solid rgba(251,146,60,0.4); }
+
+        .check { color: var(--green); font-weight: 700; }
+        .cross { color: var(--red);   font-weight: 700; }
+        .part  { color: var(--amber); font-weight: 700; }
+
+        hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+        .doc-footer {
+            margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .doc-footer-text { font-size: 12px; color: var(--text-dim); }
+
+        @media print {
+            body { background: #fff; color: #000; padding: 0; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Print / Export PDF</button>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="doc-header">
+        <div class="header-badge-new">&#10022; New — Gap Identified by Malcolm</div>
+        <div class="header-top">
+            <div>
+                <div class="doc-title">UC23 — Software Bill of Materials (SBOM)</div>
+                <div class="doc-subtitle">SBOM Template, Format Reference &amp; Regulatory Mapping — AI-Powered DevSecOps Security Gate</div>
+            </div>
+            <div class="status-badge">Not Started — Planning Phase</div>
+        </div>
+        <div class="meta-row">
+            <span class="meta-chip">UC-23</span>
+            <span class="meta-chip">SBOM Template v1.0</span>
+            <span class="meta-chip">2026-05-09</span>
+            <span class="meta-chip">SPDX 2.3 · CycloneDX 1.5</span>
+            <span class="meta-chip">PCI-DSS · ISO 27001 · POPIA</span>
+        </div>
+        <div class="owner-badge">
+            <div class="owner-avatar">MG</div>
+            Malcolm Govender — Head of AI &amp; Engineering
+        </div>
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+        <div class="toc-title">Table of Contents</div>
+        <ul class="toc-list">
+            <li><a href="#s1"><span class="toc-num">1.</span> What is an SBOM &amp; Why It's Required</a></li>
+            <li><a href="#s2"><span class="toc-num">2.</span> SBOM Format Comparison</a></li>
+            <li><a href="#s3"><span class="toc-num">3.</span> Example SBOM Structures</a></li>
+            <li><a href="#s4"><span class="toc-num">4.</span> Component Inventory Table</a></li>
+            <li><a href="#s5"><span class="toc-num">5.</span> Vulnerability Tracking</a></li>
+            <li><a href="#s6"><span class="toc-num">6.</span> SBOM Generation Automation</a></li>
+            <li><a href="#s7"><span class="toc-num">7.</span> Regulatory Compliance Mapping</a></li>
+            <li><a href="#s8"><span class="toc-num">8.</span> SBOM Lifecycle &amp; Update Cadence</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Overview -->
+    <div class="section" id="s1">
+        <div class="section-title">1. What is an SBOM &amp; Why It's Required</div>
+        <h2>Software Bill of Materials — Overview</h2>
+        <p>A Software Bill of Materials (SBOM) is a formal, machine-readable inventory of all software components, libraries, and dependencies included in a software product or service. It records the name, version, supplier, licence, package URL (PURL), and known vulnerabilities for every component — from first-party code to transitive open-source dependencies.</p>
+        <p>SBOMs are required by PCI-DSS v4.0 Requirement 6.3.2, ISO 27001:2022 Annex A.8.8 (management of technical vulnerabilities), and POPIA Section 19 (security safeguards). Executive Order 14028 (US) and the EU Cyber Resilience Act (CRA) mandate SBOM production for software sold to government entities. Even where not legally mandated, SBOMs are considered baseline supply chain security hygiene for any production fintech system.</p>
+
+        <div class="stats-strip">
+            <div class="stat-card">
+                <div class="stat-value">10</div>
+                <div class="stat-label">Components (Example)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">2</div>
+                <div class="stat-label">SBOM Formats</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color:var(--amber)">3</div>
+                <div class="stat-label">Regulatory Frameworks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">On PR</div>
+                <div class="stat-label">Generation Trigger</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">12mo</div>
+                <div class="stat-label">Retention Period</div>
+            </div>
+        </div>
+
+        <h3>Key SBOM Use Cases</h3>
+        <ul style="color:var(--text-muted);font-size:13px;padding-left:20px;line-height:2.1;">
+            <li><strong style="color:var(--text)">Vulnerability management</strong> — immediately identify all deployments affected when a new CVE is disclosed for a dependency</li>
+            <li><strong style="color:var(--text)">Licence compliance</strong> — audit all open-source licences in the dependency tree before a regulatory review</li>
+            <li><strong style="color:var(--text)">Supply chain security</strong> — detect tampering or unexpected component substitution between builds</li>
+            <li><strong style="color:var(--text)">PCI-DSS audit evidence</strong> — provide PCI-QSA with a complete software inventory satisfying Req 6.3.2</li>
+            <li><strong style="color:var(--text)">Incident response</strong> — during a breach, immediately scope which services consumed a compromised library</li>
+            <li><strong style="color:var(--text)">POPIA data flow</strong> — map personal data processing libraries to data subject categories for DPIA purposes</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <!-- Section 2: Format Comparison -->
+    <div class="section" id="s2">
+        <div class="section-title">2. SBOM Format Comparison</div>
+        <h2>SPDX vs CycloneDX vs SWID</h2>
+        <p>The three dominant SBOM standards each have different strengths. UC23 generates both SPDX 2.3 and CycloneDX 1.5 by default. SWID is not generated but is noted for completeness as it is used in some enterprise procurement contexts.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th><span class="format-badge format-spdx">SPDX 2.3</span></th>
+                        <th><span class="format-badge format-cdx">CycloneDX 1.5</span></th>
+                        <th><span class="format-badge format-swid">SWID</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Primary Org</td>
+                        <td>Linux Foundation</td>
+                        <td>OWASP</td>
+                        <td>ISO/IEC 19770-2 (NIST)</td>
+                    </tr>
+                    <tr>
+                        <td>Native Formats</td>
+                        <td>JSON, RDF, YAML, TV, XML</td>
+                        <td>JSON, XML, Protobuf</td>
+                        <td>XML only</td>
+                    </tr>
+                    <tr>
+                        <td>Licence Data</td>
+                        <td><span class="check">Full SPDX expression</span></td>
+                        <td><span class="check">SPDX IDs + custom</span></td>
+                        <td><span class="part">Limited</span></td>
+                    </tr>
+                    <tr>
+                        <td>Vulnerability Data (VEX)</td>
+                        <td><span class="check">Yes (SPDX-Lite + VEX)</span></td>
+                        <td><span class="check">Yes — native VEX support</span></td>
+                        <td><span class="cross">No</span></td>
+                    </tr>
+                    <tr>
+                        <td>Component Relationships</td>
+                        <td><span class="check">DESCRIBES, CONTAINS, DEPENDS_ON</span></td>
+                        <td><span class="check">Rich dependency graph</span></td>
+                        <td><span class="part">Basic parent-child only</span></td>
+                    </tr>
+                    <tr>
+                        <td>PURL Support</td>
+                        <td><span class="check">Yes</span></td>
+                        <td><span class="check">Yes — first class</span></td>
+                        <td><span class="cross">No</span></td>
+                    </tr>
+                    <tr>
+                        <td>Hash Algorithms</td>
+                        <td>MD5, SHA-1, SHA-256, SHA-512</td>
+                        <td>MD5, SHA-1, SHA-256, SHA-512, BLAKE2b</td>
+                        <td>SHA-256</td>
+                    </tr>
+                    <tr>
+                        <td>Services &amp; APIs</td>
+                        <td><span class="cross">No</span></td>
+                        <td><span class="check">Yes — service component type</span></td>
+                        <td><span class="cross">No</span></td>
+                    </tr>
+                    <tr>
+                        <td>ML Model Components</td>
+                        <td><span class="cross">No</span></td>
+                        <td><span class="check">Yes — v1.5 ML extension</span></td>
+                        <td><span class="cross">No</span></td>
+                    </tr>
+                    <tr>
+                        <td>PCI-DSS Req 6.3.2 Compliance</td>
+                        <td><span class="check">Accepted</span></td>
+                        <td><span class="check">Accepted (preferred by PCI Council)</span></td>
+                        <td><span class="part">Accepted with caveats</span></td>
+                    </tr>
+                    <tr>
+                        <td>Tooling Support</td>
+                        <td>Syft, SPDX-Tools, Tern, Trivy</td>
+                        <td>Syft, Trivy, cdxgen, Dependency-Track</td>
+                        <td>Limited OSS tooling</td>
+                    </tr>
+                    <tr>
+                        <td>UC23 Generated</td>
+                        <td><span class="check">Yes — default</span></td>
+                        <td><span class="check">Yes — default</span></td>
+                        <td><span class="cross">No — not generated</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 3: Example SBOM Structures -->
+    <div class="section" id="s3">
+        <div class="section-title">3. Example SBOM Structures</div>
+        <h2>SPDX JSON &amp; CycloneDX JSON Examples</h2>
+        <p>The following examples show the SBOM structure as generated by Syft for the UC23 security gate Python package. These are truncated to two components for brevity — actual SBOMs contain all components including transitive dependencies.</p>
+
+        <h3>3.1 SPDX 2.3 JSON Format</h3>
+        <div class="code-block">
+<pre><span class="cm">{</span>
+  <span class="ck">"spdxVersion"</span>: <span class="cs">"SPDX-2.3"</span>,
+  <span class="ck">"dataLicense"</span>: <span class="cs">"CC0-1.0"</span>,
+  <span class="ck">"SPDXID"</span>: <span class="cs">"SPDXRef-DOCUMENT"</span>,
+  <span class="ck">"name"</span>: <span class="cs">"uc23-devsecops-security-gate"</span>,
+  <span class="ck">"documentNamespace"</span>: <span class="cs">"https://sbom.intelligencehub.io/uc23/2026-05-09/spdx"</span>,
+  <span class="ck">"creationInfo"</span>: <span class="cm">{</span>
+    <span class="ck">"created"</span>: <span class="cs">"2026-05-09T08:00:00Z"</span>,
+    <span class="ck">"creators"</span>: <span class="cm">[</span>
+      <span class="cs">"Tool: Syft-1.0.1"</span>,
+      <span class="cs">"Organization: IntelligenceHub (Malcolm Govender)"</span>
+    <span class="cm">]</span>
+  <span class="cm">}</span>,
+  <span class="ck">"packages"</span>: <span class="cm">[</span>
+    <span class="cm">{</span>
+      <span class="ck">"SPDXID"</span>: <span class="cs">"SPDXRef-Package-fastapi-0.110.0"</span>,
+      <span class="ck">"name"</span>: <span class="cs">"fastapi"</span>,
+      <span class="ck">"version"</span>: <span class="cs">"0.110.0"</span>,
+      <span class="ck">"supplier"</span>: <span class="cs">"Organization: Sebastián Ramírez"</span>,
+      <span class="ck">"downloadLocation"</span>: <span class="cs">"https://pypi.org/project/fastapi/0.110.0/"</span>,
+      <span class="ck">"licenseConcluded"</span>: <span class="cs">"MIT"</span>,
+      <span class="ck">"licenseDeclared"</span>: <span class="cs">"MIT"</span>,
+      <span class="ck">"copyrightText"</span>: <span class="cs">"Copyright 2018, Sebastián Ramírez"</span>,
+      <span class="ck">"externalRefs"</span>: <span class="cm">[{</span>
+        <span class="ck">"referenceCategory"</span>: <span class="cs">"PACKAGE-MANAGER"</span>,
+        <span class="ck">"referenceType"</span>: <span class="cs">"purl"</span>,
+        <span class="ck">"referenceLocator"</span>: <span class="cs">"pkg:pypi/fastapi@0.110.0"</span>
+      <span class="cm">}]</span>,
+      <span class="ck">"checksums"</span>: <span class="cm">[{</span>
+        <span class="ck">"algorithm"</span>: <span class="cs">"SHA256"</span>,
+        <span class="ck">"checksumValue"</span>: <span class="cs">"4b6cf3f03c4...&lt;sha256-hash&gt;"</span>
+      <span class="cm">}]</span>
+    <span class="cm">}</span>,
+    <span class="cm">{</span>
+      <span class="ck">"SPDXID"</span>: <span class="cs">"SPDXRef-Package-cryptography-42.0.5"</span>,
+      <span class="ck">"name"</span>: <span class="cs">"cryptography"</span>,
+      <span class="ck">"version"</span>: <span class="cs">"42.0.5"</span>,
+      <span class="ck">"supplier"</span>: <span class="cs">"Organization: Python Cryptographic Authority"</span>,
+      <span class="ck">"downloadLocation"</span>: <span class="cs">"https://pypi.org/project/cryptography/42.0.5/"</span>,
+      <span class="ck">"licenseConcluded"</span>: <span class="cs">"Apache-2.0 OR BSD-3-Clause"</span>,
+      <span class="ck">"licenseDeclared"</span>: <span class="cs">"Apache-2.0 OR BSD-3-Clause"</span>,
+      <span class="ck">"externalRefs"</span>: <span class="cm">[{</span>
+        <span class="ck">"referenceCategory"</span>: <span class="cs">"PACKAGE-MANAGER"</span>,
+        <span class="ck">"referenceType"</span>: <span class="cs">"purl"</span>,
+        <span class="ck">"referenceLocator"</span>: <span class="cs">"pkg:pypi/cryptography@42.0.5"</span>
+      <span class="cm">}]</span>
+    <span class="cm">}</span>
+  <span class="cm">]</span>,
+  <span class="ck">"relationships"</span>: <span class="cm">[</span>
+    <span class="cm">{</span> <span class="ck">"spdxElementId"</span>: <span class="cs">"SPDXRef-DOCUMENT"</span>, <span class="ck">"relationshipType"</span>: <span class="cs">"DESCRIBES"</span>, <span class="ck">"relatedSpdxElement"</span>: <span class="cs">"SPDXRef-Package-fastapi-0.110.0"</span> <span class="cm">}</span>,
+    <span class="cm">{</span> <span class="ck">"spdxElementId"</span>: <span class="cs">"SPDXRef-Package-fastapi-0.110.0"</span>, <span class="ck">"relationshipType"</span>: <span class="cs">"DEPENDS_ON"</span>, <span class="ck">"relatedSpdxElement"</span>: <span class="cs">"SPDXRef-Package-cryptography-42.0.5"</span> <span class="cm">}</span>
+  <span class="cm">]</span>
+<span class="cm">}</span></pre>
+        </div>
+
+        <h3>3.2 CycloneDX 1.5 JSON Format</h3>
+        <div class="code-block">
+<pre><span class="cm">{</span>
+  <span class="ck">"bomFormat"</span>: <span class="cs">"CycloneDX"</span>,
+  <span class="ck">"specVersion"</span>: <span class="cs">"1.5"</span>,
+  <span class="ck">"serialNumber"</span>: <span class="cs">"urn:uuid:a1b2c3d4-e5f6-7890-abcd-ef1234567890"</span>,
+  <span class="ck">"version"</span>: <span class="cn">1</span>,
+  <span class="ck">"metadata"</span>: <span class="cm">{</span>
+    <span class="ck">"timestamp"</span>: <span class="cs">"2026-05-09T08:00:00Z"</span>,
+    <span class="ck">"tools"</span>: <span class="cm">[{</span> <span class="ck">"vendor"</span>: <span class="cs">"Anchore"</span>, <span class="ck">"name"</span>: <span class="cs">"Syft"</span>, <span class="ck">"version"</span>: <span class="cs">"1.0.1"</span> <span class="cm">}]</span>,
+    <span class="ck">"component"</span>: <span class="cm">{</span>
+      <span class="ck">"type"</span>: <span class="cs">"application"</span>,
+      <span class="ck">"name"</span>: <span class="cs">"uc23-devsecops-security-gate"</span>,
+      <span class="ck">"version"</span>: <span class="cs">"1.0.0"</span>,
+      <span class="ck">"supplier"</span>: <span class="cm">{</span> <span class="ck">"name"</span>: <span class="cs">"IntelligenceHub"</span>, <span class="ck">"contact"</span>: <span class="cm">[{</span> <span class="ck">"name"</span>: <span class="cs">"Malcolm Govender"</span> <span class="cm">}]</span> <span class="cm">}</span>
+    <span class="cm">}</span>
+  <span class="cm">}</span>,
+  <span class="ck">"components"</span>: <span class="cm">[</span>
+    <span class="cm">{</span>
+      <span class="ck">"type"</span>: <span class="cs">"library"</span>,
+      <span class="ck">"name"</span>: <span class="cs">"fastapi"</span>,
+      <span class="ck">"version"</span>: <span class="cs">"0.110.0"</span>,
+      <span class="ck">"supplier"</span>: <span class="cm">{</span> <span class="ck">"name"</span>: <span class="cs">"Sebastián Ramírez"</span> <span class="cm">}</span>,
+      <span class="ck">"purl"</span>: <span class="cs">"pkg:pypi/fastapi@0.110.0"</span>,
+      <span class="ck">"licenses"</span>: <span class="cm">[{</span> <span class="ck">"license"</span>: <span class="cm">{</span> <span class="ck">"id"</span>: <span class="cs">"MIT"</span> <span class="cm">}</span> <span class="cm">}]</span>,
+      <span class="ck">"hashes"</span>: <span class="cm">[{</span> <span class="ck">"alg"</span>: <span class="cs">"SHA-256"</span>, <span class="ck">"content"</span>: <span class="cs">"4b6cf3f03c4...&lt;sha256-hash&gt;"</span> <span class="cm">}]</span>,
+      <span class="ck">"vulnerabilities"</span>: <span class="cm">[]</span>
+    <span class="cm">}</span>,
+    <span class="cm">{</span>
+      <span class="ck">"type"</span>: <span class="cs">"library"</span>,
+      <span class="ck">"name"</span>: <span class="cs">"cryptography"</span>,
+      <span class="ck">"version"</span>: <span class="cs">"42.0.5"</span>,
+      <span class="ck">"supplier"</span>: <span class="cm">{</span> <span class="ck">"name"</span>: <span class="cs">"Python Cryptographic Authority"</span> <span class="cm">}</span>,
+      <span class="ck">"purl"</span>: <span class="cs">"pkg:pypi/cryptography@42.0.5"</span>,
+      <span class="ck">"licenses"</span>: <span class="cm">[{</span> <span class="ck">"license"</span>: <span class="cm">{</span> <span class="ck">"id"</span>: <span class="cs">"Apache-2.0"</span> <span class="cm">}</span> <span class="cm">}</span>, <span class="cm">{</span> <span class="ck">"license"</span>: <span class="cm">{</span> <span class="ck">"id"</span>: <span class="cs">"BSD-3-Clause"</span> <span class="cm">}</span> <span class="cm">}]</span>,
+      <span class="ck">"hashes"</span>: <span class="cm">[{</span> <span class="ck">"alg"</span>: <span class="cs">"SHA-256"</span>, <span class="ck">"content"</span>: <span class="cs">"8a9b2c1d0e3...&lt;sha256-hash&gt;"</span> <span class="cm">}]</span>,
+      <span class="ck">"vulnerabilities"</span>: <span class="cm">[]</span>
+    <span class="cm">}</span>
+  <span class="cm">]</span>,
+  <span class="ck">"dependencies"</span>: <span class="cm">[{</span>
+    <span class="ck">"ref"</span>: <span class="cs">"pkg:pypi/fastapi@0.110.0"</span>,
+    <span class="ck">"dependsOn"</span>: <span class="cm">[</span><span class="cs">"pkg:pypi/cryptography@42.0.5"</span>, <span class="cs">"pkg:pypi/pydantic@2.6.4"</span><span class="cm">]</span>
+  <span class="cm">}]</span>
+<span class="cm">}</span></pre>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 4: Component Inventory -->
+    <div class="section" id="s4">
+        <div class="section-title">4. Component Inventory Table</div>
+        <h2>Example Component Inventory — UC23 Python/TypeScript Fintech App</h2>
+        <p>The following table shows a representative component inventory for a Python/TypeScript fintech application. This is pre-populated with 10 realistic example components as a template. In production, this table is auto-generated from the SBOM artefact and rendered in the Dependency-Track dashboard.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Component Name</th>
+                        <th>Version</th>
+                        <th>Ecosystem</th>
+                        <th>Licence</th>
+                        <th>PURL</th>
+                        <th>Vuln Count</th>
+                        <th>Risk Rating</th>
+                        <th>Supplier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><strong>fastapi</strong></td>
+                        <td><span class="mono">0.110.0</span></td>
+                        <td>PyPI</td>
+                        <td><span class="pill pill-lic-ok">MIT</span></td>
+                        <td><span class="mono">pkg:pypi/fastapi@0.110.0</span></td>
+                        <td>0</td>
+                        <td><span class="pill pill-clean">Clean</span></td>
+                        <td>Sebastián Ramírez</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><strong>pydantic</strong></td>
+                        <td><span class="mono">2.6.4</span></td>
+                        <td>PyPI</td>
+                        <td><span class="pill pill-lic-ok">MIT</span></td>
+                        <td><span class="mono">pkg:pypi/pydantic@2.6.4</span></td>
+                        <td>0</td>
+                        <td><span class="pill pill-clean">Clean</span></td>
+                        <td>Samuel Colvin</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><strong>cryptography</strong></td>
+                        <td><span class="mono">42.0.5</span></td>
+                        <td>PyPI</td>
+                        <td><span class="pill pill-lic-ok">Apache-2.0</span></td>
+                        <td><span class="mono">pkg:pypi/cryptography@42.0.5</span></td>
+                        <td>0</td>
+                        <td><span class="pill pill-clean">Clean</span></td>
+                        <td>Python Cryptographic Authority</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><strong>sqlalchemy</strong></td>
+                        <td><span class="mono">2.0.29</span></td>
+                        <td>PyPI</td>
+                        <td><span class="pill pill-lic-ok">MIT</span></td>
+                        <td><span class="mono">pkg:pypi/sqlalchemy@2.0.29</span></td>
+                        <td>0</td>
+                        <td><span class="pill pill-clean">Clean</span></td>
+                        <td>Mike Bayer / SQLAlchemy Authors</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td><strong>requests</strong></td>
+                        <td><span class="mono">2.31.0</span></td>
+                        <td>PyPI</td>
+                        <td><span class="pill pill-lic-ok">Apache-2.0</span></td>
+                        <td><span class="mono">pkg:pypi/requests@2.31.0</span></td>
+                        <td>1</td>
+                        <td><span class="pill pill-medium">Medium</span></td>
+                        <td>Kenneth Reitz / PSF</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td><strong>python-jose</strong></td>
+                        <td><span class="mono">3.3.0</span></td>
+                        <td>PyPI</td>
+                        <td><span class="pill pill-lic-ok">MIT</span></td>
+                        <td><span class="mono">pkg:pypi/python-jose@3.3.0</span></td>
+                        <td>2</td>
+                        <td><span class="pill pill-high">High</span></td>
+                        <td>Michael Hart</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td><strong>axios</strong></td>
+                        <td><span class="mono">1.6.8</span></td>
+                        <td>npm</td>
+                        <td><span class="pill pill-lic-ok">MIT</span></td>
+                        <td><span class="mono">pkg:npm/axios@1.6.8</span></td>
+                        <td>0</td>
+                        <td><span class="pill pill-clean">Clean</span></td>
+                        <td>Matt Zabriskie</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td><strong>next</strong></td>
+                        <td><span class="mono">14.1.4</span></td>
+                        <td>npm</td>
+                        <td><span class="pill pill-lic-ok">MIT</span></td>
+                        <td><span class="mono">pkg:npm/next@14.1.4</span></td>
+                        <td>1</td>
+                        <td><span class="pill pill-low">Low</span></td>
+                        <td>Vercel Inc.</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td><strong>jsonwebtoken</strong></td>
+                        <td><span class="mono">9.0.2</span></td>
+                        <td>npm</td>
+                        <td><span class="pill pill-lic-ok">MIT</span></td>
+                        <td><span class="mono">pkg:npm/jsonwebtoken@9.0.2</span></td>
+                        <td>0</td>
+                        <td><span class="pill pill-clean">Clean</span></td>
+                        <td>Auth0 Inc.</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td><strong>scikit-learn</strong></td>
+                        <td><span class="mono">1.4.2</span></td>
+                        <td>PyPI</td>
+                        <td><span class="pill pill-lic-ok">BSD-3-Clause</span></td>
+                        <td><span class="mono">pkg:pypi/scikit-learn@1.4.2</span></td>
+                        <td>0</td>
+                        <td><span class="pill pill-clean">Clean</span></td>
+                        <td>scikit-learn Contributors</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-teal">
+            <div class="alert-icon">&#128196;</div>
+            <div class="alert-text">This table is automatically regenerated on every pipeline run and published as a pipeline artifact. The live version is available in the Dependency-Track dashboard at <span class="mono">https://deptrack.intelligencehub.io/projects/uc23</span>. The SBOM artifact is archived for 12 months per the retention policy.</div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 5: Vulnerability Tracking -->
+    <div class="section" id="s5">
+        <div class="section-title">5. Vulnerability Tracking</div>
+        <h2>CVE Tracking Table</h2>
+        <p>Known vulnerabilities in SBOM components are tracked below. This table is updated automatically by the security gate on every scan cycle. Remediation owners are assigned at sprint planning and tracked via Jira.</p>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>CVE ID</th>
+                        <th>Component</th>
+                        <th>Version</th>
+                        <th>CVSS Score</th>
+                        <th>Severity</th>
+                        <th>Fix Version</th>
+                        <th>Status</th>
+                        <th>Remediation Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="mono" style="color:var(--orange)">CVE-2024-23334</span></td>
+                        <td>aiohttp (transitive via requests)</td>
+                        <td><span class="mono">3.9.1</span></td>
+                        <td>7.5</td>
+                        <td><span class="pill pill-high">High</span></td>
+                        <td><span class="mono">3.9.4</span></td>
+                        <td><span class="pill pill-open">Open</span></td>
+                        <td>Malcolm Govender</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono" style="color:var(--amber)">CVE-2024-33663</span></td>
+                        <td>python-jose</td>
+                        <td><span class="mono">3.3.0</span></td>
+                        <td>6.8</td>
+                        <td><span class="pill pill-medium">Medium</span></td>
+                        <td>No fix (deprecated)</td>
+                        <td><span class="pill pill-mitigated">Mitigated</span></td>
+                        <td>Malcolm Govender</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono" style="color:var(--amber)">CVE-2024-33664</span></td>
+                        <td>python-jose</td>
+                        <td><span class="mono">3.3.0</span></td>
+                        <td>5.9</td>
+                        <td><span class="pill pill-medium">Medium</span></td>
+                        <td>Migrate to <span class="mono">joserfc</span></td>
+                        <td><span class="pill pill-open">Open</span></td>
+                        <td>Malcolm Govender</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono" style="color:var(--indigo)">CVE-2024-34069</span></td>
+                        <td>requests</td>
+                        <td><span class="mono">2.31.0</span></td>
+                        <td>3.7</td>
+                        <td><span class="pill pill-low">Low</span></td>
+                        <td><span class="mono">2.32.0</span></td>
+                        <td><span class="pill pill-fixed">Fixed — PR #412</span></td>
+                        <td>Malcolm Govender</td>
+                    </tr>
+                    <tr>
+                        <td><span class="mono" style="color:var(--indigo)">GHSA-jfh8-c2jp-hdp2</span></td>
+                        <td>next</td>
+                        <td><span class="mono">14.1.4</span></td>
+                        <td>3.1</td>
+                        <td><span class="pill pill-low">Low</span></td>
+                        <td><span class="mono">14.2.0</span></td>
+                        <td><span class="pill pill-open">Open</span></td>
+                        <td>Malcolm Govender</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-warn">
+            <div class="alert-icon">⚠</div>
+            <div class="alert-text"><strong>Note on python-jose CVE-2024-33663 (Mitigated):</strong> python-jose is deprecated upstream. The security gate has approved a temporary exemption with a compensating control (JWT validation is performed server-side with additional signature checks). Migration to <span class="mono">joserfc</span> is planned for Sprint 3, tracked in Jira SECU-147. The exemption expires 2026-06-01.</div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 6: Generation Automation -->
+    <div class="section" id="s6">
+        <div class="section-title">6. SBOM Generation Automation</div>
+        <h2>Syft &amp; Trivy Commands</h2>
+        <p>SBOMs are generated automatically by the security gate pipeline on every PR and push to a protected branch. The following commands are used directly or wrapped by the gate's <span class="mono">sbom_generator.py</span> module. They can also be run locally for development verification.</p>
+
+        <h3>6.1 Syft — Generate SBOM from Source Directory</h3>
+        <div class="code-block">
+<pre><span class="cm"># Generate SPDX 2.3 JSON SBOM from Python project directory</span>
+syft dir:. --output spdx-json=sbom-spdx.json
+
+<span class="cm"># Generate CycloneDX 1.5 JSON SBOM from Python project directory</span>
+syft dir:. --output cyclonedx-json=sbom-cdx.json
+
+<span class="cm"># Generate both formats simultaneously</span>
+syft dir:. \
+  --output spdx-json=sbom-spdx.json \
+  --output cyclonedx-json=sbom-cdx.json
+
+<span class="cm"># Generate from a Docker image (post-build)</span>
+syft image:intelligencehub/uc23-gate:latest \
+  --output cyclonedx-json=sbom-image-cdx.json
+
+<span class="cm"># Include dev dependencies (not recommended for production SBOM)</span>
+syft dir:. \
+  --output spdx-json=sbom-dev-spdx.json \
+  --config syft-config.yaml</pre>
+        </div>
+
+        <h3>6.2 Trivy — SBOM from Container Image</h3>
+        <div class="code-block">
+<pre><span class="cm"># Generate CycloneDX SBOM from a container image</span>
+trivy image \
+  --format cyclonedx \
+  --output sbom-trivy-cdx.json \
+  intelligencehub/uc23-gate:latest
+
+<span class="cm"># Generate SPDX SBOM from a container image</span>
+trivy image \
+  --format spdx-json \
+  --output sbom-trivy-spdx.json \
+  intelligencehub/uc23-gate:latest
+
+<span class="cm"># Generate SBOM + scan for vulnerabilities in one pass</span>
+trivy image \
+  --format table \
+  --output trivy-scan-report.txt \
+  --severity CRITICAL,HIGH \
+  --exit-code 1 \
+  intelligencehub/uc23-gate:latest
+
+<span class="cm"># Scan a filesystem (for CI without Docker build)</span>
+trivy fs . \
+  --format cyclonedx \
+  --output sbom-fs-cdx.json</pre>
+        </div>
+
+        <h3>6.3 Security Gate Python Wrapper</h3>
+        <div class="code-block">
+<pre><span class="cm"># UC23 security gate SBOM generation module</span>
+<span class="cm"># Invoked by GitHub Actions / Azure DevOps pipeline</span>
+
+python security-gate/sbom_generator.py \
+  --source-dir . \
+  --image intelligencehub/uc23-gate:latest \
+  --output-dir ./sbom-artifacts \
+  --formats spdx,cyclonedx \
+  --commit-to-registry \
+  --registry-url https://sbom.intelligencehub.io
+
+<span class="cm"># Validate generated SBOM against schema</span>
+python security-gate/sbom_validator.py \
+  --sbom sbom-artifacts/sbom-cdx.json \
+  --format cyclonedx \
+  --strict
+
+<span class="cm"># Push SBOM to Dependency-Track for continuous monitoring</span>
+python security-gate/sbom_uploader.py \
+  --sbom sbom-artifacts/sbom-cdx.json \
+  --project-id uc23-devsecops-gate \
+  --deptrack-url https://deptrack.intelligencehub.io \
+  --api-key ${DEPTRACK_API_KEY}</pre>
+        </div>
+
+        <div class="alert alert-info">
+            <div class="alert-icon">ℹ</div>
+            <div class="alert-text">All generated SBOM files are attached as pipeline artifacts with a 12-month retention window. SBOMs are also committed to the <span class="mono">sbom-registry</span> Git repository under a path matching <span class="mono">&lt;service&gt;/&lt;year&gt;/&lt;month&gt;/&lt;build-id&gt;/</span>. This enables point-in-time retrieval for audit and incident response purposes.</div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 7: Regulatory Mapping -->
+    <div class="section" id="s7">
+        <div class="section-title">7. Regulatory Compliance Mapping</div>
+        <h2>SBOM Fields → Regulatory Control Mapping</h2>
+        <p>Each SBOM field satisfies one or more compliance controls. The mapping below enables PCI-QSA and ISO auditors to identify which SBOM elements provide evidence for specific controls during assessments.</p>
+
+        <div class="compliance-grid">
+            <div class="compliance-card">
+                <div class="compliance-header">
+                    <div class="compliance-icon pci">🔐</div>
+                    <div>
+                        <div class="compliance-title">PCI-DSS v4.0</div>
+                        <div class="compliance-sub">Payment Card Industry Data Security Standard</div>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Component Name + Version + PURL</span>
+                    <span class="comp-control">Req 6.3.2 — Software inventory</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Vulnerability Count + CVE IDs</span>
+                    <span class="comp-control">Req 6.3.3 — Patch management</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Licence field</span>
+                    <span class="comp-control">Req 12.3.4 — Software IP review</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">SBOM creation timestamp + creator</span>
+                    <span class="comp-control">Req 10.2.1 — Audit log integrity</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Component hashes (SHA-256)</span>
+                    <span class="comp-control">Req 6.3.2 — Integrity verification</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Supplier / organisation field</span>
+                    <span class="comp-control">Req 12.8 — Third-party risk management</span>
+                </div>
+            </div>
+
+            <div class="compliance-card">
+                <div class="compliance-header">
+                    <div class="compliance-icon iso">🛡</div>
+                    <div>
+                        <div class="compliance-title">ISO 27001:2022</div>
+                        <div class="compliance-sub">Information Security Management System</div>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Full component inventory</span>
+                    <span class="comp-control">A.8.8 — Vulnerability management</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">CVE tracking + fix versions</span>
+                    <span class="comp-control">A.8.8 — Technical vulnerability treatment</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Supplier + download location</span>
+                    <span class="comp-control">A.5.21 — Supply chain information security</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Licence information</span>
+                    <span class="comp-control">A.5.32 — Intellectual property rights</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">SBOM signed artefact + retention</span>
+                    <span class="comp-control">A.8.15 — Logging + A.8.12 — Data leakage prevention</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Component relationships / dependencies</span>
+                    <span class="comp-control">A.8.27 — Secure system architecture</span>
+                </div>
+            </div>
+
+            <div class="compliance-card">
+                <div class="compliance-header">
+                    <div class="compliance-icon popia">📋</div>
+                    <div>
+                        <div class="compliance-title">POPIA (South Africa)</div>
+                        <div class="compliance-sub">Protection of Personal Information Act</div>
+                    </div>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Components processing personal data</span>
+                    <span class="comp-control">Section 19 — Security safeguards</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Data processing library identification</span>
+                    <span class="comp-control">Section 22 — Notification of security compromise</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Dependency vulnerability status</span>
+                    <span class="comp-control">Section 19(1) — Integrity &amp; confidentiality</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">Supplier details for PI-handling components</span>
+                    <span class="comp-control">Section 21 — Third-party operators</span>
+                </div>
+                <div class="compliance-row">
+                    <span class="comp-field">SBOM update cadence &amp; retention</span>
+                    <span class="comp-control">Section 14 — Records management</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Section 8: Lifecycle -->
+    <div class="section" id="s8">
+        <div class="section-title">8. SBOM Lifecycle &amp; Update Cadence</div>
+        <h2>SBOM Production, Distribution &amp; Update Policy</h2>
+        <p>SBOMs are living documents that must remain current with the deployed software. The following lifecycle defines when SBOMs are generated, validated, distributed, and archived.</p>
+
+        <div class="lifecycle">
+            <div class="lifecycle-step">
+                <div class="lc-step-num">Trigger</div>
+                <div class="lc-step-title">PR Merge / Build</div>
+                <div class="lc-step-desc">SBOM generated automatically by Syft + Trivy on every successful build. Attached as pipeline artifact.</div>
+            </div>
+            <div class="lifecycle-step">
+                <div class="lc-step-num">Validate</div>
+                <div class="lc-step-title">Schema Validation</div>
+                <div class="lc-step-desc">SBOM validated against SPDX 2.3 / CycloneDX 1.5 schemas. Build fails if SBOM is malformed or incomplete.</div>
+            </div>
+            <div class="lifecycle-step">
+                <div class="lc-step-num">Publish</div>
+                <div class="lc-step-title">Registry &amp; DTrack</div>
+                <div class="lc-step-desc">SBOM committed to sbom-registry repo. Pushed to Dependency-Track for continuous CVE monitoring and dashboard.</div>
+            </div>
+            <div class="lifecycle-step">
+                <div class="lc-step-num">Monitor</div>
+                <div class="lc-step-title">Continuous Scan</div>
+                <div class="lc-step-desc">Dependency-Track re-evaluates SBOM against NVD daily. New CVEs trigger Slack alerts and Jira tickets automatically.</div>
+            </div>
+            <div class="lifecycle-step">
+                <div class="lc-step-num">Retain</div>
+                <div class="lc-step-title">12-Month Archive</div>
+                <div class="lc-step-desc">SBOMs retained in immutable storage for 12 months. Accessible for PCI-QSA and ISO 27001 audits on demand.</div>
+            </div>
+        </div>
+
+        <h3>8.1 Update Cadence Policy</h3>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trigger</th>
+                        <th>SBOM Action</th>
+                        <th>Timeframe</th>
+                        <th>Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Code merged to main branch</td>
+                        <td>Full SBOM regeneration (automated)</td>
+                        <td>Immediate (pipeline)</td>
+                        <td>Security Gate (automated)</td>
+                    </tr>
+                    <tr>
+                        <td>New CVE disclosed for any component</td>
+                        <td>Dependency-Track alert; Jira ticket raised</td>
+                        <td>Within 24h of NVD publication</td>
+                        <td>Dependency-Track (automated)</td>
+                    </tr>
+                    <tr>
+                        <td>Dependency version bump (any)</td>
+                        <td>Incremental SBOM diff generated</td>
+                        <td>On PR merge</td>
+                        <td>Security Gate (automated)</td>
+                    </tr>
+                    <tr>
+                        <td>Base Docker image updated</td>
+                        <td>Container SBOM regenerated via Trivy</td>
+                        <td>On image build</td>
+                        <td>Security Gate (automated)</td>
+                    </tr>
+                    <tr>
+                        <td>PCI-DSS / ISO 27001 audit preparation</td>
+                        <td>Point-in-time SBOM retrieved from archive</td>
+                        <td>On request (24h SLA)</td>
+                        <td>Malcolm Govender / Security Lead</td>
+                    </tr>
+                    <tr>
+                        <td>Security incident (supply chain breach)</td>
+                        <td>Emergency SBOM scan — all services in scope</td>
+                        <td>Within 1h of P1 declaration</td>
+                        <td>CISO + Malcolm Govender</td>
+                    </tr>
+                    <tr>
+                        <td>Annual SBOM policy review</td>
+                        <td>Format versions updated; toolchain reviewed</td>
+                        <td>Annually (January)</td>
+                        <td>Malcolm Govender</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-teal">
+            <div class="alert-icon">✓</div>
+            <div class="alert-text"><strong>SBOM Quality Targets (UC23 Success Criteria):</strong> 100% of production deployments have a current SBOM (updated within 24h of last build). Zero components with Critical/High CVEs in production at merge time. SBOM generation adds &lt; 45 seconds to pipeline runtime. All SBOMs pass schema validation. Dependency-Track dashboard shows real-time component risk for 100% of tracked services.</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="doc-footer">
+        <div class="owner-badge">
+            <div class="owner-avatar">MG</div>
+            Malcolm Govender — Head of AI &amp; Engineering
+        </div>
+        <div class="doc-footer-text">UC23 · SBOM Template v1.0 · 2026-05-09 · CONFIDENTIAL — INTERNAL USE ONLY</div>
+    </div>
+
+</div>
+</body>
+</html>
