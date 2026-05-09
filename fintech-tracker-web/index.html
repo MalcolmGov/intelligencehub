@@ -451,6 +451,7 @@ td { padding: 0 0; vertical-align: middle; }
 .art-pdf    { background: rgba(248,113,113,.18); color: #f87171; }
 .art-gh     { background: rgba(255,255,255,.10); color: #e8eaff; border: 1px solid rgba(255,255,255,.12); }
 .art-github { background: rgba(255,255,255,.10); color: #e8eaff; }
+.art-doc   { background: rgba(52,211,153,.18);  color: #34d399; border: 1px solid rgba(52,211,153,.22); }
 
 /* ── Row actions ────────────────────────────────────────── */
 .row-actions { display: flex; gap: 2px; opacity: 0; transition: opacity .1s; padding: 9px 6px; }
@@ -894,6 +895,7 @@ tbody tr.data-row:hover {
   display: inline-flex; align-items: center; gap: 3px;
 }
 .art-chip:hover { transform: translateY(-1px); opacity: .9; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.art-doc  { border-color: rgba(52,211,153,.22); }
 .art-gh   { border-color: rgba(255,255,255,.14); }
 .art-html { border-color: rgba(251,146,60,.18); }
 .art-md   { border-color: rgba(167,139,250,.18); }
@@ -2084,7 +2086,7 @@ tbody tr.data-row td a { cursor: auto; }
 </div>
 
 <script>
-const STORE_KEY = 'fintech_projects_v59';
+const STORE_KEY = 'fintech_projects_v60';
 
 const DEFAULT_DATA = [
   { id:1,  priority:1, owner:'Anupam Sharma', project:'AI-Based Test Case Generation',              sq:'built',
@@ -2916,6 +2918,10 @@ function renderArtifacts(arts, rowId) {
   const chips = arts.map((a, i) => {
     const icon = ART_ICONS[a.t] || '';
     const hidden = (rowId && i >= SHOW) ? ' art-chip-hidden' : '';
+    const isPlaceholder = !a.u || a.u === '#';
+    if (isPlaceholder) {
+      return `<span class="art-chip art-${a.t}${hidden}" style="opacity:.55;cursor:default" title="${a.l} — Coming soon">${icon}${a.l}</span>`;
+    }
     return `<a class="art-chip art-${a.t}${hidden}" href="${a.u}" target="_blank" title="${a.l}">${icon}${a.l}</a>`;
   }).join('');
   const extra = arts.length - SHOW;
