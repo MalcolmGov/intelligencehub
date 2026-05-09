@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-23 AI-Powered DevSecOps Security Gate — Requirements & Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #64748b; border: 1px solid #334155; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-must { background: #dc2626; color: #fff; }
+        .badge-should { background: #d97706; color: #fff; }
+        .badge-nice { background: #059669; color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .artifacts-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+        .artifact-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; color: #818cf8; font-size: 0.88em; text-decoration: none; font-weight: 600; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .step-list { counter-reset: step; list-style: none; padding: 0; }
+        .step-list li { counter-increment: step; padding: 12px 0 12px 48px; position: relative; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.94em; }
+        .step-list li:last-child { border-bottom: none; }
+        .step-list li::before { content: counter(step); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85em; color: #fff; text-align: center; line-height: 28px; }
+        .pipeline-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; margin: 20px 0; }
+        .pipeline-stage { background: #0f172a; border: 1px solid #334155; padding: 14px 10px; text-align: center; position: relative; }
+        .pipeline-stage:not(:last-child)::after { content: "→"; position: absolute; right: -10px; top: 50%; transform: translateY(-50%); color: #6366f1; font-size: 1.2em; z-index: 1; }
+        .pipeline-stage:first-child { border-radius: 6px 0 0 6px; border-left: 3px solid #6366f1; }
+        .pipeline-stage:last-child { border-radius: 0 6px 6px 0; border-right: 3px solid #14b8a6; }
+        .pipeline-icon { font-size: 1.4em; margin-bottom: 6px; }
+        .pipeline-name { font-size: 0.78em; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.04em; }
+        .pipeline-desc { font-size: 0.72em; color: #64748b; margin-top: 4px; line-height: 1.3; }
+        .severity-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        .severity-critical { background: rgba(220,38,38,0.1); border-left: 3px solid #dc2626; }
+        .severity-high { background: rgba(234,88,12,0.1); border-left: 3px solid #ea580c; }
+        .severity-medium { background: rgba(234,179,8,0.08); border-left: 3px solid #eab308; }
+        .severity-low { background: rgba(34,197,94,0.08); border-left: 3px solid #22c55e; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#1e293b;border:1px solid #334155;color:#64748b;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#334155';this.style.color='#e2e8f0'" onmouseout="this.style.background='#1e293b';this.style.color='#64748b'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+<div class="container">
+    <header>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+            <div>
+                <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Security &amp; Compliance · Use Case 23</div>
+                <h1>AI-Powered DevSecOps Security Gate</h1>
+                <div class="subtitle">ML-enhanced SAST, secret scanning, dependency vulnerability scoring and container image analysis blocking critical CVEs at merge time with auto-generated SBOMs</div>
+                <div>
+                    <span class="badge badge-new">New — Gap Identified by Malcolm</span>
+                    <span class="badge badge-not-started">Not Started — Planning Phase</span>
+                    <span class="badge badge-high">Complexity: High</span>
+                </div>
+                <div style="margin-top:10px;">
+                    <span class="badge badge-compliance">PCI-DSS</span>
+                    <span class="badge badge-compliance">ISO 27001</span>
+                    <span class="badge badge-compliance">POPIA</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-23</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Source Lines</div><div class="meta-value">~1,600 LOC</div></div>
+            <div class="meta-item"><div class="meta-label">Test Lines</div><div class="meta-value">~320 LOC</div></div>
+            <div class="meta-item"><div class="meta-label">Files</div><div class="meta-value">8 Files</div></div>
+            <div class="meta-item"><div class="meta-label">Languages</div><div class="meta-value">Python / YAML</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering · Document Author &amp; Gap Identifier</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <section>
+        <h2>Executive Summary</h2>
+        <p>The AI-Powered DevSecOps Security Gate integrates directly into CI/CD pipelines (GitHub Actions / Azure DevOps) to enforce security standards at every merge. It combines ML-enhanced Static Application Security Testing (SAST) with intelligent false-positive reduction, secret scanning, dependency vulnerability scoring (CVSS-based), and container image analysis — blocking Critical and High CVEs before they reach production.</p>
+        <p>Malcolm Govender identified this gap after an internal review revealed that existing security tooling produces high volumes of false positives (reducing developer trust), lacks container-level analysis, and generates no Software Bill of Materials (SBOM) — a requirement for PCI-DSS v4.0 compliance. The AI-powered gate addresses all three deficiencies while making security findings actionable through severity-ranked, PR-level remediation guidance.</p>
+        <div class="comparison-box">
+            <div class="compare-card traditional">
+                <div class="compare-label">Traditional Approach</div>
+                <div class="compare-value">3 Months</div>
+                <div class="compare-sub">3 engineers × 3 months manual build</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">AI-Assisted Delivery</div>
+                <div class="compare-value">6 Hours</div>
+                <div class="compare-sub">AI-accelerated implementation target</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROBLEM STATEMENT -->
+    <section class="violet">
+        <h2>Problem Statement</h2>
+        <div class="card violet">
+            <div class="card-title">High False-Positive Rate Destroying Developer Trust</div>
+            <div class="card-content">Existing SAST tools generate excessive false positives that developers learn to ignore. When security findings are routinely wrong, engineers dismiss alerts — creating a culture where genuine Critical vulnerabilities are overlooked alongside the noise. ML-based false-positive reduction is essential to restore signal quality.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">No Container Image Security Analysis</div>
+            <div class="card-content">Container images built in CI/CD pipelines are not scanned for OS-level CVEs, known malicious layers or outdated base images before deployment. A single compromised or outdated base image can expose all services built on it to known exploits.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Secret Leakage in Source Code and Commits</div>
+            <div class="card-content">API keys, database credentials and private certificates are periodically committed to source repositories. Without automated secret scanning at commit and PR time, these credentials remain embedded in git history — creating persistent exposure even after manual removal.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">No SBOM Generation — PCI-DSS v4.0 Gap</div>
+            <div class="card-content">PCI-DSS v4.0 (effective March 2025) requires organisations to maintain a Software Bill of Materials for in-scope systems. No current process generates, stores or validates SBOMs — creating a direct compliance gap that will surface in the next QSA assessment.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Security Findings Are Not Actionable at PR Time</div>
+            <div class="card-content">When security issues are detected, findings are reported in separate dashboards that engineers rarely visit. Without direct PR integration providing severity-ranked, code-location-specific remediation guidance, security defects survive to production as a matter of workflow friction.</div>
+        </div>
+    </section>
+
+    <!-- SOLUTION OVERVIEW -->
+    <section>
+        <h2>Solution Overview</h2>
+        <p>The DevSecOps Security Gate is a multi-layer security enforcement pipeline integrated into every PR workflow. It combines four specialised scanning engines under a unified AI orchestration layer that de-duplicates findings, applies ML false-positive reduction, ranks by severity and posts actionable remediation guidance directly on the PR.</p>
+        <h3>Pipeline Integration Overview</h3>
+        <div class="pipeline-grid">
+            <div class="pipeline-stage">
+                <div class="pipeline-icon">🔍</div>
+                <div class="pipeline-name">SAST + ML FP Filter</div>
+                <div class="pipeline-desc">Source code static analysis with ML false-positive reduction</div>
+            </div>
+            <div class="pipeline-stage">
+                <div class="pipeline-icon">🔑</div>
+                <div class="pipeline-name">Secret Scan</div>
+                <div class="pipeline-desc">Credential &amp; key detection across all files and git history</div>
+            </div>
+            <div class="pipeline-stage">
+                <div class="pipeline-icon">📦</div>
+                <div class="pipeline-name">Dependency CVE</div>
+                <div class="pipeline-desc">CVSS-scored dependency vulnerability analysis</div>
+            </div>
+            <div class="pipeline-stage">
+                <div class="pipeline-icon">🐳</div>
+                <div class="pipeline-name">Container Scan</div>
+                <div class="pipeline-desc">OS &amp; layer CVE analysis on built container images</div>
+            </div>
+            <div class="pipeline-stage">
+                <div class="pipeline-icon">📋</div>
+                <div class="pipeline-name">SBOM + Gate</div>
+                <div class="pipeline-desc">SBOM generation + merge block on Critical/High</div>
+            </div>
+        </div>
+        <h3>CVSS Blocking Thresholds</h3>
+        <table class="severity-table">
+            <thead><tr><th>Severity</th><th>CVSS Range</th><th>Gate Action</th><th>SLA for Fix</th></tr></thead>
+            <tbody>
+                <tr class="severity-critical"><td><strong>Critical</strong></td><td>9.0 – 10.0</td><td>Block merge — mandatory fix before merge</td><td>24 hours</td></tr>
+                <tr class="severity-high"><td><strong>High</strong></td><td>7.0 – 8.9</td><td>Block merge — fix or CISO-approved exception required</td><td>72 hours</td></tr>
+                <tr class="severity-medium"><td><strong>Medium</strong></td><td>4.0 – 6.9</td><td>Warning on PR — track in backlog; does not block</td><td>Next sprint</td></tr>
+                <tr class="severity-low"><td><strong>Low</strong></td><td>0.1 – 3.9</td><td>Informational PR comment — fix at discretion</td><td>Best effort</td></tr>
+            </tbody>
+        </table>
+        <h3>Core Capabilities</h3>
+        <div class="card">
+            <div class="card-title">ML-Enhanced SAST with False-Positive Reduction</div>
+            <div class="card-content">Integrates with existing SAST tools (Semgrep, Bandit, CodeQL) and applies a trained ML classifier to filter false positives based on code context, historical developer feedback and repository-specific patterns. Targets &lt;10% false-positive rate — significantly below industry baseline of 40–60%.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Secret Scanning (Commits + PR + History)</div>
+            <div class="card-content">Scans all files, environment configs and commit history for high-entropy strings, known credential patterns (AWS keys, GCP service accounts, Azure SAS tokens, database URLs, private keys, JWT secrets). Immediate PR block on secret detection. Alerts sent to security team and credential owner for rotation.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Dependency Vulnerability Scoring</div>
+            <div class="card-content">CVSS v3.1 scoring applied to all direct and transitive dependencies across npm, pip, Maven and NuGet manifests. Integrates with OSV, NVD and GitHub Advisory Database. Provides upgrade path recommendations alongside blocking decision.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Container Image Analysis</div>
+            <div class="card-content">Scans built container images using Trivy/Grype for OS-level CVEs, outdated base images and known malicious layers. Analysis triggered automatically when Dockerfile changes are detected in the PR. Base image freshness policy enforced (maximum 30-day age for in-scope services).</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Automated SBOM Generation</div>
+            <div class="card-content">CycloneDX and SPDX format SBOMs generated on every successful pipeline run. SBOMs stored in tamper-evident artefact store and linked to container image digest. PCI-DSS v4.0 compliant SBOM cadence enforced per in-scope service.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Actionable PR Remediation Guidance</div>
+            <div class="card-content">Unified PR comment posts severity-ranked findings with: CVE/CWE reference, affected file/line, CVSS score, fix recommendation (specific version upgrade or code change), and estimated fix effort. Engineers can resolve without leaving the PR context.</div>
+        </div>
+    </section>
+
+    <!-- FUNCTIONAL REQUIREMENTS -->
+    <section class="teal">
+        <h2>Functional Requirements</h2>
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>FR-23-01</strong></td><td>SAST engine shall scan all code changes in a PR using Semgrep/Bandit/CodeQL; ML false-positive filter shall reduce noise to &lt;10% FP rate</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-02</strong></td><td>Secret scanner shall detect high-entropy strings and known credential patterns across all PR file changes and commit history; block merge immediately on detection</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-03</strong></td><td>Dependency scanner shall perform CVSS v3.1 scoring on all direct and transitive dependencies; block merge for Critical (&ge;9.0) and High (&ge;7.0) CVEs</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-04</strong></td><td>Container image scanner shall analyse built images for OS-level CVEs and outdated base images; triggered automatically on Dockerfile changes; block on Critical/High</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-05</strong></td><td>Gate shall block PR merge for Critical CVSS &ge;9.0 and High CVSS &ge;7.0 findings across all scan types; unblock only on fix or CISO-approved exception with audit trail</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-06</strong></td><td>Unified PR comment shall post severity-ranked findings within 15 minutes of PR creation; include CVE/CWE reference, CVSS score, affected location and specific remediation recommendation</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-07</strong></td><td>SBOM generator shall produce CycloneDX and SPDX format SBOMs on every successful pipeline run; SBOMs stored linked to container image digest and build artefact</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-08</strong></td><td>Secret detection alert shall notify security team and credential owner within 5 minutes; include credential type, file location and rotation guidance</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-09</strong></td><td>CISO exception workflow shall allow High CVE merge with documented justification and CISO approval; exception recorded in immutable audit log with expiry date</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-10</strong></td><td>Security posture dashboard shall display real-time vulnerability counts by severity, repository and team; trend charts over rolling 30/90 days; exportable for PCI-DSS audit evidence</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-23-11</strong></td><td>ML false-positive classifier shall accept developer feedback on findings; model retrained monthly on accumulated feedback corpus</td><td><span class="badge badge-nice" style="margin:0;padding:3px 10px;font-size:0.75em;">NICE TO HAVE</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- NON-FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>Non-Functional Requirements</h2>
+        <table>
+            <thead>
+                <tr><th>Category</th><th>Requirement</th><th>Target</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Performance</strong></td><td>Full gate scan completion (SAST + secrets + deps + container)</td><td>&lt; 15 minutes</td></tr>
+                <tr><td><strong>Performance</strong></td><td>PR comment post time after scan completion</td><td>&lt; 30 seconds</td></tr>
+                <tr><td><strong>Accuracy</strong></td><td>SAST false-positive rate (post ML filter)</td><td>&lt; 10%</td></tr>
+                <tr><td><strong>Accuracy</strong></td><td>Critical CVE false-negative rate (missed Critical findings)</td><td>0% target</td></tr>
+                <tr><td><strong>Security</strong></td><td>Source code must not leave the organisation's VCS tenancy; no external SAST SaaS with code upload</td><td>Mandatory</td></tr>
+                <tr><td><strong>Security</strong></td><td>Secret scan alerts must mask detected secret values in notifications — reference only, not value</td><td>Mandatory</td></tr>
+                <tr><td><strong>Availability</strong></td><td>Gate service uptime (degrade to advisory-only on failure — never block PRs on service outage)</td><td>99.9%</td></tr>
+                <tr><td><strong>Scalability</strong></td><td>Concurrent PR scans across all repositories without queue delay beyond 15 minutes</td><td>&ge; 40 simultaneous</td></tr>
+                <tr><td><strong>Audit</strong></td><td>All scan results, blocking decisions and exception approvals retained with immutable audit trail</td><td>3 years minimum</td></tr>
+                <tr><td><strong>SBOM Cadence</strong></td><td>SBOMs generated and archived for every production build of in-scope PCI services</td><td>100% coverage</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- TECHNICAL ARCHITECTURE -->
+    <section class="violet">
+        <h2>Technical Architecture</h2>
+        <div class="card violet">
+            <div class="card-title">GitHub Actions / Azure DevOps Integration (YAML)</div>
+            <div class="card-content">Reusable composite action / pipeline template deployed to all service repositories via centralised template repository. Configurable per-repo overrides for blocking thresholds and scan scope. Central configuration managed by security engineering team; repos consume as a versioned dependency.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">SAST Orchestration Layer (Python)</div>
+            <div class="card-content">Wraps Semgrep, Bandit and CodeQL. Normalises findings into a unified JSON schema. Invokes ML false-positive classifier (scikit-learn / ONNX model) on each finding. Applies severity mapping. Aggregates results for gate decision and PR comment generation.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Secret Scanning Engine (Python)</div>
+            <div class="card-content">Gitleaks and detect-secrets integration with custom rule extensions for SA-specific credential formats (SARB payment credentials, FSCA API tokens). Scans current PR diff and full git history. Entropy analysis for novel credential patterns. Zero-trust: any detection blocks immediately.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Dependency &amp; Container CVE Engine (Python)</div>
+            <div class="card-content">OSV-Scanner and Trivy/Grype integration for dependency and container analysis respectively. Normalised CVSS v3.1 scoring across all sources (NVD, OSV, GitHub Advisory DB). Deduplication of findings appearing across multiple scan engines. Upgrade path recommendations from package registry metadata.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">SBOM Generator &amp; Artefact Store (Python)</div>
+            <div class="card-content">Syft-based SBOM generation in CycloneDX 1.5 and SPDX 2.3 formats. SBOMs signed with Cosign and stored in Azure Blob Storage linked to container image digest and build pipeline run ID. SBOM completeness validation against PCI-DSS v4.0 Req 6.3.2 requirements.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Gate Decision &amp; PR Comment Engine (Python)</div>
+            <div class="card-content">Aggregates findings from all scan engines, applies blocking threshold policy, generates structured PR comment with severity-ranked findings using GPT-4o for natural-language remediation guidance. Posts to GitHub/Azure DevOps via API. Emits gate pass/fail status check.</div>
+        </div>
+    </section>
+
+    <!-- COMPLIANCE -->
+    <section class="teal">
+        <h2>Compliance &amp; Regulatory Alignment</h2>
+        <table>
+            <thead>
+                <tr><th>Framework</th><th>Specific Requirement</th><th>How Gate Addresses It</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>PCI-DSS v4.0</strong></td><td>Req 6.2.4: Software engineering techniques to prevent common vulnerabilities; Req 6.3.2: SBOM inventory for bespoke and custom software</td><td>SAST gate enforces coding standards; SBOM generated on every production build with CycloneDX/SPDX format compliance</td></tr>
+                <tr><td><strong>PCI-DSS v4.0</strong></td><td>Req 6.3.3: All software components protected from known vulnerabilities (critical patches within 1 month)</td><td>Dependency CVSS gate blocks Critical CVEs from reaching production; SLA enforcement tracked in dashboard</td></tr>
+                <tr><td><strong>ISO 27001:2022</strong></td><td>A.8.8: Management of technical vulnerabilities; A.8.25: Secure development lifecycle</td><td>Continuous vulnerability management at PR time; documented scan results provide ISO 27001 control evidence</td></tr>
+                <tr><td><strong>POPIA Section 19</strong></td><td>Security safeguards for personal information — technical measures to prevent unauthorised access</td><td>Secret scanning prevents credential exposure; SAST catches insecure personal data handling patterns</td></tr>
+                <tr><td><strong>SARB Supervisory</strong></td><td>Technology risk management — software supply chain security expectations</td><td>SBOM generation and dependency vulnerability tracking provides supply chain transparency required by SARB</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- SUCCESS METRICS -->
+    <section>
+        <h2>Success Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Critical CVEs reaching production (target)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">&lt;10%</div>
+                <div class="metric-label">SAST false-positive rate (post ML filter)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">&lt;15 min</div>
+                <div class="metric-label">Full gate scan turnaround</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">PCI in-scope services with SBOM coverage</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">Shift Left</div>
+                <div class="metric-label">Security finds at PR not production</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">PCI v4.0</div>
+                <div class="metric-label">Req 6.3.2 SBOM compliance achieved</div>
+            </div>
+        </div>
+        <p style="margin-top:20px;">Business value: Catches critical vulnerabilities before production, significantly reduces security remediation cost by shifting detection left, and auto-generates SBOM and scan-result evidence packs for PCI-DSS QSA assessments and ISO 27001 audits.</p>
+    </section>
+
+    <!-- NEXT STEPS -->
+    <section class="violet">
+        <h2>Next Steps</h2>
+        <ol class="step-list">
+            <li>Define CVSS blocking thresholds with CISO — document Critical (&ge;9.0) hard block and High (&ge;7.0) block-with-exception policies in security policy register</li>
+            <li>Inventory existing SAST tools across all repositories — identify overlaps, gaps and false-positive baseline rates per tool</li>
+            <li>Configure GitHub Actions / Azure DevOps composite action template in central security repository — pilot on 2 low-risk service repos</li>
+            <li>Establish SBOM generation cadence and storage location — confirm Azure Blob Storage configuration for tamper-evident SBOM archive</li>
+            <li>Train initial ML false-positive classifier on 90-day historical SAST findings — establish FP rate baseline before and after ML filter</li>
+            <li>Onboard all repositories to advisory-only mode — measure developer engagement with PR security comments before enabling blocking</li>
+            <li>Enable blocking mode for Critical CVEs on all repositories after 30-day advisory period; High CVE blocking on PCI-DSS in-scope services first</li>
+        </ol>
+    </section>
+
+    <!-- ARTEFACTS -->
+    <section>
+        <h2>Related Artefacts</h2>
+        <div class="artifacts-row">
+            <a class="artifact-link" href="#">Requirements (this document)</a>
+            <a class="artifact-link" href="#">Architecture Specification</a>
+            <a class="artifact-link" href="#">CVSS Threshold Policy</a>
+            <a class="artifact-link" href="#">SBOM Compliance Mapping</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>UC-23 AI-Powered DevSecOps Security Gate — Requirements &amp; Planning Document v1.0</p>
+        <p style="margin-top:6px;">Gap Identified &amp; Authored by: <strong style="color:#818cf8;">Malcolm Govender</strong>, Head of AI &amp; Engineering &nbsp;·&nbsp; May 2026</p>
+        <p style="margin-top:6px;">South African Fintech AI Transformation Programme</p>
+    </footer>
+</div>
+</body>
+</html>

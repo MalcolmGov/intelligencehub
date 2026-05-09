@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-22 Regulatory Change Impact Radar — Requirements & Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #64748b; border: 1px solid #334155; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-must { background: #dc2626; color: #fff; }
+        .badge-should { background: #d97706; color: #fff; }
+        .badge-nice { background: #059669; color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .artifacts-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+        .artifact-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; color: #818cf8; font-size: 0.88em; text-decoration: none; font-weight: 600; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .step-list { counter-reset: step; list-style: none; padding: 0; }
+        .step-list li { counter-increment: step; padding: 12px 0 12px 48px; position: relative; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.94em; }
+        .step-list li:last-child { border-bottom: none; }
+        .step-list li::before { content: counter(step); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85em; color: #fff; text-align: center; line-height: 28px; }
+        .radar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+        .regulator-card { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 14px; border-top: 3px solid #6366f1; }
+        .regulator-card:nth-child(2) { border-top-color: #7c3aed; }
+        .regulator-card:nth-child(3) { border-top-color: #14b8a6; }
+        .regulator-card:nth-child(4) { border-top-color: #f59e0b; }
+        .regulator-card:nth-child(5) { border-top-color: #ef4444; }
+        .regulator-card:nth-child(6) { border-top-color: #06b6d4; }
+        .regulator-name { font-weight: 700; color: #e2e8f0; font-size: 0.95em; margin-bottom: 4px; }
+        .regulator-desc { font-size: 0.82em; color: #64748b; line-height: 1.4; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+    </style>
+</head>
+<body>
+<a href="file:///Users/malcolmgovender/Desktop/fintech_projects_interactive.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#1e293b;border:1px solid #334155;color:#64748b;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#334155';this.style.color='#e2e8f0'" onmouseout="this.style.background='#1e293b';this.style.color='#64748b'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+<div class="container">
+    <header>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
+            <div>
+                <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Security &amp; Compliance · Use Case 22</div>
+                <h1>Regulatory Change Impact Radar</h1>
+                <div class="subtitle">AI-powered regulatory intelligence platform monitoring SARB, FSCA, POPIA, PCI-SSC and FICA — auto-classifying changes and generating board-ready impact assessments</div>
+                <div>
+                    <span class="badge badge-new">New — Gap Identified by Malcolm</span>
+                    <span class="badge badge-not-started">Not Started — Planning Phase</span>
+                    <span class="badge badge-high">Complexity: High</span>
+                </div>
+                <div style="margin-top:10px;">
+                    <span class="badge badge-compliance">POPIA</span>
+                    <span class="badge badge-compliance">FICA</span>
+                    <span class="badge badge-compliance">PCI-DSS</span>
+                    <span class="badge badge-compliance">SARB</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-22</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Source Lines</div><div class="meta-value">~2,800 LOC</div></div>
+            <div class="meta-item"><div class="meta-label">Test Lines</div><div class="meta-value">~420 LOC</div></div>
+            <div class="meta-item"><div class="meta-label">Files</div><div class="meta-value">13 Files</div></div>
+            <div class="meta-item"><div class="meta-label">Languages</div><div class="meta-value">Python / TypeScript</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering · Document Author &amp; Gap Identifier</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- EXECUTIVE SUMMARY -->
+    <section>
+        <h2>Executive Summary</h2>
+        <p>The Regulatory Change Impact Radar is an AI-powered intelligence platform that continuously monitors 6+ South African regulatory bodies — SARB, FSCA, POPIA Information Regulator, PCI-SSC and FICA — for amendments, new guidelines, consultation papers and enforcement notices. Changes are auto-classified by impact severity, mapped to affected internal systems and processes, and surfaced to compliance and legal teams as board-ready impact assessments with implementation timelines and cost estimates.</p>
+        <p>Malcolm Govender identified this as a critical strategic gap: the organisation currently monitors regulatory bodies manually and reactively, with compliance teams spending significant time reading regulatory publications and manually assessing their impact. This creates a risk of missed regulatory changes and slow response times that expose the organisation to enforcement action.</p>
+        <div class="comparison-box">
+            <div class="compare-card traditional">
+                <div class="compare-label">Traditional Approach</div>
+                <div class="compare-value">6 Months</div>
+                <div class="compare-sub">3 engineers × 6 months manual build</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">AI-Assisted Delivery</div>
+                <div class="compare-value">8 Hours</div>
+                <div class="compare-sub">AI-accelerated implementation target</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PROBLEM STATEMENT -->
+    <section class="violet">
+        <h2>Problem Statement</h2>
+        <div class="card violet">
+            <div class="card-title">Manual Monitoring of 6+ Regulatory Bodies</div>
+            <div class="card-content">Compliance and legal teams manually monitor SARB, FSCA, POPIA Information Regulator, PCI-SSC, FICA and NCR publications. This requires dedicated time across multiple portals, email subscriptions and PDF-heavy regulatory documents — creating a high-effort, error-prone process.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Weeks-Long Regulatory Response Cycle</div>
+            <div class="card-content">From a regulatory change being published to an internal impact assessment landing on the board's desk currently takes 4–8 weeks. In a fast-moving regulatory environment, this lag creates enforcement risk and increases remediation cost as systems continue operating out of compliance.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">No Systematic Impact-to-System Mapping</div>
+            <div class="card-content">When a regulatory change is identified, mapping it to affected systems, processes and business units is done manually through tribal knowledge. There is no maintained map of regulatory obligations to the technical system landscape, making impact assessment inconsistent and incomplete.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Board Reporting Requires Manual Synthesis</div>
+            <div class="card-content">Preparing board-level regulatory impact summaries with implementation timelines and cost estimates requires significant manual effort from senior compliance staff. There is no automated mechanism to produce audit-ready impact assessments on demand.</div>
+        </div>
+    </section>
+
+    <!-- SOLUTION OVERVIEW -->
+    <section>
+        <h2>Solution Overview</h2>
+        <p>The Regulatory Change Impact Radar operates as a three-component intelligence platform: a <strong>regulatory feed ingestion layer</strong> that monitors official sources in real time, an <strong>AI impact classification engine</strong> that assesses severity and maps changes to internal systems, and a <strong>reporting layer</strong> that generates board-ready assessments and maintains the living regulatory obligation register.</p>
+        <h3>Monitored Regulatory Sources</h3>
+        <div class="radar-grid">
+            <div class="regulator-card">
+                <div class="regulator-name">SARB</div>
+                <div class="regulator-desc">Prudential Authority bulletins, Bank Supervision circulars, payment system guidance</div>
+            </div>
+            <div class="regulator-card">
+                <div class="regulator-name">FSCA</div>
+                <div class="regulator-desc">Conduct of Business standards, COFI Act guidance, FSP licensing requirements</div>
+            </div>
+            <div class="regulator-card">
+                <div class="regulator-name">POPIA Information Regulator</div>
+                <div class="regulator-desc">Enforcement notices, guidance notes, condition of registration updates</div>
+            </div>
+            <div class="regulator-card">
+                <div class="regulator-name">FICA</div>
+                <div class="regulator-desc">FIC amendments, AML/CFT guidance, accountable institution requirements</div>
+            </div>
+            <div class="regulator-card">
+                <div class="regulator-name">PCI-SSC</div>
+                <div class="regulator-desc">PCI-DSS version updates, supplemental guidance, QSA bulletins</div>
+            </div>
+            <div class="regulator-card">
+                <div class="regulator-name">NCR / NCA</div>
+                <div class="regulator-desc">National Credit Act amendments, credit provider compliance notices</div>
+            </div>
+        </div>
+        <h3>Core Capabilities</h3>
+        <div class="card">
+            <div class="card-title">Real-Time Regulatory Feed Monitoring</div>
+            <div class="card-content">Automated ingestion of regulatory publications via RSS feeds, website scraping with change detection, email parsing and official API integrations where available. New publications trigger immediate analysis pipeline — no manual checking required.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">AI Impact Classification Engine</div>
+            <div class="card-content">LLM-powered analysis classifies each regulatory change by: impact severity (Critical / High / Medium / Low / Informational), affected obligation category (data privacy, AML/CFT, payment systems, conduct of business, capital requirements), implementation timeline and estimated cost range.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">System-to-Obligation Mapping</div>
+            <div class="card-content">Regulatory changes are automatically mapped to affected internal systems, processes and business units using a maintained regulatory obligation register. Engineers and business owners are notified of changes affecting their domain.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">Board-Ready Impact Assessment Generation</div>
+            <div class="card-content">Automated generation of structured impact assessment documents: executive summary, affected systems, gap analysis, implementation roadmap with timelines, resource requirements and cost estimates. Ready for legal review and board distribution within hours.</div>
+        </div>
+    </section>
+
+    <!-- FUNCTIONAL REQUIREMENTS -->
+    <section class="teal">
+        <h2>Functional Requirements</h2>
+        <table>
+            <thead>
+                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>FR-22-01</strong></td><td>Feed ingestion layer shall monitor all 6+ configured regulatory sources with a maximum polling interval of 4 hours; new publications trigger immediate analysis pipeline</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-02</strong></td><td>AI classification engine shall assign impact severity (Critical/High/Medium/Low/Informational) and obligation category to each regulatory change within 30 minutes of publication detection</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-03</strong></td><td>System impact mapper shall cross-reference regulatory changes with a maintained system-obligation register and identify affected services, teams and processes</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-04</strong></td><td>Impact assessment generator shall produce a structured board-ready document (PDF + structured JSON) within 2 hours of Critical/High classification; within 24 hours for Medium</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-05</strong></td><td>Alert routing shall notify relevant stakeholders (compliance officer, CISO, business unit owner, legal) via email and Slack within 1 hour of Critical classification</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-06</strong></td><td>Regulatory obligation register shall be maintained and queryable — mapping each active regulation to responsible teams, affected systems and current compliance status</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-07</strong></td><td>Implementation timeline estimator shall provide date ranges and resource estimates for regulatory changes requiring system changes, based on complexity scoring</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-08</strong></td><td>Compliance dashboard shall display real-time regulatory posture — pending changes by severity, overdue implementations, and upcoming effective dates</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-09</strong></td><td>Monthly regulatory digest shall be auto-generated for board consumption — summarising all changes in the period, their status and any overdue implementation items</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+                <tr><td><strong>FR-22-10</strong></td><td>Regulatory change history shall be searchable and auditable — full trail of detection, classification, stakeholder notification and implementation tracking per change</td><td><span class="badge badge-nice" style="margin:0;padding:3px 10px;font-size:0.75em;">NICE TO HAVE</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- NON-FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>Non-Functional Requirements</h2>
+        <table>
+            <thead>
+                <tr><th>Category</th><th>Requirement</th><th>Target</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Timeliness</strong></td><td>New publication detection to classification completion</td><td>&lt; 30 minutes</td></tr>
+                <tr><td><strong>Timeliness</strong></td><td>Critical change alert to stakeholder notification</td><td>&lt; 1 hour</td></tr>
+                <tr><td><strong>Timeliness</strong></td><td>Board-ready impact assessment generation for Critical changes</td><td>&lt; 2 hours</td></tr>
+                <tr><td><strong>Accuracy</strong></td><td>Impact severity classification accuracy (validated quarterly against expert review)</td><td>&ge; 90%</td></tr>
+                <tr><td><strong>Coverage</strong></td><td>All configured regulatory sources monitored without manual intervention</td><td>100% automated</td></tr>
+                <tr><td><strong>Data Residency</strong></td><td>All regulatory intelligence data stored and processed within South Africa</td><td>Mandatory — POPIA</td></tr>
+                <tr><td><strong>Availability</strong></td><td>Regulatory monitoring service uptime</td><td>99.5%</td></tr>
+                <tr><td><strong>Audit</strong></td><td>All regulatory changes, classifications and assessments retained with full audit trail</td><td>7 years minimum</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- TECHNICAL ARCHITECTURE -->
+    <section class="violet">
+        <h2>Technical Architecture</h2>
+        <div class="card violet">
+            <div class="card-title">Feed Ingestion Layer (Python)</div>
+            <div class="card-content">Scheduled crawlers per regulatory source using RSS parsers, HTML diff-detection scrapers and email parsing. Change deduplication using content hashing. New publication events published to internal message queue for downstream processing. Configurable polling intervals per source.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">AI Classification Engine (Python + Azure OpenAI)</div>
+            <div class="card-content">GPT-4o powered document analysis pipeline. Structured output schema enforces consistent classification fields. Domain-specific few-shot prompting built from historical regulatory change examples. Expert review feedback loop for continuous accuracy improvement.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Regulatory Obligation Register (PostgreSQL)</div>
+            <div class="card-content">Normalised data model linking regulations to obligations, obligations to internal systems, and systems to responsible teams. Updated by both automated classification and manual compliance team input. Exposes REST API for dashboard and reporting consumption.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Impact Assessment Generator (TypeScript)</div>
+            <div class="card-content">Template-driven document generator producing board-ready PDFs and structured JSON. Templates maintained per regulatory body to ensure appropriate formatting and terminology. Legal team review workflow integrated before final distribution.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Notification &amp; Routing Layer</div>
+            <div class="card-content">Configurable routing rules mapping severity + obligation category to stakeholder groups. Multi-channel delivery: email, Slack, Microsoft Teams. Escalation logic for unacknowledged Critical alerts. Delivery receipts tracked for audit trail.</div>
+        </div>
+    </section>
+
+    <!-- COMPLIANCE -->
+    <section class="teal">
+        <h2>Compliance &amp; Regulatory Alignment</h2>
+        <table>
+            <thead>
+                <tr><th>Regulatory Body</th><th>Key Change Types Monitored</th><th>Response SLA</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>SARB / Prudential Authority</strong></td><td>Bank supervision directives, payment system exemptions, capital requirement changes</td><td>Critical: 1h alert / 2h assessment</td></tr>
+                <tr><td><strong>FSCA</strong></td><td>COFI Act instruments, FSP conduct standards, product intervention orders</td><td>Critical: 1h alert / 2h assessment</td></tr>
+                <tr><td><strong>POPIA Information Regulator</strong></td><td>Enforcement notices, conditions of registration, breach notification requirements</td><td>Critical: 1h alert / 2h assessment</td></tr>
+                <tr><td><strong>FICA / FIC</strong></td><td>AML/CFT guidance, accountable institution schedules, beneficial ownership requirements</td><td>High: 4h alert / 24h assessment</td></tr>
+                <tr><td><strong>PCI-SSC</strong></td><td>PCI-DSS version updates, supplemental guidance, SAQ eligibility changes</td><td>High: 4h alert / 24h assessment</td></tr>
+                <tr><td><strong>NCR / NCA</strong></td><td>Credit Act amendments, affordability assessment regulations, fee limits</td><td>Medium: 24h alert / 5d assessment</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- SUCCESS METRICS -->
+    <section>
+        <h2>Success Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">Weeks → Hours</div>
+                <div class="metric-label">Regulatory response time reduction</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">6+</div>
+                <div class="metric-label">Regulatory bodies monitored automatically</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">&lt;30 min</div>
+                <div class="metric-label">Detection to classification time</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">&ge;90%</div>
+                <div class="metric-label">Classification accuracy (expert-validated)</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">Auto</div>
+                <div class="metric-label">Audit-ready impact assessments</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Missed Critical regulatory changes (target)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEXT STEPS -->
+    <section class="violet">
+        <h2>Next Steps</h2>
+        <ol class="step-list">
+            <li>Audit regulatory feed availability across SARB, FSCA, POPIA Information Regulator, FICA, PCI-SSC and NCR — document API vs scraping approach per source</li>
+            <li>Define impact severity taxonomy with compliance and legal teams — calibrate Critical/High/Medium/Low thresholds against regulatory framework obligations</li>
+            <li>Map current system landscape to active regulatory obligations — produce initial obligation register baseline</li>
+            <li>Establish board reporting cadence and impact assessment template format with legal and executive team sign-off</li>
+            <li>Build and test feed ingestion layer for top 3 priority sources (SARB, FSCA, POPIA) — validate publication detection reliability</li>
+            <li>Run classification engine pilot on 30-day historical regulatory publications — validate accuracy against expert review</li>
+            <li>Onboard compliance team to dashboard and alert routing — establish Human-in-the-loop review workflow for Critical classifications</li>
+        </ol>
+    </section>
+
+    <!-- ARTEFACTS -->
+    <section>
+        <h2>Related Artefacts</h2>
+        <div class="artifacts-row">
+            <a class="artifact-link" href="#">Requirements (this document)</a>
+            <a class="artifact-link" href="#">Architecture Specification</a>
+            <a class="artifact-link" href="#">Regulatory Obligation Register</a>
+            <a class="artifact-link" href="#">Impact Assessment Templates</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>UC-22 Regulatory Change Impact Radar — Requirements &amp; Planning Document v1.0</p>
+        <p style="margin-top:6px;">Gap Identified &amp; Authored by: <strong style="color:#818cf8;">Malcolm Govender</strong>, Head of AI &amp; Engineering &nbsp;·&nbsp; May 2026</p>
+        <p style="margin-top:6px;">South African Fintech AI Transformation Programme</p>
+    </footer>
+</div>
+</body>
+</html>
