@@ -1808,11 +1808,51 @@ tbody tr.data-row td a { cursor: auto; }
 .metrics-table td { color: #e2e8f0; }
 .metrics-table tr:hover td { background: rgba(0,240,255,.04); }
 .metrics-table .num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+/* ── Executive summary banner ─────────────────────────────────────── */
+.metrics-exec-banner {
+  padding: 20px 28px 16px;
+  background: linear-gradient(135deg, rgba(99,102,241,.08) 0%, rgba(0,115,234,.06) 50%, rgba(52,211,153,.06) 100%);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  display: none; flex-shrink: 0;
+}
+.exec-kpi-row { display: flex; gap: 0; flex-wrap: wrap; margin-bottom: 14px; }
+.exec-kpi {
+  flex: 1; min-width: 130px; padding: 12px 20px;
+  border-right: 1px solid rgba(255,255,255,.07);
+}
+.exec-kpi:last-child { border-right: none; }
+.exec-kpi-value {
+  font-size: 30px; font-weight: 900; letter-spacing: -1px; line-height: 1;
+  background: linear-gradient(135deg, var(--kc, #e2e8f0), var(--kc2, #94a3b8));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.exec-kpi-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: #64748b; margin-top: 5px;
+}
+.exec-kpi-sub { font-size: 11px; color: #475569; margin-top: 2px; }
+.exec-vs-bar {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 8px 0 10px; border-top: 1px solid rgba(255,255,255,.05);
+}
+.exec-vs-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #64748b; white-space: nowrap; }
+.exec-bar-wrap { flex: 1; min-width: 200px; max-width: 480px; display: flex; flex-direction: column; gap: 5px; }
+.exec-bar-row { display: flex; align-items: center; gap: 8px; }
+.exec-bar-track { flex: 1; height: 7px; border-radius: 4px; background: rgba(255,255,255,.06); overflow: hidden; }
+.exec-bar-fill { height: 100%; border-radius: 4px; }
+.exec-bar-text { font-size: 11px; font-weight: 700; white-space: nowrap; min-width: 82px; }
+.exec-badge-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; }
+.exec-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  border: 1px solid; white-space: nowrap;
+}
+/* ─────────────────────────────────────────────────────────────────── */
 .metrics-totals {
-  margin: 10px 20px; padding: 14px 18px; border-radius: 10px;
-  background: linear-gradient(135deg, rgba(99,102,241,.1) 0%, rgba(0,115,234,.08) 100%);
-  border: 1px solid rgba(99,102,241,.2);
-  font-size: 12px; color: #cbd5e1; line-height: 1.8;
+  margin: 8px 20px; padding: 10px 14px; border-radius: 8px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid rgba(255,255,255,.06);
+  font-size: 11px; color: #64748b; line-height: 1.7;
   flex-shrink: 0;
 }
 .btn-metrics { color: #fbbf24 !important; }
@@ -2028,6 +2068,7 @@ tbody tr.data-row td a { cursor: auto; }
       <button type="button" onclick="renderMetricsTable(document.getElementById('metricsSearch').value)">Refresh</button>
       <input type="search" id="metricsSearch" placeholder="Filter rows…" style="flex:1;min-width:140px;max-width:260px;padding:6px 10px;border-radius:7px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:#e2e8f0;font-size:11px;" oninput="renderMetricsTable(this.value)" />
     </div>
+    <div class="metrics-exec-banner" id="metricsExecBanner"></div>
     <div class="metrics-totals" id="metricsTotals"></div>
     <div class="metrics-scroll">
       <table class="metrics-table" id="metricsTable" aria-describedby="metricsTitle"></table>
@@ -2036,7 +2077,7 @@ tbody tr.data-row td a { cursor: auto; }
 </div>
 
 <script>
-const STORE_KEY = 'fintech_projects_v54';
+const STORE_KEY = 'fintech_projects_v55';
 
 const DEFAULT_DATA = [
   { id:1,  priority:1, owner:'Anupam Sharma', project:'AI-Based Test Case Generation',              sq:'built',
@@ -2604,28 +2645,89 @@ function renderMetricsTable(filterQ) {
 
   const mt = document.getElementById('metricsTable');
   const tot = document.getElementById('metricsTotals');
+  const banner = document.getElementById('metricsExecBanner');
   if (mt) mt.innerHTML = th + tb;
+
+  // ── Executive hero banner ────────────────────────────────────────────────
+  if (banner) {
+    const fmtZAR = v => 'R' + (v >= 1e6 ? (v/1e6).toFixed(1) + 'M' : (v/1e3).toFixed(0) + 'k');
+    const totalLOC = (sumSrc + sumTest).toLocaleString();
+    const pctAiBar = sumTradDevMonths > 0 ? Math.max(3, Math.round((sumAiDevMonths / sumTradDevMonths) * 100)) : 0;
+    banner.style.display = 'block';
+    banner.innerHTML =
+      // ── KPI strip ──
+      '<div class="exec-kpi-row">' +
+        '<div class="exec-kpi">' +
+          '<div class="exec-kpi-value" style="--kc:#818cf8;--kc2:#a78bfa">' + rows.length + '</div>' +
+          '<div class="exec-kpi-label">Use Cases Delivered</div>' +
+          '<div class="exec-kpi-sub">across all SDLC layers</div>' +
+        '</div>' +
+        '<div class="exec-kpi">' +
+          '<div class="exec-kpi-value" style="--kc:#34d399;--kc2:#4ade80">' + totalLOC + '</div>' +
+          '<div class="exec-kpi-label">Lines of Code</div>' +
+          '<div class="exec-kpi-sub">src + test combined</div>' +
+        '</div>' +
+        '<div class="exec-kpi">' +
+          '<div class="exec-kpi-value" style="--kc:#60a5fa;--kc2:#38bdf8">3</div>' +
+          '<div class="exec-kpi-label">Days · 1 Developer</div>' +
+          '<div class="exec-kpi-sub">end-to-end delivery with AI</div>' +
+        '</div>' +
+        '<div class="exec-kpi">' +
+          '<div class="exec-kpi-value" style="--kc:#a78bfa;--kc2:#f472b6">~' + overallAccel + '×</div>' +
+          '<div class="exec-kpi-label">Avg Acceleration</div>' +
+          '<div class="exec-kpi-sub">vs traditional team estimate</div>' +
+        '</div>' +
+        '<div class="exec-kpi">' +
+          '<div class="exec-kpi-value" style="--kc:#4ade80;--kc2:#34d399">' + fmtZAR(savedZAR) + '</div>' +
+          '<div class="exec-kpi-label">Estimated Cost Saved</div>' +
+          '<div class="exec-kpi-sub">R850k/dev/yr market rate</div>' +
+        '</div>' +
+      '</div>' +
+      // ── Effort comparison bar ──
+      '<div class="exec-vs-bar">' +
+        '<div class="exec-vs-label">Effort<br>comparison</div>' +
+        '<div class="exec-bar-wrap">' +
+          '<div class="exec-bar-row">' +
+            '<span class="exec-bar-text" style="color:#f87171">Traditional</span>' +
+            '<div class="exec-bar-track">' +
+              '<div class="exec-bar-fill" style="width:100%;background:linear-gradient(90deg,#f87171,#fb923c)"></div>' +
+            '</div>' +
+            '<span style="font-size:11px;color:#f87171;font-weight:700;min-width:88px">' + sumTradDevMonths + ' dev-months</span>' +
+          '</div>' +
+          '<div class="exec-bar-row">' +
+            '<span class="exec-bar-text" style="color:#34d399">AI-assisted</span>' +
+            '<div class="exec-bar-track">' +
+              '<div class="exec-bar-fill" style="width:' + pctAiBar + '%;background:linear-gradient(90deg,#34d399,#4ade80)"></div>' +
+            '</div>' +
+            '<span style="font-size:11px;color:#34d399;font-weight:700;min-width:88px">' + sumAiDevMonths + ' dev-months</span>' +
+          '</div>' +
+        '</div>' +
+        '<div style="text-align:right;flex-shrink:0;padding-left:8px">' +
+          '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b">Dev-months saved</div>' +
+          '<div style="font-size:26px;font-weight:900;color:#facc15;line-height:1.1">' + savedDevMonths + '</div>' +
+          '<div style="font-size:10px;color:#475569">(' + fmtZAR(savedZAR) + ' est.)</div>' +
+        '</div>' +
+      '</div>' +
+      // ── Badge row ──
+      '<div class="exec-badge-row">' +
+        '<span class="exec-badge" style="background:rgba(99,102,241,.12);color:#818cf8;border-color:rgba(99,102,241,.3)">⬡ ' + sumDeps + ' dependencies</span>' +
+        '<span class="exec-badge" style="background:rgba(52,211,153,.1);color:#34d399;border-color:rgba(52,211,153,.25)">⇄ ' + sumIntegrations + ' integrations</span>' +
+        '<span class="exec-badge" style="background:rgba(167,139,250,.1);color:#a78bfa;border-color:rgba(167,139,250,.25)">⚖ ' + compUCs.size + ' compliance-scoped UCs</span>' +
+        '<span class="exec-badge" style="background:rgba(74,222,128,.1);color:#4ade80;border-color:rgba(74,222,128,.25)">✓ ' + realCount + ' repo-measured</span>' +
+        '<span class="exec-badge" style="background:rgba(251,191,36,.1);color:#fbbf24;border-color:rgba(251,191,36,.25)">📎 ' + sumArt + ' artifacts linked</span>' +
+      '</div>';
+  }
+
+  // ── Slim detail strip ────────────────────────────────────────────────────
   if (tot) {
     const fmtZAR = v => 'R' + (v >= 1e6 ? (v/1e6).toFixed(1) + 'M' : (v/1e3).toFixed(0) + 'k');
-    tot.innerHTML = '<strong>Filtered (' + rows.length + ' of ' + data.length + ')</strong> — ' +
-      '<span style="color:#4ade80">✓ ' + realCount + ' UCs with repo-measured LOC</span> · ' +
-      'Source LOC Σ <strong>' + sumSrc.toLocaleString() + '</strong> · ' +
-      'Test LOC Σ <strong>' + sumTest.toLocaleString() + '</strong> · ' +
-      'Artifact links Σ <strong>' + sumArt + '</strong><br>' +
-      '<span style="color:#60a5fa">⬡ Deps Σ <strong>' + sumDeps + '</strong></span> · ' +
-      '<span style="color:#34d399">⇄ Integrations Σ <strong>' + sumIntegrations + '</strong></span> · ' +
-      '<span style="color:#a78bfa">⚖ Compliance-flagged UCs: <strong>' + compUCs.size + '</strong></span><br>' +
-      '<span style="background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);border-radius:6px;padding:3px 10px;display:inline-block;margin:4px 0">' +
-      '🚀 <strong style="color:#a78bfa">AI Acceleration</strong> — ' +
-      'Traditional: <strong style="color:#f87171">' + sumTradDevMonths + ' dev-months</strong> · ' +
-      'AI-delivered: <strong style="color:#34d399">' + sumAiDevMonths + ' dev-months</strong> · ' +
-      'Dev-months saved: <strong style="color:#facc15">' + savedDevMonths + '</strong> · ' +
-      'Cost saved (est.): <strong style="color:#4ade80">' + fmtZAR(savedZAR) + '</strong> · ' +
-      'Overall accel: <strong style="color:#a78bfa;font-size:14px">~' + overallAccel + '×</strong>' +
-      '</span><br>' +
-      '<span style="color:#64748b">Green = measured from actual files via <code>wc -l</code>. Italic~ = estimated from description text. ' +
-      'Trad. cost rate: R850k/dev/yr · AI delivery = 1 dev + AI tools. ' +
-      'This page (DOM) ≈ <strong>' + (domBytes / 1024 / 1024).toFixed(2) + ' MB</strong>.</span>';
+    tot.innerHTML =
+      'Showing <strong>' + rows.length + ' of ' + data.length + '</strong> use cases · ' +
+      'Src LOC <strong>' + sumSrc.toLocaleString() + '</strong> · ' +
+      'Test LOC <strong>' + sumTest.toLocaleString() + '</strong> · ' +
+      'Score Σ <strong>' + sumScore.toLocaleString() + '</strong> · ' +
+      '<span style="color:#4ade80">Green = repo-measured via wc -l</span> · ' +
+      'Italic~ = estimated · Trad. rate R850k/dev/yr · AI = 1 dev + AI tools';
   }
 }
 
