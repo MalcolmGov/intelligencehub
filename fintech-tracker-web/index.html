@@ -244,6 +244,7 @@ td { padding: 0 0; vertical-align: middle; }
 .td-pad { padding: 9px 10px; display: block; }
 
 /* ── Col widths ─────────────────────────────────────────── */
+.col-id   { width: 3%; min-width: 44px; text-align: center; }
 .col-drag { width: 1%; }
 .col-sq   { width: 7%; }
 .col-demo  { width: 8%; }
@@ -258,6 +259,19 @@ td { padding: 0 0; vertical-align: middle; }
 .col-sta  { width: 7%; }
 .col-pct  { width: 7%; }
 .col-act  { width: 3%; }
+
+/* UC ID badge */
+.uc-id-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; letter-spacing: .04em;
+  color: #7c9cff;
+  background: rgba(99,120,255,.12);
+  border: 1px solid rgba(99,120,255,.25);
+  border-radius: 6px;
+  padding: 3px 7px;
+  white-space: nowrap;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
 
 /* ── Assigned-to chip ───────────────────────────────────── */
 .asgn-chip {
@@ -2125,6 +2139,7 @@ tbody tr.data-row td a { cursor: auto; }
     <table>
       <thead>
         <tr>
+          <th class="col-id sortable" onclick="toggleSort('id')" title="Use Case number">UC <span class="arrow" id="arr-id"></span></th>
           <th class="col-drag"></th>
           <th class="col-sq">Build Status</th>
           <th class="col-demo">Live Demo</th>
@@ -2176,7 +2191,7 @@ tbody tr.data-row td a { cursor: auto; }
 </div>
 
 <script>
-const STORE_KEY = 'fintech_projects_v72';
+const STORE_KEY = 'fintech_projects_v73';
 
 const DEFAULT_DATA = [
   { id:1,  priority:1, owner:'Anupam Sharma', project:'AI-Based Test Case Generation',              sq:'built',
@@ -3735,7 +3750,7 @@ function renderTable() {
   const rows  = applySortTo(getFiltered());
   const tbody = document.getElementById('tbody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="13"><div class="empty"><div class="empty-icon">🔍</div>No use cases match your filters.</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="14"><div class="empty"><div class="empty-icon">🔍</div>No use cases match your filters.</div></td></tr>`;
     return;
   }
 
@@ -3767,7 +3782,7 @@ function renderTable() {
       const ownerDone = ownerRows.filter(x => x.status === 'Done').length;
       lastOwner = r.owner;
       html += `<tr class="owner-group-row">
-        <td colspan="13">
+        <td colspan="14">
           <span class="owner-pill" style="background:${om.bg}">
             <span class="owner-avatar" style="background:${om.color}">${om.initials}</span>
             <span style="color:${om.color};font-size:12px">${r.owner}</span>
@@ -3784,6 +3799,7 @@ function renderTable() {
       ondragleave="onDragLeave(event)"
       ondrop="onDrop(event,${r.id})"
       ondragend="onDragEnd()">
+      <td class="col-id"><div class="td-pad" style="display:flex;justify-content:center;"><span class="uc-id-badge">UC-${String(r.id).padStart(2,'0')}</span></div></td>
       <td class="col-drag"><div class="td-pad" style="display:flex;align-items:center;gap:2px"><span class="row-chevron" title="Expand/collapse row">▶</span><span class="drag-handle" title="Drag to reorder">⋮⋮</span></div></td>
       <td class="col-sq"><div class="td-pad">
         <span class="sq-badge ${bw.cls}">
@@ -3850,7 +3866,7 @@ function renderTable() {
     } catch(rowErr) { console.error('renderTable row error (id='+r.id+'):', rowErr); }
   });
 
-  html += `<tr><td colspan="13" style="padding:0"><button class="btn-add-row" onclick="addRow()">+ Add project</button></td></tr>`;
+  html += `<tr><td colspan="14" style="padding:0"><button class="btn-add-row" onclick="addRow()">+ Add project</button></td></tr>`;
   tbody.innerHTML = html;
   renderFilterChips();
   renderStats();
