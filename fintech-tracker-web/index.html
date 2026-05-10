@@ -1985,9 +1985,172 @@ tbody tr.data-row td a { cursor: auto; }
 
 .bv-head { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .bv-value { font-size: 11px; font-weight: 700; color: #4ade80; margin-top: 3px; display: block; }
+
+/* ── Auth gate ───────────────────────────────────────────── */
+#auth-gate {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0a0d1a;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: opacity .35s ease;
+}
+#auth-gate.fade-out { opacity: 0; pointer-events: none; }
+.auth-card {
+  width: 100%; max-width: 400px; margin: 0 20px;
+  background: #161b2e;
+  border: 1px solid rgba(34,211,238,.22);
+  border-radius: 16px;
+  padding: 40px 36px 36px;
+  box-shadow: 0 0 60px rgba(34,211,238,.07), 0 24px 80px rgba(0,0,0,.6);
+  animation: auth-slide-up .4s cubic-bezier(.22,1,.36,1);
+}
+@keyframes auth-slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.auth-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+.auth-logo-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, #22d3ee, #818cf8);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.auth-logo-text { font-size: 15px; font-weight: 700; color: #e8eaff; letter-spacing: -.3px; }
+.auth-logo-sub  { font-size: 11px; color: #555e8a; font-weight: 500; margin-top: 1px; }
+.auth-heading { font-size: 22px; font-weight: 800; color: #e8eaff; letter-spacing: -.5px; margin-bottom: 6px; }
+.auth-sub { font-size: 13px; color: #555e8a; margin-bottom: 28px; line-height: 1.5; }
+.auth-field { position: relative; margin-bottom: 16px; }
+.auth-field input {
+  width: 100%; padding: 12px 44px 12px 16px;
+  background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(34,211,238,.2);
+  border-radius: 9px;
+  font-size: 14px; font-family: inherit;
+  color: #e8eaff; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+  box-sizing: border-box;
+}
+.auth-field input::placeholder { color: #3a4268; }
+.auth-field input:focus { border-color: #22d3ee; box-shadow: 0 0 0 3px rgba(34,211,238,.12); }
+.auth-eye {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: #3a4268; padding: 4px; font-size: 15px; line-height: 1; transition: color .15s;
+}
+.auth-eye:hover { color: #22d3ee; }
+.auth-error { font-size: 12px; color: #f87171; margin-bottom: 14px; display: none; text-align: center; }
+.auth-error.show { display: block; }
+.auth-btn {
+  width: 100%; padding: 12px;
+  background: linear-gradient(135deg, #22d3ee, #818cf8);
+  border: none; border-radius: 9px;
+  font-size: 14px; font-weight: 700; color: #0a0d1a;
+  cursor: pointer; font-family: inherit;
+  transition: opacity .15s, transform .12s; letter-spacing: .01em;
+}
+.auth-btn:hover { opacity: .9; }
+.auth-btn:active { transform: scale(.98); }
+.auth-btn:disabled { opacity: .5; cursor: default; }
+@keyframes auth-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-8px); }
+  40%      { transform: translateX(8px); }
+  60%      { transform: translateX(-6px); }
+  80%      { transform: translateX(6px); }
+}
+.auth-card.shake { animation: auth-shake .35s ease; }
+.auth-footer { text-align: center; margin-top: 20px; font-size: 11px; color: #2d3358; line-height: 1.6; }
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════════════════
+     AUTH GATE
+     Password is stored as a SHA-256 hash — plaintext never
+     appears in this file.
+     To change your password:
+       1. Open Terminal and run:
+          echo -n "YourNewPassword" | shasum -a 256
+       2. Copy the hash and replace the AUTH_HASH value below.
+     ═══════════════════════════════════════════════════════ -->
+<div id="auth-gate">
+  <div class="auth-card" id="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🏦</div>
+      <div>
+        <div class="auth-logo-text">Fintech AI Tracker</div>
+        <div class="auth-logo-sub">Intelligence Hub · Private</div>
+      </div>
+    </div>
+    <div class="auth-heading">Secure Access</div>
+    <div class="auth-sub">This tracker contains confidential AI programme data. Enter your password to continue.</div>
+    <div class="auth-field">
+      <input type="password" id="auth-input" placeholder="Enter password" autocomplete="current-password" />
+      <button class="auth-eye" type="button" id="auth-eye-btn" title="Show/hide password">👁</button>
+    </div>
+    <div class="auth-error" id="auth-error">Incorrect password. Please try again.</div>
+    <button class="auth-btn" id="auth-btn" type="button">Unlock Tracker</button>
+    <div class="auth-footer">🔒 Protected · Malcolm Govender · Confidential</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ── SHA-256 hash of the access password ──────────────────
+  // To change: echo -n "NewPassword" | shasum -a 256 (in Terminal)
+  const AUTH_HASH = 'cda09c69aabac4e7862441c59e23dcfdf4d226cd445e22c1e0d57c698b0f24b4';
+  const SESSION_KEY = 'ft_auth_v1';
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function unlock() {
+    const gate = document.getElementById('auth-gate');
+    gate.classList.add('fade-out');
+    setTimeout(() => gate.remove(), 380);
+  }
+
+  // Already authenticated this session?
+  if (sessionStorage.getItem(SESSION_KEY) === AUTH_HASH) { unlock(); return; }
+
+  // Wire up form
+  document.addEventListener('DOMContentLoaded', function() {
+    const input  = document.getElementById('auth-input');
+    const btn    = document.getElementById('auth-btn');
+    const err    = document.getElementById('auth-error');
+    const card   = document.getElementById('auth-card');
+    const eyeBtn = document.getElementById('auth-eye-btn');
+
+    eyeBtn.addEventListener('click', function() {
+      input.type = input.type === 'password' ? 'text' : 'password';
+    });
+
+    async function attempt() {
+      btn.disabled = true;
+      err.classList.remove('show');
+      const hash = await sha256(input.value);
+      if (hash === AUTH_HASH) {
+        sessionStorage.setItem(SESSION_KEY, AUTH_HASH);
+        unlock();
+      } else {
+        card.classList.remove('shake');
+        void card.offsetWidth; // reflow to restart animation
+        card.classList.add('shake');
+        err.classList.add('show');
+        input.value = '';
+        input.focus();
+        btn.disabled = false;
+      }
+    }
+
+    btn.addEventListener('click', attempt);
+    input.addEventListener('keydown', function(e) { if (e.key === 'Enter') attempt(); });
+    input.focus();
+  });
+})();
+</script>
+
 <!-- Monday.com-style cursor spotlight glow -->
 <div id="cursor-glow"></div>
 <div class="accent-bar"></div>
