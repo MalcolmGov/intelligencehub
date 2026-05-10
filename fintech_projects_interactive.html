@@ -905,6 +905,42 @@ tbody tr.data-row:hover {
 .art-sh   { border-color: rgba(52,211,153,.18); }
 .art-pdf  { border-color: rgba(248,113,113,.18); }
 
+/* ── Row expand / collapse ─────────────────────────────────── */
+.row-chevron {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 4px;
+  background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.22);
+  color: #818cf8; font-size: 9px; cursor: pointer;
+  transition: transform .2s ease, background .15s;
+  margin-right: 5px; flex-shrink: 0; user-select: none;
+}
+.data-row:not(.row-collapsed) .row-chevron { transform: rotate(90deg); background: rgba(99,102,241,.22); }
+.row-chevron:hover { background: rgba(99,102,241,.3); border-color: #6366f1; }
+
+/* Collapsed: hide heavy column content */
+.data-row.row-collapsed .col-desc .td-pad,
+.data-row.row-collapsed .col-art .td-pad,
+.data-row.row-collapsed .col-nxt .td-pad,
+.data-row.row-collapsed .col-bv .td-pad { display: none; }
+
+/* Brief description shown only when collapsed */
+.row-brief-desc {
+  display: none; font-size: 10px; color: #64748b;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 340px; margin-top: 2px; font-style: italic;
+}
+.data-row.row-collapsed .row-brief-desc { display: block; }
+
+/* Expand All button */
+.btn-expand-all {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 13px; background: rgba(99,102,241,.1);
+  border: 1px solid rgba(99,102,241,.3); border-radius: 7px;
+  color: #a5b4fc; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.btn-expand-all:hover { background: rgba(99,102,241,.22); border-color: #6366f1; color: #c7d2fe; }
+
 /* Collapsed artifact overflow */
 .art-chips.collapsed .art-chip-hidden { display: none; }
 .art-more-btn {
@@ -2016,6 +2052,8 @@ tbody tr.data-row td a { cursor: auto; }
       <option value="missing">Not built ✗</option>
       <option value="none">Standalone</option>
     </select>
+    <div class="ctrl-divider"></div>
+    <button class="btn-expand-all" id="btnExpandAll" onclick="toggleExpandAll()">⊞ Expand All</button>
   </div>
 
   <!-- Filter chips -->
@@ -2086,7 +2124,7 @@ tbody tr.data-row td a { cursor: auto; }
 </div>
 
 <script>
-const STORE_KEY = 'fintech_projects_v66';
+const STORE_KEY = 'fintech_projects_v67';
 
 const DEFAULT_DATA = [
   { id:1,  priority:1, owner:'Anupam Sharma', project:'AI-Based Test Case Generation',              sq:'built',
@@ -2519,7 +2557,7 @@ const DEFAULT_DATA = [
     traditionalEst:{devs:4,months:6,aiWeeks:16},
     status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
 
-  { id:25, priority:1, owner:'Malcolm Govender', project:'USSD AI Assistant', sq:'missing', isNew:true,
+  { id:25, demoUrl:'./artifacts/ussd_demo_25.html', priority:1, owner:'Malcolm Govender', project:'USSD AI Assistant', sq:'missing', isNew:true,
     desc:'Natural language AI layer on top of USSD that replaces rigid menu trees with intent-driven conversation — allowing MTN customers on any phone (no internet required) to send money, check balances, query transactions, and get support by typing plain-text shortcodes. Works within USSD character and session constraints across all 13 MTN African markets, with per-market language localisation and regulatory compliance (POPIA, NDPR, Kenya DPA).',
     artifacts:[
       {t:'html', l:'Requirements',          u:'./requirements/req_25_ussd_ai_assistant.html'},
@@ -2527,7 +2565,6 @@ const DEFAULT_DATA = [
       {t:'html', l:'USSD Flow Design',      u:'./artifacts/ussd_flow_25.html'},
       {t:'html', l:'Multi-Market Compliance', u:'./artifacts/compliance_25_ussd.html'},
       {t:'html', l:'Integration Map',       u:'./artifacts/integration_map_25.html'},
-      {t:'html', l:'🎮 Live Demo',           u:'./artifacts/ussd_demo_25.html'},
     ],
     nextSteps:'⚠ Not started — Malcolm Govender to initiate. Phase 1: partner with USSD gateway provider per OpCo to expose AI session handler; define NLU intent taxonomy for Mobile Money operations (send, receive, balance, history, support). Phase 2: build intent classification layer with sub-160-char response formatting; localise for English, French, Swahili, Hausa, Zulu, Amharic. Phase 3: integrate with UC24 Customer Intelligence for personalised responses and UC16 PayGuard for transaction fraud screening.',
     bv:{ tier:'High', driver:'Customer Experience & Market Reach',
@@ -3351,14 +3388,14 @@ function renderTable() {
       </tr>`;
     }
 
-    html += `<tr class="data-row" draggable="true" data-id="${r.id}" style="--row-color:${om.color}"
+    html += `<tr class="data-row row-collapsed" draggable="true" data-id="${r.id}" style="--row-color:${om.color}"
       onclick="handleRowClick(event,${r.id})"
       ondragstart="onDragStart(event,${r.id})"
       ondragover="onDragOver(event,${r.id})"
       ondragleave="onDragLeave(event)"
       ondrop="onDrop(event,${r.id})"
       ondragend="onDragEnd()">
-      <td class="col-drag"><div class="td-pad"><span class="drag-handle" title="Drag to reorder">⋮⋮</span></div></td>
+      <td class="col-drag"><div class="td-pad" style="display:flex;align-items:center;gap:2px"><span class="row-chevron" title="Expand/collapse row">▶</span><span class="drag-handle" title="Drag to reorder">⋮⋮</span></div></td>
       <td class="col-sq"><div class="td-pad">
         <span class="sq-badge ${bw.cls}">
           <span class="sq-dot"></span>${bw.label}
@@ -3390,7 +3427,7 @@ function renderTable() {
           >${esc(a||'Unassigned')}</span>
         </span>`;
       })()}</div></td>
-      <td class="col-prj"><div class="td-pad"><span class="editable cell-project" contenteditable="true" onblur="updateField(${r.id},'project',this.textContent.trim())" onkeydown="blurOnEnter(event)">${esc(r.project)}</span>${r.isNew ? '<span class=\"badge-new\">New</span>' : ''}</div></td>
+      <td class="col-prj"><div class="td-pad"><span class="editable cell-project" contenteditable="true" onblur="updateField(${r.id},'project',this.textContent.trim())" onkeydown="blurOnEnter(event)">${esc(r.project)}</span>${r.isNew ? '<span class=\"badge-new\">New</span>' : ''}<div class="row-brief-desc">${esc((r.desc||'').slice(0,100))}${(r.desc||'').length>100?'…':''}</div></div></td>
       <td class="col-desc"><div class="td-pad"><span class="editable cell-desc" contenteditable="true" onblur="updateField(${r.id},'desc',this.textContent.trim())" onkeydown="blurOnEnter(event,true)" title="Click to expand">${esc(r.desc)}</span></div></td>
       <td class="col-art"><div class="td-pad">${renderArtifacts(r.artifacts, r.id)}</div></td>
       <td class="col-nxt"><div class="td-pad"><span class="editable cell-nxt${isComplete?' complete':''}" contenteditable="true" onblur="updateField(${r.id},'nextSteps',this.textContent.trim())" onkeydown="blurOnEnter(event,true)">${esc(r.nextSteps||'')}</span></div></td>
@@ -3837,7 +3874,33 @@ function handleRowClick(e, id) {
     e.target.closest('.demo-cell') ||
     e.target.closest('.slider-row')
   ) return;
-  openDrawer(id);
+  toggleRow(id);
+}
+
+let _allExpanded = false;
+
+function toggleRow(id) {
+  const tr = document.querySelector(`tr.data-row[data-id="${id}"]`);
+  if (!tr) return;
+  tr.classList.toggle('row-collapsed');
+  // Update expand-all button label to reflect mixed state
+  const allRows = document.querySelectorAll('tr.data-row[data-id]');
+  const collapsedCount = document.querySelectorAll('tr.data-row[data-id].row-collapsed').length;
+  const btn = document.getElementById('btnExpandAll');
+  if (btn) {
+    _allExpanded = collapsedCount === 0;
+    btn.textContent = _allExpanded ? '⊟ Collapse All' : '⊞ Expand All';
+  }
+}
+
+function toggleExpandAll() {
+  _allExpanded = !_allExpanded;
+  document.querySelectorAll('tr.data-row[data-id]').forEach(tr => {
+    if (_allExpanded) tr.classList.remove('row-collapsed');
+    else tr.classList.add('row-collapsed');
+  });
+  const btn = document.getElementById('btnExpandAll');
+  if (btn) btn.textContent = _allExpanded ? '⊟ Collapse All' : '⊞ Expand All';
 }
 
 function openDrawer(id) {
