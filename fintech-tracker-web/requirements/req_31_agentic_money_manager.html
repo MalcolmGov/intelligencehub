@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-31 Agentic Financial AI — Autonomous Money Manager — Requirements &amp; Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-p1 { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        section.amber { border-left-color: #f59e0b; }
+        section.red { border-left-color: #dc2626; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
+        ul li { margin-bottom: 5px; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card.amber { border-left-color: #f59e0b; }
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #34d399; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card.amber .card-title { color: #f59e0b; }
+        .card.red .card-title { color: #f87171; }
+        .card.green .card-title { color: #34d399; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-card.indigo { border-top-color: #6366f1; }
+        .metric-card.violet { border-top-color: #7c3aed; }
+        .metric-card.amber { border-top-color: #f59e0b; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-card.indigo .metric-value { color: #818cf8; }
+        .metric-card.violet .metric-value { color: #a78bfa; }
+        .metric-card.amber .metric-value { color: #f59e0b; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .four-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
+        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
+        .us-ac li { margin-bottom: 3px; }
+        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
+        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
+        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
+        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
+        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
+        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
+        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 140px; }
+        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
+        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
+        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
+        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
+        .arch-layer:last-child .arch-layer-label { color: #64748b; }
+        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
+        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
+        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
+        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
+        .priority-high { color: #f87171; font-weight: 700; }
+        .priority-med { color: #fbbf24; font-weight: 700; }
+        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
+        .dsl-box { background: #020617; border: 2px solid #334155; border-radius: 8px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; margin: 12px 0; white-space: pre-wrap; line-height: 1.7; }
+        .dsl-box .comment { color: #475569; }
+        .dsl-box .keyword { color: #818cf8; }
+        .dsl-box .value { color: #fbbf24; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
+
+<div class="container">
+
+    <header>
+        <div>
+            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 31</div>
+            <h1>Agentic Financial AI &mdash; Autonomous Money Manager</h1>
+            <div class="subtitle">A true AI agent embedded in the MoMo app that autonomously manages consumer finances based on user-defined rules &mdash; not a chatbot, but an actor. Users set financial policies for automated bill payment, savings, and investments, targeting 35&ndash;45% reduction in wallet dormancy.</div>
+            <div>
+                <span class="badge badge-new">New &mdash; Gap Identified by Malcolm</span>
+                <span class="badge badge-not-started">Not Started &mdash; 0%</span>
+                <span class="badge badge-p1">Priority: P1</span>
+                <span class="badge badge-high">Complexity: High</span>
+            </div>
+            <div style="margin-top:10px;">
+                <span class="badge badge-compliance">POPIA</span>
+                <span class="badge badge-compliance">NDPR</span>
+                <span class="badge badge-compliance">FSCA</span>
+                <span class="badge badge-teal">Policy DSL</span>
+                <span class="badge badge-teal">Autonomous Execution</span>
+                <span class="badge badge-teal">Audit Trail</span>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-31</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P1</div></div>
+            <div class="meta-item"><div class="meta-label">Strategic Driver</div><div class="meta-value">Revenue Growth</div></div>
+            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">35&ndash;45% dormancy reduction</div></div>
+            <div class="meta-item"><div class="meta-label">Agent Type</div><div class="meta-value">Autonomous Financial Actor</div></div>
+            <div class="meta-item"><div class="meta-label">Policy Engine</div><div class="meta-value">Custom DSL (if/then rules)</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering &middot; Document Author &amp; Use Case Owner</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <section>
+        <h2>1. Executive Summary &amp; Business Case</h2>
+        <p>MTN MoMo has onboarded over 65 million subscribers across 13 markets, but a significant proportion of these accounts sit dormant &mdash; customers who registered for Mobile Money but do not actively transact. Industry research pegs wallet dormancy rates across African mobile money platforms at 35&ndash;55%, representing a direct revenue loss and a customer engagement failure. The current MoMo product is a reactive tool: it waits for the customer to initiate every action. This interaction model fails customers whose financial lives require consistent, automated management that they do not have the time, cognitive bandwidth, or financial literacy to execute manually.</p>
+        <p>UC-31 transforms MoMo from a passive payment rail into an <strong style="color:#818cf8;">autonomous financial agent</strong>. Users define financial policies &mdash; rules expressed in a plain-English policy DSL (Domain-Specific Language) &mdash; and the AI agent executes those policies automatically on their behalf. Bill payments are made the moment they're due. Savings are rounded up from every transaction and moved to a savings pocket. Investment contributions are executed on payday. The agent is not a chatbot providing suggestions; it is an actor with delegated authority to execute within user-defined constraints.</p>
+        <p>The business case is direct: a 35&ndash;45% reduction in wallet dormancy at current subscriber volumes converts dormant accounts into active transactors, generating fee revenue on each automated transaction. Engaged customers also demonstrate 2&ndash;3x higher cross-sell conversion for premium MoMo products. The agent creates a daily engagement habit &mdash; customers check their MoMo to see what the agent has done for them, dramatically increasing DAU metrics.</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">35&ndash;45%</div>
+                <div class="metric-label">Target Reduction in Wallet Dormancy</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">65M+</div>
+                <div class="metric-label">MoMo Subscribers (potential base)</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">Auditable Action Trail (every agent action)</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">P1</div>
+                <div class="metric-label">Priority — Customer Engagement Driver</div>
+            </div>
+        </div>
+
+        <div class="comparison-box" style="margin-top:20px;">
+            <div class="compare-card traditional">
+                <div class="compare-label">Current MoMo (Reactive)</div>
+                <div class="compare-value">55% Dormancy</div>
+                <div class="compare-sub">Customer must initiate every action; bills missed; savings only when customer remembers; no automation; financial stress from manual money management</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">Agentic Money Manager (UC-31)</div>
+                <div class="compare-value">30% Dormancy</div>
+                <div class="compare-sub">Agent executes financial policies autonomously; bills paid on schedule; savings happen automatically; customer reviews what agent did; full audit trail; pause/override controls</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PROBLEM STATEMENT -->
+    <section class="violet">
+        <h2>2. Problem Statement</h2>
+
+        <div class="card violet">
+            <div class="card-title">Problem 1 &mdash; Manual Money Management Creates Financial Stress and Dormancy</div>
+            <div class="card-content">The majority of MoMo's target customer base &mdash; informal economy workers, market traders, domestic workers &mdash; have irregular income, multiple financial obligations, and limited time to actively manage their finances. Requiring every MoMo action to be manually initiated means bills are missed, savings intentions never materialise, and the wallet sits unused between the sporadic transactions the customer remembers to initiate. Financial passivity is not laziness; it is a rational response to cognitive overload.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 2 &mdash; Dormant Wallets Represent Massive Unrealised Revenue</div>
+            <div class="card-content">An estimated 35&ndash;55% of MTN MoMo accounts are dormant at any given time. These accounts represent customers who have onboarded but not engaged sufficiently to derive value. Re-engaging a dormant customer is 5&ndash;7x more expensive than retaining an active one. An agent that executes transactions automatically on the customer's behalf converts dormant accounts into active transactors without requiring customer re-acquisition spend.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 3 &mdash; No Trusted Autonomous Financial Management Tool for the Informal Economy</div>
+            <div class="card-content">Sophisticated financial automation tools (robo-advisors, auto-savings apps, bill payment schedulers) exist in developed markets and are marketed to formally employed, banked customers. No comparable tool exists for informal economy workers in Africa who transact via mobile money. UC-31 delivers this capability to MTN's core customer base &mdash; a genuinely differentiated product that competitors without an agentic AI investment cannot replicate.</div>
+        </div>
+    </section>
+
+    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
+    <section class="teal">
+        <h2>3. Objectives &amp; Success Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">&minus;40%</div>
+                <div class="metric-label">Wallet Dormancy Rate (12-month target)</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">+35%</div>
+                <div class="metric-label">Daily Active Users (vs baseline)</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">3x</div>
+                <div class="metric-label">Cross-sell Conversion for Agent Users</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">Agent Actions with Audit Trail</div>
+            </div>
+        </div>
+        <table style="margin-top:20px;">
+            <thead><tr><th>KPI</th><th>Baseline</th><th>6-Month Target</th><th>12-Month Target</th><th>Measurement</th></tr></thead>
+            <tbody>
+                <tr><td>Wallet dormancy rate</td><td>~45%</td><td class="priority-high">35%</td><td class="priority-high">28%</td><td>MoMo account activity logs</td></tr>
+                <tr><td>Agent-activated users (cumulative)</td><td>0</td><td class="priority-med">500K</td><td class="priority-high">3M</td><td>Agent enrolment events</td></tr>
+                <tr><td>Autonomous transactions per day</td><td>0</td><td class="priority-med">100K/day</td><td class="priority-high">1M/day</td><td>Agent execution logs</td></tr>
+                <tr><td>Bill payment on-time rate (agent)</td><td>N/A</td><td class="priority-high">&gt;98%</td><td class="priority-high">&gt;99%</td><td>Bill payment completion logs</td></tr>
+                <tr><td>User-initiated agent pauses</td><td>N/A</td><td class="priority-med">&lt;5%/month</td><td class="priority-med">&lt;3%/month</td><td>User control events</td></tr>
+                <tr><td>Savings round-up participation</td><td>N/A</td><td class="priority-med">200K users</td><td class="priority-high">1M users</td><td>Savings pocket activations</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 4. USER STORIES -->
+    <section>
+        <h2>4. User Stories &amp; Acceptance Criteria</h2>
+
+        <div class="us-card">
+            <div class="us-id">US-31-01</div>
+            <div class="us-title">Automated Bill Payment Policy</div>
+            <div class="us-story">"As Thabo, a taxi driver in Johannesburg, I want to set up a rule that pays my electricity bill automatically on the 25th of every month from my MoMo wallet, so that I never face a disconnection again without having to remember to pay."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>User can create a bill payment policy via natural language or structured form in the MoMo app</li>
+                <li>Policy is expressed as: IF date = 25th AND balance &gt; bill amount THEN pay [biller] [amount]</li>
+                <li>Agent executes payment at 08:00 on the specified date</li>
+                <li>Push notification sent to user 24 hours before and immediately after execution</li>
+                <li>If balance insufficient, user is notified 48 hours before due date with shortfall amount</li>
+                <li>Full audit entry: policy ID, trigger condition, execution timestamp, transaction ID, balance at time of execution</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-31-02</div>
+            <div class="us-title">Auto-Savings Roundup</div>
+            <div class="us-story">"As Amara, a market trader, I want to automatically save the 'change' from every transaction I make, rounding up to the nearest 100 naira and moving it to my savings pocket, so that I build savings without feeling the sacrifice."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>User activates roundup savings with configurable rounding unit (50, 100, 500 in local currency)</li>
+                <li>Agent detects every outgoing transaction and calculates roundup amount</li>
+                <li>Roundup moved to savings pocket within 30 seconds of triggering transaction</li>
+                <li>Weekly savings summary notification showing total saved via roundup</li>
+                <li>Roundup paused automatically if wallet balance drops below user-defined floor</li>
+                <li>User can withdraw from savings pocket at any time; no lock-in</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-31-03</div>
+            <div class="us-title">Payday Investment Policy</div>
+            <div class="us-story">"As a salaried worker, I want to automatically invest 10% of my salary payment the moment it arrives in my MoMo wallet into a MoMo Invest product, so that I invest before I spend."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Agent detects inbound salary payment via transaction label or known payer MSISDN</li>
+                <li>Configured percentage transferred to investment product within 5 minutes of salary receipt</li>
+                <li>POPIA consent obtained for agent to access incoming transaction data for trigger detection</li>
+                <li>Investment execution confirmation notification with amount invested and portfolio update</li>
+                <li>User can modify or pause the policy at any time; pending executions cancelled within 60 seconds</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-31-04</div>
+            <div class="us-title">User Override &amp; Pause Control</div>
+            <div class="us-story">"As a MoMo agent user, I want to be able to pause all agent activities instantly when I'm in financial difficulty, and review every action the agent has taken, so that I remain in complete control of my money."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Single-tap "Pause Agent" control available on home screen; all scheduled actions paused within 60 seconds</li>
+                <li>Full audit log accessible in app: every agent action, trigger event, amount, and timestamp</li>
+                <li>User can reverse any agent-initiated transaction within 15 minutes if within same platform</li>
+                <li>Emergency pause also available via USSD *165*STOP# command</li>
+                <li>Paused state persists until user explicitly resumes; no automatic re-activation</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-31-05</div>
+            <div class="us-title">Natural Language Policy Creation</div>
+            <div class="us-story">"As a non-technical user, I want to describe my financial policy in plain English or my local language and have the agent convert it into an executable rule, so that I don't need to understand if/then logic to automate my finances."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>NL policy parser accepts input in English, Swahili, Hausa, Zulu, French, and Yoruba</li>
+                <li>Parsed policy presented to user for confirmation in plain language before activation</li>
+                <li>Policy DSL representation shown as "advanced view" for technically confident users</li>
+                <li>Ambiguous policies prompt clarifying questions (max 2 follow-up questions)</li>
+                <li>Policy library of 20+ pre-built templates available as starting points</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-31-06</div>
+            <div class="us-title">POPIA Consent &amp; Delegated Authority</div>
+            <div class="us-story">"As a compliance officer, I want every agent-initiated transaction to be traceable to an explicit user consent and policy, so that MTN can demonstrate regulatory compliance for autonomous financial actions."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Every agent activation requires explicit, informed consent with policy scope clearly stated</li>
+                <li>Consent stored with timestamp, policy ID, version, and channel (app/USSD)</li>
+                <li>Every autonomous transaction references the policy ID and consent event in its audit record</li>
+                <li>Consent withdrawal immediately deactivates all policies; in-flight transactions cancelled</li>
+                <li>Annual consent re-confirmation prompted for all active agent policies</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 5. FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>5. Functional Requirements</h2>
+
+        <h3>5.1 Policy DSL &amp; Rule Engine</h3>
+
+        <div class="dsl-box"><span class="comment"># Example Policy DSL — Agent Policy Language (APL)</span>
+<span class="keyword">POLICY</span> <span class="value">"Pay Electricity"</span>
+  <span class="keyword">TRIGGER</span>: date.day == <span class="value">25</span> AND time == <span class="value">"08:00"</span>
+  <span class="keyword">CONDITION</span>: wallet.balance >= <span class="value">350.00</span>
+  <span class="keyword">ACTION</span>: pay biller=<span class="value">"CityPower"</span> amount=<span class="value">320.00</span> currency=<span class="value">"ZAR"</span>
+  <span class="keyword">ON_FAIL</span>: notify user <span class="value">"Insufficient balance for electricity payment"</span>
+  <span class="keyword">CONSENT_REF</span>: <span class="value">"CNS-20260501-8821"</span>
+
+<span class="keyword">POLICY</span> <span class="value">"Roundup Savings"</span>
+  <span class="keyword">TRIGGER</span>: transaction.type == <span class="value">"OUTGOING"</span>
+  <span class="keyword">ACTION</span>: transfer roundup(transaction.amount, <span class="value">100</span>) to pocket=<span class="value">"savings"</span>
+  <span class="keyword">GUARD</span>: wallet.balance >= pocket.floor(<span class="value">200</span>)</div>
+
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-01</code></td><td>The system SHALL implement a Policy DSL (Agent Policy Language / APL) with trigger, condition, action, on_fail, guard, and consent_ref primitives.</td><td><span class="tag tag-must">MUST</span></td><td>DSL spec to be formally defined in Sprint 1</td></tr>
+                <tr><td><code>FR-02</code></td><td>The policy rule engine SHALL evaluate all active policies for a user on every qualifying trigger event within 500ms of the event occurring.</td><td><span class="tag tag-must">MUST</span></td><td>Redis-backed event stream</td></tr>
+                <tr><td><code>FR-03</code></td><td>Natural language policy creation SHALL support 6 languages and convert NL intent to APL DSL with user confirmation before activation.</td><td><span class="tag tag-must">MUST</span></td><td>LLM-assisted NL-to-DSL compiler</td></tr>
+                <tr><td><code>FR-04</code></td><td>A library of at least 20 pre-built policy templates SHALL be available, covering: bill payment, roundup savings, payday invest, airtime top-up, family support transfer, and emergency fund.</td><td><span class="tag tag-should">SHOULD</span></td><td>Templates configurable per market</td></tr>
+                <tr><td><code>FR-05</code></td><td>Maximum active policies per user: 10 in Phase 1 with configurable limit increase in Phase 2.</td><td><span class="tag tag-must">MUST</span></td><td>Guard against complexity and error cascade</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.2 Autonomous Execution Layer</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-06</code></td><td>The execution layer SHALL call MoMo API to execute financial actions (transfer, bill payment, savings move, investment) on behalf of the user using delegated authority tokens scoped to the policy.</td><td><span class="tag tag-must">MUST</span></td><td>OAuth 2.0 delegated access model</td></tr>
+                <tr><td><code>FR-07</code></td><td>Every agent-initiated transaction SHALL create an immutable audit record containing: user MSISDN, policy ID, trigger event, condition evaluation result, action executed, MoMo API response code, timestamp, and balance snapshot before/after.</td><td><span class="tag tag-must">MUST</span></td><td>Regulatory compliance requirement</td></tr>
+                <tr><td><code>FR-08</code></td><td>Failed agent actions SHALL be retried with exponential backoff (max 3 attempts). After final failure, the user SHALL receive a push notification with failure reason and suggested manual action.</td><td><span class="tag tag-must">MUST</span></td><td>Bill payment reliability critical</td></tr>
+                <tr><td><code>FR-09</code></td><td>A global "pause agent" command SHALL halt all active policy executions within 60 seconds. Available via: in-app toggle, USSD *165*STOP#, and customer service portal.</td><td><span class="tag tag-must">MUST</span></td><td>User control non-negotiable</td></tr>
+                <tr><td><code>FR-10</code></td><td>Transaction reversal SHALL be supported for agent-initiated transactions within a 15-minute window, subject to MoMo API reversal capabilities and biller confirmation.</td><td><span class="tag tag-should">SHOULD</span></td><td>Technical feasibility per transaction type</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.3 POPIA Consent Management</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-11</code></td><td>Agent activation SHALL require explicit informed consent with the scope of delegated authority clearly stated. Consent must be recordable, timestamped, and linked to each policy.</td><td><span class="tag tag-must">MUST</span></td><td>POPIA Section 11 lawful basis</td></tr>
+                <tr><td><code>FR-12</code></td><td>Consent withdrawal SHALL immediately deactivate all user policies and remove delegated authority tokens. In-flight transactions SHALL be cancelled where technically possible.</td><td><span class="tag tag-must">MUST</span></td><td>POPIA right to withdraw consent</td></tr>
+                <tr><td><code>FR-13</code></td><td>Annual consent re-confirmation SHALL be prompted for all users with active policies. Failure to re-confirm within 30 days SHALL suspend (not delete) all policies.</td><td><span class="tag tag-must">MUST</span></td><td>Ongoing consent validity requirement</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 6. TECHNICAL ARCHITECTURE -->
+    <section class="violet">
+        <h2>6. Technical Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <div class="arch-layer-label">User Interface</div>
+                <div class="arch-layer-content">MoMo App (iOS/Android) Agent Dashboard &rarr; Policy Builder UI (NL + template + DSL advanced) &rarr; Audit Log Viewer &rarr; Pause/Override controls &rarr; USSD *165*STOP# emergency pause</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Agent Brain</div>
+                <div class="arch-layer-content">NL-to-APL Policy Compiler (LLM-assisted) &rarr; APL Policy Parser &amp; Validator &rarr; Policy Rule Engine (event-driven, Redis stream) &rarr; Condition Evaluator &rarr; Action Dispatcher</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Execution Layer</div>
+                <div class="arch-layer-content">MoMo API Integration (delegated OAuth tokens) &rarr; Bill Payment Connector &rarr; Savings Pocket API &rarr; Investment Product API &rarr; Retry &amp; Failure Handler &rarr; Audit Record Writer</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Event &amp; Trigger Bus</div>
+                <div class="arch-layer-content">MoMo Transaction Event Stream (Kafka) &rarr; Scheduled Trigger Service (cron + market timezone) &rarr; Balance Change Events &rarr; Inbound Payment Detector</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Compliance &amp; Data</div>
+                <div class="arch-layer-content">Consent Management Store &rarr; Immutable Audit Log (append-only) &rarr; Policy Version History &rarr; POPIA data minimisation &rarr; Per-market data residency enforcement</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. DATA & AI MODEL -->
+    <section>
+        <h2>7. Data &amp; AI Model Requirements</h2>
+
+        <div class="card">
+            <div class="card-title">NL-to-APL Policy Compiler</div>
+            <div class="card-content">Fine-tuned instruction-following LLM (Llama 3 8B or equivalent) trained on MTN MoMo domain vocabulary and APL grammar. Input: user natural language policy description. Output: structured APL policy + plain-language confirmation text. Hosted server-side (no user data leaves platform). Inference latency &lt;2 seconds.</div>
+        </div>
+        <div class="card teal">
+            <div class="card-title">Salary / Inbound Payment Detector</div>
+            <div class="card-content">Transaction classification model distinguishing salary inflows from other credits, based on: amount regularity, payer MSISDN consistency, time-of-month patterns, transaction label keywords. Per-user model trained on 90-day rolling transaction history. Precision target: &gt;95% to avoid false-positive investment triggers.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Policy Conflict Detection</div>
+            <div class="card-content">Rule-based conflict detector identifying: circular dependencies between policies, double-spend risks (two policies targeting same balance), and ordering conflicts (roundup after a send that drains the wallet). Executed at policy activation time, not at runtime, to prevent mid-execution failures.</div>
+        </div>
+
+        <h3>Required Data Inputs</h3>
+        <table>
+            <thead><tr><th>Data Element</th><th>Source</th><th>Use</th><th>Sensitivity</th></tr></thead>
+            <tbody>
+                <tr><td>Real-time wallet balance</td><td>MoMo API</td><td>Condition evaluation (guard clause)</td><td>High — PII</td></tr>
+                <tr><td>Transaction event stream</td><td>MoMo Kafka topic</td><td>Event trigger detection</td><td>High — PII</td></tr>
+                <tr><td>Biller catalog (per market)</td><td>MoMo Biller Registry</td><td>Bill payment target resolution</td><td>Low</td></tr>
+                <tr><td>Market timezone + calendar</td><td>Config service</td><td>Scheduled trigger evaluation</td><td>None</td></tr>
+                <tr><td>User policy definitions (APL)</td><td>Policy store (encrypted)</td><td>Rule evaluation</td><td>High — PII</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 8. COMPLIANCE -->
+    <section class="amber">
+        <h2>8. Compliance &amp; Regulatory</h2>
+
+        <div class="card amber">
+            <div class="card-title">POPIA — Autonomous Financial Action Consent</div>
+            <div class="card-content">Autonomous execution of financial transactions on behalf of a data subject requires a lawful basis under POPIA Section 11. The recommended basis is explicit consent (Section 11(1)(a)) with the scope of delegated authority clearly defined. MTN must ensure: (1) consent is freely given, specific, informed, and unambiguous; (2) withdrawal is as easy as giving consent; (3) all autonomous actions are traceable to a specific consent event; (4) data subjects can access their full audit trail on request; (5) the automated decision-making transparency requirements under Section 71 are met, giving users the right to understand how agent policies are triggered.</div>
+        </div>
+        <div class="card amber">
+            <div class="card-title">FSCA — Automated Financial Advice</div>
+            <div class="card-content">Pre-built policy templates that recommend investment or savings allocations may constitute "financial advice" under the Financial Advisory and Intermediary Services (FAIS) Act (South Africa). Legal review required to determine whether template recommendations require an FSP licence. Conservative approach: templates present options without recommendation language; user explicitly selects and configures all financial parameters.</div>
+        </div>
+        <div class="card amber">
+            <div class="card-title">NDPR / CBN — Nigeria Automated Transaction Rules</div>
+            <div class="card-content">The CBN's e-Payment guidelines require that recurring automated debit mandates be explicitly authorised by the account holder with a clearly defined scope (maximum amount, frequency, duration). Agent bill payment policies that trigger recurring debits must comply with CBN mandate registration requirements. NDPR requires explicit consent for automated processing of personal data used in policy triggers.</div>
+        </div>
+
+        <h3>Regulatory Matrix</h3>
+        <table>
+            <thead><tr><th>Market</th><th>Key Regulation</th><th>Agent Requirement</th><th>Risk Level</th></tr></thead>
+            <tbody>
+                <tr><td>South Africa</td><td>POPIA, FAIS, NCA</td><td>Explicit consent, FSP licence review for investment templates</td><td class="priority-high">High</td></tr>
+                <tr><td>Nigeria</td><td>NDPR, CBN e-Payment</td><td>CBN mandate registration for recurring debits</td><td class="priority-high">High</td></tr>
+                <tr><td>Kenya</td><td>Kenya DPA, CBK</td><td>DPIA required; CBK approval for automated financial services</td><td class="priority-high">High</td></tr>
+                <tr><td>Ghana</td><td>BoG, Data Protection Act</td><td>BoG approval for automated payment services</td><td class="priority-med">Medium</td></tr>
+                <tr><td>Uganda, Rwanda, Zambia</td><td>Local CB regulations</td><td>Per-market consultation; no specific prohibition identified</td><td class="priority-med">Medium</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 9. SPRINT PLAN -->
+    <section class="teal">
+        <h2>9. Sprint Plan &amp; Roadmap</h2>
+
+        <h3>Sprint 1 (Weeks 1&ndash;3): DSL Design &amp; Core Engine</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 1 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>APL (Agent Policy Language) formal grammar specification &mdash; triggers, conditions, actions, guards, on_fail primitives</li>
+                    <li>Policy parser and validator implementation (ANTLR4 grammar)</li>
+                    <li>Policy rule engine v1 (event-driven, Redis Stream): scheduled triggers and transaction event triggers</li>
+                    <li>MoMo API delegated authority token model (OAuth 2.0 scoped tokens)</li>
+                    <li>POPIA consent management service: consent capture, storage, withdrawal, version tracking</li>
+                    <li>Immutable audit log schema and write API</li>
+                    <li>Bill payment policy (scheduled trigger) end-to-end proof of concept in staging</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Sprint 2 (Weeks 4&ndash;6): NL Compiler, Savings, Investment</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 2 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>NL-to-APL policy compiler: fine-tuned LLM, APL output schema, user confirmation flow</li>
+                    <li>Roundup savings policy: transaction event trigger, savings pocket API integration, balance guard</li>
+                    <li>Payday investment policy: salary detector model, investment product API integration</li>
+                    <li>Policy conflict detection engine (circular dependencies, double-spend guards)</li>
+                    <li>20 pre-built policy templates (English, Swahili, Hausa initial release)</li>
+                    <li>Pause agent feature: in-app toggle, *165*STOP# USSD command, graceful in-flight cancellation</li>
+                    <li>Push notification service: pre-execution alerts, post-execution confirmations, failure notifications</li>
+                    <li>Agent dashboard UI in MoMo app: policy list, audit log, pause control</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Sprint 3 (Weeks 7&ndash;9): Pilot, Compliance Hardening &amp; Scale</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 3 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>Pilot deployment: MTN South Africa (10,000 user cohort) &mdash; bill payment and roundup savings only</li>
+                    <li>FSCA legal review of investment template compliance</li>
+                    <li>POPIA consent audit: verify all autonomous transactions traceable to consent events</li>
+                    <li>CBN mandate registration integration for Nigeria recurring debits</li>
+                    <li>Policy template library expansion to 20 templates in 5 languages</li>
+                    <li>Audit log export for data subject access requests (DSAR) automation</li>
+                    <li>Load testing: 500K concurrent active policies, 1M trigger events per hour</li>
+                    <li>Dormancy metric baseline and 30-day trend measurement post-pilot</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. RISK REGISTER -->
+    <section class="red">
+        <h2>10. Risk Register</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><code>R-01</code></td>
+                    <td>FSCA determines investment policy templates constitute unlicensed financial advice</td>
+                    <td class="priority-med">Medium</td>
+                    <td class="priority-high">Very High</td>
+                    <td>Legal review before Sprint 3 pilot. Restrict Phase 1 to bill payment and savings (not investment) to reduce regulatory risk. Investment templates launched only after FSCA/legal clearance obtained.</td>
+                </tr>
+                <tr>
+                    <td><code>R-02</code></td>
+                    <td>Incorrect policy execution causes unintended financial harm (double payment, incorrect amount)</td>
+                    <td class="priority-med">Low-Medium</td>
+                    <td class="priority-high">Very High</td>
+                    <td>Pre-execution confirmation notification with 15-minute cancellation window for scheduled policies. Transaction amount limits per policy (capped at ZAR 5,000 / NGN 100,000 equivalent in Phase 1). Comprehensive unit and integration test suite for rule engine.</td>
+                </tr>
+                <tr>
+                    <td><code>R-03</code></td>
+                    <td>NL-to-APL compiler misinterprets user policy intent, creating unintended automation</td>
+                    <td class="priority-med">Medium</td>
+                    <td class="priority-high">High</td>
+                    <td>Mandatory user confirmation of parsed policy in plain language before activation. APL DSL view available for inspection. Policy activation requires explicit tap-to-confirm — no implicit activation. Human review queue for policies flagged as low-confidence by compiler.</td>
+                </tr>
+                <tr>
+                    <td><code>R-04</code></td>
+                    <td>Policy execution failure cascade — one policy failure triggers multiple downstream failures</td>
+                    <td class="priority-med">Medium</td>
+                    <td class="priority-med">Medium</td>
+                    <td>Policy execution isolation: each policy runs in independent execution context. Guard clauses re-evaluated immediately before execution. Circuit breaker on MoMo API failures pauses all executions for 5 minutes. Failure rate alerting with PagerDuty escalation.</td>
+                </tr>
+                <tr>
+                    <td><code>R-05</code></td>
+                    <td>Customer distrust of autonomous financial actions leads to low adoption</td>
+                    <td class="priority-high">High</td>
+                    <td class="priority-med">Medium</td>
+                    <td>Start with low-stakes policies (roundup savings, small fixed amounts) to build trust. Full audit trail and easy pause builds confidence. Testimonials and agent channel demonstrations. Pre-execution notifications give users visibility and control feeling.</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-31 Agentic Financial AI &mdash; Autonomous Money Manager &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
+        <div>Document Author: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
+        <div style="margin-top:8px;font-size:0.82em;">Integrations: MoMo API &nbsp;&middot;&nbsp; UC-16 PayGuard &nbsp;&middot;&nbsp; MoMo Invest &nbsp;&middot;&nbsp; MoMo Biller Registry &nbsp;&middot;&nbsp; Compliance: POPIA &middot; NDPR &middot; FAIS &middot; FSCA &middot; CBN</div>
+    </footer>
+
+</div>
+</body>
+</html>

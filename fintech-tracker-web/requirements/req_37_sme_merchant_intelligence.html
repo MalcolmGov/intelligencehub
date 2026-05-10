@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-37 AI SME &amp; Merchant Growth Intelligence — Requirements &amp; Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-p1 { background: rgba(220,38,38,0.2); color: #f87171; border: 1px solid #7f1d1d; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        section.amber { border-left-color: #f59e0b; }
+        section.red { border-left-color: #dc2626; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
+        ul li { margin-bottom: 5px; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card.amber { border-left-color: #f59e0b; }
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #34d399; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card.amber .card-title { color: #f59e0b; }
+        .card.red .card-title { color: #f87171; }
+        .card.green .card-title { color: #34d399; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-card.indigo { border-top-color: #6366f1; }
+        .metric-card.violet { border-top-color: #7c3aed; }
+        .metric-card.amber { border-top-color: #f59e0b; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-card.indigo .metric-value { color: #818cf8; }
+        .metric-card.violet .metric-value { color: #a78bfa; }
+        .metric-card.amber .metric-value { color: #f59e0b; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
+        .us-ac li { margin-bottom: 3px; }
+        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
+        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
+        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
+        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
+        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
+        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
+        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 140px; }
+        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
+        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
+        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
+        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
+        .arch-layer:last-child .arch-layer-label { color: #64748b; }
+        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
+        .sprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px; }
+        .sprint-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .sprint-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+        .sprint-1 .sprint-label { color: #6366f1; }
+        .sprint-2 .sprint-label { color: #14b8a6; }
+        .sprint-3 .sprint-label { color: #f59e0b; }
+        .sprint-title { font-size: 1.05em; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
+        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
+        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
+        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
+        .priority-high { color: #f87171; font-weight: 700; }
+        .priority-med { color: #fbbf24; font-weight: 700; }
+        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <div>
+            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 37</div>
+            <h1>AI SME &amp; Merchant Growth Intelligence</h1>
+            <div class="subtitle">AI-powered business intelligence embedded in the MoMo merchant app &mdash; transforming raw transaction data into actionable growth insights. Analyses sales patterns, predicts stock-out timing, recommends promotions, and scores revenue-based lending eligibility. The merchant's free AI CFO.</div>
+            <div>
+                <span class="badge badge-new">New &mdash; Revenue Growth Opportunity</span>
+                <span class="badge badge-not-started">Not Started &mdash; 0% Complete</span>
+                <span class="badge badge-p1">Priority: P1</span>
+                <span class="badge badge-high">Tier: High</span>
+            </div>
+            <div style="margin-top:10px;">
+                <span class="badge badge-compliance">POPIA</span>
+                <span class="badge badge-compliance">NDPR</span>
+                <span class="badge badge-compliance">FICA</span>
+                <span class="badge badge-teal">Revenue-Based Lending</span>
+                <span class="badge badge-teal">WhatsApp Reporting</span>
+                <span class="badge badge-teal">13 Markets</span>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-37</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P1</div></div>
+            <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">Not Started</div></div>
+            <div class="meta-item"><div class="meta-label">Target Users</div><div class="meta-value">MoMo Merchants</div></div>
+            <div class="meta-item"><div class="meta-label">Driver</div><div class="meta-value">Revenue Growth &amp; Ecosystem</div></div>
+            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">RBL + Fee Income Growth</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering &middot; Document Author &amp; Use Case Owner</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <section>
+        <h2>1. Executive Summary &amp; Business Case</h2>
+        <p>MTN Group Fintech has built a significant merchant network through MoMo POS and merchant wallet products across its 13 African markets. These merchants &mdash; predominantly small and medium enterprises (SMEs) ranging from individual market traders to small retail shops &mdash; generate daily transaction data through MoMo but receive nothing in return except a payment receipt. They have no access to business analytics, no financial reporting, and no intelligence to help them grow. Most cannot afford a bookkeeper, let alone a CFO.</p>
+        <p>UC-37 changes this equation dramatically. By converting raw MoMo POS and merchant wallet transaction data into an AI-powered business intelligence layer, MTN gives every merchant a free AI CFO embedded in the MoMo merchant app. The system generates daily, weekly, and monthly P&amp;L summaries, predicts when specific product categories will run out of stock, identifies peak trading hours for staffing optimisation, benchmarks the merchant against similar businesses in the same area, and surfaces targeted promotional recommendations that have the highest probability of driving revenue.</p>
+        <p>The revenue model is two-pronged: (1) <strong style="color:#818cf8;">Revenue-Based Lending (RBL)</strong> &mdash; the AI intelligence layer generates a real-time lending eligibility score based on merchant revenue patterns, enabling instant working capital loans repaid as a percentage of daily MoMo sales, and (2) <strong style="color:#818cf8;">Premium Intelligence Subscriptions</strong> &mdash; advanced analytics features (competitor benchmarking, supplier marketplace, multi-location management) available for a monthly fee. Merchants who grow their business through MoMo intelligence are also more likely to increase their MoMo transaction volume, driving fee income.</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">2M+</div>
+                <div class="metric-label">MoMo Merchants Across 13 Markets</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Current Access to Business Analytics</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">Free</div>
+                <div class="metric-label">Base Intelligence Tier for All Merchants</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">RBL</div>
+                <div class="metric-label">Revenue-Based Lending Unlocked by AI Score</div>
+            </div>
+        </div>
+
+        <div class="comparison-box" style="margin-top:20px;">
+            <div class="compare-card traditional">
+                <div class="compare-label">Current Merchant Experience</div>
+                <div class="compare-value">Zero Insight</div>
+                <div class="compare-sub">Payment receipts only, no analytics, no P&amp;L, no forecasting, no lending access based on revenue, no benchmarking, no supplier connections</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">AI SME Intelligence (UC-37)</div>
+                <div class="compare-value">AI CFO</div>
+                <div class="compare-sub">Daily P&amp;L, stock-out prediction, peak hour analysis, competitor benchmarking, revenue-based lending pre-approval, WhatsApp reporting, supplier marketplace</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PROBLEM STATEMENT -->
+    <section class="violet">
+        <h2>2. Problem Statement</h2>
+        <div class="card violet">
+            <div class="card-title">Problem 1 &mdash; African SMEs Are Flying Blind on Business Performance</div>
+            <div class="card-content">The majority of MoMo's 2 million+ merchants are micro and small businesses with no access to accounting software, business intelligence tools, or financial advisors. They make inventory decisions based on intuition, miss their own peak trading hours, price products without competitive intelligence, and have no idea whether their business is growing or shrinking in real terms. MoMo holds the data to solve all of these problems but does not surface it to merchants.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 2 &mdash; SMEs Are Excluded from Traditional Business Lending</div>
+            <div class="card-content">African SMEs are routinely denied traditional bank loans due to lack of formal financial records, no audited accounts, and insufficient collateral. The irony is that MoMo holds precisely the revenue evidence that banks require &mdash; in real-time, unmanipulated form. Revenue-Based Lending (RBL) using MoMo revenue as the underwriting basis is the most natural credit product for this segment, but requires the AI intelligence layer to accurately score lending eligibility and calibrate repayment structures.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 3 &mdash; Merchant Churn Risk from Super-App Competitors</div>
+            <div class="card-content">Super-apps (OPay, PalmPay, Chipper Cash) are aggressively targeting African SME merchants with bundled payment + analytics + credit offers. MTN MoMo's competitive moat is its 13-market network and brand trust, but without meaningful merchant value-add beyond payments, churn risk is increasing. UC-37 deepens merchant stickiness by making MoMo the irreplaceable business intelligence backbone of the merchant's operation &mdash; not just a payment terminal.</div>
+        </div>
+    </section>
+
+    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
+    <section class="teal">
+        <h2>3. Objectives &amp; Success Metrics</h2>
+        <div class="two-col">
+            <div>
+                <div class="card teal">
+                    <div class="card-title">OBJ-01 &mdash; Merchant P&amp;L Intelligence</div>
+                    <div class="card-content">Deliver daily, weekly, and monthly P&amp;L summaries from MoMo transaction data to every active MoMo merchant, with zero manual bookkeeping required.</div>
+                </div>
+                <div class="card teal">
+                    <div class="card-title">OBJ-02 &mdash; Stock-Out Prediction</div>
+                    <div class="card-content">Deploy AI models that predict stock depletion timing per product category, enabling merchants to restock before running out and losing sales.</div>
+                </div>
+                <div class="card teal">
+                    <div class="card-title">OBJ-03 &mdash; Revenue-Based Lending Scoring</div>
+                    <div class="card-content">Generate real-time RBL eligibility scores for all active merchants, enabling instant working capital loans underwritten by MoMo revenue history.</div>
+                </div>
+                <div class="card teal">
+                    <div class="card-title">OBJ-04 &mdash; WhatsApp Intelligence Delivery</div>
+                    <div class="card-content">Deliver daily business summary reports via WhatsApp to merchants who prefer not to open the app, reaching the 60%+ of merchants who use WhatsApp Business daily.</div>
+                </div>
+            </div>
+            <div>
+                <table>
+                    <thead><tr><th>KPI</th><th>M6 Target</th><th>M12 Target</th></tr></thead>
+                    <tbody>
+                        <tr><td>Merchants Using Intelligence</td><td>200,000</td><td>500,000</td></tr>
+                        <tr><td>Daily P&amp;L Adoption Rate</td><td>40%</td><td>60%</td></tr>
+                        <tr><td>WhatsApp Report Subscribers</td><td>100,000</td><td>300,000</td></tr>
+                        <tr><td>RBL Loans Originated via AI Score</td><td>5,000</td><td>25,000</td></tr>
+                        <tr><td>Merchant RBL Book Size</td><td>R100M</td><td>R500M</td></tr>
+                        <tr><td>Merchant Churn Reduction</td><td>&minus;15%</td><td>&minus;30%</td></tr>
+                        <tr><td>Avg Merchant MoMo Volume Lift</td><td>+10%</td><td>+25%</td></tr>
+                        <tr><td>Premium Subscription Revenue</td><td>R500k/mo</td><td>R2M/mo</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. USER STORIES -->
+    <section>
+        <h2>4. User Stories</h2>
+        <div class="two-col">
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-01 &middot; Daily P&amp;L Summary</div>
+                    <div class="us-title">Automated Daily Business Performance Report</div>
+                    <div class="us-story">"As a MoMo merchant, I want to see my daily revenue, number of transactions, average basket size, and comparison to yesterday at a glance so I know how my business is performing."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Daily P&amp;L summary generated and available by 06:00 each morning</li>
+                        <li>Shows: total revenue, transaction count, avg basket, vs previous day, vs 7-day avg</li>
+                        <li>Top 3 revenue-generating product categories highlighted</li>
+                        <li>Summary available in app and via WhatsApp (opted-in merchants)</li>
+                        <li>Displayed in merchant's local currency with correct formatting</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-02 &middot; Stock-Out Prediction</div>
+                    <div class="us-title">AI Predicts When Stock Will Run Out</div>
+                    <div class="us-story">"As a spaza shop owner, I want the app to tell me when I'm likely to run out of bread, milk, and airtime so I can reorder in time."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Stock-out prediction generated per product category based on sales velocity</li>
+                        <li>Alert sent 3 days before predicted stock-out (configurable by merchant)</li>
+                        <li>Supplier marketplace link embedded in stock-out alert</li>
+                        <li>Prediction accuracy: &gt;75% within &plusmn;2 days on validation set</li>
+                        <li>Seasonal adjustment applied (e.g., higher demand around month-end)</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-03 &middot; Peak Hour Analysis</div>
+                    <div class="us-title">Identify Busiest Trading Hours</div>
+                    <div class="us-story">"As a food court vendor, I want to know what hours I'm busiest so I know when to hire extra staff and when I can take breaks."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Hourly transaction heatmap displayed per day of week</li>
+                        <li>Peak hours highlighted with "Your busiest hour: 12:00-13:00" insight</li>
+                        <li>Slowest hours identified with "Consider a lunch promotion" suggestion</li>
+                        <li>Data based on minimum 30-day rolling transaction history</li>
+                        <li>Heatmap exportable as image for staff scheduling use</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-04 &middot; Revenue-Based Lending</div>
+                    <div class="us-title">Instant Working Capital Loan Pre-Approval</div>
+                    <div class="us-story">"As a merchant growing my stock, I want to be offered a working capital loan based on my MoMo sales history without needing bank statements or collateral."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>RBL eligibility score calculated daily for all active merchants (&gt;90 days history)</li>
+                        <li>Pre-approved loan amount displayed in-app if score exceeds threshold</li>
+                        <li>Repayment structured as % of daily MoMo sales (configurable 5&ndash;20%)</li>
+                        <li>Merchant can accept loan offer in-app in under 3 minutes</li>
+                        <li>Funds disbursed to MoMo merchant wallet within 24 hours of acceptance</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-05 &middot; WhatsApp Daily Report</div>
+                    <div class="us-title">Business Summary Delivered via WhatsApp</div>
+                    <div class="us-story">"As a busy merchant, I want my daily business summary sent to my WhatsApp every morning so I can check it without opening the app."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>WhatsApp Business API integration delivers formatted daily summary</li>
+                        <li>Report delivered by 07:00 daily to opted-in merchants</li>
+                        <li>Merchant can reply "MORE" to get weekly comparison, "STOP" to unsubscribe</li>
+                        <li>Report includes yesterday's revenue, top product, one AI insight</li>
+                        <li>Delivered in merchant's preferred language (English, French, Swahili, Hausa)</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-06 &middot; Competitor Benchmarking</div>
+                    <div class="us-title">Anonymous Benchmark vs Similar Merchants</div>
+                    <div class="us-story">"As a merchant, I want to know how my sales compare to similar shops in my area so I can understand if I'm growing or losing market share."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Merchant benchmarked against anonymised peers: same area, same category, similar size</li>
+                        <li>Benchmark shows percentile rank: "Your revenue is in the top 40% of similar shops"</li>
+                        <li>Minimum peer group size of 10 merchants before benchmark displayed (privacy)</li>
+                        <li>Individual merchant data never identifiable in benchmark calculations</li>
+                        <li>Available in premium subscription tier only</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-07 &middot; Promotion Recommendations</div>
+                    <div class="us-title">AI-Generated Promotion Suggestions</div>
+                    <div class="us-story">"As a merchant, I want the AI to suggest promotions based on my slow-moving stock and upcoming slow periods so I can drive revenue when I need it most."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>AI identifies slow-moving product categories (velocity below 30-day avg)</li>
+                        <li>Generates specific promotion suggestion: "Run a 10% discount on cooking oil this weekend based on your Thursday&ndash;Sunday slow period"</li>
+                        <li>Merchant can activate promotion in-app with one tap</li>
+                        <li>Post-promotion sales lift measured and reported to merchant</li>
+                        <li>Maximum 1 promotion suggestion per day to avoid alert fatigue</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-08 &middot; Monthly Financial Statement</div>
+                    <div class="us-title">Auto-Generated Monthly Business Statement</div>
+                    <div class="us-story">"As a merchant who needs to apply for a lease renewal, I want a professional monthly statement of my MoMo business revenue that I can share with my landlord."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Monthly statement generated in PDF format by the 3rd of each month</li>
+                        <li>Shows: revenue by week, top products, transaction count, average basket</li>
+                        <li>MTN MoMo branding and merchant business name on statement</li>
+                        <li>Downloadable and shareable from app</li>
+                        <li>Statement covers prior calendar month; available for up to 12 months history</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>5. Functional Requirements</h2>
+
+        <h3>5.1 Merchant Analytics Engine</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-01</code></td><td>The analytics engine SHALL process all MoMo POS and merchant wallet transactions in real-time, aggregating revenue, transaction count, average basket size, and category breakdown at daily, weekly, and monthly intervals per merchant.</td><td><span class="tag tag-must">MUST</span></td><td>Real-time Kafka stream consumer + daily batch aggregation</td></tr>
+                <tr><td><code>FR-02</code></td><td>The system SHALL generate and persist a daily merchant P&amp;L summary including: total revenue, total transactions, average basket size, revenue by product category, and comparison vs prior day, prior week, and prior month same day.</td><td><span class="tag tag-must">MUST</span></td><td>Base tier feature for all merchants</td></tr>
+                <tr><td><code>FR-03</code></td><td>The system SHALL compute an hourly transaction heatmap per day of week using a minimum 30-day rolling window, identifying peak and trough trading hours per merchant.</td><td><span class="tag tag-must">MUST</span></td><td>Base tier feature</td></tr>
+                <tr><td><code>FR-04</code></td><td>The analytics engine SHALL categorise each transaction into product category using merchant-defined categories, MCC codes from POS data, and AI-based NLP categorisation for uncategorised transactions.</td><td><span class="tag tag-must">MUST</span></td><td>Requires merchant to optionally confirm/correct AI categorisation</td></tr>
+                <tr><td><code>FR-05</code></td><td>The system SHALL generate a monthly statement PDF for each merchant by the 3rd of the following month, covering all MoMo transactions in the prior calendar month, formatted with MTN MoMo branding and merchant business name.</td><td><span class="tag tag-must">MUST</span></td><td>PDF generation service required</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.2 Stock-Out Prediction Model</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-06</code></td><td>The stock-out prediction model SHALL calculate product category sales velocity (units sold per day) from transaction data and estimate days-to-stockout based on the merchant's historical restocking patterns and observed velocity.</td><td><span class="tag tag-must">MUST</span></td><td>Minimum 45-day transaction history required for reliable prediction</td></tr>
+                <tr><td><code>FR-07</code></td><td>The system SHALL send a stock-out alert to the merchant via in-app notification and/or WhatsApp when predicted days-to-stockout crosses a configurable threshold (default: 3 days). Alert SHALL include a direct link to the supplier marketplace.</td><td><span class="tag tag-must">MUST</span></td><td>Supplier marketplace integration required</td></tr>
+                <tr><td><code>FR-08</code></td><td>The stock-out prediction SHALL incorporate seasonal adjustment factors: month-end demand spikes, school term peaks, holiday periods, and local event calendars. Seasonal factors shall be per-market and per-product-category.</td><td><span class="tag tag-should">SHOULD</span></td><td>Improves prediction accuracy by est. 12&ndash;18%</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.3 Revenue-Based Lending (RBL) Scoring</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-09</code></td><td>The RBL scoring engine SHALL compute a daily lending eligibility score (0.00&ndash;1.00) for all active merchants with &gt;90 days of MoMo transaction history. Score SHALL incorporate: revenue consistency, revenue growth trend, transaction frequency, average basket stability, and seasonal volatility.</td><td><span class="tag tag-must">MUST</span></td><td>Core RBL underwriting model</td></tr>
+                <tr><td><code>FR-10</code></td><td>Merchants with an RBL score above the eligibility threshold SHALL be shown a pre-approved loan offer in-app, displaying: maximum loan amount, daily repayment %, estimated repayment period, and total cost of credit (NCA-compliant disclosure).</td><td><span class="tag tag-must">MUST</span></td><td>NCA Section 92 cost of credit disclosure required</td></tr>
+                <tr><td><code>FR-11</code></td><td>RBL loan acceptance SHALL be completable in-app in under 3 minutes. Accepted loans SHALL be disbursed to the merchant's MoMo wallet within 24 hours. Repayments SHALL be automatically deducted as a percentage of daily MoMo sales, with a minimum floor repayment if daily sales are below a threshold.</td><td><span class="tag tag-must">MUST</span></td><td>Revenue-based repayment mechanism unique to RBL</td></tr>
+                <tr><td><code>FR-12</code></td><td>The RBL model SHALL be re-scored daily and loan limits SHALL be dynamically adjusted based on updated revenue performance. Merchants showing revenue growth SHALL be eligible for credit limit increases without re-application.</td><td><span class="tag tag-should">SHOULD</span></td><td>Differentiator vs traditional lending</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.4 WhatsApp Business Reporting</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-13</code></td><td>The system SHALL integrate with WhatsApp Business API to deliver formatted daily business summaries to opted-in merchants. Message SHALL be delivered by 07:00 merchant local time and SHALL include: previous day revenue, transaction count, top product category, one AI insight or recommendation.</td><td><span class="tag tag-must">MUST</span></td><td>WhatsApp Business API licence required per market</td></tr>
+                <tr><td><code>FR-14</code></td><td>Merchants SHALL be able to interact with the WhatsApp report using keyword commands: "MORE" (weekly comparison), "LOAN" (RBL eligibility), "STOCK" (stock-out alerts), "STOP" (unsubscribe), "HELP" (command list). Responses SHALL be generated within 30 seconds.</td><td><span class="tag tag-should">SHOULD</span></td><td>Conversational intelligence via WhatsApp</td></tr>
+                <tr><td><code>FR-15</code></td><td>WhatsApp report content SHALL be available in English, French, Swahili, and Hausa. Language selection SHALL default to the merchant's MoMo profile language preference.</td><td><span class="tag tag-must">MUST</span></td><td>Multilingual support per market requirements</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.5 Competitor Benchmarking &amp; Promotion Engine</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-16</code></td><td>The competitor benchmarking feature SHALL group merchants into peer cohorts based on: geographic proximity (same suburb/ward), primary product category, and revenue tier. Cohort minimum size SHALL be 10 merchants before any benchmarking data is surfaced.</td><td><span class="tag tag-should">SHOULD</span></td><td>Privacy protection requirement; premium tier feature</td></tr>
+                <tr><td><code>FR-17</code></td><td>The AI promotion engine SHALL identify slow-moving product categories (below 30-day average velocity) and upcoming slow trading periods, and generate a specific, actionable promotion recommendation with estimated revenue impact.</td><td><span class="tag tag-should">SHOULD</span></td><td>Recommendations generated weekly; max 1 per day displayed</td></tr>
+                <tr><td><code>FR-18</code></td><td>Merchant shall be able to activate recommended promotions in-app with one tap, applying the discount to future MoMo QR/POS payments. Promotion performance (revenue lift) SHALL be reported to the merchant 7 days after promotion end.</td><td><span class="tag tag-nice">NICE</span></td><td>Requires MoMo POS discount API integration</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 6. TECHNICAL ARCHITECTURE -->
+    <section class="violet">
+        <h2>6. Technical Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <div class="arch-layer-label">Merchant Channels</div>
+                <div class="arch-layer-content">MoMo Merchant App (iOS + Android) &rarr; Merchant Intelligence Dashboard &rarr; WhatsApp Business (daily reports + commands) &rarr; SMS (critical alerts, feature phone fallback)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">AI Intelligence Layer</div>
+                <div class="arch-layer-content">Sales Analytics Engine &rarr; Stock-Out Prediction Model &rarr; RBL Scoring Engine &rarr; Peer Benchmarking Engine &rarr; Promotion Recommendation Engine &rarr; WhatsApp Report Generator (NLG)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Data Pipeline</div>
+                <div class="arch-layer-content">MoMo POS Transaction Stream (Kafka real-time) &rarr; Merchant Wallet Event Stream &rarr; Daily Batch Aggregation (Spark/Airflow) &rarr; Merchant Analytics Store (ClickHouse) &rarr; RBL Score Store (PostgreSQL)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Integration Layer</div>
+                <div class="arch-layer-content">WhatsApp Business API &rarr; Supplier Marketplace API &rarr; MoMo Credit API (RBL disbursement) &rarr; MoMo POS Discount API &rarr; Push Notification Service &rarr; PDF Generation Service</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Compliance &amp; MLOps</div>
+                <div class="arch-layer-content">Audit Log (Kafka &rarr; S3) &rarr; POPIA/NDPR Consent Store &rarr; Model Monitoring (AUC, PSI tracking) &rarr; Retraining Pipeline &rarr; Feature Store &rarr; Grafana Dashboard</div>
+            </div>
+        </div>
+
+        <h3>AI Model Summary</h3>
+        <table>
+            <thead><tr><th>Model</th><th>Type</th><th>Key Inputs</th><th>Output</th><th>Accuracy Target</th></tr></thead>
+            <tbody>
+                <tr><td>Stock-Out Predictor</td><td>Time-series (Prophet + LSTM)</td><td>Category sales velocity, seasonality, restocking history</td><td>Days-to-stockout per category</td><td>MAPE &lt;25% at 7-day horizon</td></tr>
+                <tr><td>RBL Eligibility Scorer</td><td>Gradient boosting (XGBoost)</td><td>Revenue consistency, growth rate, transaction frequency, volatility</td><td>Eligibility score 0&ndash;1, max loan amount</td><td>AUC &gt;0.80 on repayment prediction</td></tr>
+                <tr><td>Peer Benchmarking</td><td>Clustering (K-Means + geospatial)</td><td>Location, category, revenue tier, transaction patterns</td><td>Cohort assignment, percentile rank</td><td>Cohort homogeneity score &gt;0.70</td></tr>
+                <tr><td>Promotion Recommender</td><td>Collaborative filtering + rule-based</td><td>Slow-moving categories, slow periods, similar merchant success patterns</td><td>Specific promotion recommendation + estimated revenue lift</td><td>Revenue lift &gt;10% observed in A/B testing</td></tr>
+                <tr><td>WhatsApp NLG</td><td>Template-based NLG + LLM (Phase 2)</td><td>Daily P&amp;L metrics, top insights, stock alerts</td><td>Formatted WhatsApp message (multilingual)</td><td>Merchant engagement rate &gt;30%</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 7. DATA & AI REQUIREMENTS -->
+    <section>
+        <h2>7. Data &amp; AI Model Requirements</h2>
+        <p>The intelligence layer requires a minimum 90-day transaction history per merchant before the full feature set is activated. For new merchants, the following progressive activation applies:</p>
+        <table>
+            <thead><tr><th>Days Active</th><th>Features Unlocked</th><th>AI Models Active</th></tr></thead>
+            <tbody>
+                <tr><td>Day 1&ndash;14</td><td>Basic transaction log, daily revenue total</td><td>None (insufficient data)</td></tr>
+                <tr><td>Day 15&ndash;44</td><td>Daily P&amp;L summary, peak hour heatmap (limited)</td><td>Sales aggregation only</td></tr>
+                <tr><td>Day 45&ndash;89</td><td>Full P&amp;L, peak hours, category breakdown, WhatsApp reports</td><td>Stock-out predictor (limited), category classifier</td></tr>
+                <tr><td>Day 90+</td><td>All features including RBL eligibility, benchmarking, promotion engine</td><td>All models fully active</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Data Privacy &amp; POPIA/NDPR Compliance</h3>
+        <ul>
+            <li>Merchant transaction data processed per POPIA (SA), NDPR (Nigeria), Kenya DPA for analytics purposes</li>
+            <li>Peer benchmarking uses anonymised, aggregated data only &mdash; individual merchant data never identifiable in benchmark output</li>
+            <li>Merchant consents to AI-powered analytics at merchant onboarding (embedded in MoMo merchant T&amp;Cs)</li>
+            <li>WhatsApp delivery uses encrypted WhatsApp Business API &mdash; no transaction data stored by Meta</li>
+            <li>RBL credit decision process follows NCA prescribed disclosure and right-to-reason obligations</li>
+            <li>POPIA impact assessment required before launch covering both merchant data processing and benchmarking aggregation</li>
+        </ul>
+    </section>
+
+    <!-- 8. COMPLIANCE -->
+    <section class="violet">
+        <h2>8. Compliance &amp; Regulatory Requirements</h2>
+        <table>
+            <thead><tr><th>Framework</th><th>Market(s)</th><th>Key Obligation</th><th>UC-37 Control</th><th>Owner</th></tr></thead>
+            <tbody>
+                <tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Consent for processing merchant transaction data; data minimisation; merchant's right to access their data</td><td>Consent in merchant T&amp;Cs; merchant data access endpoint in-app; anonymised benchmarking; DPO sign-off</td><td>Group DPO + MTN SA Compliance</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">NCA</strong></td><td>South Africa</td><td>Credit cost disclosure; right-to-reason for loan decisions; reckless credit prevention; repayment affordability assessment</td><td>FR-10 NCA Section 92 cost disclosure; FR-12 daily revenue-based affordability; SHAP explanation for RBL decisions</td><td>MTN SA Legal + Credit Risk</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">NCR</strong></td><td>South Africa</td><td>Registered credit provider obligations for RBL product; credit bureau reporting</td><td>RBL product registration with NCR; credit bureau reporting on default; merchant credit file maintenance</td><td>MTN SA FinCrime + Compliance</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">FICA</strong></td><td>South Africa</td><td>AML/CFT for RBL disbursements; transaction monitoring; beneficial owner verification</td><td>RBL disbursement monitoring via PayGuard (UC-16); merchant KYC verification; SAR workflow for suspicious patterns</td><td>MTN SA FinCrime</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">NDPR</strong></td><td>Nigeria</td><td>Data localisation; consent for financial data analytics; breach notification within 72 hours</td><td>Nigeria merchant data processed in-country; explicit consent in Nigerian merchant T&amp;Cs; breach detection pipeline</td><td>MTN Nigeria OpCo + Legal</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">CBN Lending Rules</strong></td><td>Nigeria</td><td>Lending licence requirements; interest rate caps; credit disclosure obligations</td><td>Nigeria RBL via MFIN-licensed partner; interest rate within CBN cap; full cost disclosure per CBN guidelines</td><td>MTN Nigeria OpCo + Legal</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 9. SPRINT PLAN -->
+    <section class="teal">
+        <h2>9. Sprint Plan &amp; Roadmap</h2>
+        <div class="sprint-grid">
+            <div class="sprint-card sprint-1">
+                <div class="sprint-label">Sprint 1 &mdash; Weeks 1&ndash;4 &mdash; Data Foundation</div>
+                <div class="sprint-title">Analytics Engine &amp; Data Pipeline</div>
+                <ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
+                    <li>Build MoMo POS + merchant wallet Kafka consumer pipeline</li>
+                    <li>Design merchant analytics store schema (ClickHouse)</li>
+                    <li>Implement daily P&amp;L aggregation engine</li>
+                    <li>Build product category classifier (MCC + NLP)</li>
+                    <li>Develop hourly transaction heatmap computation</li>
+                    <li>WhatsApp Business API account setup and webhook integration</li>
+                    <li>POPIA/NDPR impact assessment and DPO engagement</li>
+                    <li>NCA credit product regulatory review for RBL structure</li>
+                </ul>
+            </div>
+            <div class="sprint-card sprint-2">
+                <div class="sprint-label">Sprint 2 &mdash; Weeks 5&ndash;8 &mdash; AI Models &amp; Core Features</div>
+                <div class="sprint-title">Predictive Models &amp; RBL Engine</div>
+                <ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
+                    <li>Train and validate stock-out prediction model (Prophet + LSTM)</li>
+                    <li>Build RBL eligibility scoring model (XGBoost)</li>
+                    <li>Implement RBL loan offer engine and in-app acceptance flow</li>
+                    <li>Build MoMo Credit API integration for RBL disbursement</li>
+                    <li>Develop WhatsApp daily report generator (multilingual NLG)</li>
+                    <li>Build merchant intelligence dashboard (React Native)</li>
+                    <li>Implement monthly statement PDF generation</li>
+                    <li>MLOps pipeline: model monitoring, retraining triggers</li>
+                </ul>
+            </div>
+            <div class="sprint-card sprint-3">
+                <div class="sprint-label">Sprint 3 &mdash; Weeks 9&ndash;12 &mdash; Premium Features &amp; Launch</div>
+                <div class="sprint-title">Benchmarking, Promotions &amp; Pilot Launch</div>
+                <ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
+                    <li>Build peer benchmarking cohort engine (K-Means + geo)</li>
+                    <li>Develop promotion recommendation engine</li>
+                    <li>WhatsApp interactive command handling (MORE, LOAN, STOCK, STOP)</li>
+                    <li>Supplier marketplace integration (stock-out alert deep links)</li>
+                    <li>NCR credit registration and POPIA DPO sign-off</li>
+                    <li>End-to-end integration testing (transaction &rarr; insight &rarr; WhatsApp delivery)</li>
+                    <li>UAT with 200 pilot merchants (MTN SA, Lagos, Nairobi)</li>
+                    <li>Pilot launch: 500 merchants in SA (analytics), 100 merchants (RBL beta)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. RISK REGISTER -->
+    <section class="red">
+        <h2>10. Risk Register</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+            <tbody>
+                <tr><td><code>R-01</code></td><td>Merchants do not trust MoMo's use of their transaction data for analytics and benchmarking</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Transparent consent process. Merchant data-access portal. Benchmarking uses anonymised aggregated data only. Focus groups with merchant community before launch to validate messaging. "Your data, your insights" positioning.</td></tr>
+                <tr><td><code>R-02</code></td><td>RBL default rate higher than projected due to model inaccuracy in volatile market conditions</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Conservative eligibility thresholds at launch. Small loan sizes (R500&ndash;R5,000 range initially). Daily revenue-based repayment reduces default risk. Minimum floor repayment regardless of daily sales. 90-day model shadow period before live RBL disbursements.</td></tr>
+                <tr><td><code>R-03</code></td><td>WhatsApp Business API changes pricing or restricts message types mid-implementation</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>SMS fallback channel implemented from Day 1. App push notifications as primary channel. WhatsApp positioned as preferred but not essential channel. Monitor Meta WhatsApp Business API policy changes monthly.</td></tr>
+                <tr><td><code>R-04</code></td><td>Stock-out prediction accuracy below threshold, causing merchant distrust</td><td class="priority-high">Medium</td><td class="priority-med">Medium</td><td>45-day minimum data requirement before predictions surfaced. Accuracy displayed transparently ("Based on your last 60 days, predicted with 75% confidence"). Merchant feedback loop: was the prediction correct? Used for model retraining.</td></tr>
+                <tr><td><code>R-05</code></td><td>NCR registration for RBL product takes &gt;6 months, delaying lending revenue</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Analytics features (P&amp;L, stock-out, WhatsApp) launched independently of RBL. RBL delivered via existing NCR-registered credit provider partner in Phase 1 while MTN own registration is obtained. Phase 2: MTN own credit book under NCR registration.</td></tr>
+                <tr><td><code>R-06</code></td><td>Merchant analytics dashboard not adopted &mdash; merchants prefer simpler tools</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>WhatsApp delivery as low-friction alternative to app. Progressive disclosure: start with single-number daily revenue, expand to full dashboard based on engagement. In-market merchant focus groups to validate UX before build. Onboarding tutorial on first login.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-37 AI SME &amp; Merchant Growth Intelligence &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
+        <div>Document Author: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
+        <div style="margin-top:8px;font-size:0.82em;">Driver: Revenue Growth &amp; Merchant Ecosystem Expansion &nbsp;&middot;&nbsp; Value: Revenue-Based Lending + Fee Income Growth &nbsp;&middot;&nbsp; Compliance: POPIA &middot; NDPR &middot; NCA &middot; NCR &middot; FICA &middot; CBN &nbsp;&middot;&nbsp; Next Steps: Build merchant revenue analytics engine from MoMo POS/merchant wallet transaction data</div>
+    </footer>
+
+</div>
+</body>
+</html>

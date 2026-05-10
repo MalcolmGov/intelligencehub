@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-28 USSD AgriIntel &mdash; Requirements &amp; Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        section.amber { border-left-color: #f59e0b; }
+        section.red { border-left-color: #dc2626; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
+        ul li { margin-bottom: 5px; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card.amber { border-left-color: #f59e0b; }
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #34d399; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card.amber .card-title { color: #f59e0b; }
+        .card.red .card-title { color: #f87171; }
+        .card.green .card-title { color: #34d399; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-card.indigo { border-top-color: #6366f1; }
+        .metric-card.violet { border-top-color: #7c3aed; }
+        .metric-card.amber { border-top-color: #f59e0b; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-card.indigo .metric-value { color: #818cf8; }
+        .metric-card.violet .metric-value { color: #a78bfa; }
+        .metric-card.amber .metric-value { color: #f59e0b; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
+        .us-ac li { margin-bottom: 3px; }
+        .flow-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; margin-top: 14px; }
+        .flow-title { font-size: 0.9em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+        .flow-step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+        .flow-num { width: 26px; height: 26px; min-width: 26px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: 700; color: #fff; line-height: 26px; text-align: center; }
+        .flow-text { font-size: 0.88em; color: #cbd5e1; line-height: 1.5; }
+        .ussd-mock { background: #020617; border: 2px solid #334155; border-radius: 8px; padding: 16px; font-family: "Courier New", monospace; font-size: 0.88em; color: #34d399; margin: 12px 0; white-space: pre-wrap; line-height: 1.7; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
+        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
+        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
+        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
+        .priority-high { color: #f87171; font-weight: 700; }
+        .priority-med { color: #fbbf24; font-weight: 700; }
+        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
+        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
+        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
+        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
+        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
+        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
+        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 120px; }
+        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
+        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
+        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
+        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
+        .arch-layer:last-child .arch-layer-label { color: #64748b; }
+        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
+        .market-pill { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; padding: 8px 10px; text-align: center; font-size: 0.8em; color: #a5b4fc; font-weight: 600; }
+        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: "Courier New", monospace; font-size: 0.85em; color: #34d399; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+        .sprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+        .sprint-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .sprint-label { font-size: 0.78em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6366f1; margin-bottom: 6px; }
+        .sprint-title { font-size: 1.05em; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
+        .sprint-item { font-size: 0.88em; color: #94a3b8; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
+
+<div class="container">
+
+    <header>
+        <div>
+            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 28</div>
+            <h1>USSD AgriIntel</h1>
+            <div class="subtitle">Real-time AI-powered agricultural market intelligence over USSD &mdash; commodity prices updated 3x daily, hyperlocal 7-day weather forecasts, AI crop advisory, and direct buyer-seller matching for smallholder farmers across MTN's 13 markets &mdash; driving 20&ndash;30% farmer income uplift on any 2G feature phone</div>
+            <div>
+                <span class="badge badge-not-started">Not Started &mdash; 0%</span>
+                <span class="badge badge-high">Priority: P2</span>
+                <span class="badge badge-high">Tier: High</span>
+                <span class="badge badge-new">Driver: Market Expansion &amp; Social Impact</span>
+            </div>
+            <div style="margin-top:10px;">
+                <span class="badge badge-compliance">POPIA</span>
+                <span class="badge badge-compliance">NDPR</span>
+                <span class="badge badge-teal">13 Markets</span>
+                <span class="badge badge-teal">8 Languages</span>
+                <span class="badge badge-teal">50+ Commodities</span>
+                <span class="badge badge-teal">Works on 2G</span>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-28</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">Not Started</div></div>
+            <div class="meta-item"><div class="meta-label">Owner</div><div class="meta-value">Malcolm Govender</div></div>
+            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P2</div></div>
+            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">20&ndash;30% Income Uplift</div></div>
+            <div class="meta-item"><div class="meta-label">Channel</div><div class="meta-value">USSD / SMS / 2G</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering &middot; Product Owner &amp; Document Author</div>
+            </div>
+        </div>
+    </header>
+
+    <section>
+        <h2>1. Executive Summary &amp; Business Case</h2>
+        <p>Smallholder farmers constitute the backbone of food security across sub-Saharan Africa, cultivating an estimated 80% of the continent's farmland on plots smaller than 2 hectares. Yet these farmers operate under a profound information asymmetry: commodity prices in their nearest market town may differ by 40&ndash;80% from prices 50 kilometres away, weather forecasts are inaccessible without a smartphone or radio, and pest or disease outbreaks spread unchecked because farmers have no early-warning advisory system. The result is chronic income underperformance &mdash; not because these farmers lack skill or land, but because they lack market intelligence.</p>
+        <p>MTN Group serves farmers in all 13 of its African markets, predominantly via 2G USSD on basic feature phones. UC-28 &mdash; USSD AgriIntel &mdash; transforms MTN's network into an agricultural intelligence platform: commodity prices for 50+ crops updated three times daily from market aggregators, hyperlocal 7-day weather forecasts from meteorological API partners, an AI crop advisor that delivers season-appropriate guidance, and a buyer-seller matching marketplace where farmers can list produce and connect directly with verified buyers via USSD and SMS.</p>
+        <p>The projected impact is a <strong style="color:#818cf8;">20&ndash;30% increase in farmer income</strong> within the engaged user cohort &mdash; validated by comparable deployments: Esoko in Ghana delivered 25% income uplift, Reuters Market Light in India delivered 16&ndash;20%, and iCOW in Kenya improved cattle farmer income by 32%. For MTN, AgriIntel creates a high-engagement daily-use product that drives MoMo transaction volume (farmers transact proceeds through MoMo), airtime revenue, and positions MTN as a socially impactful financial inclusion leader across agriculture-dependent markets.</p>
+        <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-value">80%</div><div class="metric-label">African Farmland Operated by Smallholders</div></div>
+            <div class="metric-card indigo"><div class="metric-value">50+</div><div class="metric-label">Commodity Prices Updated 3x Daily</div></div>
+            <div class="metric-card violet"><div class="metric-value">30%</div><div class="metric-label">Target Farmer Income Uplift</div></div>
+            <div class="metric-card amber"><div class="metric-value">13</div><div class="metric-label">African Markets</div></div>
+        </div>
+        <div class="comparison-box" style="margin-top:20px;">
+            <div class="compare-card traditional">
+                <div class="compare-label">Farmer Without AgriIntel</div>
+                <div class="compare-value">40&ndash;80%</div>
+                <div class="compare-sub">Price information gap between local and distant markets, no weather forecast, no pest advisory, selling to first available buyer at any price, income chronically underperforms potential</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">USSD AgriIntel (UC-28)</div>
+                <div class="compare-value">3x Daily</div>
+                <div class="compare-sub">Real-time commodity prices for 50+ crops, hyperlocal 7-day weather, AI crop advisor, direct buyer matching via USSD &mdash; any 2G phone, no internet, 8 languages, 13 markets</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="violet">
+        <h2>2. Problem Statement</h2>
+        <div class="card violet">
+            <div class="card-title">Problem 1 &mdash; Price Information Asymmetry Costs Farmers 40&ndash;80% of Potential Income</div>
+            <div class="card-content">A smallholder farmer in rural Ghana selling maize to the first trader who arrives at their farm gate has no way of knowing that the market price in Accra is 60% higher than what the trader is offering. This information asymmetry &mdash; which traders exploit systematically &mdash; is the single largest cause of preventable income loss for African smallholders. Access to daily commodity prices in multiple markets would fundamentally shift negotiating power from intermediaries to farmers.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 2 &mdash; Weather Forecast Inaccessibility Causes Avoidable Crop Loss</div>
+            <div class="card-content">Smallholder farmers in sub-Saharan Africa have no reliable access to hyperlocal weather forecasts. National meteorological services publish forecasts at district level with 24&ndash;48 hour lag. Farmers plant, irrigate, spray pesticides, and harvest based on historical patterns and intuition &mdash; not forecast data. A 7-day hyperlocal forecast would enable smarter irrigation scheduling, early harvest before rain damage, and planting timing optimisation. In pilot studies, weather-informed farmers reduced weather-related crop loss by 15&ndash;25%.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 3 &mdash; Fragmented Supply Chains Lock Out Smallholders from Premium Markets</div>
+            <div class="card-content">Large buyers (supermarkets, food processors, exporters) cannot efficiently source from thousands of small individual farmers. Smallholders cannot access these premium markets. The gap is informational, not logistical: buyers do not know who has produce available, in what quantity, and at what location. A USSD-based produce listing and buyer-matching system connects buyers with aggregated smallholder supply, enabling premium market access without requiring a smartphone or internet connection.</div>
+        </div>
+        <h3>Target Markets</h3>
+        <div class="market-grid">
+            <div class="market-pill">South Africa</div>
+            <div class="market-pill">Nigeria</div>
+            <div class="market-pill">Ghana</div>
+            <div class="market-pill">Uganda</div>
+            <div class="market-pill">Kenya</div>
+            <div class="market-pill">Cameroon</div>
+            <div class="market-pill">Ivory Coast</div>
+            <div class="market-pill">Rwanda</div>
+            <div class="market-pill">Zambia</div>
+            <div class="market-pill">Benin</div>
+            <div class="market-pill">Guinea</div>
+            <div class="market-pill">Ethiopia</div>
+            <div class="market-pill">Sudan</div>
+        </div>
+    </section>
+
+    <section class="teal">
+        <h2>3. Objectives &amp; Success Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-value">500k</div><div class="metric-label">Target Farmers Enrolled (Year 1)</div></div>
+            <div class="metric-card indigo"><div class="metric-value">25%</div><div class="metric-label">Target Income Uplift (Engaged Farmers)</div></div>
+            <div class="metric-card violet"><div class="metric-value">7-Day</div><div class="metric-label">Hyperlocal Weather Forecast Window</div></div>
+            <div class="metric-card amber"><div class="metric-value">3x</div><div class="metric-label">Daily Commodity Price Updates</div></div>
+        </div>
+        <table style="margin-top:20px;">
+            <thead><tr><th>KPI</th><th>Target (6 Mo)</th><th>Target (12 Mo)</th><th>Measurement</th></tr></thead>
+            <tbody>
+                <tr><td>Enrolled Farmers</td><td class="priority-med">50,000</td><td class="priority-high">500,000</td><td>USSD opt-in event logs</td></tr>
+                <tr><td>Daily Active Users</td><td class="priority-med">10,000</td><td class="priority-high">100,000</td><td>USSD session logs</td></tr>
+                <tr><td>Commodity Prices Available</td><td class="priority-high">50+</td><td class="priority-high">80+</td><td>Data provider catalogue</td></tr>
+                <tr><td>Price Update Freshness</td><td class="priority-high">3x/day</td><td class="priority-high">3x/day</td><td>Price ingestion pipeline logs</td></tr>
+                <tr><td>Buyer-Seller Matches (monthly)</td><td class="priority-med">2,000</td><td class="priority-high">20,000</td><td>Marketplace event logs</td></tr>
+                <tr><td>Farmer Income Uplift (surveyed cohort)</td><td class="priority-med">+15%</td><td class="priority-high">+25%</td><td>Quarterly farmer income survey</td></tr>
+                <tr><td>Weather Forecast Accuracy</td><td class="priority-high">ge 80% (24h)</td><td class="priority-high">ge 80% (24h)</td><td>Met API provider SLA</td></tr>
+                <tr><td>Markets Live</td><td class="priority-med">3</td><td class="priority-high">7</td><td>Deployment tracker</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>4. User Stories</h2>
+        <div class="two-col">
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-01 &middot; Commodity Price Check</div>
+                    <div class="us-title">Farmer Checks Current Maize Price</div>
+                    <div class="us-story">"As a maize farmer in Ghana, I want to check the current price of maize in 3 nearby markets before I sell to a trader."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Customer selects crop (maize) and region via USSD menu</li>
+                        <li>Prices shown for nearest 3 markets (name + price per kg/bag)</li>
+                        <li>Price freshness shown ("Updated 4h ago")</li>
+                        <li>All within 160-char USSD format with pagination</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-02 &middot; Weather Forecast</div>
+                    <div class="us-title">Farmer Gets 7-Day Hyperlocal Forecast</div>
+                    <div class="us-story">"As a farmer preparing to plant, I want a 7-day weather forecast for my specific area to plan my planting date."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Farmer's district/location stored at registration</li>
+                        <li>7-day forecast shown: daily condition + rain probability</li>
+                        <li>Paginated across 2&ndash;3 USSD screens</li>
+                        <li>Forecast updated daily from meteorological API partner</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-03 &middot; AI Crop Advisory</div>
+                    <div class="us-title">Crop-Specific Growing Advice</div>
+                    <div class="us-story">"As a tomato farmer, I want advice on what to do with my crop this week given current weather conditions."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Farmer selects crop and growth stage via USSD</li>
+                        <li>Advisory generated combining: crop stage, current weather forecast, seasonal calendar</li>
+                        <li>Advisory le 3 paginated USSD screens</li>
+                        <li>Advisory in farmer's registered language</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-04 &middot; Produce Listing</div>
+                    <div class="us-title">Farmer Lists Produce for Sale</div>
+                    <div class="us-story">"As a farmer with 10 bags of cassava ready, I want to list it for sale on the USSD marketplace so buyers can contact me."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Farmer enters: crop, quantity, asking price, location, available from date</li>
+                        <li>Listing posted to AgriIntel marketplace within 60 seconds</li>
+                        <li>SMS sent to farmer confirming listing reference number</li>
+                        <li>Listing visible to registered buyers searching that crop and region</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-05 &middot; Buyer Matching</div>
+                    <div class="us-title">Buyer Searches for Available Produce</div>
+                    <div class="us-story">"As a food trader, I want to search for available cassava in Brong-Ahafo region via USSD and contact matching farmers."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Buyer selects crop and region; sees top 3 matching listings</li>
+                        <li>Each listing shows: quantity, price, distance, listing date</li>
+                        <li>Buyer can initiate contact via USSD-triggered SMS to farmer</li>
+                        <li>Farmer receives SMS with buyer contact details within 2 minutes</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-06 &middot; Pest Alert Subscription</div>
+                    <div class="us-title">Farmer Receives Crop Disease Alert</div>
+                    <div class="us-story">"As a maize farmer, I want to receive an SMS alert if Fall Armyworm is reported in my district so I can act early."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Farmer subscribes to pest alerts for registered crop and region</li>
+                        <li>Pest reports from agricultural extension services trigger SMS within 24h</li>
+                        <li>Alert includes: pest name, severity, recommended action</li>
+                        <li>Advisory on treatment available via USSD follow-up</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-07 &middot; Price Alert</div>
+                    <div class="us-title">Automated Price Alert When Target Price Reached</div>
+                    <div class="us-story">"As a farmer holding cassava in storage, I want an SMS alert when the cassava price in Accra reaches R2.50/kg."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Farmer sets price alert via USSD: crop, market, target price</li>
+                        <li>SMS sent within 4 hours of price reaching target</li>
+                        <li>Alert includes current price and 3-day trend</li>
+                        <li>Maximum 3 active price alerts per farmer</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-08 &middot; Hausa Language Support (Nigeria)</div>
+                    <div class="us-title">Full AgriIntel Experience in Hausa</div>
+                    <div class="us-story">"As a Hausa-speaking farmer in Kano State, I want to access commodity prices and crop advice entirely in Hausa."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Hausa menu strings, crop names, and advisory text localised</li>
+                        <li>Nigerian commodity prices (sorghum, millet, groundnut, cowpea)</li>
+                        <li>Weather forecast for Northern Nigeria regions</li>
+                        <li>All within 160-char Hausa text constraints</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>5. Functional Requirements</h2>
+        <h3>5.1 Commodity Price Feed</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-01</code></td><td>The system SHALL maintain a commodity price database covering at least 50 crops per market, with prices refreshed at 06:00, 12:00, and 18:00 market-local time via integration with agricultural data providers (ESOKO, Agmarknet equivalents, national market information systems per country).</td><td><span class="tag tag-must">MUST</span></td><td>Next step: partner with agricultural data providers</td></tr>
+                <tr><td><code>FR-02</code></td><td>Prices SHALL be presented with: commodity name, unit (kg/bag/tonne), price, market name, and freshness timestamp (hours since last update). If a price is older than 12 hours, a staleness warning SHALL be displayed.</td><td><span class="tag tag-must">MUST</span></td><td>Transparency on data freshness builds farmer trust</td></tr>
+                <tr><td><code>FR-03</code></td><td>The system SHALL show prices for the 3 nearest markets to the farmer's registered location, ordered by distance. A "Show more" option SHALL allow viewing up to 10 markets in paginated USSD format.</td><td><span class="tag tag-must">MUST</span></td><td>Location registered at farmer onboarding</td></tr>
+                <tr><td><code>FR-04</code></td><td>Price alerts SHALL be triggered within 4 hours of a price reaching or exceeding a farmer-defined threshold, delivered via SMS. Maximum 3 active price alerts per MSISDN.</td><td><span class="tag tag-should">SHOULD</span></td><td>Drives high-value engagement</td></tr>
+            </tbody>
+        </table>
+        <h3>5.2 Weather &amp; Crop Advisory</h3>
+        <div class="ussd-mock">Customer dials *188#
+
+AgriIntel: Welcome, Kwame (Maize, Brong-Ahafo)
+1. Commodity prices
+2. Weather forecast
+3. Crop advice
+4. Buy/Sell marketplace
+5. My alerts
+
+Customer: 2
+
+AgriIntel: Weather (Brong-Ahafo, 7 days):
+Mon: Sunny, 28C, Rain:10%
+Tue: Partly cloudy, 26C, Rain:30%
+Wed: Rain likely, 22C, Rain:75%
+0=More days
+
+Customer: 3
+
+AgriIntel: Maize Advice (Mid-season):
+Rain Wed - good for irrigation skip.
+Check for Fall Armyworm in humid
+conditions after rain. Apply neem
+oil preventively if seen.</div>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-05</code></td><td>The system SHALL integrate with at least one meteorological API provider (AccuWeather, OpenWeatherMap, or ECMWF) to deliver hyperlocal 7-day daily forecasts at district level across all 13 markets, refreshed every 6 hours.</td><td><span class="tag tag-must">MUST</span></td><td>District-level resolution minimum</td></tr>
+                <tr><td><code>FR-06</code></td><td>The AI crop advisory engine SHALL generate context-aware advice by combining: farmer's registered crop, current growth stage (determined from planting date if provided), 7-day weather forecast, seasonal calendar for the market, and pest advisory alerts. Advisory SHALL be generated by LLM and capped at 3 paginated USSD screens.</td><td><span class="tag tag-must">MUST</span></td><td>LLM: Claude claude-sonnet-4-6 with agri knowledge base</td></tr>
+                <tr><td><code>FR-07</code></td><td>Pest and disease alerts SHALL be sourced from agricultural extension service data feeds (CABI Crop Protection Compendium, FAO EMPRES, national plant protection organisations) and delivered to subscribed farmers via SMS within 24 hours of a confirmed regional outbreak.</td><td><span class="tag tag-should">SHOULD</span></td><td>Extension service API partnerships required</td></tr>
+            </tbody>
+        </table>
+        <h3>5.3 Buyer-Seller Marketplace</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-08</code></td><td>Farmers SHALL be able to create a produce listing via USSD specifying: crop type, quantity (kg or bags), asking price per unit, location (district), and available-from date. Listings SHALL be active for 14 days unless renewed or sold.</td><td><span class="tag tag-must">MUST</span></td><td>Define crop taxonomy per market in Sprint 1</td></tr>
+                <tr><td><code>FR-09</code></td><td>Buyers (registered traders and food companies) SHALL be able to search for listings by crop and region via USSD. The top 3 matching listings SHALL be shown with farmer contact details. Contact initiation triggers an SMS to the farmer within 2 minutes.</td><td><span class="tag tag-must">MUST</span></td><td>Buyer registration includes verification step</td></tr>
+                <tr><td><code>FR-10</code></td><td>The marketplace SHALL display the current AgriIntel reference price for the listed commodity alongside each listing, enabling farmers and buyers to see how the listing compares to market price.</td><td><span class="tag tag-should">SHOULD</span></td><td>Prevents exploitative pricing</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="violet">
+        <h2>6. Technical Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <div class="arch-layer-label">USSD Channel</div>
+                <div class="arch-layer-content">Farmer Feature Phone (2G) &rarr; USSD Gateway (per OpCo) &rarr; AgriIntel USSD App Server (FastAPI) &nbsp;|&nbsp; SMS Gateway (alerts + marketplace notifications)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Data Ingestion</div>
+                <div class="arch-layer-content">Commodity Price APIs (ESOKO, national market data systems) &rarr; Weather APIs (AccuWeather / OpenWeatherMap per market) &rarr; Pest Alert Feeds (CABI, FAO EMPRES) &rarr; Kafka ingestion &rarr; Price and Weather Store (PostgreSQL + Redis cache)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">AI Advisory Engine</div>
+                <div class="arch-layer-content">Crop Advisory LLM (Claude claude-sonnet-4-6) + Agricultural Knowledge Base (RAG, Pinecone) &rarr; Context Builder (crop + weather + season + pest) &rarr; 160-char Response Formatter &rarr; Multilingual Output (8 languages)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Marketplace</div>
+                <div class="arch-layer-content">Produce Listing Service (PostgreSQL) &rarr; Buyer Search Engine (location + crop matching) &rarr; Contact Bridge (SMS gateway, MoMo MSISDN) &rarr; Listing Expiry Manager (14-day TTL)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Ops &amp; Compliance</div>
+                <div class="arch-layer-content">Farmer Profile Store (per-market data residency) &rarr; Audit Log (Kafka) &rarr; Price Freshness Monitor &rarr; Grafana Dashboard &rarr; POPIA / NDPR Consent Store</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>7. Data &amp; AI Model Requirements</h2>
+        <h3>Commodity Taxonomy (Phase 1 &mdash; Priority Crops)</h3>
+        <table>
+            <thead><tr><th>Market</th><th>Priority Crops (Phase 1)</th><th>Data Provider</th><th>Update Frequency</th></tr></thead>
+            <tbody>
+                <tr><td>Ghana</td><td>Maize, Cassava, Cocoa, Tomato, Plantain, Groundnut</td><td>ESOKO, MoFA Price Bulletin</td><td>3x daily</td></tr>
+                <tr><td>Nigeria</td><td>Sorghum, Millet, Cowpea, Groundnut, Cassava, Yam</td><td>National Agricultural Extension Service, FEWSNET</td><td>3x daily</td></tr>
+                <tr><td>Uganda</td><td>Maize, Beans, Banana (matoke), Coffee, Sorghum</td><td>MAAIF Market Information System</td><td>3x daily</td></tr>
+                <tr><td>Kenya</td><td>Maize, Tea, Coffee, Avocado, French Beans, Tomato</td><td>NAFIS (National Farmers Information Service)</td><td>3x daily</td></tr>
+                <tr><td>South Africa</td><td>Maize (yellow/white), Wheat, Sunflower, Soya, Sorghum</td><td>SAFEX / Grain SA</td><td>3x daily</td></tr>
+            </tbody>
+        </table>
+        <div class="card teal">
+            <div class="card-title">Next Step: Partner with Agricultural Data Providers &amp; Define Crop Taxonomy per Market</div>
+            <div class="card-content">The first two action items for UC-28 are: (1) initiate partnership agreements with agricultural data providers in each target market (ESOKO for West Africa, NAFIS for Kenya, MAAIF for Uganda, SAFEX for South Africa, etc.) &mdash; these typically require 4&ndash;8 weeks of commercial negotiation; (2) convene a per-market workshop with OpCo teams and agricultural extension officers to define the full commodity taxonomy (crop names, units, quality grades, and market location codes) for each of the 13 markets.</div>
+        </div>
+    </section>
+
+    <section class="violet">
+        <h2>8. Compliance &amp; Regulatory</h2>
+        <table>
+            <thead><tr><th>Framework</th><th>Market</th><th>Key Obligation</th><th>UC-28 Control</th></tr></thead>
+            <tbody>
+                <tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Consent for processing farmer location and crop data; data minimisation; right to erasure</td><td>Opt-in consent at registration; location data used only for price and weather lookup; not sold to third parties; erasure on request</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">NDPR</strong></td><td>Nigeria</td><td>Data localisation; consent; data minimisation</td><td>Nigerian farmer data stored in Nigeria-resident infrastructure; separate consent form; location precision limited to district level</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">Agricultural Market Regulations</strong></td><td>All markets</td><td>No market manipulation; price data must be attributed and accurate</td><td>All prices attributed to source and freshness timestamp; staleness warning &gt;12h; no AgriIntel-originated price setting; data provider contracts include accuracy SLAs</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">Consumer Protection</strong></td><td>All markets</td><td>Marketplace listings must not enable fraud; buyer verification required</td><td>Buyer registration with MSISDN verification; listing fraud monitoring; farmer complaint mechanism via USSD; AgriIntel not party to transaction (introduction service only)</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">POPI Act S69 (SA)</strong></td><td>South Africa</td><td>Price alert SMS is direct marketing requiring opt-in</td><td>Price alerts and pest alerts are explicitly opted into at registration; STOP command to opt out at any time</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="teal">
+        <h2>9. Sprint Plan &amp; Roadmap</h2>
+        <div class="sprint-grid">
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 1 &mdash; Discovery</div>
+                <div class="sprint-title">Partnerships &amp; Taxonomy</div>
+                <div class="sprint-item">&#8226; Agricultural data provider partnerships (Ghana, Nigeria, SA)</div>
+                <div class="sprint-item">&#8226; Crop taxonomy definition per pilot market</div>
+                <div class="sprint-item">&#8226; Weather API selection and contract</div>
+                <div class="sprint-item">&#8226; Pest alert feed API evaluation</div>
+                <div class="sprint-item">&#8226; Farmer persona research (3 markets)</div>
+                <div class="sprint-item">&#8226; USSD flow wireframes (8 languages)</div>
+                <div class="sprint-item">&#8226; Buyer registration model design</div>
+                <div class="sprint-item">&#8226; POPIA / NDPR legal review</div>
+            </div>
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 2 &mdash; Core Build</div>
+                <div class="sprint-title">Price Feed, Weather &amp; USSD</div>
+                <div class="sprint-item">&#8226; Price ingestion pipeline (3x daily)</div>
+                <div class="sprint-item">&#8226; USSD price enquiry flow (Ghana pilot)</div>
+                <div class="sprint-item">&#8226; Weather API integration (district-level)</div>
+                <div class="sprint-item">&#8226; AI crop advisory (LLM + RAG)</div>
+                <div class="sprint-item">&#8226; Farmer registration and profile</div>
+                <div class="sprint-item">&#8226; Price alert engine (SMS)</div>
+                <div class="sprint-item">&#8226; Marketplace listing flow (USSD)</div>
+                <div class="sprint-item">&#8226; Multilingual output (EN, French, Hausa)</div>
+            </div>
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 3 &mdash; Pilot &amp; Expand</div>
+                <div class="sprint-title">Ghana Pilot &amp; Nigeria Expansion</div>
+                <div class="sprint-item">&#8226; Ghana pilot: 5,000 farmers</div>
+                <div class="sprint-item">&#8226; Buyer marketplace: 200 verified buyers</div>
+                <div class="sprint-item">&#8226; Pest alert integration (CABI)</div>
+                <div class="sprint-item">&#8226; Farmer income survey (6-week baseline)</div>
+                <div class="sprint-item">&#8226; Nigeria commodity taxonomy + USSD</div>
+                <div class="sprint-item">&#8226; Hausa + Yoruba translations</div>
+                <div class="sprint-item">&#8226; Grafana monitoring dashboard</div>
+                <div class="sprint-item">&#8226; Impact report: income uplift vs control</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="red">
+        <h2>10. Risk Register</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+            <tbody>
+                <tr><td><code>R-01</code></td><td>Agricultural data provider partnerships delayed or unavailable in key markets, leaving price database incomplete</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Prioritise markets with existing data providers (Ghana: ESOKO, Kenya: NAFIS). For markets without commercial providers, partner with government Ministry of Agriculture price bulletin systems. Budget 8-week commercial negotiation lead time.</td></tr>
+                <tr><td><code>R-02</code></td><td>Commodity price data quality insufficient (stale, inconsistent units, missing markets) eroding farmer trust</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Staleness warning displayed for prices &gt;12 hours old. Data provider SLA includes 95% freshness guarantee. Human review process for anomalous price movements (&gt;30% change vs prior reading). Farmer feedback channel via USSD ("Report incorrect price").</td></tr>
+                <tr><td><code>R-03</code></td><td>AI crop advisory generates incorrect advice (wrong pest treatment, wrong planting timing) causing crop loss</td><td class="priority-med">Low</td><td class="priority-high">Very High</td><td>Agricultural knowledge base reviewed by agronomists before launch. LLM advisory always prefaced with "Consult your extension officer to confirm." No pesticide dosage recommendations without agronomist review. RAG retrieval from validated sources only (CABI, FAO).</td></tr>
+                <tr><td><code>R-04</code></td><td>Buyer-seller marketplace used for fraud (phantom listings, payment fraud)</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Buyer registration requires MSISDN verification + KYC for high-volume buyers. Listing volume limit per farmer (5 active listings max). Fraud monitoring: flag MSISDNs with high listing-to-contact ratio without completed sales. AgriIntel is introduction service only, not payment processor.</td></tr>
+                <tr><td><code>R-05</code></td><td>Weather API provider unavailable or inaccurate for rural African locations</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>Evaluate 3 weather API providers before launch; select primary + fallback. AccuWeather and OpenWeatherMap both have African coverage. Accept lower resolution (sub-district) for remote areas. Display resolution clearly ("District-level forecast").</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-28 USSD AgriIntel &mdash; Agricultural Market Intelligence &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
+        <div>Owner: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
+        <div style="margin-top:8px;font-size:0.82em;">Integrations: ESOKO &middot; NAFIS &middot; AccuWeather &middot; CABI &middot; Claude claude-sonnet-4-6 &middot; USSD Gateway &middot; SMS Gateway &nbsp;&middot;&nbsp; Compliance: POPIA &middot; NDPR &middot; Agricultural Market Regulations &middot; Consumer Protection</div>
+    </footer>
+
+</div>
+</body>
+</html>

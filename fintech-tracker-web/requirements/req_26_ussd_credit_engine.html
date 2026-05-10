@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-26 USSD AI Credit Engine — Requirements &amp; Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        section.amber { border-left-color: #f59e0b; }
+        section.red { border-left-color: #dc2626; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
+        ul li { margin-bottom: 5px; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card.amber { border-left-color: #f59e0b; }
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #34d399; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card.amber .card-title { color: #f59e0b; }
+        .card.red .card-title { color: #f87171; }
+        .card.green .card-title { color: #34d399; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-card.indigo { border-top-color: #6366f1; }
+        .metric-card.violet { border-top-color: #7c3aed; }
+        .metric-card.amber { border-top-color: #f59e0b; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-card.indigo .metric-value { color: #818cf8; }
+        .metric-card.violet .metric-value { color: #a78bfa; }
+        .metric-card.amber .metric-value { color: #f59e0b; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .four-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
+        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
+        .us-ac li { margin-bottom: 3px; }
+        .flow-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; margin-top: 14px; }
+        .flow-title { font-size: 0.9em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+        .flow-step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+        .flow-num { width: 26px; height: 26px; min-width: 26px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: 700; color: #fff; line-height: 26px; text-align: center; }
+        .flow-text { font-size: 0.88em; color: #cbd5e1; line-height: 1.5; }
+        .ussd-mock { background: #020617; border: 2px solid #334155; border-radius: 8px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.88em; color: #34d399; margin: 12px 0; white-space: pre-wrap; line-height: 1.7; }
+        .ussd-mock .prompt { color: #818cf8; }
+        .ussd-mock .system { color: #64748b; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
+        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
+        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
+        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
+        .priority-high { color: #f87171; font-weight: 700; }
+        .priority-med { color: #fbbf24; font-weight: 700; }
+        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
+        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
+        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
+        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
+        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
+        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
+        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 120px; }
+        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
+        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
+        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
+        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
+        .arch-layer:last-child .arch-layer-label { color: #64748b; }
+        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
+        .market-pill { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; padding: 8px 10px; text-align: center; font-size: 0.8em; color: #a5b4fc; font-weight: 600; }
+        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+        .sprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+        .sprint-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .sprint-label { font-size: 0.78em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6366f1; margin-bottom: 6px; }
+        .sprint-title { font-size: 1.05em; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
+        .sprint-item { font-size: 0.88em; color: #94a3b8; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <div>
+            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 26</div>
+            <h1>USSD AI Credit Engine</h1>
+            <div class="subtitle">AI-powered instant micro-lending over USSD &mdash; alternative credit scores built entirely from Mobile Money transaction history, airtime top-up frequency, utility payment behaviour, and network tenure &mdash; enabling R10&ndash;R5000 instant loans for the financially underserved across 13 African markets without a credit bureau</div>
+            <div>
+                <span class="badge badge-not-started">Not Started &mdash; 0%</span>
+                <span class="badge badge-high">Priority: P1</span>
+                <span class="badge badge-high">Tier: High</span>
+                <span class="badge badge-new">Driver: Revenue Growth &amp; Financial Inclusion</span>
+            </div>
+            <div style="margin-top:10px;">
+                <span class="badge badge-compliance">POPIA</span>
+                <span class="badge badge-compliance">NCR</span>
+                <span class="badge badge-compliance">NCA</span>
+                <span class="badge badge-compliance">FSCA</span>
+                <span class="badge badge-teal">13 Markets</span>
+                <span class="badge badge-teal">No Bureau Needed</span>
+                <span class="badge badge-teal">&lt;3s Decisioning</span>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-26</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">Not Started</div></div>
+            <div class="meta-item"><div class="meta-label">Owner</div><div class="meta-value">Malcolm Govender</div></div>
+            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P1</div></div>
+            <div class="meta-item"><div class="meta-label">Loan Range</div><div class="meta-value">R10 &ndash; R5,000</div></div>
+            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">High-margin Lending</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering &middot; Product Owner &amp; Document Author</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <section>
+        <h2>1. Executive Summary &amp; Business Case</h2>
+        <p>Approximately 1.4 billion adults across sub-Saharan Africa remain excluded from formal credit markets. The primary barrier is not creditworthiness &mdash; it is the absence of a credit history that traditional bureaux can score. MTN's Mobile Money platform, however, generates a rich, longitudinal dataset for every registered customer: transaction frequency, average balances, merchant payment behaviour, airtime recharge patterns, utility payments, and peer transfer networks. This data constitutes a powerful alternative credit signal that traditional lenders cannot access.</p>
+        <p>UC-26 builds an AI-powered credit scoring and micro-lending engine that operates entirely within the USSD channel &mdash; accessible to any GSM handset, no internet required. A customer dials a short code, requests a loan amount, and receives an instant credit decision within 3 seconds. If approved, funds are disbursed directly to their MoMo wallet. Repayment is automated via scheduled MoMo wallet deductions. No paperwork, no branch visit, no credit bureau check required.</p>
+        <p>The lending business model generates high-margin revenue: micro-loans carry interest rates of 8&ndash;24% per month depending on risk tier, with a projected portfolio NPL rate of 6&ndash;9% manageable through automated repayment and conservative initial limits. At 500,000 active borrowers with an average outstanding balance of R800, the loan book reaches R400 million with annual interest revenue approaching R600 million at blended rates. Even at conservative penetration of 2% of MTN's 65M MoMo customers, the financial inclusion and revenue impact is transformational.</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">1.4B</div>
+                <div class="metric-label">Credit-Excluded Adults in Africa</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">&lt;3s</div>
+                <div class="metric-label">Target Loan Decisioning Time</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">R5k</div>
+                <div class="metric-label">Maximum Loan Amount (Phase 1)</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">R600M</div>
+                <div class="metric-label">Projected Annual Interest Revenue at Scale</div>
+            </div>
+        </div>
+
+        <div class="comparison-box" style="margin-top:20px;">
+            <div class="compare-card traditional">
+                <div class="compare-label">Traditional Credit Assessment</div>
+                <div class="compare-value">3&ndash;14 Days</div>
+                <div class="compare-sub">Bureau check required, branch visit needed, formal income proof, 70%+ of MTN customers excluded, high cost-per-origination, no micro-loan product viable</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">USSD AI Credit Engine (UC-26)</div>
+                <div class="compare-value">&lt;3 Seconds</div>
+                <div class="compare-sub">No bureau, no paperwork, MoMo data-driven scoring, any feature phone, instant disbursement to wallet, automated repayment, serves 65M+ MoMo customers</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PROBLEM STATEMENT -->
+    <section class="violet">
+        <h2>2. Problem Statement</h2>
+        <p>Three interlocking problems create the opportunity for UC-26:</p>
+
+        <div class="card violet">
+            <div class="card-title">Problem 1 &mdash; The Credit Invisibility Trap</div>
+            <div class="card-content">Across MTN's 13 markets, the majority of Mobile Money customers have no formal credit history. Without a credit bureau score, they are invisible to traditional lenders. Yet many of these customers demonstrate consistent, reliable financial behaviour through their MoMo wallets: regular income deposits, timely airtime purchases, consistent merchant payments, and prudent balance management. The credit invisibility trap prevents financially responsible people from accessing the credit they need to smooth income volatility, manage emergencies, and invest in livelihoods.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 2 &mdash; Emergency Liquidity Gaps Drive Harmful Alternatives</div>
+            <div class="card-content">When MTN customers face unexpected expenses &mdash; medical bills, school fees, transport costs, equipment repair &mdash; they currently turn to informal lenders (mashonisas/loan sharks) charging effective annual rates of 300&ndash;600%, or they sell productive assets at distressed prices. The absence of a fast, affordable emergency credit product pushes financially vulnerable customers into cycles of debt or asset loss. MTN's USSD channel can close this gap with a regulated, fairly-priced alternative.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 3 &mdash; MTN's MoMo Data Is an Untapped Credit Asset</div>
+            <div class="card-content">MTN possesses one of the richest longitudinal financial behaviour datasets on the continent. Every airtime recharge, peer transfer, merchant payment, utility bill, and savings deposit represents a data point about a customer's financial capacity and reliability. This data is currently used for product analytics and marketing, but not for credit origination. UC-26 monetises this asset directly while simultaneously delivering genuine financial inclusion value.</div>
+        </div>
+    </section>
+
+    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
+    <section class="teal">
+        <h2>3. Objectives &amp; Success Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">500k</div>
+                <div class="metric-label">Target Active Borrowers (Year 1)</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">&lt;9%</div>
+                <div class="metric-label">Target NPL Rate</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">99.9%</div>
+                <div class="metric-label">Decisioning Engine Availability</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">13</div>
+                <div class="metric-label">Markets Eligible (phased rollout)</div>
+            </div>
+        </div>
+
+        <table style="margin-top:20px;">
+            <thead><tr><th>KPI</th><th>Target (6 Mo)</th><th>Target (12 Mo)</th><th>Measurement</th></tr></thead>
+            <tbody>
+                <tr><td>Active Borrowers</td><td class="priority-med">50,000</td><td class="priority-high">500,000</td><td>Loan management system</td></tr>
+                <tr><td>Decisioning Latency P95</td><td class="priority-high">&lt;3s</td><td class="priority-high">&lt;2s</td><td>API latency monitoring</td></tr>
+                <tr><td>NPL Rate (&gt;30 days overdue)</td><td class="priority-high">&lt;9%</td><td class="priority-high">&lt;6%</td><td>Loan management system</td></tr>
+                <tr><td>Loan Book Size</td><td class="priority-med">R40M</td><td class="priority-high">R400M</td><td>Financial reporting</td></tr>
+                <tr><td>Disbursement Success Rate</td><td class="priority-high">&gt;99%</td><td class="priority-high">&gt;99.5%</td><td>MoMo API logs</td></tr>
+                <tr><td>Repayment Collection Rate</td><td class="priority-high">&gt;91%</td><td class="priority-high">&gt;94%</td><td>Loan management system</td></tr>
+                <tr><td>Markets Live</td><td class="priority-med">2 (SA, Ghana)</td><td class="priority-high">5</td><td>Deployment tracker</td></tr>
+                <tr><td>Average Loan Amount</td><td class="priority-med">R350</td><td class="priority-med">R800</td><td>Loan management system</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 4. USER STORIES -->
+    <section>
+        <h2>4. User Stories</h2>
+        <div class="two-col">
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-01 &middot; First Loan Application</div>
+                    <div class="us-title">Feature-Phone Loan via USSD</div>
+                    <div class="us-story">"As a MoMo customer who has never accessed formal credit, I want to apply for a small loan using my feature phone and receive a decision instantly."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Customer dials USSD short code, requests R500 loan</li>
+                        <li>Credit score computed from MoMo history within 3 seconds</li>
+                        <li>Approved customers see offer with amount, rate, and repayment date</li>
+                        <li>Funds disbursed to MoMo wallet within 30 seconds of acceptance</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-02 &middot; Credit Score Transparency</div>
+                    <div class="us-title">Customer Views Their Credit Score</div>
+                    <div class="us-story">"As a MoMo customer, I want to see my credit score and understand what factors are improving or reducing it."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Score (0&ndash;100) displayed with tier label (Poor/Fair/Good/Excellent)</li>
+                        <li>Top 2 positive factors shown within 160-char USSD format</li>
+                        <li>Top 1 improvement area shown (e.g. "Top up airtime more regularly")</li>
+                        <li>Score refreshes daily based on latest MoMo activity</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-03 &middot; Automated Repayment</div>
+                    <div class="us-title">Repayment Deducted Automatically on Due Date</div>
+                    <div class="us-story">"As a borrower, I want my repayment to be automatically deducted from my MoMo wallet on the due date without any manual action."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Deduction attempted at 08:00 on repayment due date</li>
+                        <li>If insufficient balance: retry at 12:00, 18:00, 22:00</li>
+                        <li>SMS reminder sent 48 hours before due date</li>
+                        <li>Successful deduction confirmed via SMS to borrower</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-04 &middot; Loan Declined &mdash; Reason Given</div>
+                    <div class="us-title">Declined Applicant Receives Actionable Guidance</div>
+                    <div class="us-story">"As a customer whose loan was declined, I want to understand why and what I can do to qualify in future."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Decline reason shown (score too low / existing loan / KYC tier)</li>
+                        <li>Top 1 actionable improvement suggestion provided</li>
+                        <li>Next eligible application date shown if applicable</li>
+                        <li>All within 160 characters per USSD message</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-05 &middot; Loan History</div>
+                    <div class="us-title">Borrower Checks Outstanding Loan Status</div>
+                    <div class="us-story">"As a borrower, I want to check my outstanding loan balance, due date, and repayment history via USSD."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Outstanding balance, interest, and due date displayed</li>
+                        <li>Last 3 repayments shown in paginated USSD format</li>
+                        <li>Option to make early repayment from within USSD session</li>
+                        <li>Early repayment improves credit score immediately</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-06 &middot; Risk Officer Override</div>
+                    <div class="us-title">Credit Risk Officer Reviews Model Output</div>
+                    <div class="us-story">"As a credit risk officer, I want to review the AI credit score model's feature importances and override decisions for specific customer segments."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Risk dashboard shows feature importance per score decile</li>
+                        <li>Manual override capability for individual MSISDNs</li>
+                        <li>Override audit log maintained (who, why, timestamp)</li>
+                        <li>Segment-level risk appetite parameter configuration</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-07 &middot; NCR Compliance Disclosure</div>
+                    <div class="us-title">Mandatory Credit Disclosure Before Acceptance</div>
+                    <div class="us-story">"As a regulator, I want every borrower to see the full cost of credit (principal, interest, fees, total repayable) before accepting a loan."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Pre-acceptance screen shows: principal, monthly rate, total repayable, due date</li>
+                        <li>Customer must press 1 to accept or 2 to decline</li>
+                        <li>No loan disbursed without explicit acceptance recorded</li>
+                        <li>Acceptance timestamp and loan terms stored immutably</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-08 &middot; Top-Up Loan</div>
+                    <div class="us-title">Existing Good-Standing Borrower Requests Limit Increase</div>
+                    <div class="us-story">"As a borrower with a clean repayment history, I want my loan limit to increase automatically over time."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Credit limit reviewed monthly for on-time payers</li>
+                        <li>After 3 successful repayments: limit increases 25&ndash;50%</li>
+                        <li>SMS notification sent when limit increases</li>
+                        <li>Limit increase reflected immediately in USSD credit check</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>5. Functional Requirements</h2>
+
+        <h3>5.1 Alternative Credit Scoring Model</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-01</code></td><td>The credit scoring model SHALL compute a 0&ndash;100 score for each eligible MoMo customer using at minimum the following features: (a) 12-month MoMo transaction volume and value, (b) airtime recharge frequency and consistency, (c) utility payment behaviour, (d) network tenure (months as MTN subscriber), (e) average wallet balance trend, (f) merchant payment diversity.</td><td><span class="tag tag-must">MUST</span></td><td>No credit bureau data required</td></tr>
+                <tr><td><code>FR-02</code></td><td>The model SHALL be retrained at minimum monthly on the latest 18 months of anonymised MoMo transaction data, with automated evaluation against held-out default labels before any model update is promoted to production.</td><td><span class="tag tag-must">MUST</span></td><td>MLOps pipeline required</td></tr>
+                <tr><td><code>FR-03</code></td><td>The scoring API SHALL return a decision (APPROVE / DECLINE / REVIEW) and a pre-approved amount within 3 seconds P95. The API must be callable from the USSD gateway within the 180-second session window.</td><td><span class="tag tag-must">MUST</span></td><td>Sub-3s is hard constraint</td></tr>
+                <tr><td><code>FR-04</code></td><td>The model SHALL produce SHAP-based feature importance explanations for each individual decision, stored for regulatory audit and available to the risk officer dashboard.</td><td><span class="tag tag-must">MUST</span></td><td>NCR / POPIA explainability requirement</td></tr>
+                <tr><td><code>FR-05</code></td><td>The system SHALL enforce a risk appetite configuration per market: maximum loan amount per score tier, minimum score threshold for approval, maximum single-customer outstanding balance, and market-specific NPL rate triggers for automatic tightening.</td><td><span class="tag tag-must">MUST</span></td><td>Per-market risk configuration</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.2 USSD Loan Application Flow</h3>
+        <div class="ussd-mock"><span class="system">--- Customer dials *186*LOAN# ---</span>
+<span class="prompt">MTN Credit:</span> Welcome to MTN Instant Loan.
+1.Apply for loan  2.Check my loan
+3.Check my score  4.Exit
+
+<span class="prompt">Customer:</span> 1
+
+<span class="prompt">MTN Credit:</span> How much do you need?
+Min:R10  Max:R2000
+Enter amount:
+
+<span class="prompt">Customer:</span> 500
+
+<span class="system">--- Credit engine: score=74, tier=Good, limit=R2000, rate=12%/mo ---</span>
+<span class="system">--- Decisioning: APPROVE R500 ---</span>
+
+<span class="prompt">MTN Credit:</span> Loan approved!
+Amount: R500
+Fee: R60 (12%)
+Repay: R560 by 10/06/26
+1.Accept  2.Decline
+
+<span class="prompt">Customer:</span> 1
+<span class="system">--- Disbursement: MoMo wallet credit R500 within 30s ---</span>
+
+<span class="prompt">MTN Credit:</span> R500 sent to your MoMo!
+Repay R560 by 10/06/26.
+Auto-deducted from wallet.</div>
+
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-06</code></td><td>The USSD loan application SHALL be completable in &le;5 customer interactions (dial, amount entry, review disclosure, accept/decline, confirmation), with each USSD message &le;160 characters.</td><td><span class="tag tag-must">MUST</span></td><td>USSD protocol constraint</td></tr>
+                <tr><td><code>FR-07</code></td><td>The system SHALL display a mandatory pre-disbursement disclosure screen showing: principal amount, monthly interest rate (as percentage), total repayable amount, and repayment due date. No loan SHALL be disbursed without the customer pressing 1 to accept this screen.</td><td><span class="tag tag-must">MUST</span></td><td>NCA / NCR mandatory disclosure</td></tr>
+                <tr><td><code>FR-08</code></td><td>Approved loan amounts SHALL be disbursed to the customer's active MoMo wallet within 60 seconds of acceptance. Disbursement failures SHALL trigger an automatic retry within 5 minutes and notify the customer via SMS if retry also fails.</td><td><span class="tag tag-must">MUST</span></td><td>MoMo API disbursement integration</td></tr>
+                <tr><td><code>FR-09</code></td><td>The system SHALL enforce a maximum of 1 active loan per customer at any time. Customers with an outstanding loan SHALL be shown their current balance and repayment date, and blocked from applying for a new loan.</td><td><span class="tag tag-must">MUST</span></td><td>Responsible lending requirement</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.3 Repayment Management</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-10</code></td><td>Repayments SHALL be collected via automated MoMo wallet deduction on the due date at 08:00 market-local time. If balance is insufficient, three retries SHALL occur at 12:00, 18:00, and 22:00 on the due date before marking the loan as late.</td><td><span class="tag tag-must">MUST</span></td><td>Automated collection reduces NPL</td></tr>
+                <tr><td><code>FR-11</code></td><td>An SMS reminder SHALL be sent 48 hours and 24 hours before the repayment due date, showing the amount due and the customer's current MoMo wallet balance.</td><td><span class="tag tag-must">MUST</span></td><td>Reduces missed payments</td></tr>
+                <tr><td><code>FR-12</code></td><td>Customers in arrears (&gt;30 days) SHALL have their credit score penalised and their loan limit reduced until the arrear is cleared. Customers in arrears &gt;60 days SHALL be flagged for human collections review.</td><td><span class="tag tag-must">MUST</span></td><td>NCR collections compliance</td></tr>
+                <tr><td><code>FR-13</code></td><td>Early repayment SHALL be supported via a USSD menu option and SHALL be rewarded with an immediate credit score uplift and eligibility for a higher limit on next application.</td><td><span class="tag tag-should">SHOULD</span></td><td>Positive behaviour reinforcement</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 6. TECHNICAL ARCHITECTURE -->
+    <section class="violet">
+        <h2>6. Technical Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <div class="arch-layer-label">USSD Layer</div>
+                <div class="arch-layer-content">Customer Feature Phone &rarr; USSD Gateway (per OpCo) &rarr; USSD Gateway Adapter &rarr; Credit USSD Application Server (FastAPI)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Credit Engine</div>
+                <div class="arch-layer-content">Feature Engineering Service (MoMo data pipeline) &rarr; Credit Scoring Model (XGBoost/LightGBM, SHAP explanations) &rarr; Decision Engine (risk rules + model score) &rarr; Offer Generator</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Data &amp; ML</div>
+                <div class="arch-layer-content">MoMo Transaction Data Lake (Kafka ingestion, Spark ETL) &rarr; Feature Store (Redis, real-time features) &rarr; MLflow (model versioning, evaluation) &rarr; Monthly model retraining pipeline</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Loan Management &amp; Repayment</div>
+                <div class="arch-layer-content">Loan Management System (LMS) &rarr; MoMo API (disbursement + collection) &rarr; SMS Gateway (reminders) &rarr; Collections Service (arrears management) &rarr; NCR Reporting</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Compliance &amp; Ops</div>
+                <div class="arch-layer-content">NCR Disclosure Engine &rarr; Audit Log (Kafka, immutable) &rarr; Risk Officer Dashboard &rarr; Prometheus + Grafana (monitoring) &rarr; Market-local data residency (per OpCo)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. DATA & AI MODEL REQUIREMENTS -->
+    <section>
+        <h2>7. Data &amp; AI Model Requirements</h2>
+        <h3>Credit Score Feature Set</h3>
+        <table>
+            <thead><tr><th>Feature Category</th><th>Specific Features</th><th>Lookback Window</th><th>Weight Rationale</th></tr></thead>
+            <tbody>
+                <tr><td>Transaction Behaviour</td><td>Monthly tx count, avg tx value, tx value trend, merchant diversity, peer transfer ratio</td><td>12 months</td><td>Strongest default predictor in comparable deployments (M-Shwari, Tigo Pesa)</td></tr>
+                <tr><td>Airtime Top-Up Patterns</td><td>Recharge frequency, avg recharge amount, consistency score (coefficient of variation)</td><td>6 months</td><td>Proxy for income regularity; high consistency = lower default risk</td></tr>
+                <tr><td>Balance Behaviour</td><td>Avg end-of-day balance, balance trend (3-month), balance-to-loan ratio, zero-balance days</td><td>6 months</td><td>Liquidity indicator; zero-balance frequency predicts repayment difficulty</td></tr>
+                <tr><td>Network Tenure</td><td>Months as MTN subscriber, months with active MoMo wallet</td><td>Lifetime</td><td>Longer tenure correlates with lower default rate across African MFS deployments</td></tr>
+                <tr><td>Utility &amp; Bill Payments</td><td>Utility payment frequency, on-time rate, avg payment amount</td><td>12 months</td><td>Strongest bureau-equivalent signal for commitment to regular payments</td></tr>
+                <tr><td>Social Graph</td><td>Peer network size, reciprocal transfer ratio, community payment participation</td><td>6 months</td><td>Network embeddedness reduces strategic default incentive</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Model Governance</h3>
+        <div class="two-col">
+            <div>
+                <div class="card">
+                    <div class="card-title">Model: XGBoost Gradient Boosting Classifier</div>
+                    <div class="card-content">Algorithm selected for: (a) high accuracy on tabular financial data, (b) native SHAP support for explainability, (c) fast inference (&lt;50ms per scoring call), (d) proven performance in African MFS credit scoring contexts (M-Shwari, similar). Monthly retraining on 18-month rolling window. Evaluation metric: Gini coefficient + KS statistic + expected NPL rate.</div>
+                </div>
+            </div>
+            <div>
+                <div class="card teal">
+                    <div class="card-title">Next Steps: Define Credit Scoring Model Inputs</div>
+                    <div class="card-content">The first task for UC-26 is to convene a credit risk workshop with: (1) MTN Fintech Risk Officer, (2) MoMo data engineering team, (3) a credit risk consultant with African MFS experience. Output: agreed feature list, data availability confirmation, risk appetite framework (maximum NPL rate per market, minimum score thresholds, loan size limits by tier).</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. COMPLIANCE & REGULATORY -->
+    <section class="violet">
+        <h2>8. Compliance &amp; Regulatory</h2>
+        <table>
+            <thead><tr><th>Framework</th><th>Market</th><th>Key Obligation</th><th>UC-26 Control</th></tr></thead>
+            <tbody>
+                <tr><td><strong style="color:#2dd4bf;">NCA / NCR</strong></td><td>South Africa</td><td>Registered credit provider; mandatory pre-agreement disclosure; affordability assessment; reckless lending prohibition; 30-day cancellation right</td><td>FR-07 mandatory disclosure screen; affordability scoring via MoMo balance data; 1 active loan limit; cancellation within 5 days via USSD</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Lawful basis for processing financial transaction data for credit scoring; consent; right to explanation of automated decision</td><td>SHAP explanations per decision (FR-04); consent at first loan application; data minimisation (only MoMo data used); audit trail</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">FSCA</strong></td><td>South Africa</td><td>Fairness in automated credit decisions; prohibition on discriminatory scoring factors; disclosure of AI use</td><td>SHAP explainability; bias testing across demographic proxies; ARIA discloses AI scoring in consent notice</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">CBN / CAC</strong></td><td>Nigeria</td><td>Money lender licensing; interest rate caps; consumer protection</td><td>Per-market rate configuration; interest rate cap enforcement in offer generator; CBN-compliant disclosure format</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">Bank of Ghana Regs</strong></td><td>Ghana</td><td>Mobile money lending guidelines; consumer protection; data localisation</td><td>Per-market data residency; Bank of Ghana rate caps; Ghana-specific disclosure language</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">Pan-African</strong></td><td>All markets</td><td>Anti-money laundering; KYC tiering; suspicious transaction monitoring</td><td>KYC tier eligibility check before loan approval; AML flag check via MoMo platform; loan amounts capped per KYC tier</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 9. SPRINT PLAN -->
+    <section class="teal">
+        <h2>9. Sprint Plan &amp; Roadmap</h2>
+        <div class="sprint-grid">
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 1 &mdash; Discovery &amp; Design</div>
+                <div class="sprint-title">Foundation &amp; Risk Framework</div>
+                <div class="sprint-item">&#8226; Credit risk workshop: feature definition</div>
+                <div class="sprint-item">&#8226; Risk appetite framework per market</div>
+                <div class="sprint-item">&#8226; Default rate targets: SA, Ghana</div>
+                <div class="sprint-item">&#8226; MoMo data availability audit</div>
+                <div class="sprint-item">&#8226; NCR / NCA regulatory review (SA)</div>
+                <div class="sprint-item">&#8226; Credit provider registration (SA)</div>
+                <div class="sprint-item">&#8226; USSD flow UX design (160-char)</div>
+                <div class="sprint-item">&#8226; LMS vendor selection</div>
+            </div>
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 2 &mdash; Model &amp; Core Build</div>
+                <div class="sprint-title">Credit Model &amp; USSD Integration</div>
+                <div class="sprint-item">&#8226; Feature engineering pipeline (Spark)</div>
+                <div class="sprint-item">&#8226; XGBoost model training (18mo data)</div>
+                <div class="sprint-item">&#8226; SHAP explainability integration</div>
+                <div class="sprint-item">&#8226; Scoring API (&lt;3s P95 validation)</div>
+                <div class="sprint-item">&#8226; USSD gateway adapter (SA)</div>
+                <div class="sprint-item">&#8226; MoMo disbursement integration</div>
+                <div class="sprint-item">&#8226; MoMo repayment collection</div>
+                <div class="sprint-item">&#8226; NCR disclosure screen (SA)</div>
+            </div>
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 3 &mdash; Pilot &amp; Scale</div>
+                <div class="sprint-title">SA Pilot Launch &amp; Ghana Expansion</div>
+                <div class="sprint-item">&#8226; SA pilot: 10,000 customers</div>
+                <div class="sprint-item">&#8226; NPL monitoring dashboard</div>
+                <div class="sprint-item">&#8226; Model performance evaluation</div>
+                <div class="sprint-item">&#8226; SMS reminder system</div>
+                <div class="sprint-item">&#8226; Collections service (30+ day arrears)</div>
+                <div class="sprint-item">&#8226; Risk officer dashboard (SHAP)</div>
+                <div class="sprint-item">&#8226; Ghana regulatory prep</div>
+                <div class="sprint-item">&#8226; Month 6 NPL report to board</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. RISK REGISTER -->
+    <section class="red">
+        <h2>10. Risk Register</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+            <tbody>
+                <tr><td><code>R-01</code></td><td>NPL rate exceeds 9% target in first 6 months due to model overfitting or data quality issues</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Conservative initial limits (max R500 for new borrowers). Monthly model evaluation. Automatic portfolio tightening trigger at 8% NPL. Human credit review for high-value loans (&gt;R2,000).</td></tr>
+                <tr><td><code>R-02</code></td><td>NCR / NCA regulatory approval for credit provider status delayed, blocking SA launch</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Engage specialist fintech regulatory counsel in Sprint 1. Consider white-label partnership with existing NCR-registered credit provider while own registration processes. Budget for 6-month regulatory lead time.</td></tr>
+                <tr><td><code>R-03</code></td><td>MoMo transaction data insufficient for meaningful credit signal for new or low-activity customers</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>Minimum eligibility: 6-month MoMo account age, 10+ transactions. Offer micro-limit (R10&ndash;R50) as first loan to build repayment history. Supplement with airtime top-up data as first signal.</td></tr>
+                <tr><td><code>R-04</code></td><td>Scoring model exhibits proxy discrimination against low-income or rural customer segments</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Bias testing against income, geography, gender proxies before launch. FSCA fairness assessment. SHAP analysis to identify discriminatory feature interactions. Third-party audit before scale.</td></tr>
+                <tr><td><code>R-05</code></td><td>MoMo wallet deduction for repayment fails at high rate, driving NPL above target</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>4x daily retry on due date. Pre-due-date balance check alerts. SMS reminders 48h and 24h prior. Consider partial deduction if full amount unavailable (NCR-compliant partial payment terms).</td></tr>
+                <tr><td><code>R-06</code></td><td>Loan disbursement or collection creates AML exposure via structuring or mule account patterns</td><td class="priority-med">Low</td><td class="priority-high">Very High</td><td>AML flag check before any disbursement. Velocity limits per MSISDN. Suspicious pattern detection: multiple rapid loans to same network cluster. SAR filing process aligned with FICA.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-26 USSD AI Credit Engine &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
+        <div>Owner: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
+        <div style="margin-top:8px;font-size:0.82em;">Integrations: MoMo API &middot; USSD Gateway &middot; Loan Management System &middot; SMS Gateway &middot; PagerDuty &nbsp;&middot;&nbsp; Compliance: NCR &middot; NCA &middot; POPIA &middot; FSCA &middot; CBN &middot; Bank of Ghana</div>
+    </footer>
+
+</div>
+</body>
+</html>

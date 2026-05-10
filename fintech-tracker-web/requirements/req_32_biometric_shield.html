@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-32 Invisible Behavioral Biometric Shield — Requirements &amp; Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-p1 { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        section.amber { border-left-color: #f59e0b; }
+        section.red { border-left-color: #dc2626; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
+        ul li { margin-bottom: 5px; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card.amber { border-left-color: #f59e0b; }
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #34d399; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card.amber .card-title { color: #f59e0b; }
+        .card.red .card-title { color: #f87171; }
+        .card.green .card-title { color: #34d399; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-card.indigo { border-top-color: #6366f1; }
+        .metric-card.violet { border-top-color: #7c3aed; }
+        .metric-card.amber { border-top-color: #f59e0b; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-card.indigo .metric-value { color: #818cf8; }
+        .metric-card.violet .metric-value { color: #a78bfa; }
+        .metric-card.amber .metric-value { color: #f59e0b; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .four-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
+        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
+        .us-ac li { margin-bottom: 3px; }
+        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
+        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
+        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
+        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
+        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
+        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
+        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 140px; }
+        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
+        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
+        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
+        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
+        .arch-layer:last-child .arch-layer-label { color: #64748b; }
+        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
+        .signal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin: 12px 0; }
+        .signal-pill { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; padding: 8px 10px; text-align: center; font-size: 0.8em; color: #a5b4fc; font-weight: 600; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
+        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
+        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
+        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
+        .priority-high { color: #f87171; font-weight: 700; }
+        .priority-med { color: #fbbf24; font-weight: 700; }
+        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
+
+<div class="container">
+
+    <header>
+        <div>
+            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 32</div>
+            <h1>Invisible Behavioral Biometric Shield</h1>
+            <div class="subtitle">Continuous passive authentication layer within the MoMo app that learns each user's unique behavioural fingerprint &mdash; swipe pressure, typing cadence, tap patterns, phone grip angle &mdash; detecting session takeover silently. Targets elimination of 60&ndash;70% of device-based fraud.</div>
+            <div>
+                <span class="badge badge-new">New &mdash; Gap Identified by Malcolm</span>
+                <span class="badge badge-not-started">Not Started &mdash; 0%</span>
+                <span class="badge badge-p1">Priority: P1</span>
+                <span class="badge badge-high">Complexity: High</span>
+            </div>
+            <div style="margin-top:10px;">
+                <span class="badge badge-compliance">POPIA</span>
+                <span class="badge badge-compliance">NDPR</span>
+                <span class="badge badge-compliance">Privacy by Design</span>
+                <span class="badge badge-teal">On-Device ML</span>
+                <span class="badge badge-teal">47 Signals</span>
+                <span class="badge badge-teal">Federated Learning</span>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-32</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P1</div></div>
+            <div class="meta-item"><div class="meta-label">Strategic Driver</div><div class="meta-value">Security &amp; Customer Trust</div></div>
+            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">60&ndash;70% device fraud eliminated</div></div>
+            <div class="meta-item"><div class="meta-label">Inference Latency</div><div class="meta-value">&lt;100ms on-device</div></div>
+            <div class="meta-item"><div class="meta-label">Behavioural Signals</div><div class="meta-value">47 passive signals</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering &middot; Document Author &amp; Use Case Owner</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <section>
+        <h2>1. Executive Summary &amp; Business Case</h2>
+        <p>Mobile money fraud in sub-Saharan Africa is dominated by account takeover and SIM swap attacks, where an attacker gains access to a victim's device or phone number and executes transactions before the customer can respond. Once a session is established and the attacker passes the PIN authentication screen, existing security controls are essentially blind. PIN authentication is a point-in-time check; it cannot detect if the person using the app after authentication is the legitimate account holder or an attacker who has taken control mid-session.</p>
+        <p>UC-32 introduces a fundamentally different security paradigm: <strong style="color:#818cf8;">continuous, invisible, passive authentication</strong> throughout the entire session. The on-device ML model learns each user's unique behavioural fingerprint from 47 distinct signals &mdash; the precise pressure of their swipe, their characteristic typing cadence between PIN digits, the angle at which they hold their phone, the rhythm of their tap-to-confirm patterns &mdash; and continuously scores the probability that the current user matches the enrolled profile. A session takeover by an attacker who does not share these behaviours is detected within 30&ndash;60 seconds, triggering a step-up authentication challenge.</p>
+        <p>The system is architecturally private-by-design: the behavioural model lives entirely on the user's device. Raw sensor data is never transmitted. Federated learning allows model improvements to be aggregated across users without raw data leaving any device. The user experiences zero friction until a risk threshold is breached. This combination of invisible protection and privacy-preserving architecture makes UC-32 a genuinely novel security capability that directly addresses the most damaging fraud vector in MTN's Mobile Money portfolio.</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">60&ndash;70%</div>
+                <div class="metric-label">Device-Based Fraud Elimination Target</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">47</div>
+                <div class="metric-label">Passive Behavioural Signals Monitored</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">&lt;100ms</div>
+                <div class="metric-label">On-Device Inference Latency</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">0</div>
+                <div class="metric-label">Raw Behavioural Data Leaving Device</div>
+            </div>
+        </div>
+
+        <div class="comparison-box" style="margin-top:20px;">
+            <div class="compare-card traditional">
+                <div class="compare-label">Current: PIN-Only Authentication</div>
+                <div class="compare-value">Point-in-Time</div>
+                <div class="compare-sub">Single auth check at login; blind to session takeover post-authentication; attacker with PIN has unlimited session access; SIM swap fully bypasses all controls</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">Behavioural Shield (UC-32)</div>
+                <div class="compare-value">Continuous</div>
+                <div class="compare-sub">Session-long behavioural monitoring; takeover detected in 30&ndash;60s; step-up challenge triggered silently; fully passive &mdash; zero friction for legitimate user; on-device privacy</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PROBLEM STATEMENT -->
+    <section class="violet">
+        <h2>2. Problem Statement</h2>
+
+        <div class="card violet">
+            <div class="card-title">Problem 1 &mdash; PIN Authentication Cannot Detect Session Takeover</div>
+            <div class="card-content">MTN MoMo's current authentication model is PIN-only at session initiation. Once a session is active, there is no ongoing verification that the authenticated user is still the person in control of the device. Account takeover fraud typically occurs mid-session: the attacker compels the victim to open the app and enter their PIN under social engineering pressure, then physically takes the device. From the system's perspective, this is an authenticated, legitimate session. The fraud is invisible to all existing controls.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 2 &mdash; SIM Swap Fraud Bypasses All Device Controls</div>
+            <div class="card-content">SIM swap fraud &mdash; where an attacker fraudulently transfers a victim's phone number to a new SIM &mdash; allows the attacker to receive all OTPs and authentication messages. In markets where OTP-based auth is used as a second factor, SIM swap entirely neutralises this control. South Africa alone reported over 2,400 SIM swap fraud incidents in 2025 targeting mobile money accounts. UC-32's behavioural biometrics detect the attacker's different behavioural fingerprint on a cloned session regardless of SIM ownership.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 3 &mdash; Friction-Based Security Drives Customer Abandonment</div>
+            <div class="card-content">Existing fraud countermeasures &mdash; transaction delays, secondary PIN prompts, OTP challenges on every transaction &mdash; create friction that drives customers away from the app and back to the less secure USSD channel or to competitor platforms with weaker but faster security. UC-32 resolves this dilemma: security is invisible to the legitimate user (no extra steps) and only triggers challenge authentication when the behavioural anomaly score exceeds a risk threshold, targeting zero false-positive impact on the legitimate user experience.</div>
+        </div>
+    </section>
+
+    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
+    <section class="teal">
+        <h2>3. Objectives &amp; Success Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">&gt;95%</div>
+                <div class="metric-label">Session Takeover Detection Rate</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">&lt;0.1%</div>
+                <div class="metric-label">False Positive Rate (legitimate users challenged)</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">&lt;60s</div>
+                <div class="metric-label">Mean Time to Detect Session Takeover</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">0 bytes</div>
+                <div class="metric-label">Raw Behavioural Data Transmitted</div>
+            </div>
+        </div>
+
+        <table style="margin-top:20px;">
+            <thead><tr><th>KPI</th><th>Baseline</th><th>6-Month Target</th><th>12-Month Target</th><th>Measurement</th></tr></thead>
+            <tbody>
+                <tr><td>Device-based fraud rate</td><td>Baseline TBD (fraud team)</td><td class="priority-high">&minus;40%</td><td class="priority-high">&minus;65%</td><td>Fraud team monthly report</td></tr>
+                <tr><td>Session takeover detection rate</td><td>~0% (not measured)</td><td class="priority-high">&gt;90%</td><td class="priority-high">&gt;95%</td><td>Red team / fraud investigation match</td></tr>
+                <tr><td>False positive rate</td><td>N/A</td><td class="priority-high">&lt;0.5%</td><td class="priority-high">&lt;0.1%</td><td>Step-up challenges that resolve correctly</td></tr>
+                <tr><td>Behavioural model enrolment rate</td><td>0</td><td class="priority-med">&gt;70% of active app users</td><td class="priority-high">&gt;90%</td><td>SDK telemetry (model active flag)</td></tr>
+                <tr><td>On-device inference latency P95</td><td>N/A</td><td class="priority-high">&lt;100ms</td><td class="priority-high">&lt;80ms</td><td>SDK performance metrics</td></tr>
+                <tr><td>Battery impact per session (&gt;5 min)</td><td>N/A</td><td class="priority-high">&lt;0.5%</td><td class="priority-high">&lt;0.3%</td><td>Battery profiling tests</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 4. USER STORIES -->
+    <section>
+        <h2>4. User Stories &amp; Acceptance Criteria</h2>
+
+        <div class="us-card">
+            <div class="us-id">US-32-01</div>
+            <div class="us-title">Silent Fraud Prevention — Session Takeover</div>
+            <div class="us-story">"As Grace, a MoMo app user who has been compelled to unlock my phone and hand it to an attacker, I want the app to detect that someone else is using it and block the transaction before money leaves my account, without me having to do anything."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Behavioural score drops below threshold within 60 seconds of a different person using the device</li>
+                <li>High-value transaction (above market-defined threshold) is blocked and step-up auth triggered</li>
+                <li>Step-up challenge is delivered silently as if normal app flow (no "fraud detected" message shown to attacker)</li>
+                <li>Legitimate user notified by push notification that a challenge was triggered</li>
+                <li>If challenge fails, session terminated and account temporarily locked</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-32-02</div>
+            <div class="us-title">Zero-Friction Legitimate User Experience</div>
+            <div class="us-story">"As a regular MoMo app user, I want to use the app exactly as I always have without any extra steps, prompts, or delays caused by the fraud protection layer, so that security does not create friction that makes me prefer the USSD channel."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>SDK data collection adds &lt;5ms to UI interaction latency</li>
+                <li>False positive rate &lt;0.1% (legitimate users should not see step-up challenge more than once per 1,000 sessions)</li>
+                <li>No visible security UI element during normal operation</li>
+                <li>App launch time not increased by more than 200ms by SDK initialisation</li>
+                <li>Battery drain attributable to SDK &lt;0.5% per 10-minute session</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-32-03</div>
+            <div class="us-title">Behavioural Model Enrolment</div>
+            <div class="us-story">"As a new MoMo app user, I want my behavioural profile to build passively over my first few sessions without me needing to do anything, so that I gain fraud protection automatically without a burdensome onboarding process."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Model enters active monitoring mode after 5 minutes of cumulative app interaction (across sessions)</li>
+                <li>No explicit enrolment action required from user</li>
+                <li>Model confidence score shown in security settings for technically curious users</li>
+                <li>User can opt out of behavioural monitoring in privacy settings at any time</li>
+                <li>Opting out immediately destroys all on-device behavioural model data</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-32-04</div>
+            <div class="us-title">Graceful Handling of Legitimate Behavioural Change</div>
+            <div class="us-story">"As a MoMo user who has injured my hand, I want the system to adapt to my changed interaction patterns within a few sessions rather than repeatedly challenging me, so that temporary behavioural changes don't create security friction for weeks."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Model updates continuously with each confirmed-legitimate session</li>
+                <li>After 3 successful step-up challenges in 7 days, model sensitivity is temporarily reduced and retraining prioritised</li>
+                <li>Retraining convergence to new behavioural baseline within 5&ndash;10 sessions</li>
+                <li>User can manually trigger model reset via security settings to accelerate re-enrolment</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-32-05</div>
+            <div class="us-title">Privacy-Preserving Architecture — Compliance Officer</div>
+            <div class="us-story">"As a Group Data Protection Officer, I want to confirm that no raw behavioural data leaves the user's device, so that UC-32 can be deployed across all markets without triggering cross-border data transfer restrictions under POPIA and NDPR."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Architecture review confirms raw sensor data (touch coordinates, pressure, accelerometer) never transmitted to any server</li>
+                <li>Only model weight gradients (anonymised) transmitted for federated learning aggregation</li>
+                <li>Differential privacy guarantees applied to federated gradients (&epsilon; &le; 5)</li>
+                <li>Third-party security audit confirms no data leakage via SDK</li>
+                <li>POPIA data minimisation documentation produced for Group DPO sign-off</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-32-06</div>
+            <div class="us-title">Risk Threshold Configuration — Security Operations</div>
+            <div class="us-story">"As a Security Operations analyst, I want to configure the behavioural anomaly threshold per market and transaction type, so that I can tune the sensitivity to match local fraud patterns without redeploying the SDK."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Risk threshold configurable per: market, transaction type, transaction amount band</li>
+                <li>Threshold changes take effect in SDK within 24 hours via remote config (no app store update)</li>
+                <li>Real-time dashboard shows: anomaly score distribution, step-up rate, fraud catch rate by threshold</li>
+                <li>A/B threshold testing supported with cohort assignment via server-side flag</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 5. FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>5. Functional Requirements</h2>
+
+        <h3>5.1 The 47 Behavioural Signals</h3>
+        <div class="signal-grid">
+            <div class="signal-pill">Swipe Velocity</div>
+            <div class="signal-pill">Swipe Pressure</div>
+            <div class="signal-pill">Swipe Length</div>
+            <div class="signal-pill">Swipe Curvature</div>
+            <div class="signal-pill">Swipe Start X/Y</div>
+            <div class="signal-pill">Tap Duration</div>
+            <div class="signal-pill">Tap Pressure</div>
+            <div class="signal-pill">Tap Size (touch area)</div>
+            <div class="signal-pill">Tap Frequency</div>
+            <div class="signal-pill">Tap Location Bias</div>
+            <div class="signal-pill">Keystroke Dwell Time</div>
+            <div class="signal-pill">Keystroke Flight Time</div>
+            <div class="signal-pill">PIN Digit Cadence</div>
+            <div class="signal-pill">Typing Error Rate</div>
+            <div class="signal-pill">Backspace Frequency</div>
+            <div class="signal-pill">Scroll Velocity</div>
+            <div class="signal-pill">Scroll Acceleration</div>
+            <div class="signal-pill">Scroll Direction Bias</div>
+            <div class="signal-pill">Phone Grip Angle (pitch)</div>
+            <div class="signal-pill">Phone Grip Angle (roll)</div>
+            <div class="signal-pill">Phone Hold Steadiness</div>
+            <div class="signal-pill">Accelerometer Pattern</div>
+            <div class="signal-pill">Gyroscope Pattern</div>
+            <div class="signal-pill">Session Navigation Pattern</div>
+            <div class="signal-pill">Screen Time per View</div>
+            <div class="signal-pill">Feature Visit Sequence</div>
+            <div class="signal-pill">Amount Entry Pattern</div>
+            <div class="signal-pill">Confirm Button Hesitation</div>
+            <div class="signal-pill">Task Completion Speed</div>
+            <div class="signal-pill">Zoom Gesture Pattern</div>
+            <div class="signal-pill">Multi-touch Characteristics</div>
+        </div>
+
+        <h3>5.2 On-Device SDK Requirements</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-01</code></td><td>The behavioural biometric SDK SHALL collect all 47 defined signals passively during normal app interaction with &lt;5ms added latency to UI events.</td><td><span class="tag tag-must">MUST</span></td><td>Native iOS (Swift) and Android (Kotlin) SDK</td></tr>
+                <tr><td><code>FR-02</code></td><td>All ML inference SHALL execute on-device (CoreML on iOS, TensorFlow Lite on Android) with P95 latency &lt;100ms and no network dependency.</td><td><span class="tag tag-must">MUST</span></td><td>Privacy by design — no server inference</td></tr>
+                <tr><td><code>FR-03</code></td><td>Raw sensor data SHALL never leave the device. Only anonymised model gradient updates (federated learning) may be transmitted, protected by differential privacy (&epsilon; &le; 5).</td><td><span class="tag tag-must">MUST</span></td><td>POPIA/NDPR data minimisation</td></tr>
+                <tr><td><code>FR-04</code></td><td>The on-device model SHALL enter active monitoring mode after 5 cumulative minutes of interaction, with progressive confidence scoring during enrolment phase.</td><td><span class="tag tag-must">MUST</span></td><td>No explicit user enrolment action required</td></tr>
+                <tr><td><code>FR-05</code></td><td>SDK battery consumption SHALL not exceed 0.5% per 10-minute session on a mid-range Android device (tested on Samsung Galaxy A22).</td><td><span class="tag tag-must">MUST</span></td><td>Africa-relevant device constraint</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.3 Risk Scoring &amp; Step-Up Authentication</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-06</code></td><td>The anomaly scoring engine SHALL produce a continuous risk score (0.0&ndash;1.0) updated every 5 seconds during active session. Score &gt; configurable threshold (default 0.80) triggers step-up authentication.</td><td><span class="tag tag-must">MUST</span></td><td>Threshold configurable per market/transaction type</td></tr>
+                <tr><td><code>FR-07</code></td><td>Step-up authentication SHALL be triggered silently without displaying any fraud-related message to the potential attacker. The challenge shall appear as a routine "confirm your identity" prompt.</td><td><span class="tag tag-must">MUST</span></td><td>Anti-evasion design</td></tr>
+                <tr><td><code>FR-08</code></td><td>High-risk transactions (above market-specific amount threshold) SHALL be blocked for step-up authentication when anomaly score &gt; 0.70, regardless of session duration.</td><td><span class="tag tag-must">MUST</span></td><td>Transaction-value-based sensitivity</td></tr>
+                <tr><td><code>FR-09</code></td><td>Failed step-up authentication (3 consecutive failures) SHALL terminate the session, temporarily lock the account, and notify the legitimate user's registered email and USSD fallback number.</td><td><span class="tag tag-must">MUST</span></td><td>Security response protocol</td></tr>
+                <tr><td><code>FR-10</code></td><td>The step-up challenge SHALL integrate with UC-32 biometric options AND existing PIN/OTP auth, allowing the user to choose their preferred method.</td><td><span class="tag tag-should">SHOULD</span></td><td>Accessibility requirement</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.4 Federated Learning &amp; Model Improvement</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-11</code></td><td>The federated learning system SHALL aggregate model gradient updates from opted-in devices to improve the global base model, without any individual device's raw data leaving the device.</td><td><span class="tag tag-must">MUST</span></td><td>TensorFlow Federated or equivalent</td></tr>
+                <tr><td><code>FR-12</code></td><td>Federated updates SHALL be protected by differential privacy guarantees (&epsilon; &le; 5, &delta; &le; 10<sup>-5</sup>) to prevent reconstruction of individual behavioural patterns from aggregated gradients.</td><td><span class="tag tag-must">MUST</span></td><td>Mathematical privacy guarantee</td></tr>
+                <tr><td><code>FR-13</code></td><td>User opt-out of federated learning SHALL not affect the quality of their personal on-device model or their fraud protection coverage.</td><td><span class="tag tag-must">MUST</span></td><td>Opt-out must not penalise user</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 6. TECHNICAL ARCHITECTURE -->
+    <section class="violet">
+        <h2>6. Technical Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <div class="arch-layer-label">Device Layer</div>
+                <div class="arch-layer-content">iOS Swift SDK + Android Kotlin SDK &rarr; 47-signal sensor collector (touch, motion, keypress) &rarr; Feature extractor &rarr; On-device ML model (CoreML / TFLite) &rarr; Anomaly score engine &rarr; Step-up trigger</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">App Integration</div>
+                <div class="arch-layer-content">MoMo App SDK integration hooks &rarr; Session lifecycle events &rarr; Transaction intercept for high-value step-up &rarr; Step-up UI component &rarr; Account lock trigger API</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Server (No Raw Data)</div>
+                <div class="arch-layer-content">Federated Learning Aggregation Server &rarr; Differential privacy gradient processing &rarr; Global base model update &rarr; Remote config service (threshold management) &rarr; Fraud alert event bus</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Security Operations</div>
+                <div class="arch-layer-content">SOC Dashboard: anomaly score distribution, step-up rate, fraud catch rate &rarr; Threshold configuration portal &rarr; A/B test framework &rarr; Integration with UC-16 PayGuard fraud event correlation</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Privacy &amp; Compliance</div>
+                <div class="arch-layer-content">On-device data isolation (encrypted enclave) &rarr; Zero raw data egress &rarr; Opt-out / model deletion &rarr; POPIA consent record &rarr; Privacy audit trail for Group DPO</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. DATA & AI MODEL -->
+    <section>
+        <h2>7. Data &amp; AI Model Requirements</h2>
+
+        <div class="card">
+            <div class="card-title">On-Device Personal Model Architecture</div>
+            <div class="card-content">Lightweight autoencoder (encoder: 47 signals &rarr; 16-dim embedding; decoder: 16-dim &rarr; 47 signals). Reconstruction error used as anomaly score. Model size target: &lt;5MB for iOS CoreML / TFLite. Enrolment: 5 minutes cumulative interaction. Continuous incremental update on confirmed legitimate sessions using federated learning local round. Quantised to INT8 for inference efficiency.</div>
+        </div>
+        <div class="card teal">
+            <div class="card-title">Global Base Model (Federated)</div>
+            <div class="card-content">Federated average of local model weights from opted-in devices, updated weekly. Provides starting point for new users to reduce cold-start time from 5 minutes to approximately 2 minutes. Protected by differential privacy (Gaussian mechanism). Separate market-level base models to account for regional device type and interaction pattern differences.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Signal Weighting</div>
+            <div class="card-content">Not all 47 signals are equally discriminative across all users and devices. The model learns per-user signal weights during enrolment. Signals with low discriminative power for a given user (e.g., pressure on devices without pressure sensors) are automatically down-weighted. This ensures the model remains robust across the diverse Android device ecosystem prevalent in MTN markets.</div>
+        </div>
+    </section>
+
+    <!-- 8. COMPLIANCE -->
+    <section class="amber">
+        <h2>8. Compliance &amp; Regulatory</h2>
+
+        <div class="card amber">
+            <div class="card-title">POPIA — Behavioural Data as Personal Information</div>
+            <div class="card-content">Behavioural interaction data (touch patterns, typing cadence) constitutes "personal information" under POPIA as it relates to and is collected from an identifiable natural person. The privacy-by-design architecture (on-device processing, no raw data egress) significantly reduces but does not eliminate POPIA obligations. Consent is required for: (1) collection and processing of behavioural data for authentication purposes; (2) federated learning gradient sharing. Consent must be explicit, informed, and withdrawable. The on-device nature enables a compelling data minimisation argument to regulators.</div>
+        </div>
+        <div class="card amber">
+            <div class="card-title">POPIA Section 72 — Information Officer Obligations</div>
+            <div class="card-content">MTN's Information Officer must include the behavioural biometric system in the PAIA/POPIA manual and record of processing activities. The system must be assessed in a DPIA given the automated profiling of all active MoMo app users. The DPIA must document: the categories of data processed, on-device processing architecture, retention periods (effectively zero on server side), and the step-up authentication decision logic.</div>
+        </div>
+        <div class="card amber">
+            <div class="card-title">NDPR — Nigeria Biometric Processing</div>
+            <div class="card-content">NDPR classifies behavioural patterns used for identification as sensitive personal data requiring explicit consent. The behavioural biometric framework must be registered with NITDA before deployment in Nigeria. The NDPR audit trail requirement means that even on-device processing events (step-up triggers, authentication outcomes) must be logged in a format accessible for regulatory inspection.</div>
+        </div>
+
+        <h3>Privacy-by-Design Compliance Matrix</h3>
+        <table>
+            <thead><tr><th>Principle</th><th>Implementation</th><th>Evidence</th></tr></thead>
+            <tbody>
+                <tr><td>Data Minimisation</td><td>Raw sensor data processed on-device, never transmitted</td><td>Network traffic analysis shows zero raw data egress</td></tr>
+                <tr><td>Purpose Limitation</td><td>Behavioural data used only for authentication, not profiling or marketing</td><td>SDK code review confirms sole use for anomaly scoring</td></tr>
+                <tr><td>Storage Limitation</td><td>Model data stored only on user's device; deleted on opt-out</td><td>Server-side data inventory shows no user behavioural records</td></tr>
+                <tr><td>Integrity &amp; Confidentiality</td><td>On-device model stored in encrypted enclave (iOS Secure Enclave / Android Keystore)</td><td>Cryptographic attestation of storage location</td></tr>
+                <tr><td>Transparency</td><td>Privacy settings page explains behavioural monitoring; opt-out visible</td><td>UX review and privacy notice audit</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 9. SPRINT PLAN -->
+    <section class="teal">
+        <h2>9. Sprint Plan &amp; Roadmap</h2>
+
+        <h3>Sprint 1 (Weeks 1&ndash;3): SDK Foundation &amp; Signal Collection</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 1 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>iOS Swift SDK: 47-signal collector (UITouch, CMMotionManager, UIKeyInput events), feature extractor, local storage (encrypted)</li>
+                    <li>Android Kotlin SDK: 47-signal collector (MotionEvent, SensorManager, InputMethodManager), feature extractor, local storage (Android Keystore)</li>
+                    <li>CoreML and TFLite autoencoder model: architecture design, training on synthetic behavioural dataset, quantisation</li>
+                    <li>MoMo app SDK integration hooks: session start/end events, transaction intercept API</li>
+                    <li>POPIA consent capture: opt-out mechanism in privacy settings with immediate model destruction</li>
+                    <li>Battery and latency benchmarking on Samsung Galaxy A22 (Africa target device)</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Sprint 2 (Weeks 4&ndash;6): Anomaly Scoring, Step-Up &amp; Federated Learning</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 2 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>Anomaly scoring engine: continuous score (0&ndash;1), 5-second update cycle, threshold comparison</li>
+                    <li>Step-up authentication integration: silent trigger, challenge UI, PIN/biometric options</li>
+                    <li>Account lock mechanism: 3-failure lockout, push notification to legitimate user, USSD unlock fallback</li>
+                    <li>Federated learning infrastructure: gradient aggregation server, differential privacy (Gaussian mechanism, &epsilon;=5), weekly round scheduling</li>
+                    <li>Remote config service: per-market threshold management, A/B test flag support</li>
+                    <li>SOC dashboard v1: anomaly score distribution, step-up rate, per-market breakdown</li>
+                    <li>UC-16 PayGuard integration: step-up trigger events forwarded to fraud event bus</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Sprint 3 (Weeks 7&ndash;9): Pilot, Red Team &amp; Privacy Audit</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 3 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>Pilot deployment: MTN South Africa, Nigeria (50,000 user cohort per market, opt-in)</li>
+                    <li>Red team exercise: session takeover attack simulation, SIM swap attack simulation, replay attack</li>
+                    <li>False positive rate measurement over 30-day pilot period</li>
+                    <li>DPIA completed and filed with Group DPO; NITDA notification for Nigeria</li>
+                    <li>Third-party SDK security audit (no data leakage validation)</li>
+                    <li>Model enrolment quality metrics: median time to confident model, signal coverage by device type</li>
+                    <li>User experience research: friction measurement, step-up complaint rate</li>
+                    <li>Full market rollout plan with per-market threshold recommendations</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. RISK REGISTER -->
+    <section class="red">
+        <h2>10. Risk Register</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+            <tbody>
+                <tr><td><code>R-01</code></td><td>High false positive rate disrupts legitimate user experience and drives app abandonment</td><td class="priority-high">Medium-High</td><td class="priority-high">Very High</td><td>Conservative default threshold (0.80). Graduated response: score 0.70&ndash;0.80 only blocks high-value transactions; &gt;0.80 triggers full step-up. Threshold tuned down during pilot until false positive rate &lt;0.1% confirmed. User-facing appeal mechanism for locked accounts.</td></tr>
+                <tr><td><code>R-02</code></td><td>Android device fragmentation: sensor APIs unavailable or inconsistent on budget devices prevalent in MTN markets</td><td class="priority-high">High</td><td class="priority-med">Medium</td><td>Device capability detection at SDK init. Gracefully degrade to available signals (minimum 15 signals for active monitoring). Signal weight learning auto-compensates for absent sensors. Test on top-20 Android device models by market volume.</td></tr>
+                <tr><td><code>R-03</code></td><td>Federated learning gradient inversion attack reveals individual user behavioural patterns</td><td class="priority-med">Low</td><td class="priority-high">Very High</td><td>Differential privacy mandatory (&epsilon;&le;5). Gradient clipping before transmission. Secure aggregation protocol (SecAgg) ensures server never sees individual gradients. Annual cryptographic audit of federated learning implementation.</td></tr>
+                <tr><td><code>R-04</code></td><td>Regulatory classification of behavioural patterns as "biometric data" requiring highest-tier consent in some markets</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>Legal review in each market before launch. On-device architecture is strongest possible argument for data minimisation. Opt-in consent model (not opt-out) in markets where classification risk is high.</td></tr>
+                <tr><td><code>R-05</code></td><td>Adversarial mimicry: sophisticated attacker studies target's phone usage to mimic behavioural patterns</td><td class="priority-med">Very Low</td><td class="priority-high">High</td><td>47-signal fingerprint makes mimicry practically infeasible. Model includes time-variant features that cannot be studied by observation. Step-up challenge adds second factor even if primary model is defeated. High-value transactions require step-up regardless of score.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-32 Invisible Behavioral Biometric Shield &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
+        <div>Document Author: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
+        <div style="margin-top:8px;font-size:0.82em;">Integrations: UC-16 PayGuard &nbsp;&middot;&nbsp; MoMo App SDK &nbsp;&middot;&nbsp; Federated Learning Server &nbsp;&middot;&nbsp; Compliance: POPIA &middot; NDPR &middot; Privacy by Design &middot; Differential Privacy</div>
+    </footer>
+
+</div>
+</body>
+</html>

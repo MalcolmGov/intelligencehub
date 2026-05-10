@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-18 ARIA Voice Support Agent — Requirements &amp; Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
+        .badge-in-progress { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid #312e81; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        section.amber { border-left-color: #f59e0b; }
+        section.red { border-left-color: #dc2626; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
+        ul li { margin-bottom: 5px; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card.amber { border-left-color: #f59e0b; }
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #34d399; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card.amber .card-title { color: #f59e0b; }
+        .card.red .card-title { color: #f87171; }
+        .card.green .card-title { color: #34d399; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-card.indigo { border-top-color: #6366f1; }
+        .metric-card.violet { border-top-color: #7c3aed; }
+        .metric-card.amber { border-top-color: #f59e0b; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-card.indigo .metric-value { color: #818cf8; }
+        .metric-card.violet .metric-value { color: #a78bfa; }
+        .metric-card.amber .metric-value { color: #f59e0b; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .four-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
+        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
+        .us-ac li { margin-bottom: 3px; }
+        .flow-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; margin-top: 14px; }
+        .flow-title { font-size: 0.9em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+        .flow-step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+        .flow-num { width: 26px; height: 26px; min-width: 26px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: 700; color: #fff; line-height: 26px; text-align: center; }
+        .flow-text { font-size: 0.88em; color: #cbd5e1; line-height: 1.5; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
+        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
+        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
+        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
+        .priority-high { color: #f87171; font-weight: 700; }
+        .priority-med { color: #fbbf24; font-weight: 700; }
+        .lang-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 12px 0; }
+        .lang-card { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px; text-align: center; }
+        .lang-flag { font-size: 1.6em; margin-bottom: 4px; }
+        .lang-name { font-size: 0.82em; font-weight: 700; color: #818cf8; }
+        .lang-market { font-size: 0.72em; color: #64748b; margin-top: 2px; }
+        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
+        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
+        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
+        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
+        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
+        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
+        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 120px; }
+        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
+        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
+        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
+        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
+        .arch-layer:last-child .arch-layer-label { color: #64748b; }
+        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
+        .market-pill { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; padding: 8px 10px; text-align: center; font-size: 0.8em; color: #a5b4fc; font-weight: 600; }
+        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+        .sprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+        .sprint-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .sprint-label { font-size: 0.78em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6366f1; margin-bottom: 6px; }
+        .sprint-title { font-size: 1.05em; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
+        .sprint-item { font-size: 0.88em; color: #94a3b8; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <div>
+            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 18</div>
+            <h1>ARIA &mdash; AI Voice Support Agent</h1>
+            <div class="subtitle">Voice-first AI L1 support agent for South African fintech and banking staff and customers &mdash; handling IT support, banking product queries, P1&ndash;P4 incident triage, and regulatory/compliance queries via ElevenLabs voice cloning and Twilio integration over a RAG-powered banking knowledge base</div>
+            <div>
+                <span class="badge badge-in-progress">In Progress &mdash; 94% Complete</span>
+                <span class="badge badge-high">Priority: P2</span>
+                <span class="badge badge-high">Tier: High</span>
+                <span class="badge badge-new">Driver: Cost Reduction</span>
+            </div>
+            <div style="margin-top:10px;">
+                <span class="badge badge-compliance">POPIA</span>
+                <span class="badge badge-compliance">FSCA</span>
+                <span class="badge badge-compliance">FICA</span>
+                <span class="badge badge-teal">5 Languages</span>
+                <span class="badge badge-teal">P1&ndash;P4 Triage</span>
+                <span class="badge badge-teal">ElevenLabs</span>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-18</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">In Progress 94%</div></div>
+            <div class="meta-item"><div class="meta-label">Owner</div><div class="meta-value">Artemij Demidczyk</div></div>
+            <div class="meta-item"><div class="meta-label">Assignee</div><div class="meta-value">Malcolm Govender</div></div>
+            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">$400k&ndash;$800k/yr</div></div>
+            <div class="meta-item"><div class="meta-label">Channel</div><div class="meta-value">Voice / IVR / API</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender &mdash; Assignee &amp; Document Author</div>
+                <div class="owner-role">Head of AI &amp; Engineering &nbsp;&middot;&nbsp; Owner: Artemij Demidczyk</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <section>
+        <h2>1. Executive Summary &amp; Business Case</h2>
+        <p>MTN Group Fintech and its banking partners field tens of thousands of inbound support calls per month across South Africa alone. The L1 support function &mdash; handling password resets, account status queries, basic product information, and P3/P4 incident triage &mdash; accounts for an estimated 65% of total contact-centre volume. At an average handling time of 7.2 minutes and a fully-loaded agent cost of R420/hour, the annual L1 support cost across fintech and banking products exceeds R18 million in South Africa before considering attrition, training and quality assurance overhead.</p>
+        <p>ARIA (AI Response &amp; Intelligence Agent) is a voice-first AI L1 support agent designed to resolve the majority of these interactions autonomously, with natural, human-quality voice output synthesised by ElevenLabs voice cloning technology. The system answers inbound calls via a Twilio integration, identifies the caller, determines their intent, retrieves answers from a RAG-powered banking and IT knowledge base, resolves L1 queries end-to-end, and escalates only genuine L2/L3 issues to human agents &mdash; with full context passed in the handoff.</p>
+        <p>At 94% completion, ARIA is in the final stages of production deployment. The remaining work centres on sourcing African English and French voice recordings for voice cloning, and executing the ElevenLabs production deployment pipeline. The projected saving of <strong style="color:#818cf8;">$400k&ndash;$800k per year</strong> is derived from a 60% L1 deflection rate applied to current contact-centre volumes, with a conservative 40% cost-per-call reduction accounting for human-agent supervision of edge cases.</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">60%</div>
+                <div class="metric-label">Projected L1 Call Deflection</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">$800k</div>
+                <div class="metric-label">Maximum Annual Saving</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">94%</div>
+                <div class="metric-label">Implementation Complete</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">&lt;4s</div>
+                <div class="metric-label">Target Voice Response Latency</div>
+            </div>
+        </div>
+
+        <div class="comparison-box" style="margin-top:20px;">
+            <div class="compare-card traditional">
+                <div class="compare-label">Traditional L1 Human Agent</div>
+                <div class="compare-value">R420/hr</div>
+                <div class="compare-sub">7.2 min avg handling time, 65% of volume is L1-resolvable, high attrition, inconsistent quality, no 24/7 coverage without premium cost</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">ARIA AI Voice Agent (UC-18)</div>
+                <div class="compare-value">R12/call</div>
+                <div class="compare-sub">Sub-4s voice response, 24/7/365, consistent quality, multilingual, full context passed on escalation, scales to any call volume instantly</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PROBLEM STATEMENT -->
+    <section class="violet">
+        <h2>2. Problem Statement</h2>
+        <p>Three compounding problems drive the business case for ARIA:</p>
+
+        <div class="card violet">
+            <div class="card-title">Problem 1 &mdash; L1 Support Costs Are Unsustainable at Scale</div>
+            <div class="card-content">As MTN Fintech expands its banking product suite and customer base, L1 support volumes grow linearly with customer acquisition. Human agent headcount cannot scale economically. Call centre attrition in South Africa averages 35% annually, creating perpetual training cycles. The unit economics of human L1 support break the business case for financial inclusion products targeting lower-income segments where ARPU is low.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 2 &mdash; Existing IVR Systems Are Rigid and Frustrating</div>
+            <div class="card-content">Current IVR systems present pre-recorded menu trees that cannot understand natural language, cannot look up customer-specific information in real time, and cannot resolve queries end-to-end. Customers are routed to human agents for queries that are entirely resolvable from structured knowledge bases. The IVR-to-agent transfer rate is 78%, meaning the IVR is functioning as a delay mechanism rather than a resolution channel.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 3 &mdash; P1/P2 Incident Triage Is Slow Without Intelligent Routing</div>
+            <div class="card-content">When critical incidents occur (P1/P2), the absence of intelligent triage means high-severity reports are mixed with low-priority queries in the same queue. Mean time to acknowledge (MTTA) for P1 incidents averages 18 minutes due to queue saturation. ARIA classifies incident severity in real time during the call, immediately escalating P1/P2 calls to the on-call engineer with structured context, targeting MTTA under 3 minutes.</div>
+        </div>
+    </section>
+
+    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
+    <section class="teal">
+        <h2>3. Objectives &amp; Success Metrics</h2>
+        <div class="two-col">
+            <div>
+                <h3>Primary Objectives</h3>
+                <div class="card teal">
+                    <div class="card-title">OBJ-01 L1 Call Deflection</div>
+                    <div class="card-content">Resolve &ge;60% of inbound L1 support calls autonomously without human agent involvement, within 12 months of production deployment.</div>
+                </div>
+                <div class="card teal">
+                    <div class="card-title">OBJ-02 P1/P2 Incident MTTA</div>
+                    <div class="card-content">Reduce mean time to acknowledge for P1 incidents from 18 minutes to under 3 minutes via intelligent real-time triage and escalation.</div>
+                </div>
+                <div class="card teal">
+                    <div class="card-title">OBJ-03 Multilingual Voice Support</div>
+                    <div class="card-content">Deliver natural, human-quality voice support in SA English, Zulu, Xhosa, Afrikaans, and French with cloned South African voices.</div>
+                </div>
+                <div class="card teal">
+                    <div class="card-title">OBJ-04 POPIA-Compliant Processing</div>
+                    <div class="card-content">All voice data, transcripts, and personal information processed in compliance with POPIA, FSCA, and FICA requirements with full audit trail.</div>
+                </div>
+            </div>
+            <div>
+                <h3>Success Metrics</h3>
+                <table>
+                    <thead><tr><th>Metric</th><th>Target</th><th>Timeline</th></tr></thead>
+                    <tbody>
+                        <tr><td>L1 Deflection Rate</td><td class="priority-high">&ge;60%</td><td>Month 6</td></tr>
+                        <tr><td>P1 MTTA</td><td class="priority-high">&lt;3 min</td><td>Month 3</td></tr>
+                        <tr><td>Voice Response Latency P95</td><td class="priority-high">&lt;4s</td><td>Launch</td></tr>
+                        <tr><td>CSAT Score (AI calls)</td><td class="priority-med">&ge;4.2/5</td><td>Month 6</td></tr>
+                        <tr><td>Escalation Accuracy</td><td class="priority-high">&ge;95%</td><td>Month 3</td></tr>
+                        <tr><td>Annual Cost Saving</td><td class="priority-high">$400k+</td><td>Month 12</td></tr>
+                        <tr><td>Language Detection Accuracy</td><td class="priority-high">&ge;97%</td><td>Launch</td></tr>
+                        <tr><td>Knowledge Base Hit Rate</td><td class="priority-med">&ge;85%</td><td>Month 6</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. USER STORIES -->
+    <section>
+        <h2>4. User Stories</h2>
+        <div class="two-col">
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-01 &middot; Password Reset</div>
+                    <div class="us-title">Self-Service Password / PIN Reset via Voice</div>
+                    <div class="us-story">"As a MTN banking customer, I want to reset my internet banking password over the phone without waiting for a human agent."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>ARIA identifies caller by MSISDN and account verification</li>
+                        <li>Password reset OTP flow completed end-to-end without agent</li>
+                        <li>Confirmation SMS sent to registered number after reset</li>
+                        <li>Full call transcript logged with PII masked for compliance</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-02 &middot; P1 Incident Triage</div>
+                    <div class="us-title">Critical Incident Escalated Immediately</div>
+                    <div class="us-story">"As an IT engineer, I want ARIA to classify my incident report as P1 and immediately connect me to the on-call team with my context pre-loaded."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>ARIA classifies incident as P1 within first 60 seconds of call</li>
+                        <li>On-call engineer notified via PagerDuty within 90 seconds</li>
+                        <li>Structured incident summary passed in escalation payload</li>
+                        <li>Caller connected to on-call engineer or bridge within 3 minutes total</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-03 &middot; Zulu Language Support</div>
+                    <div class="us-title">Native Zulu Voice Interaction</div>
+                    <div class="us-story">"As a Zulu-speaking MTN customer, I want to speak to ARIA in Zulu and receive natural voice responses in Zulu."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Language detected as Zulu with &ge;97% accuracy within 5 seconds</li>
+                        <li>Voice response in cloned Zulu-accented voice</li>
+                        <li>Banking knowledge base queried in Zulu context</li>
+                        <li>Escalation handoff to Zulu-speaking agent if needed</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-04 &middot; Product Query Resolution</div>
+                    <div class="us-title">Banking Product Information via RAG</div>
+                    <div class="us-story">"As a customer enquiring about home loan rates, I want ARIA to retrieve current rate information accurately without hallucinating."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>RAG retrieves relevant document chunk with source citation</li>
+                        <li>ARIA quotes current rate accurately from knowledge base</li>
+                        <li>Response generated in under 4 seconds end-to-end</li>
+                        <li>Offer to send information via SMS at end of interaction</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-05 &middot; Compliance Query</div>
+                    <div class="us-title">FICA / Regulatory Document Query</div>
+                    <div class="us-story">"As a compliance officer, I want to ask ARIA about FICA requirements for a specific product and get a sourced answer."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Compliance KB includes FICA, POPIA, and FSCA documents</li>
+                        <li>RAG retrieves correct regulatory passage with section reference</li>
+                        <li>ARIA states the source document and section clearly</li>
+                        <li>Option to escalate to human compliance officer if uncertain</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-06 &middot; Graceful Escalation</div>
+                    <div class="us-title">L2 Escalation with Full Context Transfer</div>
+                    <div class="us-story">"As a human agent receiving an escalated call, I want to see a structured summary of what ARIA discussed so I don't repeat the customer's journey."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Escalation payload includes: caller ID, intent, conversation summary, KB articles referenced, sentiment score</li>
+                        <li>Agent screen-pop populated before call connects</li>
+                        <li>Call recording and transcript available in CRM immediately</li>
+                        <li>Customer not asked to repeat information already given to ARIA</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-07 &middot; POPIA Consent</div>
+                    <div class="us-title">Voice Recording Consent at Call Start</div>
+                    <div class="us-story">"As a customer, I want to be told that my call may be recorded and processed by AI before any personal data is collected."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>POPIA consent notice delivered within first 10 seconds of call</li>
+                        <li>Customer can opt out of AI processing and route to human agent</li>
+                        <li>Consent response (yes/no) recorded with timestamp in audit log</li>
+                        <li>No personal data processed before consent obtained</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-08 &middot; After-Hours Support</div>
+                    <div class="us-title">24/7 L1 Resolution Outside Business Hours</div>
+                    <div class="us-story">"As a customer with a banking issue at 2am, I want to resolve my query without waiting until 8am when human agents are available."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>ARIA operates 24/7/365 without scheduled downtime</li>
+                        <li>L1 resolvable queries (balance, statement, PIN reset) available at any hour</li>
+                        <li>P1/P2 escalations routed to on-call engineer regardless of hour</li>
+                        <li>L2/L3 non-urgent queries create ticket for next business day</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>5. Functional Requirements</h2>
+
+        <h3>5.1 Voice Synthesis &amp; Language Support</h3>
+        <div class="lang-grid">
+            <div class="lang-card"><div class="lang-flag">&#127988;</div><div class="lang-name">SA English</div><div class="lang-market">Primary</div></div>
+            <div class="lang-card"><div class="lang-flag">&#127487;&#127462;</div><div class="lang-name">Zulu</div><div class="lang-market">South Africa</div></div>
+            <div class="lang-card"><div class="lang-flag">&#127487;&#127462;</div><div class="lang-name">Xhosa</div><div class="lang-market">South Africa</div></div>
+            <div class="lang-card"><div class="lang-flag">&#127487;&#127462;</div><div class="lang-name">Afrikaans</div><div class="lang-market">South Africa</div></div>
+            <div class="lang-card"><div class="lang-flag">&#127467;&#127479;</div><div class="lang-name">French</div><div class="lang-market">Francophone</div></div>
+        </div>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-01</code></td><td>The system SHALL use ElevenLabs voice cloning to synthesise natural-sounding voice output in SA English, Zulu, Xhosa, Afrikaans, and French, using cloned South African voice profiles.</td><td><span class="tag tag-must">MUST</span></td><td>Voice recordings required per language</td></tr>
+                <tr><td><code>FR-02</code></td><td>The system SHALL auto-detect the caller's language from the first 5&ndash;10 seconds of speech using a multilingual speech recognition model and switch voice and response language accordingly.</td><td><span class="tag tag-must">MUST</span></td><td>Language switch persists for session</td></tr>
+                <tr><td><code>FR-03</code></td><td>ElevenLabs TTS latency from text input to audio output SHALL be &lt;1.5 seconds P95 to meet the overall 4-second end-to-end response target.</td><td><span class="tag tag-must">MUST</span></td><td>Streaming TTS preferred</td></tr>
+                <tr><td><code>FR-04</code></td><td>The system SHALL support voice recordings sourced from at least 2 native speakers per language for the ElevenLabs cloning pipeline to ensure naturalness and reduce accent bias.</td><td><span class="tag tag-should">SHOULD</span></td><td>Next step: source recordings</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.2 Twilio Integration &amp; Call Handling</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-05</code></td><td>The system SHALL integrate with Twilio Programmable Voice to receive inbound calls, manage call state, and handle DTMF and speech input within a single Twilio application SID per OpCo.</td><td><span class="tag tag-must">MUST</span></td><td>Twilio Flex for agent handoff</td></tr>
+                <tr><td><code>FR-06</code></td><td>The system SHALL support warm transfer to a human agent via Twilio Flex, passing a structured context payload (caller ID, intent classification, conversation summary, sentiment score) to the agent desktop before the call connects.</td><td><span class="tag tag-must">MUST</span></td><td>Screen-pop integration</td></tr>
+                <tr><td><code>FR-07</code></td><td>Call recordings SHALL be stored encrypted at rest in a South Africa-resident cloud storage bucket, accessible only via authenticated audit requests for a minimum of 5 years per FICA requirements.</td><td><span class="tag tag-must">MUST</span></td><td>FICA 5-year retention</td></tr>
+                <tr><td><code>FR-08</code></td><td>The system SHALL provide a fallback DTMF menu when speech recognition fails after 2 consecutive retries, ensuring no caller is left without a resolution path.</td><td><span class="tag tag-must">MUST</span></td><td>Preserves call completion rate</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.3 RAG Knowledge Base &amp; Intent Classification</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-09</code></td><td>The system SHALL maintain a RAG knowledge base comprising: banking product FAQs, IT support runbooks, FICA/POPIA/FSCA regulatory documents, incident response procedures, and tariff schedules — chunked and embedded for vector retrieval.</td><td><span class="tag tag-must">MUST</span></td><td>Embedding model: text-embedding-3-large</td></tr>
+                <tr><td><code>FR-10</code></td><td>The RAG retrieval step SHALL return the top-3 most relevant document chunks with cosine similarity scores. If the top chunk similarity is &lt;0.72, ARIA SHALL acknowledge uncertainty and offer to escalate to a human agent.</td><td><span class="tag tag-must">MUST</span></td><td>Prevents hallucination on low-confidence retrievals</td></tr>
+                <tr><td><code>FR-11</code></td><td>The intent classifier SHALL categorise each caller turn into one of: IT_SUPPORT, PRODUCT_ENQUIRY, INCIDENT_TRIAGE, COMPLIANCE_QUERY, ACCOUNT_MANAGEMENT, COMPLAINT, OPT_OUT, UNKNOWN — with a confidence score.</td><td><span class="tag tag-must">MUST</span></td><td>UNKNOWN routes to human agent</td></tr>
+                <tr><td><code>FR-12</code></td><td>The knowledge base SHALL be updated via a document ingestion pipeline that processes new documents within 4 hours of upload without requiring a service restart or model retraining.</td><td><span class="tag tag-should">SHOULD</span></td><td>Hot-reload via vector index update</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.4 Incident Triage (P1&ndash;P4)</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-13</code></td><td>The system SHALL classify reported incidents into P1 (Critical/Production down), P2 (Major/Degraded service), P3 (Moderate/Non-critical), P4 (Low/Cosmetic) using a structured triage questionnaire delivered via voice, completed within 90 seconds.</td><td><span class="tag tag-must">MUST</span></td><td>Based on ITIL severity criteria</td></tr>
+                <tr><td><code>FR-14</code></td><td>P1 incidents SHALL trigger an immediate PagerDuty alert with a structured payload (caller ID, description, affected system, business impact statement) and attempt to connect the caller to the on-call engineer within 2 minutes of classification.</td><td><span class="tag tag-must">MUST</span></td><td>PagerDuty API integration required</td></tr>
+                <tr><td><code>FR-15</code></td><td>P2 incidents SHALL create a Jira/ServiceNow ticket with high priority and notify the relevant team lead via Slack within 5 minutes. ARIA SHALL inform the caller of the ticket reference number before ending the call.</td><td><span class="tag tag-must">MUST</span></td><td>Ticket ref communicated to caller</td></tr>
+                <tr><td><code>FR-16</code></td><td>P3 and P4 incidents SHALL create standard tickets with appropriate priority levels. ARIA SHALL resolve any L1-resolvable aspects before ticket creation and include resolution attempts in the ticket description.</td><td><span class="tag tag-should">SHOULD</span></td><td>Reduces L2 ticket volume</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 6. TECHNICAL ARCHITECTURE -->
+    <section class="violet">
+        <h2>6. Technical Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <div class="arch-layer-label">Voice Channel</div>
+                <div class="arch-layer-content">Caller Phone &rarr; PSTN &rarr; Twilio Programmable Voice &rarr; Twilio Flex (for escalation) &rarr; ARIA Webhook Endpoint (FastAPI, Python)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">STT / NLU Layer</div>
+                <div class="arch-layer-content">Twilio &lt;Gather&gt; with Speech Recognition &rarr; Deepgram ASR (Nova-2, multilingual) &rarr; Language Detector &rarr; Intent Classifier (Claude claude-sonnet-4-6 via Anthropic API)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">RAG &amp; Knowledge Layer</div>
+                <div class="arch-layer-content">Pinecone Vector DB (SA-region) &rarr; Embedding: text-embedding-3-large &rarr; Retrieval (top-3, similarity threshold 0.72) &rarr; LLM Response Generation (Claude claude-sonnet-4-6)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">TTS &amp; Voice Synthesis</div>
+                <div class="arch-layer-content">ElevenLabs API (streaming TTS, cloned SA voices per language) &rarr; Audio stream &rarr; Twilio &lt;Play&gt; or &lt;Stream&gt; &rarr; Caller</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Integrations &amp; Ops</div>
+                <div class="arch-layer-content">PagerDuty (P1/P2 alerts) &middot; Jira/ServiceNow (ticket creation) &middot; Slack (team notifications) &middot; Kafka (audit log) &middot; Prometheus + Grafana (monitoring) &middot; SA-resident S3 (call recordings)</div>
+            </div>
+        </div>
+
+        <h3>Deployment Pipeline</h3>
+        <div class="card violet">
+            <div class="card-title">Production Deployment Command</div>
+            <div class="card-content">The final production deployment is executed via: <code>python elevenlabs_deploy.py --env prod</code>. This script provisions the cloned voice profiles to the ElevenLabs production workspace, updates the Twilio webhook URLs, runs smoke tests across all 5 language packs, and verifies end-to-end call flow with synthetic test callers before enabling live traffic routing.</div>
+        </div>
+
+        <h3>Data Flow &amp; Security</h3>
+        <div class="flow-box">
+            <div class="flow-title">Inbound Call Processing Pipeline</div>
+            <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">Caller dials MTN Fintech support number. Twilio receives call, triggers ARIA webhook. POPIA consent notice delivered within 10 seconds.</div></div>
+            <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">Caller speech captured via Twilio &lt;Gather&gt;. Deepgram ASR transcribes audio. Language detection runs on transcript.</div></div>
+            <div class="flow-step"><div class="flow-num">3</div><div class="flow-text">Claude intent classifier categorises the turn. RAG retrieval queries Pinecone with the caller's intent as a search query.</div></div>
+            <div class="flow-step"><div class="flow-num">4</div><div class="flow-text">Top-3 document chunks retrieved. Claude generates a grounded response using retrieved context. Response capped at 2&ndash;3 sentences for voice.</div></div>
+            <div class="flow-step"><div class="flow-num">5</div><div class="flow-text">ElevenLabs synthesises response in caller's detected language with cloned SA voice. Audio streamed back via Twilio.</div></div>
+            <div class="flow-step"><div class="flow-num">6</div><div class="flow-text">Conversation continues until: resolution confirmed, escalation triggered (P1/P2), or max turns reached (8 turns before escalation offer).</div></div>
+            <div class="flow-step"><div class="flow-num">7</div><div class="flow-text">Call recording and full transcript logged to SA-resident S3. PII masked in transcript. Audit record created in Kafka topic.</div></div>
+        </div>
+    </section>
+
+    <!-- 7. DATA & AI MODEL REQUIREMENTS -->
+    <section>
+        <h2>7. Data &amp; AI Model Requirements</h2>
+        <div class="two-col">
+            <div>
+                <h3>Knowledge Base Content</h3>
+                <div class="card">
+                    <div class="card-title">Document Categories</div>
+                    <div class="card-content">
+                        <ul>
+                            <li>Banking product FAQs (loans, accounts, cards, forex)</li>
+                            <li>IT support runbooks (password reset, access issues, system errors)</li>
+                            <li>FICA, POPIA, FSCA regulatory documents (full text)</li>
+                            <li>Incident response procedures (P1&ndash;P4 playbooks)</li>
+                            <li>Fee and tariff schedules per product</li>
+                            <li>Contact escalation directories</li>
+                            <li>MTN MoMo integration guides for banking staff</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Embedding &amp; Retrieval Configuration</div>
+                    <div class="card-content">Embedding model: OpenAI text-embedding-3-large (3072 dimensions). Chunk size: 512 tokens with 64-token overlap. Vector store: Pinecone (SA-region index). Retrieval: top-3 chunks, MMR reranking, similarity threshold 0.72. Metadata filters: document type, effective date, product category.</div>
+                </div>
+            </div>
+            <div>
+                <h3>Voice Cloning Requirements</h3>
+                <div class="card teal">
+                    <div class="card-title">ElevenLabs Voice Clone Specifications</div>
+                    <div class="card-content">
+                        <ul>
+                            <li><strong>SA English:</strong> 2 native SA English speakers, 30+ min audio each</li>
+                            <li><strong>Zulu:</strong> 2 native Zulu speakers (female + male), 25+ min each</li>
+                            <li><strong>Xhosa:</strong> 2 native Xhosa speakers, 25+ min each</li>
+                            <li><strong>Afrikaans:</strong> 2 native Afrikaans speakers, 25+ min each</li>
+                            <li><strong>French:</strong> 2 West African French speakers, 25+ min each</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card teal">
+                    <div class="card-title">Next Step: Voice Recording Sourcing</div>
+                    <div class="card-content">Voice recordings for Zulu, Xhosa, Afrikaans, and French are the primary blocker for production deployment. Recordings must be sourced from native speakers with signed recording consent forms. Professional studio quality (16kHz+, no background noise) required for ElevenLabs cloning quality threshold.</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Model Configuration</h3>
+        <table>
+            <thead><tr><th>Component</th><th>Model / Technology</th><th>Configuration</th><th>Latency Budget</th></tr></thead>
+            <tbody>
+                <tr><td>Speech-to-Text</td><td>Deepgram Nova-2</td><td>Multilingual, streaming, punctuation enabled</td><td>&lt;800ms</td></tr>
+                <tr><td>Language Detection</td><td>FastText LangDetect</td><td>5 SA languages, server-side</td><td>&lt;50ms</td></tr>
+                <tr><td>Intent Classification</td><td>Claude claude-sonnet-4-6</td><td>System prompt + 8 intent categories</td><td>&lt;1.2s</td></tr>
+                <tr><td>RAG Retrieval</td><td>Pinecone + text-embedding-3-large</td><td>Top-3, MMR, threshold 0.72</td><td>&lt;400ms</td></tr>
+                <tr><td>Response Generation</td><td>Claude claude-sonnet-4-6</td><td>Max 150 tokens, voice-optimised prompt</td><td>&lt;1.5s</td></tr>
+                <tr><td>Text-to-Speech</td><td>ElevenLabs (cloned voices)</td><td>Streaming, multilingual, emotion-aware</td><td>&lt;1.5s</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 8. COMPLIANCE & REGULATORY -->
+    <section class="violet">
+        <h2>8. Compliance &amp; Regulatory</h2>
+        <table>
+            <thead><tr><th>Framework</th><th>Market</th><th>Key Obligation</th><th>ARIA Control</th></tr></thead>
+            <tbody>
+                <tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Consent for voice recording and AI processing; right to human agent; data minimisation; PII protection</td><td>FR-07 consent notice at call start; PII masking in transcripts; opt-out to human agent; data retention controls</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">FSCA</strong></td><td>South Africa</td><td>Fairness in AI-assisted financial advice; disclosure of AI interaction; prohibition on misleading information</td><td>ARIA discloses AI nature at call start; RAG grounds responses; low-confidence responses escalated to human</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">FICA</strong></td><td>South Africa</td><td>Call recording retention (5 years); AML screening; suspicious activity reporting; audit trail</td><td>FR-07 encrypted call storage 5 years; PagerDuty incident log; Kafka audit trail; suspicious activity flagging</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">TCF (Treating Customers Fairly)</strong></td><td>South Africa</td><td>Clear communication; fair outcomes; accessible escalation to human</td><td>Max 8 turns before escalation offer; warm transfer with context; CSAT measurement post-call</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">NCA</strong></td><td>South Africa</td><td>No credit advice without proper disclosure and qualification; cooling-off rights</td><td>Credit-related intents escalated to licensed human advisor; ARIA does not provide credit advice</td></tr>
+            </tbody>
+        </table>
+
+        <div class="card violet" style="margin-top:16px;">
+            <div class="card-title">POPIA Audit Trail Requirements</div>
+            <div class="card-content">Every ARIA interaction SHALL produce an immutable audit record containing: caller MSISDN (hashed), call start/end timestamps, consent decision (accept/decline), language detected, intent classifications per turn, KB articles retrieved (document IDs), escalation trigger (if any), and call recording reference. This record is retained for 5 years per FICA requirements and is accessible only via authenticated compliance audit requests.</div>
+        </div>
+    </section>
+
+    <!-- 9. SPRINT PLAN / ROADMAP -->
+    <section class="teal">
+        <h2>9. Sprint Plan &amp; Roadmap</h2>
+        <div class="sprint-grid">
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 1 &mdash; Complete</div>
+                <div class="sprint-title">Core Voice Agent Infrastructure</div>
+                <div class="sprint-item">&#10003; Twilio Programmable Voice integration</div>
+                <div class="sprint-item">&#10003; Deepgram ASR integration (EN, FR)</div>
+                <div class="sprint-item">&#10003; Intent classifier (Claude claude-sonnet-4-6)</div>
+                <div class="sprint-item">&#10003; RAG knowledge base (Pinecone, EN documents)</div>
+                <div class="sprint-item">&#10003; ElevenLabs TTS (SA English voice)</div>
+                <div class="sprint-item">&#10003; POPIA consent flow</div>
+                <div class="sprint-item">&#10003; P1&ndash;P4 triage logic</div>
+                <div class="sprint-item">&#10003; PagerDuty P1 escalation</div>
+            </div>
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 2 &mdash; In Progress (94%)</div>
+                <div class="sprint-title">Multilingual Expansion &amp; Prod Deploy</div>
+                <div class="sprint-item">&#10003; Zulu ASR + KB translation</div>
+                <div class="sprint-item">&#10003; Xhosa ASR + KB translation</div>
+                <div class="sprint-item">&#10003; Afrikaans ASR + KB translation</div>
+                <div class="sprint-item">&#10003; French ASR + KB translation</div>
+                <div class="sprint-item">&#10003; Twilio Flex warm transfer + screen-pop</div>
+                <div class="sprint-item">&#8226; Source Zulu/Xhosa/Afrikaans/French voice recordings</div>
+                <div class="sprint-item">&#8226; ElevenLabs clone multilingual voices</div>
+                <div class="sprint-item">&#8226; Run elevenlabs_deploy.py --env prod</div>
+            </div>
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 3 &mdash; Planned</div>
+                <div class="sprint-title">Optimisation &amp; Scale</div>
+                <div class="sprint-item">&#8226; Load test to 500 concurrent calls</div>
+                <div class="sprint-item">&#8226; CSAT post-call SMS survey</div>
+                <div class="sprint-item">&#8226; Monitoring dashboard (Grafana)</div>
+                <div class="sprint-item">&#8226; KB refresh pipeline (4hr ingestion)</div>
+                <div class="sprint-item">&#8226; Model drift alerting</div>
+                <div class="sprint-item">&#8226; Jira/ServiceNow P3/P4 ticket creation</div>
+                <div class="sprint-item">&#8226; Pen test &amp; POPIA audit</div>
+                <div class="sprint-item">&#8226; 90-day post-launch cost saving report</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. RISK REGISTER -->
+    <section class="red">
+        <h2>10. Risk Register</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+            <tbody>
+                <tr><td><code>R-01</code></td><td>African English / indigenous language voice recordings unavailable or of insufficient quality for ElevenLabs cloning</td><td class="priority-high">High (current blocker)</td><td class="priority-high">High</td><td>Commission professional studio recordings with native speakers. Engage language service providers (e.g. SA Film Academy). Budget allocated. ETA: 3 weeks.</td></tr>
+                <tr><td><code>R-02</code></td><td>ElevenLabs production deployment fails quality threshold for one or more language voices</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>Staged deployment: SA English first (already passing), then add languages. Automated voice quality evaluation script in deploy pipeline. Fallback to EN voice if target language clone rejected.</td></tr>
+                <tr><td><code>R-03</code></td><td>End-to-end call latency exceeds 4 seconds due to ElevenLabs API latency under load</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>ElevenLabs streaming TTS enabled (token-by-token audio). Deepgram streaming ASR. Pre-cache common response audio fragments. Load test at 500 concurrent calls before prod switch.</td></tr>
+                <tr><td><code>R-04</code></td><td>RAG retrieval returns incorrect information for regulatory/compliance queries, creating FSCA liability</td><td class="priority-med">Low</td><td class="priority-high">Very High</td><td>Similarity threshold 0.72 below which ARIA escalates to human. Compliance documents version-controlled and dated. Legal review of KB content quarterly. Hallucination monitoring via LLM evaluator.</td></tr>
+                <tr><td><code>R-05</code></td><td>POPIA non-compliance if caller PII captured in logs before consent obtained</td><td class="priority-med">Low</td><td class="priority-high">Very High</td><td>Consent notice fires within 10 seconds before any PII processing. Call recording begins only after consent. PII scrubber on all transcripts. Legal review of consent wording. Automated compliance test in CI pipeline.</td></tr>
+                <tr><td><code>R-06</code></td><td>Twilio service degradation or outage affecting call availability</td><td class="priority-med">Low</td><td class="priority-high">High</td><td>Twilio SLA 99.95%. Backup IVR on secondary Twilio account. Call routing fallback to human agent queue if ARIA webhook unavailable. PagerDuty alert on webhook failure rate &gt;1%.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-18 ARIA Voice Support Agent &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
+        <div>Owner: Artemij Demidczyk &nbsp;|&nbsp; Assignee: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
+        <div style="margin-top:8px;font-size:0.82em;">Integrations: ElevenLabs &middot; Twilio &middot; Deepgram &middot; PagerDuty &middot; Pinecone &middot; Claude claude-sonnet-4-6 &nbsp;&middot;&nbsp; Compliance: POPIA &middot; FSCA &middot; FICA &middot; TCF &middot; NCA</div>
+    </footer>
+
+</div>
+</body>
+</html>

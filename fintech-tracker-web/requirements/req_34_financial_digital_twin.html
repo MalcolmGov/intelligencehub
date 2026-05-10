@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-34 AI Financial Digital Twin — Requirements &amp; Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-p2 { background: linear-gradient(135deg, #0891b2, #0e7490); color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        section.amber { border-left-color: #f59e0b; }
+        section.red { border-left-color: #dc2626; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
+        ul li { margin-bottom: 5px; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card.amber { border-left-color: #f59e0b; }
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #34d399; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card.amber .card-title { color: #f59e0b; }
+        .card.red .card-title { color: #f87171; }
+        .card.green .card-title { color: #34d399; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-card.indigo { border-top-color: #6366f1; }
+        .metric-card.violet { border-top-color: #7c3aed; }
+        .metric-card.amber { border-top-color: #f59e0b; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-card.indigo .metric-value { color: #818cf8; }
+        .metric-card.violet .metric-value { color: #a78bfa; }
+        .metric-card.amber .metric-value { color: #f59e0b; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
+        .us-ac li { margin-bottom: 3px; }
+        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
+        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
+        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
+        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
+        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
+        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
+        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 140px; }
+        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
+        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
+        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
+        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
+        .arch-layer:last-child .arch-layer-label { color: #64748b; }
+        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
+        .scenario-box { background: #020617; border: 2px solid #334155; border-radius: 8px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; margin: 12px 0; line-height: 1.7; }
+        .scenario-box .query { color: #818cf8; }
+        .scenario-box .result { color: #2dd4bf; }
+        .scenario-box .warn { color: #fbbf24; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
+        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
+        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
+        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
+        .priority-high { color: #f87171; font-weight: 700; }
+        .priority-med { color: #fbbf24; font-weight: 700; }
+        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
+
+<div class="container">
+
+    <header>
+        <div>
+            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 34</div>
+            <h1>AI Financial Digital Twin</h1>
+            <div class="subtitle">A living, AI-maintained simulation model of each consumer's personal finances &mdash; updated in real-time from MoMo transaction data. Users run forward-looking scenarios: &lsquo;What if I lose my job?&rsquo; &lsquo;Can I afford this loan?&rsquo; Targets 2&ndash;3x higher cross-sell conversion for engaged users.</div>
+            <div>
+                <span class="badge badge-new">New &mdash; Gap Identified by Malcolm</span>
+                <span class="badge badge-not-started">Not Started &mdash; 0%</span>
+                <span class="badge badge-p2">Priority: P2</span>
+                <span class="badge badge-high">Complexity: High</span>
+            </div>
+            <div style="margin-top:10px;">
+                <span class="badge badge-compliance">POPIA</span>
+                <span class="badge badge-compliance">NDPR</span>
+                <span class="badge badge-compliance">FSCA</span>
+                <span class="badge badge-teal">Monte Carlo Engine</span>
+                <span class="badge badge-teal">Real-Time Model</span>
+                <span class="badge badge-teal">NL Scenarios</span>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-34</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P2</div></div>
+            <div class="meta-item"><div class="meta-label">Strategic Driver</div><div class="meta-value">Customer Engagement</div></div>
+            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">2&ndash;3x cross-sell conversion</div></div>
+            <div class="meta-item"><div class="meta-label">Simulation Engine</div><div class="meta-value">Monte Carlo (10K simulations)</div></div>
+            <div class="meta-item"><div class="meta-label">Computation</div><div class="meta-value">Privacy-preserving on-device</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering &middot; Document Author &amp; Use Case Owner</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. EXECUTIVE SUMMARY -->
+    <section>
+        <h2>1. Executive Summary &amp; Business Case</h2>
+        <p>Financial planning tools &mdash; budgeting apps, investment simulators, loan affordability calculators &mdash; have traditionally been available only to banked, formally employed individuals with stable incomes and access to comprehensive financial data. MTN MoMo's 65 million subscribers transact primarily through a single channel that generates rich, longitudinal financial behaviour data: every send, receive, bill payment, savings contribution, and airtime purchase is timestamped and stored. Yet this data is used today only for transaction history display and fraud detection. UC-34 unlocks this data as the foundation for a <strong style="color:#818cf8;">living financial model</strong> &mdash; a digital twin of each customer's financial life.</p>
+        <p>The digital twin is a continuously updated simulation model built from each customer's MoMo transaction history. It classifies income streams, recurring expenses, variable spending, savings patterns, and financial shock vulnerabilities. On top of this real-time model, a Monte Carlo scenario engine allows customers to run forward-looking "what if" simulations using natural language queries: "What if I lose my job for 3 months?", "Can I afford a ZAR 500/month loan repayment?", "If I save an extra R200 per month, when will I have enough to buy a fridge?" The simulation is computed on-device where possible, preserving privacy while delivering institutional-grade financial modelling to a smartphone-accessible interface.</p>
+        <p>The commercial case is equally compelling. Customers who engage with their financial twin demonstrate 2&ndash;3x higher conversion rates for cross-sold MoMo financial products &mdash; MoMo Loans, MoMo Invest, MoMo Insurance &mdash; because the digital twin provides the customer with the information they need to make an informed product decision. Rather than a generic loan offer, MoMo can present: "Based on your income pattern and expenses, you can comfortably afford a R3,000 loan with R280 monthly repayments &mdash; your digital twin shows a 94% probability of comfortable repayment without financial stress."</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">2&ndash;3x</div>
+                <div class="metric-label">Cross-Sell Conversion for Engaged Users</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">10K</div>
+                <div class="metric-label">Monte Carlo Simulations per Scenario</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">Real-Time</div>
+                <div class="metric-label">Financial Model Update Frequency</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">Computation On-Device (Privacy Preserving)</div>
+            </div>
+        </div>
+
+        <div class="comparison-box" style="margin-top:20px;">
+            <div class="compare-card traditional">
+                <div class="compare-label">Traditional Financial Planning</div>
+                <div class="compare-value">Excluded</div>
+                <div class="compare-sub">Financial planning tools require bank accounts, stable income, formal employment, and often a financial advisor; inaccessible to informal economy workers; decisions made by gut feel</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">AI Financial Digital Twin (UC-34)</div>
+                <div class="compare-value">Inclusive</div>
+                <div class="compare-sub">Built from MoMo transaction history; works for irregular income; natural language queries; on-device privacy; loan affordability, income shock, investment projection all available</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. PROBLEM STATEMENT -->
+    <section class="violet">
+        <h2>2. Problem Statement</h2>
+
+        <div class="card violet">
+            <div class="card-title">Problem 1 &mdash; Informal Economy Workers Make Major Financial Decisions Without Data</div>
+            <div class="card-content">MTN MoMo's core user base &mdash; informal traders, domestic workers, gig economy participants &mdash; face the same fundamental financial decisions as formally employed individuals: can I afford this loan? What happens to my family if I lose income for 3 months? How long until I can afford a new phone? But they make these decisions with no tools, no data, and no professional advice. Decisions made by gut feel lead to over-indebtedness, missed savings opportunities, and financial fragility that makes customers permanently vulnerable to income shocks. MoMo has the data to change this &mdash; but does not yet use it to help customers make better decisions.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 2 &mdash; Generic Cross-Sell Offers Convert Poorly Because They Lack Personal Relevance</div>
+            <div class="card-content">MoMo's current approach to cross-selling financial products (loans, insurance, investment) is segment-level targeting: broad demographic or transaction-frequency segments receive generic offers. Conversion rates are low because the offer cannot answer the customer's fundamental question: "Is this right for me, specifically?" A customer who sees "Get a R5,000 MoMo Loan!" does not know whether they can actually afford it. A customer whose digital twin shows them personalised affordability analysis &mdash; "Based on your income and spending, this R3,000 loan at R280/month leaves you with R840 monthly comfort buffer in 85% of simulated scenarios" &mdash; makes an informed decision with higher confidence and lower subsequent default risk.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 3 &mdash; Financial Wellbeing is Not Measured or Managed at the Individual Level</div>
+            <div class="card-content">MTN MoMo measures aggregate customer value but does not track individual customer financial health trajectory. A customer who is progressively deteriorating financially &mdash; declining balance trends, increasing expense-to-income ratio, growing reliance on MoMo Loans &mdash; receives no proactive intervention until they default. The digital twin provides a continuous financial health score that enables proactive, personalised wellbeing interventions before crisis, reducing credit losses and improving long-term customer lifetime value.</div>
+        </div>
+    </section>
+
+    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
+    <section class="teal">
+        <h2>3. Objectives &amp; Success Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value">2.5x</div>
+                <div class="metric-label">Cross-Sell Conversion (vs non-twin users)</div>
+            </div>
+            <div class="metric-card indigo">
+                <div class="metric-value">5M</div>
+                <div class="metric-label">Active Digital Twin Users (12-month)</div>
+            </div>
+            <div class="metric-card violet">
+                <div class="metric-value">&minus;25%</div>
+                <div class="metric-label">Loan Default Rate for Twin-Informed Borrowers</div>
+            </div>
+            <div class="metric-card amber">
+                <div class="metric-value">+40%</div>
+                <div class="metric-label">Monthly Active Users for Engaged Twin Users</div>
+            </div>
+        </div>
+
+        <table style="margin-top:20px;">
+            <thead><tr><th>KPI</th><th>Baseline</th><th>6-Month Target</th><th>12-Month Target</th><th>Measurement</th></tr></thead>
+            <tbody>
+                <tr><td>Digital twin activations (cumulative)</td><td>0</td><td class="priority-med">1M users</td><td class="priority-high">5M users</td><td>Twin model activation events</td></tr>
+                <tr><td>Scenario queries per active twin user/month</td><td>N/A</td><td class="priority-med">&gt;3 queries/user/month</td><td class="priority-high">&gt;8 queries/user/month</td><td>Scenario engine usage logs</td></tr>
+                <tr><td>Cross-sell conversion (twin vs baseline)</td><td>Baseline TBD</td><td class="priority-high">1.5x baseline</td><td class="priority-high">2.5x baseline</td><td>Controlled A/B test</td></tr>
+                <tr><td>Loan default rate (twin-informed borrowers)</td><td>Market default rate</td><td class="priority-high">&minus;15%</td><td class="priority-high">&minus;25%</td><td>Credit team monthly report</td></tr>
+                <tr><td>Monthly app sessions (twin users vs non)</td><td>N/A</td><td class="priority-med">+25%</td><td class="priority-high">+40%</td><td>App analytics comparison</td></tr>
+                <tr><td>Financial health score improvement (engaged users)</td><td>N/A (new metric)</td><td class="priority-med">Positive trend &gt;60% of users</td><td class="priority-high">Positive trend &gt;75%</td><td>Financial health score tracker</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 4. USER STORIES -->
+    <section>
+        <h2>4. User Stories &amp; Acceptance Criteria</h2>
+
+        <div class="scenario-box"><span class="query">USER QUERY: "What if I lose my income for 3 months?"</span>
+
+<span class="result">DIGITAL TWIN RESPONSE:</span>
+<span class="result">Based on your income and spending patterns from the last 6 months:</span>
+<span class="result">  Monthly income (avg): R4,200</span>
+<span class="result">  Monthly essential expenses: R3,100 (rent R1,800, food R800, transport R500)</span>
+<span class="result">  Current savings buffer: R2,340 (MoMo savings pocket)</span>
+
+<span class="warn">SIMULATION RESULT (10,000 scenarios):</span>
+<span class="warn">  Month 1: 92% probability of meeting all essential expenses</span>
+<span class="warn">  Month 2: 67% probability (savings depleting, urgent action needed)</span>
+<span class="warn">  Month 3: 31% probability (high stress scenario)</span>
+
+<span class="result">RECOMMENDED ACTION: Adding R400/month to emergency savings now</span>
+<span class="result">would raise Month 3 survival probability to 74%.</span></div>
+
+        <div class="us-card">
+            <div class="us-id">US-34-01</div>
+            <div class="us-title">Income Shock Simulation — Natural Language</div>
+            <div class="us-story">"As Sipho, a gig economy driver, I want to ask my MoMo app in plain English 'what happens to my finances if I can't work for 3 months?' and get a clear, visual answer based on my actual income and expenses, so that I can prepare an emergency fund before it's too late."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>NL query processed and mapped to income shock scenario parameters within 2 seconds</li>
+                <li>Monte Carlo simulation runs 10,000 scenarios based on current financial model</li>
+                <li>Results presented as: probability of meeting essential expenses per month, time until financial distress (savings depleted), recommended emergency fund amount</li>
+                <li>Visualisation: probability timeline chart, current vs recommended savings level</li>
+                <li>One-tap action: "Set up emergency savings" links directly to savings pocket configuration</li>
+                <li>Computation performed on-device; no financial details transmitted to server</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-34-02</div>
+            <div class="us-title">Loan Affordability Calculator</div>
+            <div class="us-story">"As a MoMo user considering a loan, I want to see exactly whether I can afford the repayments based on my real spending patterns, not a generic affordability check, so that I borrow confidently and avoid default."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>When user views a MoMo Loan offer, digital twin affordability assessment presented automatically</li>
+                <li>Assessment shows: monthly repayment amount, projected remaining disposable income, probability of comfortable repayment across 10K scenarios, stress scenarios where repayment becomes difficult</li>
+                <li>Recommendation: "Comfortable", "Manageable with care", or "High risk &mdash; consider a smaller loan"</li>
+                <li>Smaller loan alternative suggested if recommended with calculated comfortable amount</li>
+                <li>Assessment based on real transaction history (6-month rolling), not stated income</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-34-03</div>
+            <div class="us-title">Investment Projection — NL Scenario</div>
+            <div class="us-story">"As a MoMo user, I want to ask 'if I invest R300 per month for 5 years, what will I have?' and see a realistic projection with range of outcomes, so that I can decide whether to start a MoMo Invest account."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Query parsed and mapped to investment projection parameters (amount, duration, product type)</li>
+                <li>Monte Carlo simulation incorporates MoMo Invest historical return distribution with uncertainty</li>
+                <li>Results: median projected value, 25th/75th percentile range, probability of exceeding specific targets</li>
+                <li>Affordability check: can R300/month be consistently saved based on current income/expense pattern?</li>
+                <li>One-tap: "Start investing R300/month" links to MoMo Invest onboarding</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-34-04</div>
+            <div class="us-title">Financial Health Dashboard — Personal Overview</div>
+            <div class="us-story">"As a MoMo user, I want to open my app and immediately see a clear picture of my financial health — income vs expenses, savings trend, and one key insight about something I could improve — without reading a long report."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Financial health dashboard loads in &lt;1 second (on-device model pre-computed)</li>
+                <li>Shows: 30-day income vs expenses (waterfall), savings trajectory (last 3 months), financial health score (0&ndash;100)</li>
+                <li>One personalised insight per session: e.g., "Your food spending increased 23% this month vs your average"</li>
+                <li>Spending categories auto-classified from transaction data (no manual tagging required)</li>
+                <li>Month-over-month trend indicator for each major spending category</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-34-05</div>
+            <div class="us-title">Goal Setting — Savings Milestone</div>
+            <div class="us-story">"As a MoMo user, I want to set a goal of saving R5,000 for a new fridge and be told realistically how long it will take based on my actual spending patterns, so that I have a concrete and achievable plan."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Goal set via NL query or structured input (target amount, optional deadline)</li>
+                <li>Digital twin calculates realistic savings timeline based on current surplus after essential expenses</li>
+                <li>Sensitivity analysis: "If you reduce eating out by R200/month, you'd reach your goal 6 weeks sooner"</li>
+                <li>Progress bar updated in real-time as transactions occur</li>
+                <li>Weekly check-in notification: goal progress vs plan, with adjustments if spending changes</li>
+                <li>Goal linked to savings pocket &mdash; optional automatic roundup toward goal</li>
+            </ul>
+        </div>
+
+        <div class="us-card">
+            <div class="us-id">US-34-06</div>
+            <div class="us-title">Privacy Transparency — Data Subject Rights</div>
+            <div class="us-story">"As a privacy-conscious MoMo user, I want to see exactly what financial data my digital twin uses, and be able to delete it entirely with one tap, so that I am in control of my personal financial information."</div>
+            <div class="us-ac-label">Acceptance Criteria</div>
+            <ul class="us-ac">
+                <li>Privacy settings page shows: data inputs used (transaction history months), model type, computation location (on-device)</li>
+                <li>Data deletion: "Delete my digital twin" destroys all model data and scenario history from device and server within 24 hours</li>
+                <li>Deletion does not affect transaction history (separate data owner)</li>
+                <li>Data export available: user can download their financial model in JSON format (POPIA data portability right)</li>
+                <li>POPIA consent record shown with date, scope, and mechanism to withdraw</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- 5. FUNCTIONAL REQUIREMENTS -->
+    <section>
+        <h2>5. Functional Requirements</h2>
+
+        <h3>5.1 Personal Financial Model</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-01</code></td><td>The system SHALL build a personal financial model from the customer's MoMo transaction history (minimum 90 days, target 12 months) classifying: income streams, recurring expenses, variable spending, savings contributions, and one-off irregular transactions.</td><td><span class="tag tag-must">MUST</span></td><td>Transaction history is the sole data source</td></tr>
+                <tr><td><code>FR-02</code></td><td>The financial model SHALL be updated in real-time within 30 seconds of each new MoMo transaction being processed, ensuring scenario queries always reflect the latest financial position.</td><td><span class="tag tag-must">MUST</span></td><td>Real-time model is core differentiator</td></tr>
+                <tr><td><code>FR-03</code></td><td>Transaction classification SHALL achieve &gt;90% accuracy on the MoMo domain category taxonomy (income, rent, food, transport, airtime, remittance, savings, loan repayment, entertainment, other).</td><td><span class="tag tag-must">MUST</span></td><td>Foundation for model accuracy</td></tr>
+                <tr><td><code>FR-04</code></td><td>Income variability modelling SHALL accommodate irregular income patterns (gig workers, market traders, commission-based earners) using percentile-based income distribution rather than single point estimates.</td><td><span class="tag tag-must">MUST</span></td><td>Africa informal economy requirement</td></tr>
+                <tr><td><code>FR-05</code></td><td>A financial health score (0&ndash;100) SHALL be computed continuously, weighted by: income stability (30%), expense ratio (25%), savings rate (25%), debt burden (20%). Score trajectory (improving/stable/deteriorating) displayed as primary indicator.</td><td><span class="tag tag-should">SHOULD</span></td><td>Single number for financial wellbeing</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.2 Monte Carlo Scenario Engine</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-06</code></td><td>The scenario engine SHALL run a minimum of 10,000 Monte Carlo simulations per scenario query, sampling from the income and expense distributions in the personal financial model.</td><td><span class="tag tag-must">MUST</span></td><td>10K simulations for statistical reliability</td></tr>
+                <tr><td><code>FR-07</code></td><td>Scenario engine SHALL complete 10,000 simulation runs in &lt;3 seconds on a mid-range Android device (Samsung Galaxy A52 target) using on-device computation.</td><td><span class="tag tag-must">MUST</span></td><td>Performance constraint for Africa-relevant hardware</td></tr>
+                <tr><td><code>FR-08</code></td><td>Pre-built scenario templates SHALL include: income shock (1/2/3/6 months), loan affordability, investment projection, savings goal, expense increase (rent, food, school fees), and major purchase planning.</td><td><span class="tag tag-must">MUST</span></td><td>10 scenario templates at launch</td></tr>
+                <tr><td><code>FR-09</code></td><td>Natural language scenario queries SHALL be parsed in English, Swahili, Hausa, Zulu, Yoruba, and French, mapped to scenario template parameters, and confirmed with user before running simulation.</td><td><span class="tag tag-must">MUST</span></td><td>NL query to scenario parameter mapping</td></tr>
+                <tr><td><code>FR-10</code></td><td>Simulation results SHALL be presented as: median outcome, 25th&ndash;75th percentile range, probability of specific outcomes (survival, goal achievement, repayment success), and a plain-language summary in the user's language.</td><td><span class="tag tag-must">MUST</span></td><td>Accessible to non-quantitative users</td></tr>
+            </tbody>
+        </table>
+
+        <h3>5.3 Privacy-Preserving Computation</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-11</code></td><td>All scenario computation SHALL execute on-device. Simulation inputs (transaction history) and outputs (simulation results) SHALL never be transmitted to MTN servers in identifiable form.</td><td><span class="tag tag-must">MUST</span></td><td>Privacy by design — POPIA compliance</td></tr>
+                <tr><td><code>FR-12</code></td><td>Scenario query text typed by the user SHALL be processed locally before any server API call. NL parsing that requires server inference SHALL transmit only the anonymised scenario parameters, not the raw query text.</td><td><span class="tag tag-must">MUST</span></td><td>Query privacy protection</td></tr>
+                <tr><td><code>FR-13</code></td><td>When personalised loan offers are generated using digital twin affordability data, the product recommendation algorithm SHALL run on-device. Only the loan product catalogue (not the customer's affordability data) is fetched from the server.</td><td><span class="tag tag-must">MUST</span></td><td>Cross-sell without data exposure</td></tr>
+                <tr><td><code>FR-14</code></td><td>Aggregated (fully anonymised) financial health statistics MAY be transmitted server-side for product portfolio analysis, subject to k-anonymity guarantee (minimum group size 1,000) and explicit user consent for aggregate analytics.</td><td><span class="tag tag-should">SHOULD</span></td><td>Opt-in aggregate analytics</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 6. TECHNICAL ARCHITECTURE -->
+    <section class="violet">
+        <h2>6. Technical Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <div class="arch-layer-label">User Interface</div>
+                <div class="arch-layer-content">MoMo App Financial Twin Tab &rarr; Financial Health Dashboard &rarr; Scenario Query Interface (NL + templates) &rarr; Simulation Results Visualiser &rarr; Goal Tracker &rarr; Privacy Settings &rarr; Product Recommendation Panel</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">On-Device AI Engine</div>
+                <div class="arch-layer-content">Transaction Classifier (ML, 10 categories) &rarr; Financial Model Builder (income dist, expense dist, savings rate) &rarr; Monte Carlo Simulator (10K runs, &lt;3s) &rarr; Financial Health Scorer &rarr; NL Scenario Parser (local model)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Real-Time Data Feed</div>
+                <div class="arch-layer-content">MoMo Transaction Webhook (new transaction events, &lt;30s latency) &rarr; On-device model update trigger &rarr; Model state store (encrypted local DB) &rarr; Goal progress updater</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Server Layer (No User Data)</div>
+                <div class="arch-layer-content">NL Scenario API (anonymised parameters only) &rarr; Product Catalogue API (loan offers, investment products) &rarr; Market return distribution API (investment projections) &rarr; Aggregate health analytics (k-anon, opt-in)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Privacy &amp; Compliance</div>
+                <div class="arch-layer-content">On-device encrypted model storage &rarr; POPIA consent management &rarr; Data portability export (JSON) &rarr; Right-to-erasure (model + scenario history) &rarr; FSCA automated advice compliance review</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. DATA & AI MODEL -->
+    <section>
+        <h2>7. Data &amp; AI Model Requirements</h2>
+
+        <div class="card">
+            <div class="card-title">Transaction Classification Model</div>
+            <div class="card-content">Fine-tuned text + amount classifier on MTN MoMo transaction description corpus. Architecture: lightweight BERT variant (DistilBERT) for description classification + rule-based amount/counterparty features. Categories: salary/income, rent, food, transport, airtime, remittance, savings, loan repayment, entertainment, other. Target accuracy: &gt;90% on held-out MoMo test set. On-device via TFLite, &lt;10MB model footprint.</div>
+        </div>
+        <div class="card teal">
+            <div class="card-title">Income Distribution Modelling</div>
+            <div class="card-content">Per-user income model accounts for informal economy reality: irregular payment timing, multiple income streams (salary + informal trade + remittances), seasonal variation (December market trader surge, January trough). Model: kernel density estimation on 12-month income history, producing probability distribution over monthly income. Updated monthly with rolling 12-month window.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Monte Carlo Engine Architecture</div>
+            <div class="card-content">Native on-device implementation (Swift for iOS, Kotlin for Android). 10,000 simulation draws from income and expense distributions per scenario. Vectorised computation using device GPU/NPU where available. Simulation state: per-draw income sample, per-draw expense sample, per-draw savings delta, cumulative balance trajectory. Output: 10,000 balance trajectories collapsed to percentile bands, probability calculations, plain-language summary generation.</div>
+        </div>
+        <div class="card amber">
+            <div class="card-title">NL Scenario Parser</div>
+            <div class="card-content">Lightweight on-device NL model mapping user scenario queries to structured scenario parameters. Domain: financial planning vocabulary in 6 African languages. Output: scenario type, duration, shock amount, target amount. Low-confidence queries (below 0.75) routed to server-side NL API (query text anonymised: personal names/amounts scrubbed before transmission). Confirmation step before simulation always shown to user.</div>
+        </div>
+
+        <h3>Financial Model Components</h3>
+        <table>
+            <thead><tr><th>Component</th><th>Data Source</th><th>Update Frequency</th><th>Computation Location</th></tr></thead>
+            <tbody>
+                <tr><td>Income distribution model</td><td>MoMo inbound transactions (90&ndash;365 days)</td><td>On each new income event</td><td>On-device</td></tr>
+                <tr><td>Essential expense model</td><td>MoMo recurring outbound transactions</td><td>On each new transaction</td><td>On-device</td></tr>
+                <tr><td>Variable spending model</td><td>MoMo non-recurring outbound transactions</td><td>On each new transaction</td><td>On-device</td></tr>
+                <tr><td>Savings rate &amp; trajectory</td><td>MoMo savings pocket history</td><td>On each savings event</td><td>On-device</td></tr>
+                <tr><td>Investment return distribution</td><td>MoMo Invest historical returns (market data)</td><td>Daily (server-side, fetched anonymously)</td><td>Server &rarr; local cache</td></tr>
+                <tr><td>Market lending rates</td><td>MoMo Loans product catalogue</td><td>Daily (server-side)</td><td>Server &rarr; local cache</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 8. COMPLIANCE -->
+    <section class="amber">
+        <h2>8. Compliance &amp; Regulatory</h2>
+
+        <div class="card amber">
+            <div class="card-title">FSCA — Automated Financial Advice Risk</div>
+            <div class="card-content">The digital twin's scenario outputs &mdash; particularly loan affordability recommendations and investment projections &mdash; may be classified as "financial advice" under the Financial Advisory and Intermediary Services (FAIS) Act in South Africa, requiring a Financial Services Provider (FSP) licence. The critical distinction is between "information" (presenting simulation outputs without recommendation) and "advice" (recommending a specific product or action). Conservative approach: twin presents scenario analysis as "information to help you decide" rather than "we recommend". Specific product recommendations (e.g., "take this loan") must be carefully worded. FSCA pre-clearance recommended before launch in SA.</div>
+        </div>
+        <div class="card amber">
+            <div class="card-title">POPIA — Financial Data Processing</div>
+            <div class="card-content">The digital twin processes financial transaction data which is personal information under POPIA. The on-device architecture is the primary compliance mechanism: processing occurs on the customer's own device, minimising third-party access to sensitive financial patterns. However, POPIA obligations still apply because MTN provides the app that facilitates the processing. Required: explicit informed consent for digital twin feature activation, right of access to processed data (fulfilled by on-device data portability export), right of erasure (fulfilled by model deletion), and DPIA given the automated profiling of financial behaviour.</div>
+        </div>
+        <div class="card amber">
+            <div class="card-title">Responsible AI — Scenario Output Framing</div>
+            <div class="card-content">Financial simulation outputs carry inherent uncertainty that must be clearly communicated to avoid false confidence. Requirements: all probability outputs must include confidence interval; plain-language disclaimers ("This is a simulation based on your past patterns — actual future finances may differ"); results should empower, not alarm — negative scenarios presented with actionable mitigations; no scenario should present a single deterministic "future" — always present distribution of outcomes. UX review by financial psychologist recommended before launch.</div>
+        </div>
+
+        <h3>Regulatory Requirements by Market</h3>
+        <table>
+            <thead><tr><th>Market</th><th>Key Regulation</th><th>Risk Area</th><th>Pre-Launch Action</th></tr></thead>
+            <tbody>
+                <tr><td>South Africa</td><td>FAIS, POPIA, NCA</td><td>Automated advice classification; financial data processing</td><td>FSCA legal opinion; POPIA DPIA</td></tr>
+                <tr><td>Nigeria</td><td>NDPR, CBN consumer protection</td><td>Financial data processing; consumer protection for simulation outputs</td><td>NDPR consent framework; CBN pre-consultation</td></tr>
+                <tr><td>Kenya</td><td>Kenya DPA, CBK</td><td>DPIA required; CBK guidance on digital financial planning tools</td><td>DPIA filing; CBK notification</td></tr>
+                <tr><td>Ghana / Uganda / Zambia</td><td>Local CB, Data Protection Acts</td><td>No specific prohibition identified; standard data protection</td><td>Standard compliance review per market</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- 9. SPRINT PLAN -->
+    <section class="teal">
+        <h2>9. Sprint Plan &amp; Roadmap</h2>
+
+        <h3>Sprint 1 (Weeks 1&ndash;3): Financial Model Foundation</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 1 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>Transaction classification model: training data labelling (50K MTN MoMo transactions), DistilBERT fine-tune, TFLite quantisation, on-device inference integration</li>
+                    <li>Personal financial model builder: income distribution modelling (KDE), recurring expense detection, savings rate calculation</li>
+                    <li>MoMo transaction webhook integration: real-time model update on new transaction (&lt;30s)</li>
+                    <li>On-device encrypted model storage (iOS Keychain / Android Keystore)</li>
+                    <li>Financial health dashboard v1: income vs expenses waterfall, savings trajectory, health score</li>
+                    <li>POPIA consent capture and data portability export (JSON)</li>
+                    <li>FSCA legal opinion engagement initiated</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Sprint 2 (Weeks 4&ndash;6): Monte Carlo Engine &amp; Scenario Interface</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 2 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>Monte Carlo simulation engine: 10K simulations, &lt;3s on Galaxy A52, native iOS Swift + Android Kotlin</li>
+                    <li>10 pre-built scenario templates: income shock, loan affordability, investment projection, savings goal, rent increase, school fees, major purchase, emergency fund, medical expense, retirement</li>
+                    <li>NL scenario parser: on-device lightweight model for 6 languages, anonymised server fallback</li>
+                    <li>Simulation results visualiser: probability band charts, plain-language summary, actionable next steps</li>
+                    <li>Loan affordability integration: digital twin affordability assessment shown on MoMo Loans offer screen</li>
+                    <li>Goal tracker: savings milestone setting, progress bar, weekly check-in notification</li>
+                    <li>Investment projection: MoMo Invest product integration, historical return distribution</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>Sprint 3 (Weeks 7&ndash;9): Pilot, Privacy Audit &amp; Cross-Sell Integration</h3>
+        <div class="card teal">
+            <div class="card-title">Sprint 3 Deliverables</div>
+            <div class="card-content">
+                <ul>
+                    <li>Pilot deployment: MTN South Africa (25,000 user cohort, opt-in), MTN Nigeria (10,000 user cohort)</li>
+                    <li>FSCA legal opinion received; advice framing adjusted if required</li>
+                    <li>DPIA completed and filed with Group DPO</li>
+                    <li>Third-party privacy audit: confirm no financial data egress from device</li>
+                    <li>A/B test: digital twin loan offer conversion vs standard offer (60-day test)</li>
+                    <li>Transaction classification accuracy measurement on production data (vs 90% target)</li>
+                    <li>Scenario engine performance benchmark on top-10 Android devices in SA/Nigeria markets</li>
+                    <li>Financial health score validation: domain expert review of scoring methodology</li>
+                    <li>User research: scenario usage patterns, comprehension of probability outputs, feature requests</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. RISK REGISTER -->
+    <section class="red">
+        <h2>10. Risk Register</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+            <tbody>
+                <tr><td><code>R-01</code></td><td>FSCA classifies digital twin loan affordability recommendations as unlicensed financial advice</td><td class="priority-med">Medium</td><td class="priority-high">Very High</td><td>FSCA legal opinion before Sprint 3 pilot. Conservative output framing ("information to help you decide" not "we recommend"). Engage FSCA proactively 6 months before launch. SA pilot uses information-only framing; advice language tested only after legal clearance.</td></tr>
+                <tr><td><code>R-02</code></td><td>Monte Carlo engine performance below 3-second target on low-end Android devices prevalent in sub-Saharan Africa (e.g., Tecno Spark, Samsung A03)</td><td class="priority-high">High</td><td class="priority-med">Medium</td><td>Performance benchmark on 15 low-end device models during Sprint 2. Reduce simulation count to 5K on devices below performance threshold with visual indicator. WebAssembly fallback for very low-end devices using server-side computation (anonymised parameters). Progressive enhancement: basic twin on low-end, full Monte Carlo on mid-range+.</td></tr>
+                <tr><td><code>R-03</code></td><td>Transaction classification accuracy below 90% for informal economy income patterns distorts financial model</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Extensive training data labelling focused on informal economy patterns (market trader, domestic worker, gig economy). User feedback mechanism: tap transaction category to correct classification (human-in-the-loop improvement). Model re-trained quarterly on corrected classifications. Manual income/expense correction available in settings.</td></tr>
+                <tr><td><code>R-04</code></td><td>Users make harmful financial decisions based on simulation outputs (e.g., take a loan the twin shows as "comfortable" but circumstances change)</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Prominent disclaimers: simulations based on past patterns, not guarantees of future outcomes. Stress scenarios always shown alongside comfortable scenarios. "High risk" scenarios trigger additional warnings. No simulation output should remove human agency; always present as "information" not "certainty". Consumer protection complaint monitoring and rapid output revision protocol.</td></tr>
+                <tr><td><code>R-05</code></td><td>Low-MoMo-history users (new customers, &lt;90 days) receive inaccurate financial model due to insufficient data</td><td class="priority-high">High</td><td class="priority-med">Medium</td><td>Minimum 90 days transaction history before digital twin activates. During data accumulation phase, show "building your financial twin" progress indicator (% of data needed). Interim: category averages from anonymised peer group (same market, similar income level) used as prior for Monte Carlo distributions, with explicit disclosure.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-34 AI Financial Digital Twin &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
+        <div>Document Author: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
+        <div style="margin-top:8px;font-size:0.82em;">Integrations: MoMo Transactions API &nbsp;&middot;&nbsp; MoMo Loans &nbsp;&middot;&nbsp; MoMo Invest &nbsp;&middot;&nbsp; MoMo Savings &nbsp;&middot;&nbsp; Compliance: POPIA &middot; NDPR &middot; FAIS &middot; FSCA &middot; NCA &middot; Kenya DPA</div>
+    </footer>
+
+</div>
+</body>
+</html>

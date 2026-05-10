@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-27 USSD AI Financial Health Coach &mdash; Requirements &amp; Planning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
+        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
+        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
+        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
+        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
+        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
+        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
+        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
+        .badge-high { background: #7c3aed; color: #fff; }
+        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
+        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
+        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
+        section.teal { border-left-color: #14b8a6; }
+        section.violet { border-left-color: #7c3aed; }
+        section.amber { border-left-color: #f59e0b; }
+        section.red { border-left-color: #dc2626; }
+        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
+        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
+        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
+        ul li { margin-bottom: 5px; }
+        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
+        .card.teal { border-left-color: #14b8a6; }
+        .card.violet { border-left-color: #7c3aed; }
+        .card.amber { border-left-color: #f59e0b; }
+        .card.red { border-left-color: #dc2626; }
+        .card.green { border-left-color: #34d399; }
+        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
+        .card.teal .card-title { color: #2dd4bf; }
+        .card.violet .card-title { color: #a78bfa; }
+        .card.amber .card-title { color: #f59e0b; }
+        .card.red .card-title { color: #f87171; }
+        .card.green .card-title { color: #34d399; }
+        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+        thead { background: #1e1b4b; }
+        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
+        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
+        tbody tr:hover { background: #1e293b; }
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
+        .metric-card.indigo { border-top-color: #6366f1; }
+        .metric-card.violet { border-top-color: #7c3aed; }
+        .metric-card.amber { border-top-color: #f59e0b; }
+        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
+        .metric-card.indigo .metric-value { color: #818cf8; }
+        .metric-card.violet .metric-value { color: #a78bfa; }
+        .metric-card.amber .metric-value { color: #f59e0b; }
+        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .compare-card.traditional { border-top: 3px solid #dc2626; }
+        .compare-card.ai { border-top: 3px solid #14b8a6; }
+        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
+        .compare-card.traditional .compare-label { color: #f87171; }
+        .compare-card.ai .compare-label { color: #2dd4bf; }
+        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
+        .compare-card.traditional .compare-value { color: #f87171; }
+        .compare-card.ai .compare-value { color: #2dd4bf; }
+        .compare-sub { font-size: 0.85em; color: #64748b; }
+        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
+        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
+        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
+        .owner-role { font-size: 0.85em; color: #7c3aed; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .four-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
+        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
+        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
+        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
+        .us-ac li { margin-bottom: 3px; }
+        .flow-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; margin-top: 14px; }
+        .flow-title { font-size: 0.9em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+        .flow-step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+        .flow-num { width: 26px; height: 26px; min-width: 26px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: 700; color: #fff; line-height: 26px; text-align: center; }
+        .flow-text { font-size: 0.88em; color: #cbd5e1; line-height: 1.5; }
+        .ussd-mock { background: #020617; border: 2px solid #334155; border-radius: 8px; padding: 16px; font-family: "Courier New", monospace; font-size: 0.88em; color: #34d399; margin: 12px 0; white-space: pre-wrap; line-height: 1.7; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
+        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
+        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
+        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
+        .priority-high { color: #f87171; font-weight: 700; }
+        .priority-med { color: #fbbf24; font-weight: 700; }
+        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
+        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
+        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
+        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
+        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
+        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
+        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
+        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 120px; }
+        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
+        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
+        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
+        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
+        .arch-layer:last-child .arch-layer-label { color: #64748b; }
+        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
+        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: "Courier New", monospace; font-size: 0.85em; color: #34d399; }
+        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
+        .sprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+        .sprint-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
+        .sprint-label { font-size: 0.78em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6366f1; margin-bottom: 6px; }
+        .sprint-title { font-size: 1.05em; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
+        .sprint-item { font-size: 0.88em; color: #94a3b8; padding: 4px 0; border-bottom: 1px solid #1e293b; }
+        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
+
+<div class="container">
+
+    <header>
+        <div>
+            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 27</div>
+            <h1>USSD AI Financial Health Coach</h1>
+            <div class="subtitle">Africa's first AI financial advisor accessible on any feature phone &mdash; analyses each customer's MoMo spending patterns, savings rate, income regularity, and financial goals, delivering personalised weekly nudges and a 0&ndash;100 financial health score over USSD to drive 25&ndash;35% MoMo engagement uplift across 13 markets</div>
+            <div>
+                <span class="badge badge-not-started">Not Started &mdash; 0%</span>
+                <span class="badge badge-high">Priority: P1</span>
+                <span class="badge badge-high">Tier: High</span>
+                <span class="badge badge-new">Driver: Customer Engagement &amp; Loyalty</span>
+            </div>
+            <div style="margin-top:10px;">
+                <span class="badge badge-compliance">POPIA</span>
+                <span class="badge badge-compliance">NDPR</span>
+                <span class="badge badge-compliance">Kenya DPA</span>
+                <span class="badge badge-teal">25&ndash;35% Engagement Uplift</span>
+                <span class="badge badge-teal">13 Markets</span>
+                <span class="badge badge-teal">Feature Phone</span>
+            </div>
+        </div>
+        <div class="header-grid">
+            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-27</div></div>
+            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
+            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
+            <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">Not Started</div></div>
+            <div class="meta-item"><div class="meta-label">Owner</div><div class="meta-value">Malcolm Govender</div></div>
+            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P1</div></div>
+            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">25&ndash;35% Engagement</div></div>
+            <div class="meta-item"><div class="meta-label">Channel</div><div class="meta-value">USSD + SMS</div></div>
+        </div>
+        <div class="owner-highlight">
+            <div class="owner-avatar">MG</div>
+            <div>
+                <div class="owner-name-text">Malcolm Govender</div>
+                <div class="owner-role">Head of AI &amp; Engineering &middot; Product Owner &amp; Document Author</div>
+            </div>
+        </div>
+    </header>
+
+    <section>
+        <h2>1. Executive Summary &amp; Business Case</h2>
+        <p>Financial literacy and personalised financial guidance are luxury goods in Africa &mdash; available to the wealthy through private bankers and financial planners, but inaccessible to the 65 million MoMo customers who need guidance most. These customers make daily financial decisions &mdash; how much to save, when to recharge airtime, whether to send money or keep a buffer &mdash; without access to any data-driven insight about their own financial health.</p>
+        <p>UC-27 delivers Africa's first truly accessible AI financial advisor: a system that runs entirely on the USSD channel (any GSM handset, no internet, 160-character messages) and analyses each customer's MoMo transaction history to compute a personalised 0&ndash;100 Financial Health Score. Every week, the coach sends a personalised nudge via SMS reflecting what the data says about that specific customer's financial behaviour. Over USSD, customers can explore their scores, set savings goals, and get spending category breakdowns in their preferred language.</p>
+        <p>The business case operates on two levels. First, customers who engage with their financial health score are measurably more likely to increase MoMo activity: comparable programmes (M-Pesa's Savings Coach pilot, Orange Money's financial literacy SMS) show <strong style="color:#818cf8;">25&ndash;35% uplift</strong> in monthly transaction volumes among engaged customers. Second, the coach creates a natural cross-sell surface for credit, insurance, and savings products &mdash; reducing customer acquisition cost for these high-margin products.</p>
+        <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-value">65M+</div><div class="metric-label">MoMo Customers Eligible</div></div>
+            <div class="metric-card indigo"><div class="metric-value">35%</div><div class="metric-label">Max Engagement Uplift Target</div></div>
+            <div class="metric-card violet"><div class="metric-value">0&ndash;100</div><div class="metric-label">Financial Health Score Range</div></div>
+            <div class="metric-card amber"><div class="metric-value">Weekly</div><div class="metric-label">Personalised Nudge Cadence</div></div>
+        </div>
+        <div class="comparison-box" style="margin-top:20px;">
+            <div class="compare-card traditional">
+                <div class="compare-label">Traditional Financial Advice</div>
+                <div class="compare-value">R2,000+/hr</div>
+                <div class="compare-sub">Private bankers, minimum income thresholds, smartphone required, English-only, no personalisation at transaction level, excludes 95% of MoMo customers</div>
+            </div>
+            <div class="compare-card ai">
+                <div class="compare-label">USSD AI Financial Health Coach (UC-27)</div>
+                <div class="compare-value">R0/week</div>
+                <div class="compare-sub">Any feature phone, any GSM network, personalised per transaction history, multilingual, weekly nudges, no internet required, 65M+ eligible customers</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="violet">
+        <h2>2. Problem Statement</h2>
+        <div class="card violet">
+            <div class="card-title">Problem 1 &mdash; No Access to Personalised Financial Guidance</div>
+            <div class="card-content">The 65 million customers on MTN's MoMo platform have zero access to personalised financial guidance. Their decisions about saving, spending, and transferring money are made without any feedback loop. A customer who consistently depletes their wallet before month-end has no mechanism to learn this pattern. Financial coaching exists in the abstract (financial literacy campaigns) but never at the individual transaction level where behaviour change actually happens.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 2 &mdash; Low MoMo Engagement Among Casual Users</div>
+            <div class="card-content">Approximately 40% of registered MoMo customers are classified as "casual" users &mdash; fewer than 4 transactions per month. These customers have a MoMo wallet but do not integrate it deeply into their financial lives. The absence of a compelling reason to check the wallet, set goals, or track progress means MoMo is used opportunistically. A personalised financial health score creates a weekly pull mechanism that brings customers back to the platform.</div>
+        </div>
+        <div class="card violet">
+            <div class="card-title">Problem 3 &mdash; Cross-Sell Conversion Is Low Because Customers Are Not Ready</div>
+            <div class="card-content">MTN Fintech's credit, insurance, and savings products have low conversion rates because customers receive offers without context. The financial health coach builds an advisory relationship over weeks and months, making product offers feel like recommendations from a trusted advisor rather than unsolicited marketing. Coached customers show 15&ndash;20% higher cross-sell conversion in comparable programmes.</div>
+        </div>
+    </section>
+
+    <section class="teal">
+        <h2>3. Objectives &amp; Success Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-value">50%</div><div class="metric-label">Target Opt-In Rate (12 Mo)</div></div>
+            <div class="metric-card indigo"><div class="metric-value">+35%</div><div class="metric-label">MoMo Transaction Volume Uplift</div></div>
+            <div class="metric-card violet"><div class="metric-value">+20%</div><div class="metric-label">Cross-Sell Conversion Improvement</div></div>
+            <div class="metric-card amber"><div class="metric-value">8</div><div class="metric-label">Markets Live by Month 12</div></div>
+        </div>
+        <table style="margin-top:20px;">
+            <thead><tr><th>KPI</th><th>Baseline</th><th>Target (6 Mo)</th><th>Target (12 Mo)</th><th>Measurement</th></tr></thead>
+            <tbody>
+                <tr><td>Coach Opt-In Rate</td><td>N/A</td><td class="priority-med">&ge;30%</td><td class="priority-high">&ge;50%</td><td>Consent event logs</td></tr>
+                <tr><td>Weekly Nudge Open Rate (SMS)</td><td>N/A</td><td class="priority-med">&ge;40%</td><td class="priority-med">&ge;55%</td><td>SMS delivery + USSD dial-back tracking</td></tr>
+                <tr><td>Monthly Tx Volume (coached vs control)</td><td>Baseline cohort</td><td class="priority-high">+25%</td><td class="priority-high">+35%</td><td>A/B cohort analysis monthly</td></tr>
+                <tr><td>Customers with Active Savings Goal</td><td>Baseline</td><td class="priority-med">+20%</td><td class="priority-med">+30%</td><td>USSD goal-setting events</td></tr>
+                <tr><td>Score Check Frequency (coached)</td><td>0</td><td class="priority-med">&ge;2x/month</td><td class="priority-med">&ge;3x/month</td><td>USSD session logs</td></tr>
+                <tr><td>Cross-Sell Conversion</td><td>Baseline</td><td class="priority-high">+15%</td><td class="priority-high">+20%</td><td>Product conversion attribution</td></tr>
+                <tr><td>Markets Live</td><td>0</td><td class="priority-med">3</td><td class="priority-high">8</td><td>Deployment tracker</td></tr>
+                <tr><td>Financial Health Score Avg (coached)</td><td>N/A</td><td class="priority-med">52/100</td><td class="priority-med">61/100</td><td>Daily score computation logs</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>4. User Stories</h2>
+        <div class="two-col">
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-01 &middot; Financial Health Score Check</div>
+                    <div class="us-title">Customer Checks Their Score via USSD</div>
+                    <div class="us-story">"As a MoMo customer, I want to dial a code and see my financial health score so I can understand how I am doing financially."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Score displayed (e.g. "Your score: 68/100 &mdash; Good") within 160 chars</li>
+                        <li>Score computed from last 30 days MoMo data within 3 seconds</li>
+                        <li>Top 1 strength and top 1 improvement area shown</li>
+                        <li>Option to explore spending, savings, income sub-scores</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-02 &middot; Weekly SMS Nudge</div>
+                    <div class="us-title">Personalised Weekly Coaching Nudge</div>
+                    <div class="us-story">"As a MoMo customer, I want to receive a weekly SMS that tells me something specific and actionable about my financial behaviour."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>SMS sent every Monday at 08:00 to opted-in customers</li>
+                        <li>Message personalised to individual's actual MoMo data (not generic)</li>
+                        <li>Message le 160 characters (single SMS unit)</li>
+                        <li>Reply STOP to opt out, takes effect within 24 hours</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-03 &middot; Spending Category Breakdown</div>
+                    <div class="us-title">View Spending by Category This Month</div>
+                    <div class="us-story">"As a MoMo customer, I want to see where my money went this month broken down by category over USSD."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Top 3 spending categories shown (Airtime: 35%, Food: 28%, Transfers: 22%)</li>
+                        <li>Comparison to last month shown ("Airtime up 12% vs last month")</li>
+                        <li>Paginated within 160-char USSD format</li>
+                        <li>Category classification accuracy ge 85%</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-04 &middot; Savings Goal Setting</div>
+                    <div class="us-title">Set and Track a Savings Goal via USSD</div>
+                    <div class="us-story">"As a MoMo customer, I want to set a savings goal (save R500 by month-end) and track my progress weekly via nudges."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Customer enters goal amount and target date via USSD</li>
+                        <li>Weekly progress shown as percentage in SMS nudge</li>
+                        <li>Celebration message on goal completion</li>
+                        <li>Goal can be updated or cancelled at any time via USSD</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="us-card">
+                    <div class="us-id">US-05 &middot; Income Regularity Insight</div>
+                    <div class="us-title">Coach Identifies Irregular Income Pattern</div>
+                    <div class="us-story">"As a customer with irregular income, I want the coach to recognise my pattern and give advice tailored to income volatility."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Income classified: Regular / Irregular / Seasonal</li>
+                        <li>Irregular income customers receive specific buffer-building advice</li>
+                        <li>Advice references actual average income from MoMo data</li>
+                        <li>Not generic: "Your income varied 45% over 3 months. Build a 2-week buffer."</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-06 &middot; Multilingual Coaching</div>
+                    <div class="us-title">Receive Coaching in Preferred Language</div>
+                    <div class="us-story">"As a Zulu-speaking customer, I want my weekly nudge and USSD score screen to be in Zulu, not English."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Customer sets language preference at opt-in (stored in profile)</li>
+                        <li>All nudge templates translated to supported languages</li>
+                        <li>Language can be changed at any time via USSD menu</li>
+                        <li>Currency and number formatting correct per locale</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-07 &middot; Score Trend Tracking</div>
+                    <div class="us-title">Track Score Improvement Over 3 Months</div>
+                    <div class="us-story">"As a coached customer, I want to see how my financial health score has changed over the last 3 months to see my progress."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>3-month score trend: "Your score: 68 (+8 from 3 months ago)"</li>
+                        <li>Trend direction indicated (up/down/stable) in text</li>
+                        <li>Key factor driving improvement highlighted</li>
+                        <li>Monthly scores stored without retaining raw transaction data</li>
+                    </ul>
+                </div>
+                <div class="us-card">
+                    <div class="us-id">US-08 &middot; POPIA Consent at Opt-In</div>
+                    <div class="us-title">First-Use Data Processing Consent</div>
+                    <div class="us-story">"As a customer, I want to consent to my MoMo transaction data being used for coaching before any analysis occurs."</div>
+                    <div class="us-ac-label">Acceptance Criteria</div>
+                    <ul class="us-ac">
+                        <li>Consent prompt shown on first coach feature access</li>
+                        <li>Clearly describes what data is used (MoMo transactions only)</li>
+                        <li>Decline routes to standard MoMo menu; no analysis occurs</li>
+                        <li>Consent timestamp stored immutably in MoMo profile</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>5. Functional Requirements</h2>
+        <h3>5.1 Financial Health Score Engine</h3>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-01</code></td><td>The Financial Health Score SHALL be a weighted composite of four dimensions: (1) Savings Rate 30%, (2) Spending Stability 25%, (3) Income Regularity 25%, (4) MoMo Engagement 20%. Each dimension scored 0&ndash;100.</td><td><span class="tag tag-must">MUST</span></td><td>Weights configurable per market</td></tr>
+                <tr><td><code>FR-02</code></td><td>The score SHALL be recalculated daily for each opted-in customer using the previous 30 calendar days of MoMo transaction data. Score reflects data as of the previous day.</td><td><span class="tag tag-must">MUST</span></td><td>Daily batch job (off-peak hours)</td></tr>
+                <tr><td><code>FR-03</code></td><td>MoMo transactions SHALL be categorised into: Airtime and Data, Food and Market, Transport, Utilities, Peer Transfers, Savings, and Other using a transaction classification model with ge 85% accuracy on held-out test set.</td><td><span class="tag tag-must">MUST</span></td><td>ML classification on merchant codes + amount patterns</td></tr>
+                <tr><td><code>FR-04</code></td><td>Score computation SHALL use only data available in the MoMo platform. No external data sources SHALL be used to ensure data minimisation compliance with POPIA and equivalent market regulations.</td><td><span class="tag tag-must">MUST</span></td><td>POPIA data minimisation</td></tr>
+                <tr><td><code>FR-05</code></td><td>The system SHALL generate 160-character personalised nudge templates using an LLM that takes as input: the customer's score, dimension scores, top spending category, savings goal progress (if set), and income regularity classification. Output SHALL be factual and non-generic.</td><td><span class="tag tag-must">MUST</span></td><td>Next step: design template system</td></tr>
+            </tbody>
+        </table>
+        <h3>5.2 USSD Interaction Design</h3>
+        <div class="ussd-mock">Weekly SMS (Monday 08:00):
+MTN Coach: Hi Amara! Score: 68/100 (Good).
+You saved 12% more this week!
+Tip: Keep wallet above R150 week-end.
+Dial *187# for full breakdown.
+
+--- Customer dials *187# ---
+MTN FinCoach: Your Health Score: 68
+Savings:72 Spending:65
+Income:70 Engagement:64
+1.Spending breakdown
+2.Set savings goal  3.Score history
+
+Customer: 1
+
+MTN FinCoach: Your spending (30 days):
+Airtime: 35% (R175)
+Food/Mkt: 28% (R140)
+Transfers: 22% (R110)
+Other: 15% (R75)
+0=More tips</div>
+        <table>
+            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+            <tbody>
+                <tr><td><code>FR-06</code></td><td>The USSD coach interface SHALL be accessible via a dedicated short code (e.g. *187#) and SHALL display the current score, sub-scores, and a navigation menu within the first USSD response (le 160 chars).</td><td><span class="tag tag-must">MUST</span></td><td>Dedicated short code per market</td></tr>
+                <tr><td><code>FR-07</code></td><td>The weekly SMS nudge SHALL be sent every Monday at 08:00 market-local time to all opted-in customers. The nudge SHALL reference at least one data point specific to the individual customer's last 7 days of MoMo activity.</td><td><span class="tag tag-must">MUST</span></td><td>Personalisation is non-negotiable differentiator</td></tr>
+                <tr><td><code>FR-08</code></td><td>Customers SHALL be able to set, update, or cancel a savings goal via the USSD coach menu. Goals SHALL persist across sessions and be referenced in weekly nudges when set.</td><td><span class="tag tag-should">SHOULD</span></td><td>Savings goal stored in MoMo profile extension</td></tr>
+                <tr><td><code>FR-09</code></td><td>The system SHALL support the STOP command (and translated equivalents) via SMS reply to immediately opt out of all coaching communications. Opt-out SHALL be processed within 24 hours.</td><td><span class="tag tag-must">MUST</span></td><td>POPI Act Section 69 direct marketing opt-out</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="violet">
+        <h2>6. Technical Architecture</h2>
+        <div class="arch-layers">
+            <div class="arch-layer">
+                <div class="arch-layer-label">Customer Channel</div>
+                <div class="arch-layer-content">Feature Phone &rarr; USSD Gateway &rarr; Coach USSD Application Server (FastAPI) &nbsp;|&nbsp; SMS Gateway &rarr; Customer Mobile</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Score Engine</div>
+                <div class="arch-layer-content">Daily Batch: MoMo Data Lake &rarr; Feature Engineering (Spark) &rarr; Dimension Scorers &rarr; Composite Score Computation &rarr; Score Store (Redis per-market)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Nudge Generation</div>
+                <div class="arch-layer-content">Weekly Batch (Sunday night): Score + Context Retrieval &rarr; LLM Nudge Generator (Claude claude-sonnet-4-6, 160-char enforcer) &rarr; Language Translator &rarr; SMS Queue (Kafka)</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Data &amp; ML</div>
+                <div class="arch-layer-content">Transaction Classifier (ML, merchant codes + amounts) &rarr; Income Regularity Detector &rarr; Savings Rate Calculator &rarr; MLflow (model versioning) &rarr; Monthly model evaluation</div>
+            </div>
+            <div class="arch-layer">
+                <div class="arch-layer-label">Compliance &amp; Ops</div>
+                <div class="arch-layer-content">POPIA Consent Store &rarr; Opt-Out Manager &rarr; Data Minimisation Layer (scores only, no raw transaction retention) &rarr; Audit Log (Kafka) &rarr; Grafana Dashboard</div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>7. Data &amp; AI Model Requirements</h2>
+        <h3>Financial Health Score Dimensions</h3>
+        <table>
+            <thead><tr><th>Dimension</th><th>Score Components</th><th>Weight</th><th>Good Score Threshold</th></tr></thead>
+            <tbody>
+                <tr><td>Savings Rate</td><td>% of income retained at month-end, trend direction, savings goal progress</td><td>30%</td><td>Save ge 10% of monthly inflows</td></tr>
+                <tr><td>Spending Stability</td><td>Coefficient of variation in weekly spending, impulse purchase frequency, essential vs discretionary ratio</td><td>25%</td><td>CoV lt 0.35, essential spending ge 60%</td></tr>
+                <tr><td>Income Regularity</td><td>Inflow frequency consistency, average inflow amount, inflow CoV</td><td>25%</td><td>Regular income (CoV lt 0.30), weekly or monthly</td></tr>
+                <tr><td>MoMo Engagement</td><td>Active transaction days per month, product diversity (airtime + transfers + merchants), wallet-as-primary-account indicator</td><td>20%</td><td>ge 10 active days, ge 3 product types used</td></tr>
+            </tbody>
+        </table>
+        <h3>Nudge Template Design</h3>
+        <div class="card teal">
+            <div class="card-title">Next Step: Design 160-Character Personalised Insight Templates</div>
+            <div class="card-content">The first design task for UC-27 is to create a library of personalised nudge templates covering all combinations of: score tier (Poor/Fair/Good/Excellent), dimension in focus (savings/spending/income/engagement), trend (improving/declining/stable), and goal status (set/not set/complete). Each template must be le 160 characters, reference at least one real data point from the customer's MoMo history, and be translatable to 6+ languages without exceeding the character limit. Estimated: 80&ndash;120 base templates covering 90%+ of customer scenarios.</div>
+        </div>
+    </section>
+
+    <section class="violet">
+        <h2>8. Compliance &amp; Regulatory</h2>
+        <table>
+            <thead><tr><th>Framework</th><th>Market</th><th>Key Obligation</th><th>UC-27 Control</th></tr></thead>
+            <tbody>
+                <tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Consent for processing transaction data for coaching; data minimisation; right to erasure; direct marketing opt-out</td><td>FR-04 consent at opt-in; FR-09 STOP command; score-only retention (no raw transaction data after computation); erasure on account closure</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">NDPR</strong></td><td>Nigeria</td><td>Data localisation; explicit consent; data minimisation; right to withdraw consent</td><td>Per-market score store; Nigerian consent form wording; STOP opt-out mechanism; score data only retained (not raw transactions)</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">Kenya DPA 2019</strong></td><td>Kenya</td><td>Lawful basis for processing; data subject rights; automated decision explanation</td><td>Opt-in consent; dimension score explanations provided on USSD request; opt-out mechanism; audit trail</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">POPI Act S69</strong></td><td>South Africa</td><td>Electronic direct marketing requires prior consent; opt-out on demand; sender identification</td><td>Weekly SMS is direct marketing; consent recorded at opt-in; STOP opt-out le 24h; MTN sender ID on all SMS</td></tr>
+                <tr><td><strong style="color:#2dd4bf;">Financial Advisory</strong></td><td>All markets</td><td>Coaching content must not constitute regulated financial advice; no product recommendations in coaching channel</td><td>All nudge templates reviewed by legal: no product names, no specific investment advice, behavioural coaching only. Cross-sell handled via separate channel with appropriate disclosures.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="teal">
+        <h2>9. Sprint Plan &amp; Roadmap</h2>
+        <div class="sprint-grid">
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 1 &mdash; Discovery &amp; Design</div>
+                <div class="sprint-title">Score Model &amp; Template Design</div>
+                <div class="sprint-item">&#8226; Define financial health scoring model</div>
+                <div class="sprint-item">&#8226; Design 160-char nudge template library</div>
+                <div class="sprint-item">&#8226; MoMo transaction data audit</div>
+                <div class="sprint-item">&#8226; POPIA / NDPR legal review</div>
+                <div class="sprint-item">&#8226; USSD flow wireframes (per market)</div>
+                <div class="sprint-item">&#8226; Transaction classifier training data</div>
+                <div class="sprint-item">&#8226; A/B test design (coached vs control)</div>
+                <div class="sprint-item">&#8226; SMS gateway vendor selection</div>
+            </div>
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 2 &mdash; Core Build</div>
+                <div class="sprint-title">Score Engine &amp; USSD Integration</div>
+                <div class="sprint-item">&#8226; Feature engineering pipeline (Spark)</div>
+                <div class="sprint-item">&#8226; Dimension score computation</div>
+                <div class="sprint-item">&#8226; Transaction classifier (ML model)</div>
+                <div class="sprint-item">&#8226; LLM nudge generation pipeline</div>
+                <div class="sprint-item">&#8226; USSD gateway integration (SA)</div>
+                <div class="sprint-item">&#8226; SMS delivery pipeline (Kafka)</div>
+                <div class="sprint-item">&#8226; Consent + opt-out management</div>
+                <div class="sprint-item">&#8226; Savings goal USSD flow</div>
+            </div>
+            <div class="sprint-card">
+                <div class="sprint-label">Sprint 3 &mdash; Pilot &amp; Expand</div>
+                <div class="sprint-title">SA Pilot &amp; Multi-Market Rollout</div>
+                <div class="sprint-item">&#8226; SA pilot: 50,000 customers</div>
+                <div class="sprint-item">&#8226; A/B cohort analysis (6-week)</div>
+                <div class="sprint-item">&#8226; Engagement uplift measurement</div>
+                <div class="sprint-item">&#8226; Template library refinement</div>
+                <div class="sprint-item">&#8226; Zulu + Afrikaans translations</div>
+                <div class="sprint-item">&#8226; Nigeria and Ghana regulatory prep</div>
+                <div class="sprint-item">&#8226; Cross-sell attribution model</div>
+                <div class="sprint-item">&#8226; Board impact report (Month 6)</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="red">
+        <h2>10. Risk Register</h2>
+        <table>
+            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+            <tbody>
+                <tr><td><code>R-01</code></td><td>Nudges feel generic rather than personalised, resulting in low opt-in and high opt-out rates</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Template A/B testing before launch. Personalisation requires at minimum 3 customer-specific data points per nudge. Quality gate: if personalisation score (% of template filled with real data) &lt; 60%, use backup generic template and flag for review.</td></tr>
+                <tr><td><code>R-02</code></td><td>Coaching nudges inadvertently constitute financial advice, creating FAIS liability</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Legal review of all 80&ndash;120 templates before launch. Strict content rules: no product recommendations, no specific amounts to invest, behavioural coaching only. Annual legal review of template library.</td></tr>
+                <tr><td><code>R-03</code></td><td>POPIA opt-in rate is low, limiting the coached population and reducing business impact</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>Opt-in prompt tested with focus groups per market. Emphasise value: "Get your free weekly money tip." Easy opt-out at any time builds trust. Incentivise opt-in with entry-level credit limit improvement for opted-in customers.</td></tr>
+                <tr><td><code>R-04</code></td><td>Transaction classifier accuracy below 85%, producing incorrect spending category breakdowns that erode trust</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>Classifier evaluated on 10,000 labelled transactions per market before launch. Human-reviewed label set sourced from MoMo operations team. Conservative classification: "Other" category used when confidence &lt; 0.75.</td></tr>
+                <tr><td><code>R-05</code></td><td>Score computation batch job fails or produces stale scores, causing incorrect nudges to be sent</td><td class="priority-med">Low</td><td class="priority-med">Medium</td><td>Score freshness check before nudge generation: if score older than 48 hours, delay nudge and alert MLOps. Redundant batch job with 6-hour retry. Monitoring alert on batch job failure within 30 minutes.</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-27 USSD AI Financial Health Coach &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
+        <div>Owner: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
+        <div style="margin-top:8px;font-size:0.82em;">Integrations: MoMo API &middot; USSD Gateway &middot; SMS Gateway &middot; Claude claude-sonnet-4-6 &middot; Spark Data Pipeline &nbsp;&middot;&nbsp; Compliance: POPIA &middot; NDPR &middot; Kenya DPA &middot; POPI Act S69 &middot; FAIS</div>
+    </footer>
+
+</div>
+</body>
+</html>
