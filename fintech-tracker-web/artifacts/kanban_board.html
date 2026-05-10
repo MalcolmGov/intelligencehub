@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AI Programme Board — MTN Group Fintech</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0d0f1c;
+  --surface:   #12152a;
+  --surface2:  #181b34;
+  --surface3:  #1e2240;
+  --border:    rgba(255,255,255,.07);
+  --border2:   rgba(255,255,255,.12);
+  --text-1:    #e8eaff;
+  --text-2:    #8b93c4;
+  --text-3:    #555e8a;
+  --radius:    10px;
+  --col-w:     290px;
+
+  --c-backlog: #555e8a;
+  --c-prog:    #fdab3d;
+  --c-review:  #a78bfa;
+  --c-done:    #00c875;
+  --c-p1:      #ef4444;
+  --c-p2:      #f97316;
+  --c-p3:      #fdab3d;
+  --c-p4:      #60a5fa;
+  --rainbow:   linear-gradient(90deg, #03fafa 0%, #9878f1 50%, #6161ff 100%);
+}
+
+html, body { height: 100%; }
+body {
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Cursor glow ─────────────────────────────── */
+#cg {
+  position: fixed; width: 340px; height: 340px; border-radius: 50%;
+  pointer-events: none; z-index: 9999; top: 0; left: 0;
+  transform: translate(-50%,-50%);
+  background: radial-gradient(circle, rgba(3,250,250,.06) 0%, rgba(152,120,241,.04) 35%, transparent 70%);
+  opacity: 0; transition: opacity .4s;
+}
+.cursor-ripple {
+  position: fixed; width: 100px; height: 100px; border-radius: 50%;
+  pointer-events: none; z-index: 9998;
+  transform: translate(-50%,-50%) scale(0);
+  background: radial-gradient(circle, rgba(3,250,250,.3), rgba(152,120,241,.2), transparent 70%);
+  animation: ripple 600ms linear forwards;
+}
+@keyframes ripple {
+  0%   { transform: translate(-50%,-50%) scale(0);   opacity:1; filter:blur(0); }
+  100% { transform: translate(-50%,-50%) scale(4.5); opacity:0; filter:blur(12px); }
+}
+
+/* ── Header ──────────────────────────────────── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,15,28,.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex; align-items: center; gap: 16px;
+}
+.header-logo {
+  font-size: 13px; font-weight: 800; letter-spacing: .04em;
+  color: var(--text-1);
+  display: flex; align-items: center; gap: 8px;
+}
+.header-logo-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--rainbow);
+}
+.header-sep { width: 1px; height: 20px; background: var(--border2); }
+.board-name {
+  font-size: 14px; font-weight: 600; color: var(--text-1);
+  white-space: nowrap;
+}
+.header-spacer { flex: 1; }
+
+.view-toggle {
+  display: flex; gap: 2px;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+}
+.view-btn {
+  background: none; border: none; cursor: pointer;
+  padding: 5px 12px; border-radius: 6px;
+  font-size: 12px; font-weight: 600; color: var(--text-2);
+  transition: all .15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.view-btn.active {
+  background: var(--surface2);
+  color: var(--text-1);
+  box-shadow: 0 1px 4px rgba(0,0,0,.4);
+}
+.view-btn:hover:not(.active) { color: var(--text-1); }
+
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 7px;
+  background: var(--surface3); border: 1px solid var(--border);
+  color: var(--text-2); font-size: 12px; font-weight: 500;
+  cursor: pointer; text-decoration: none; transition: all .15s;
+}
+.back-btn:hover { color: var(--text-1); border-color: var(--border2); }
+
+/* ── Sub-header (stats bar + filters) ─────────── */
+.subheader {
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; align-items: center; gap: 16px;
+  flex-wrap: wrap;
+}
+.stat-pill {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-2);
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--surface3); border: 1px solid var(--border);
+  cursor: pointer; transition: all .15s;
+}
+.stat-pill:hover { border-color: var(--border2); color: var(--text-1); }
+.stat-pill.active { border-color: rgba(3,250,250,.4); color: #03fafa; background: rgba(3,250,250,.08); }
+.stat-dot { width: 8px; height: 8px; border-radius: 50%; }
+.stat-val { font-weight: 700; color: var(--text-1); }
+.subheader-sep { flex: 1; }
+.search-box {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 5px 10px;
+}
+.search-box input {
+  background: none; border: none; outline: none;
+  color: var(--text-1); font-size: 12px; width: 180px;
+}
+.search-box input::placeholder { color: var(--text-3); }
+
+/* ── Kanban board ────────────────────────────── */
+.kanban-wrap {
+  padding: 20px 24px 40px;
+  display: flex; gap: 16px;
+  overflow-x: auto;
+  min-height: calc(100vh - 120px);
+  align-items: flex-start;
+}
+.kanban-col {
+  flex-shrink: 0;
+  width: var(--col-w);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 140px);
+  position: relative;
+}
+/* Colour top stripe per column */
+.kanban-col::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: 12px 12px 0 0;
+}
+.col-backlog::before { background: var(--c-backlog); }
+.col-prog::before    { background: var(--c-prog); }
+.col-review::before  { background: var(--c-review); }
+.col-done::before    { background: var(--c-done); }
+
+.col-header {
+  padding: 14px 14px 10px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+  background: var(--surface2);
+  border-radius: 12px 12px 0 0;
+  z-index: 2;
+}
+.col-icon { font-size: 14px; }
+.col-title { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.col-count {
+  margin-left: auto;
+  font-size: 11px; font-weight: 700;
+  padding: 2px 7px; border-radius: 10px;
+  background: rgba(255,255,255,.07);
+  color: var(--text-2);
+}
+.col-backlog .col-title { color: var(--c-backlog); }
+.col-prog .col-title    { color: var(--c-prog); }
+.col-review .col-title  { color: var(--c-review); }
+.col-done .col-title    { color: var(--c-done); }
+
+.col-cards {
+  padding: 10px;
+  display: flex; flex-direction: column; gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+.col-cards::-webkit-scrollbar { width: 4px; }
+.col-cards::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+
+/* ── Kanban Card ─────────────────────────────── */
+.k-card {
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 12px;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s, border-color .15s;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+.k-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  border-radius: 9px 0 0 9px;
+}
+.k-card.s-backlog::before { background: var(--c-backlog); }
+.k-card.s-prog::before    { background: var(--c-prog); }
+.k-card.s-review::before  { background: var(--c-review); }
+.k-card.s-done::before    { background: var(--c-done); }
+
+.k-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.4);
+  border-color: var(--border2);
+}
+.k-card.drag-over { border-color: #03fafa88; background: rgba(3,250,250,.06); }
+.k-card[draggable]:active { opacity: .6; }
+
+.k-card-top {
+  display: flex; align-items: flex-start; gap: 8px;
+  margin-bottom: 7px;
+}
+.k-uc-badge {
+  flex-shrink: 0;
+  font-size: 9px; font-weight: 800;
+  padding: 2px 6px; border-radius: 4px;
+  background: rgba(255,255,255,.07);
+  color: var(--text-2);
+  margin-top: 1px;
+}
+.k-title {
+  font-size: 12px; font-weight: 600; color: var(--text-1);
+  line-height: 1.4; flex: 1;
+}
+.k-pri {
+  flex-shrink: 0;
+  font-size: 9px; font-weight: 800;
+  padding: 2px 5px; border-radius: 4px;
+  margin-top: 1px;
+}
+.k-pri.p1 { background: rgba(239,68,68,.2);  color: #ef4444; }
+.k-pri.p2 { background: rgba(249,115,22,.2); color: #f97316; }
+.k-pri.p3 { background: rgba(253,171,61,.2); color: #fdab3d; }
+.k-pri.p4 { background: rgba(96,165,250,.2); color: #60a5fa; }
+.k-pri.p5 { background: rgba(139,147,196,.15); color: #8b93c4; }
+
+.k-card-meta {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 8px;
+}
+.k-owner {
+  font-size: 10px; color: var(--text-3);
+  display: flex; align-items: center; gap: 4px;
+}
+.k-avatar {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+  font-size: 8px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.k-pct {
+  margin-left: auto;
+  font-size: 10px; font-weight: 700; color: var(--text-2);
+}
+.k-progress {
+  margin-top: 8px;
+  height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,.06);
+  overflow: hidden;
+}
+.k-progress-fill {
+  height: 100%; border-radius: 2px;
+  transition: width .3s;
+}
+
+/* Column footer */
+.col-footer {
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+}
+.col-add-btn {
+  width: 100%; background: none; border: 1px dashed var(--border);
+  color: var(--text-3); font-size: 11px; padding: 7px;
+  border-radius: 7px; cursor: pointer; transition: all .15s;
+}
+.col-add-btn:hover { border-color: var(--border2); color: var(--text-2); background: var(--surface3); }
+
+/* Drop zone */
+.kanban-col.drag-target { border-color: #03fafa55; background: rgba(3,250,250,.04); }
+
+/* ── Table / Backlog view ────────────────────── */
+.table-wrap { padding: 0 24px 40px; display: none; }
+.backlog-table {
+  width: 100%; border-collapse: collapse; font-size: 12.5px;
+  margin-top: 16px;
+}
+.backlog-table thead th {
+  padding: 10px 14px;
+  background: var(--surface2);
+  color: var(--text-2); font-weight: 700; font-size: 11px;
+  text-transform: uppercase; letter-spacing: .04em;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  position: sticky; top: 56px; z-index: 5;
+  cursor: pointer; user-select: none;
+  white-space: nowrap;
+}
+.backlog-table thead th:hover { color: var(--text-1); }
+.backlog-table thead th .sort-icon { opacity: .4; font-size: 10px; }
+.backlog-table thead th.sorted .sort-icon { opacity: 1; color: #03fafa; }
+
+.backlog-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background .12s;
+}
+.backlog-table tbody tr:hover { background: rgba(255,255,255,.03); }
+
+.backlog-table td { padding: 10px 14px; vertical-align: middle; }
+.td-id { color: var(--text-3); font-size: 11px; font-weight: 700; width: 52px; }
+.td-name { font-weight: 500; color: var(--text-1); max-width: 340px; }
+.td-name small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
+.td-pri { width: 56px; }
+.td-owner { color: var(--text-2); font-size: 12px; white-space: nowrap; }
+.td-status { width: 120px; }
+.status-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+.status-chip.s-ns   { background: rgba(85,94,138,.2); color: var(--c-backlog); }
+.status-chip.s-ip   { background: rgba(253,171,61,.15); color: var(--c-prog); }
+.status-chip.s-ir   { background: rgba(167,139,250,.15); color: var(--c-review); }
+.status-chip.s-done { background: rgba(0,200,117,.15); color: var(--c-done); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.td-pct { width: 90px; }
+.pct-wrap { display: flex; align-items: center; gap: 7px; }
+.pct-bar { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
+.pct-fill { height: 100%; border-radius: 2px; }
+.pct-label { font-size: 10px; color: var(--text-2); font-weight: 600; min-width: 28px; text-align: right; }
+
+.group-header td {
+  padding: 12px 14px 6px;
+  font-size: 11px; font-weight: 700; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .06em;
+  background: var(--surface);
+  border-bottom: none !important;
+}
+.group-header td span {
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.group-count {
+  font-size: 10px; padding: 1px 7px; border-radius: 10px;
+  background: rgba(255,255,255,.07); color: var(--text-3);
+  font-weight: 600;
+}
+
+/* ── Empty column ────────────────────────────── */
+.col-empty {
+  padding: 24px 12px; text-align: center;
+  color: var(--text-3); font-size: 11px;
+}
+.col-empty-icon { font-size: 22px; margin-bottom: 6px; }
+
+/* ── Card modal (quick detail) ───────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  width: 100%; max-width: 560px;
+  max-height: 80vh; overflow-y: auto;
+  position: relative;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6);
+}
+.modal-box::before {
+  content: '';
+  position: absolute; inset: -6px; border-radius: 20px;
+  background: var(--rainbow); filter: blur(8px); z-index: -1; opacity: .3;
+}
+.modal-header {
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.modal-uc { font-size: 10px; font-weight: 800; color: var(--text-3); padding: 3px 8px; background: var(--surface3); border-radius: 5px; flex-shrink:0; margin-top:2px; }
+.modal-title { font-size: 15px; font-weight: 700; color: var(--text-1); flex: 1; line-height: 1.4; }
+.modal-close { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 18px; padding: 4px; flex-shrink:0; }
+.modal-close:hover { color: var(--text-1); }
+.modal-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+.modal-row { display: flex; align-items: center; gap: 10px; }
+.modal-label { font-size: 11px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; min-width: 80px; }
+.modal-val { font-size: 13px; color: var(--text-1); }
+.modal-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; padding: 10px 12px; background: var(--surface3); border-radius: 8px; border: 1px solid var(--border); }
+.modal-pct-wrap { flex: 1; }
+.modal-pct-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.06); overflow: hidden; margin-top: 4px; }
+.modal-open-btn {
+  display: block; width: 100%;
+  padding: 10px; border-radius: 8px; text-align: center;
+  background: rgba(3,250,250,.1); border: 1px solid rgba(3,250,250,.3);
+  color: #03fafa; font-size: 12px; font-weight: 600;
+  cursor: pointer; text-decoration: none; transition: all .15s;
+}
+.modal-open-btn:hover { background: rgba(3,250,250,.18); }
+</style>
+</head>
+<body>
+<div id="cg"></div>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-logo">
+    <div class="header-logo-dot"></div>
+    MTN Fintech AI
+  </div>
+  <div class="header-sep"></div>
+  <div class="board-name">🎯 AI Programme Board</div>
+  <div class="header-spacer"></div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="btnKanban" onclick="setView('kanban')">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="4" height="16" rx="1"/><rect x="6" y="0" width="4" height="12" rx="1"/><rect x="12" y="0" width="4" height="10" rx="1"/></svg>
+      Kanban
+    </button>
+    <button class="view-btn" id="btnTable" onclick="setView('table')">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="16" height="3" rx="1"/><rect x="0" y="5" width="16" height="3" rx="1"/><rect x="0" y="10" width="16" height="3" rx="1"/><rect x="0" y="15" width="16" height="1" rx="0.5"/></svg>
+      Backlog
+    </button>
+  </div>
+  <a href="../index.html" class="back-btn">← Tracker</a>
+</header>
+
+<!-- Stats sub-header -->
+<div class="subheader">
+  <div class="stat-pill active" id="pill-all" onclick="setFilter('all')">
+    <span class="stat-dot" style="background:#8b93c4"></span>
+    All <span class="stat-val" id="cnt-all">0</span>
+  </div>
+  <div class="stat-pill" id="pill-ns" onclick="setFilter('Not started')">
+    <span class="stat-dot" style="background:var(--c-backlog)"></span>
+    Backlog <span class="stat-val" id="cnt-ns">0</span>
+  </div>
+  <div class="stat-pill" id="pill-ip" onclick="setFilter('In progress')">
+    <span class="stat-dot" style="background:var(--c-prog)"></span>
+    In Progress <span class="stat-val" id="cnt-ip">0</span>
+  </div>
+  <div class="stat-pill" id="pill-ir" onclick="setFilter('In review')">
+    <span class="stat-dot" style="background:var(--c-review)"></span>
+    In Review <span class="stat-val" id="cnt-ir">0</span>
+  </div>
+  <div class="stat-pill" id="pill-done" onclick="setFilter('Done')">
+    <span class="stat-dot" style="background:var(--c-done)"></span>
+    Done <span class="stat-val" id="cnt-done">0</span>
+  </div>
+  <div class="subheader-sep"></div>
+  <div class="search-box">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" opacity=".4"><path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398l3.85 3.85a1 1 0 001.415-1.415l-3.868-3.833zm-5.242 1.406a5 5 0 110-10 5 5 0 010 10z"/></svg>
+    <input type="text" id="searchInput" placeholder="Search use cases…" oninput="render()"/>
+  </div>
+</div>
+
+<!-- Kanban view -->
+<div class="kanban-wrap" id="kanbanView">
+  <div class="kanban-col col-backlog" id="col-ns" ondragover="onDragOver(event,'Not started')" ondrop="onDrop(event,'Not started')" ondragleave="onDragLeave(event)">
+    <div class="col-header">
+      <span class="col-icon">📋</span>
+      <span class="col-title">Backlog</span>
+      <span class="col-count" id="cnt-col-ns">0</span>
+    </div>
+    <div class="col-cards" id="cards-ns"></div>
+    <div class="col-footer"><button class="col-add-btn">+ Add item</button></div>
+  </div>
+
+  <div class="kanban-col col-prog" id="col-ip" ondragover="onDragOver(event,'In progress')" ondrop="onDrop(event,'In progress')" ondragleave="onDragLeave(event)">
+    <div class="col-header">
+      <span class="col-icon">🚀</span>
+      <span class="col-title">In Progress</span>
+      <span class="col-count" id="cnt-col-ip">0</span>
+    </div>
+    <div class="col-cards" id="cards-ip"></div>
+    <div class="col-footer"><button class="col-add-btn">+ Add item</button></div>
+  </div>
+
+  <div class="kanban-col col-review" id="col-ir" ondragover="onDragOver(event,'In review')" ondrop="onDrop(event,'In review')" ondragleave="onDragLeave(event)">
+    <div class="col-header">
+      <span class="col-icon">🔍</span>
+      <span class="col-title">In Review</span>
+      <span class="col-count" id="cnt-col-ir">0</span>
+    </div>
+    <div class="col-cards" id="cards-ir"></div>
+    <div class="col-footer"><button class="col-add-btn">+ Add item</button></div>
+  </div>
+
+  <div class="kanban-col col-done" id="col-done" ondragover="onDragOver(event,'Done')" ondrop="onDrop(event,'Done')" ondragleave="onDragLeave(event)">
+    <div class="col-header">
+      <span class="col-icon">✅</span>
+      <span class="col-title">Done</span>
+      <span class="col-count" id="cnt-col-done">0</span>
+    </div>
+    <div class="col-cards" id="cards-done"></div>
+    <div class="col-footer"><button class="col-add-btn">+ Add item</button></div>
+  </div>
+</div>
+
+<!-- Backlog / Table view -->
+<div class="table-wrap" id="tableView">
+  <table class="backlog-table">
+    <thead>
+      <tr>
+        <th onclick="sortBy('id')">ID <span class="sort-icon" id="sort-id">↕</span></th>
+        <th onclick="sortBy('project')">Name <span class="sort-icon" id="sort-project">↕</span></th>
+        <th onclick="sortBy('priority')">Pri <span class="sort-icon" id="sort-priority">↕</span></th>
+        <th onclick="sortBy('owner')">Owner <span class="sort-icon" id="sort-owner">↕</span></th>
+        <th onclick="sortBy('status')">Status <span class="sort-icon" id="sort-status">↕</span></th>
+        <th onclick="sortBy('pct')">Progress <span class="sort-icon" id="sort-pct">↕</span></th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<!-- Card detail modal -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-header">
+      <span class="modal-uc" id="mUcId"></span>
+      <span class="modal-title" id="mTitle"></span>
+      <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <span class="modal-label">Status</span>
+        <span class="modal-val" id="mStatus"></span>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Priority</span>
+        <span class="modal-val" id="mPri"></span>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Owner</span>
+        <span class="modal-val" id="mOwner"></span>
+      </div>
+      <div class="modal-row">
+        <span class="modal-label">Assigned</span>
+        <span class="modal-val" id="mAssigned"></span>
+      </div>
+      <div class="modal-row" style="align-items:flex-start;flex-direction:column;gap:6px">
+        <span class="modal-label">Progress</span>
+        <div class="modal-pct-wrap" style="width:100%">
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--text-2)" id="mPctLabel">0%</span>
+          </div>
+          <div class="modal-pct-bar"><div id="mPctFill" style="height:100%;border-radius:3px;transition:width .3s"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:4px">
+        <div class="modal-label" style="margin-bottom:6px">Description</div>
+        <div class="modal-desc" id="mDesc"></div>
+      </div>
+      <a class="modal-open-btn" id="mOpenLink" href="../index.html">Open in Tracker →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Data ─────────────────────────────────────────────────────
+const STORE_KEY = 'fintech_projects_v70';
+let data = [];
+let activeFilter = 'all';
+let sortCol = 'id', sortAsc = true;
+let dragId = null;
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      data = parsed.data || [];
+    }
+  } catch(e) {}
+  // Fallback: try adjacent keys
+  if (!data.length) {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('fintech_projects_v'));
+    keys.sort().reverse();
+    for (const k of keys) {
+      try {
+        const p = JSON.parse(localStorage.getItem(k));
+        if (p && p.data && p.data.length) { data = p.data; break; }
+      } catch(e) {}
+    }
+  }
+}
+
+function saveData() {
+  try {
+    const saved = localStorage.getItem(STORE_KEY);
+    const parsed = saved ? JSON.parse(saved) : {};
+    parsed.data = data;
+    localStorage.setItem(STORE_KEY, JSON.stringify(parsed));
+  } catch(e) {}
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function priClass(p) { return 'p'+(p||5); }
+function progColor(pct, status) {
+  if (status === 'Done') return '#00c875';
+  if (status === 'In progress') return '#fdab3d';
+  if (status === 'In review') return '#a78bfa';
+  return '#555e8a';
+}
+function statusClass(s) {
+  if (s==='Done') return 's-done';
+  if (s==='In progress') return 's-ip';
+  if (s==='In review') return 's-ir';
+  return 's-ns';
+}
+function statusKlass(s) {
+  if (s==='Done') return 's-done';
+  if (s==='In progress') return 's-prog';
+  if (s==='In review') return 's-review';
+  return 's-backlog';
+}
+function initials(name) {
+  return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+function getFiltered() {
+  const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+  return data.filter(r => {
+    const matchFilter = activeFilter==='all' || r.status===activeFilter;
+    const matchQ = !q || r.project.toLowerCase().includes(q) || (r.owner||'').toLowerCase().includes(q) || String(r.id).includes(q);
+    return matchFilter && matchQ;
+  });
+}
+
+// ── Stats ──────────────────────────────────────────────────────
+function updateStats() {
+  const ns   = data.filter(r=>r.status==='Not started').length;
+  const ip   = data.filter(r=>r.status==='In progress').length;
+  const ir   = data.filter(r=>r.status==='In review').length;
+  const done = data.filter(r=>r.status==='Done').length;
+  document.getElementById('cnt-all').textContent  = data.length;
+  document.getElementById('cnt-ns').textContent   = ns;
+  document.getElementById('cnt-ip').textContent   = ip;
+  document.getElementById('cnt-ir').textContent   = ir;
+  document.getElementById('cnt-done').textContent = done;
+}
+
+// ── Kanban render ──────────────────────────────────────────────
+function renderKanban() {
+  const filtered = getFiltered();
+  const cols = {
+    'Not started': { el: 'cards-ns',   cnt: 'cnt-col-ns' },
+    'In progress': { el: 'cards-ip',   cnt: 'cnt-col-ip' },
+    'In review':   { el: 'cards-ir',   cnt: 'cnt-col-ir' },
+    'Done':        { el: 'cards-done', cnt: 'cnt-col-done' },
+  };
+  Object.entries(cols).forEach(([status, cfg]) => {
+    const rows = filtered.filter(r=>r.status===status);
+    document.getElementById(cfg.cnt).textContent = rows.length;
+    const el = document.getElementById(cfg.el);
+    if (!rows.length) {
+      el.innerHTML = `<div class="col-empty"><div class="col-empty-icon">${status==='Done'?'✅':status==='In progress'?'🚀':status==='In review'?'🔍':'📋'}</div>No items</div>`;
+      return;
+    }
+    el.innerHTML = rows.map(r => {
+      const color = progColor(r.pct, r.status);
+      const short = r.project.length > 52 ? r.project.slice(0,51)+'…' : r.project;
+      return `<div class="k-card ${statusKlass(r.status)}" draggable="true"
+        data-id="${r.id}"
+        ondragstart="onDragStart(event,${r.id})"
+        onclick="openModal(${r.id})">
+        <div class="k-card-top">
+          <span class="k-uc-badge">UC-${r.id}</span>
+          <span class="k-title">${esc(short)}</span>
+          <span class="k-pri ${priClass(r.priority)}">P${r.priority}</span>
+        </div>
+        <div class="k-card-meta">
+          <span class="k-owner">
+            <span class="k-avatar">${esc(initials(r.assignedTo||r.owner))}</span>
+            ${esc((r.assignedTo||r.owner||'').split(' ')[0])}
+          </span>
+          <span class="k-pct">${r.pct}%</span>
+        </div>
+        <div class="k-progress">
+          <div class="k-progress-fill" style="width:${r.pct}%;background:${color}"></div>
+        </div>
+      </div>`;
+    }).join('');
+  });
+}
+
+// ── Table render ──────────────────────────────────────────────
+function renderTable() {
+  const filtered = [...getFiltered()].sort((a,b) => {
+    let va = a[sortCol], vb = b[sortCol];
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    return sortAsc ? (va>vb?1:va<vb?-1:0) : (va<vb?1:va>vb?-1:0);
+  });
+
+  // Group by owner when not sorted
+  const groups = {};
+  filtered.forEach(r => {
+    const g = r.owner || 'Unassigned';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(r);
+  });
+
+  let html = '';
+  Object.entries(groups).forEach(([owner, rows]) => {
+    html += `<tr class="group-header"><td colspan="6"><span>${esc(owner)} <span class="group-count">${rows.length}</span></span></td></tr>`;
+    rows.forEach(r => {
+      const color = progColor(r.pct, r.status);
+      const sc = statusClass(r.status);
+      const sLabel = r.status==='Not started'?'Backlog':r.status;
+      html += `<tr onclick="openModal(${r.id})">
+        <td class="td-id">UC-${r.id}</td>
+        <td class="td-name">${esc(r.project)}<small>${esc((r.desc||'').slice(0,80))}${r.desc&&r.desc.length>80?'…':''}</small></td>
+        <td class="td-pri"><span class="k-pri ${priClass(r.priority)}">P${r.priority}</span></td>
+        <td class="td-owner">${esc((r.owner||'').split(' ')[0])}</td>
+        <td class="td-status">
+          <span class="status-chip ${sc}">
+            <span class="status-dot" style="background:${color}"></span>
+            ${esc(sLabel)}
+          </span>
+        </td>
+        <td class="td-pct">
+          <div class="pct-wrap">
+            <div class="pct-bar"><div class="pct-fill" style="width:${r.pct}%;background:${color}"></div></div>
+            <span class="pct-label">${r.pct}%</span>
+          </div>
+        </td>
+      </tr>`;
+    });
+  });
+  document.getElementById('tableBody').innerHTML = html;
+
+  // Update sort icons
+  ['id','project','priority','owner','status','pct'].forEach(col => {
+    const el = document.getElementById('sort-'+col);
+    if (!el) return;
+    el.textContent = col===sortCol ? (sortAsc?'↑':'↓') : '↕';
+    el.closest('th').classList.toggle('sorted', col===sortCol);
+  });
+}
+
+function render() {
+  updateStats();
+  renderKanban();
+  renderTable();
+}
+
+// ── View toggle ─────────────────────────────────────────────
+let currentView = 'kanban';
+function setView(v) {
+  currentView = v;
+  document.getElementById('kanbanView').style.display = v==='kanban' ? 'flex' : 'none';
+  document.getElementById('tableView').style.display  = v==='table'  ? 'block': 'none';
+  document.getElementById('btnKanban').classList.toggle('active', v==='kanban');
+  document.getElementById('btnTable').classList.toggle('active', v==='table');
+}
+
+// ── Filter ───────────────────────────────────────────────────
+function setFilter(f) {
+  activeFilter = f;
+  ['all','ns','ip','ir','done'].forEach(id => {
+    document.getElementById('pill-'+id).classList.toggle('active', false);
+  });
+  const map = { 'all':'all','Not started':'ns','In progress':'ip','In review':'ir','Done':'done' };
+  const key = map[f] || 'all';
+  document.getElementById('pill-'+key).classList.add('active');
+  render();
+}
+
+// ── Sort ─────────────────────────────────────────────────────
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = true; }
+  renderTable();
+}
+
+// ── Drag & drop ───────────────────────────────────────────────
+function onDragStart(e, id) {
+  dragId = id;
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onDragOver(e, status) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const colEl = document.getElementById('col-'+statusToKey(status));
+  if (colEl) colEl.classList.add('drag-target');
+}
+function onDragLeave(e) {
+  document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-target'));
+}
+function onDrop(e, newStatus) {
+  e.preventDefault();
+  document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-target'));
+  if (!dragId) return;
+  const r = data.find(x => x.id === dragId);
+  if (!r || r.status === newStatus) return;
+  r.status = newStatus;
+  // Auto-update pct on status change
+  if (newStatus === 'Done' && r.pct < 100) r.pct = 100;
+  if (newStatus === 'Not started' && r.pct === 100) r.pct = 0;
+  saveData();
+  render();
+  dragId = null;
+}
+function statusToKey(s) {
+  if (s==='Not started') return 'ns';
+  if (s==='In progress') return 'ip';
+  if (s==='In review')   return 'ir';
+  return 'done';
+}
+
+// ── Modal ─────────────────────────────────────────────────────
+function openModal(id) {
+  const r = data.find(x => x.id === id);
+  if (!r) return;
+  const color = progColor(r.pct, r.status);
+  document.getElementById('mUcId').textContent    = 'UC-'+r.id;
+  document.getElementById('mTitle').textContent   = r.project;
+  document.getElementById('mStatus').innerHTML    = `<span class="status-chip ${statusClass(r.status)}" style="padding:3px 9px;font-size:11px"><span class="status-dot" style="background:${color};width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px"></span>${r.status==='Not started'?'Backlog':r.status}</span>`;
+  document.getElementById('mPri').innerHTML       = `<span class="k-pri ${priClass(r.priority)}" style="padding:3px 8px;font-size:11px;border-radius:4px">P${r.priority} · ${r.priority===1?'Critical':r.priority===2?'High':r.priority===3?'Medium':'Low'}</span>`;
+  document.getElementById('mOwner').textContent   = r.owner || '—';
+  document.getElementById('mAssigned').textContent= r.assignedTo || r.owner || '—';
+  document.getElementById('mPctLabel').textContent= r.pct + '% complete';
+  document.getElementById('mPctFill').style.cssText = `width:${r.pct}%;background:${color};border-radius:3px`;
+  document.getElementById('mDesc').textContent    = (r.desc||'No description.').slice(0,320)+(r.desc&&r.desc.length>320?'…':'');
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) closeModalBtn();
+}
+function closeModalBtn() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+// ── Cursor glow ───────────────────────────────────────────────
+(function() {
+  const g = document.getElementById('cg');
+  if (!g) return;
+  let raf = null, cx=0, cy=0;
+  function upd() { g.style.left=cx+'px'; g.style.top=cy+'px'; raf=null; }
+  document.addEventListener('mousemove', e => {
+    cx=e.clientX; cy=e.clientY; g.style.opacity='1';
+    if (!raf) raf=requestAnimationFrame(upd);
+  }, {passive:true});
+  document.addEventListener('mouseleave', () => g.style.opacity='0');
+  document.addEventListener('click', e => {
+    const r=document.createElement('div');
+    r.className='cursor-ripple';
+    r.style.left=e.clientX+'px'; r.style.top=e.clientY+'px';
+    document.body.appendChild(r);
+    r.addEventListener('animationend', ()=>r.remove());
+  }, {passive:true});
+})();
+
+// ── Init ──────────────────────────────────────────────────────
+loadData();
+render();
+setView('kanban');
+</script>
+</body>
+</html>
