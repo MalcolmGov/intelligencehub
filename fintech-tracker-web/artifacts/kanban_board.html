@@ -85,14 +85,19 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);c
 .col-body::-webkit-scrollbar{width:4px;}
 .col-body::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px;}
 
-/* ── Card ── */
+/* ── Card ──
+   CRITICAL: flex-shrink:0 + min-height MUST stay.
+   .col-body is display:flex;flex-direction:column — without flex-shrink:0
+   every card collapses to ~31px (padding only) and content becomes invisible.
+   min-height:100px is a second safety net. Do not remove either. */
 .card{
   background:#222548;
   border:1px solid rgba(255,255,255,.1);
   border-radius:13px;padding:16px 16px 13px;
   cursor:pointer;transition:transform .15s,box-shadow .18s,border-color .15s,background .15s;
   position:relative;overflow:hidden;user-select:none;
-  flex-shrink:0;
+  flex-shrink:0;        /* CRITICAL — prevents flex container crushing cards */
+  min-height:100px;     /* SAFETY NET — cards never collapse below 100px */
 }
 .card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;border-radius:12px 0 0 12px;}
 .card.s-bl::before{background:var(--c-bl);}
@@ -956,7 +961,26 @@ function setView(v){
   document.getElementById('btnK').classList.toggle('active',v==='kanban');
   document.getElementById('btnT').classList.toggle('active',v==='table');
 }
-function render(){ updateStats(); renderKanban(); renderTable(); }
+function render(){ updateStats(); renderKanban(); renderTable(); guardCardLayout(); }
+
+/* ── Layout health-guard ──────────────────────────────────────────────────────
+   Runs after every render. If cards are crushed (height ≤ 40px), this
+   re-applies flex-shrink:0 inline so the board self-heals even if CSS fails.
+   This should never fire in normal operation — it is a last-resort safety net. */
+function guardCardLayout(){
+  requestAnimationFrame(()=>{
+    const cards=document.querySelectorAll('.card');
+    let fixed=0;
+    cards.forEach(c=>{
+      if(c.offsetHeight<=40){
+        c.style.flexShrink='0';
+        c.style.minHeight='100px';
+        fixed++;
+      }
+    });
+    if(fixed>0) console.warn('[Kanban] guardCardLayout: auto-fixed '+fixed+' collapsed cards.');
+  });
+}
 
 loadData();
 render();
