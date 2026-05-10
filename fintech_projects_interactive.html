@@ -1023,24 +1023,32 @@ tbody tr.data-row:hover {
 /* Individual chart cards — gradient border + glow */
 .chart-card {
   position: relative;
-  border: 1.5px solid transparent;
+  border: 1px solid transparent;
   background:
-    linear-gradient(#1a1d2e, #1e2240) padding-box,
-    linear-gradient(135deg, #0073ea 0%, #818cf8 30%, #a78bfa 50%, #00c875 72%, #fdab3d 100%) border-box;
+    linear-gradient(#181b34, #1c1f3e) padding-box,
+    linear-gradient(90deg, #03fafa 0%, #9878f1 50%, #6161ff 100%) border-box;
   border-radius: var(--radius-l);
-  box-shadow:
-    0 0 22px rgba(0,115,234,.35),
-    0 0 45px rgba(167,139,250,.2),
-    0 8px 32px rgba(0,0,0,.45);
+  box-shadow: 0 8px 32px rgba(0,0,0,.45);
   transition: box-shadow .25s, transform .18s;
   z-index: 1;
+  isolation: isolate;
 }
+/* Monday.com-style glow: blurred gradient spread behind the card */
+.chart-card::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: calc(var(--radius-l) + 6px);
+  background: linear-gradient(90deg, #03fafa 0%, #9878f1 50%, #6161ff 100%);
+  filter: blur(8px);
+  z-index: -1;
+  opacity: 0.35;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+.chart-card:hover::before { opacity: 0.6; }
 .chart-card:hover {
-  box-shadow:
-    0 0 32px rgba(0,115,234,.5),
-    0 0 60px rgba(167,139,250,.3),
-    0 0 80px rgba(0,200,117,.12),
-    0 12px 40px rgba(0,0,0,.55);
+  box-shadow: 0 12px 40px rgba(0,0,0,.55);
   transform: translateY(-2px);
 }
 .chart-card-title { font-size: 11px; letter-spacing: .6px; }
