@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UC25 – USSD AI Assistant | MTN Group Fintech Architecture</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0f172a;
+    --surface:     #1e293b;
+    --surface2:    #263347;
+    --border:      rgba(99,102,241,.25);
+    --border2:     rgba(99,102,241,.12);
+    --indigo:      #6366f1;
+    --indigo-lt:   #818cf8;
+    --indigo-dim:  rgba(99,102,241,.15);
+    --teal:        #34d399;
+    --teal-dim:    rgba(52,211,153,.12);
+    --amber:       #fbbf24;
+    --amber-dim:   rgba(251,191,36,.1);
+    --rose:        #f87171;
+    --rose-dim:    rgba(248,113,113,.1);
+    --sky:         #38bdf8;
+    --sky-dim:     rgba(56,189,248,.1);
+    --text:        #e2e8f0;
+    --text-muted:  #94a3b8;
+    --text-dim:    #64748b;
+    --code-bg:     #0d1b2a;
+    --radius:      10px;
+    --radius-lg:   14px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── Back button ── */
+  a.back-btn {
+    position: fixed; top: 16px; left: 16px; z-index: 9999;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px; border-radius: 8px;
+    background: rgba(30,41,59,.92);
+    border: 1px solid rgba(99,102,241,.35);
+    color: #a5b4fc; font-size: 13px; font-weight: 600;
+    text-decoration: none; backdrop-filter: blur(8px);
+    transition: background .15s, border-color .15s;
+  }
+  a.back-btn:hover { background: rgba(40,55,80,.97); border-color: rgba(99,102,241,.6); }
+
+  /* ── Layout ── */
+  .wrapper { max-width: 1100px; margin: 0 auto; }
+
+  /* ── Hero ── */
+  .hero { text-align: center; padding: 20px 0 48px; }
+  .hero .badge {
+    display: inline-block; margin-bottom: 16px;
+    padding: 4px 14px; border-radius: 999px;
+    background: var(--indigo-dim); border: 1px solid var(--border);
+    color: var(--indigo-lt); font-size: 11px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .hero h1 {
+    font-size: clamp(24px, 4vw, 40px); font-weight: 800; letter-spacing: -.5px;
+    background: linear-gradient(135deg, #a5b4fc 0%, #34d399 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 12px;
+  }
+  .hero p { color: var(--text-muted); max-width: 680px; margin: 0 auto; font-size: 15px; }
+  .hero .meta {
+    display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
+    margin-top: 20px; font-size: 12px; color: var(--text-dim);
+  }
+  .hero .meta span b { color: var(--text-muted); }
+
+  /* ── Section ── */
+  section { margin-bottom: 48px; }
+  .section-title {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 18px; font-weight: 700; color: var(--text);
+    margin-bottom: 20px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border2);
+  }
+  .section-title .icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--indigo-dim); color: var(--indigo-lt); font-size: 16px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 16px;
+  }
+  .card h3 { font-size: 14px; font-weight: 700; color: var(--indigo-lt); margin-bottom: 8px; }
+  .card p, .card li { color: var(--text-muted); font-size: 13px; }
+  .card ul { padding-left: 18px; }
+  .card ul li { margin-bottom: 4px; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .card-grid .card { margin-bottom: 0; }
+
+  /* ── Component cards ── */
+  .comp-card {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius-lg); padding: 18px 20px;
+    border-left: 3px solid var(--indigo);
+  }
+  .comp-card.teal   { border-left-color: var(--teal); }
+  .comp-card.amber  { border-left-color: var(--amber); }
+  .comp-card.rose   { border-left-color: var(--rose); }
+  .comp-card.sky    { border-left-color: var(--sky); }
+  .comp-card h3 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .comp-card .subtitle { font-size: 11px; color: var(--text-dim); margin-bottom: 10px; }
+  .comp-card p, .comp-card li { font-size: 12.5px; color: var(--text-muted); }
+  .comp-card ul { padding-left: 16px; }
+  .comp-card ul li { margin-bottom: 3px; }
+  .comp-card .tag {
+    display: inline-block; margin: 4px 4px 0 0; padding: 2px 8px;
+    border-radius: 4px; font-size: 10px; font-weight: 600;
+    background: var(--indigo-dim); color: var(--indigo-lt); border: 1px solid var(--border);
+  }
+  .comp-card.teal  .tag { background: var(--teal-dim);  color: var(--teal);  border-color: rgba(52,211,153,.25); }
+  .comp-card.amber .tag { background: var(--amber-dim); color: var(--amber); border-color: rgba(251,191,36,.25); }
+  .comp-card.rose  .tag { background: var(--rose-dim);  color: var(--rose);  border-color: rgba(248,113,113,.25); }
+  .comp-card.sky   .tag { background: var(--sky-dim);   color: var(--sky);   border-color: rgba(56,189,248,.25); }
+
+  .comp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+
+  /* ── Data flow diagram ── */
+  .flow-diagram {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 28px; overflow-x: auto;
+  }
+  .flow-row {
+    display: flex; align-items: center; gap: 0; flex-wrap: nowrap;
+    justify-content: center; min-width: max-content;
+  }
+  .flow-node {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 110px; min-height: 64px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    text-align: center; padding: 8px 6px;
+    font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.4;
+  }
+  .flow-node.primary { border-color: var(--indigo); background: var(--indigo-dim); color: var(--indigo-lt); }
+  .flow-node.teal    { border-color: var(--teal);   background: var(--teal-dim);   color: var(--teal); }
+  .flow-node.amber   { border-color: var(--amber);  background: var(--amber-dim);  color: var(--amber); }
+  .flow-node.sky     { border-color: var(--sky);    background: var(--sky-dim);    color: var(--sky); }
+  .flow-node .icon2  { font-size: 18px; margin-bottom: 4px; }
+  .flow-arrow {
+    display: flex; align-items: center; color: var(--text-dim);
+    font-size: 18px; padding: 0 4px; flex-shrink: 0;
+  }
+  .flow-label { font-size: 9px; color: var(--text-dim); margin-top: 3px; }
+
+  .flow-return {
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 18px; gap: 0;
+    border-top: 1px dashed var(--border2); padding-top: 18px;
+  }
+
+  /* ── State machine ── */
+  .state-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .state-box {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 14px 16px;
+    position: relative;
+  }
+  .state-box .state-name { font-size: 12px; font-weight: 700; color: var(--indigo-lt); margin-bottom: 6px; }
+  .state-box .state-desc { font-size: 11.5px; color: var(--text-muted); }
+  .state-box .transitions { margin-top: 8px; }
+  .state-box .trans-item { font-size: 10.5px; color: var(--text-dim); }
+  .state-box .trans-item b { color: var(--teal); }
+
+  /* ── Table ── */
+  .tbl-wrap { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border2); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    background: var(--surface2); color: var(--text-muted);
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border2);
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border2); color: var(--text-muted); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(99,102,241,.04); }
+  td code { font-family: 'Fira Code', 'Cascadia Code', monospace; font-size: 11.5px; color: var(--teal); }
+  td .pill {
+    display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700;
+  }
+  .pill.green  { background: var(--teal-dim);  color: var(--teal);  border: 1px solid rgba(52,211,153,.3); }
+  .pill.blue   { background: var(--sky-dim);   color: var(--sky);   border: 1px solid rgba(56,189,248,.3); }
+  .pill.orange { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(251,191,36,.3); }
+  .pill.red    { background: var(--rose-dim);  color: var(--rose);  border: 1px solid rgba(248,113,113,.3); }
+  .pill.indigo { background: var(--indigo-dim);color: var(--indigo-lt);border: 1px solid var(--border); }
+
+  /* ── Code block ── */
+  .code-block {
+    background: var(--code-bg); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 18px 20px;
+    font-family: 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+    font-size: 12px; line-height: 1.65; color: #a8d8c8;
+    overflow-x: auto; white-space: pre;
+  }
+  .code-block .kw  { color: #818cf8; }
+  .code-block .str { color: #34d399; }
+  .code-block .cmt { color: #475569; font-style: italic; }
+  .code-block .fn  { color: #fbbf24; }
+  .code-block .num { color: #f87171; }
+
+  /* ── ADR ── */
+  .adr {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 14px;
+  }
+  .adr-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .adr-id { font-size: 11px; font-weight: 700; color: var(--text-dim); }
+  .adr-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .adr-status { margin-left: auto; }
+  .adr-section { margin-bottom: 8px; }
+  .adr-section .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--indigo-lt); margin-bottom: 4px; }
+  .adr-section p { font-size: 13px; color: var(--text-muted); }
+
+  /* ── Spec rows ── */
+  .spec-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .spec-item {
+    flex: 1 1 220px;
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 14px 16px;
+  }
+  .spec-item .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-dim); margin-bottom: 6px; }
+  .spec-item .val { font-size: 13px; color: var(--text); }
+
+  /* ── K8s diagram ── */
+  .k8s-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 24px; overflow-x: auto;
+  }
+  .k8s-cluster {
+    border: 2px dashed rgba(99,102,241,.3); border-radius: var(--radius-lg);
+    padding: 20px; min-width: 700px;
+  }
+  .k8s-cluster-label { font-size: 11px; font-weight: 700; color: var(--indigo-lt); margin-bottom: 16px; text-transform: uppercase; letter-spacing: .08em; }
+  .k8s-row { display: flex; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+  .k8s-pod {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; flex: 1 1 130px;
+    font-size: 11px; text-align: center;
+  }
+  .k8s-pod .pod-icon { font-size: 20px; margin-bottom: 4px; }
+  .k8s-pod .pod-name { font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .k8s-pod .pod-detail { color: var(--text-dim); font-size: 10px; }
+  .k8s-namespace {
+    border: 1px solid rgba(52,211,153,.2); border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 14px;
+  }
+  .k8s-namespace .ns-label { font-size: 10px; font-weight: 700; color: var(--teal); margin-bottom: 10px; text-transform: uppercase; letter-spacing: .07em; }
+
+  /* ── Monitoring ── */
+  .mon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .mon-card {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 16px;
+  }
+  .mon-card h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .mon-card ul { padding-left: 16px; }
+  .mon-card li { font-size: 12px; color: var(--text-muted); margin-bottom: 3px; }
+
+  /* ── Principles ── */
+  .principle-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .principle {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 14px 16px;
+    border-top: 2px solid var(--indigo);
+  }
+  .principle.teal  { border-top-color: var(--teal); }
+  .principle.amber { border-top-color: var(--amber); }
+  .principle.sky   { border-top-color: var(--sky); }
+  .principle.rose  { border-top-color: var(--rose); }
+  .principle h4 { font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .principle p  { font-size: 12px; color: var(--text-muted); }
+
+  /* ── Integration callout ── */
+  .integration {
+    background: linear-gradient(135deg, rgba(99,102,241,.07) 0%, rgba(52,211,153,.05) 100%);
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 20px 24px; margin-bottom: 14px;
+    display: grid; grid-template-columns: auto 1fr; gap: 16px;
+  }
+  .integration .int-icon { font-size: 32px; }
+  .integration h3 { font-size: 14px; font-weight: 700; color: var(--indigo-lt); margin-bottom: 6px; }
+  .integration p { font-size: 13px; color: var(--text-muted); }
+  .integration ul { padding-left: 18px; margin-top: 6px; }
+  .integration ul li { font-size: 12.5px; color: var(--text-muted); margin-bottom: 3px; }
+
+  /* ── Responsive ── */
+  @media(max-width: 640px) {
+    body { padding: 60px 14px 60px; }
+    .flow-row { min-width: 800px; }
+  }
+</style>
+</head>
+<body>
+
+<a href="../" class="back-btn">&#8592; Back to Tracker</a>
+
+<div class="wrapper">
+
+  <!-- ═══════════════ HERO ═══════════════ -->
+  <div class="hero">
+    <div class="badge">UC-25 &bull; MTN Group Fintech &bull; Architecture Specification</div>
+    <h1>USSD AI Assistant Architecture</h1>
+    <p>Conversational intelligence over USSD — bringing AI-driven financial services to 2G feature phones across MTN's 17-market footprint without internet connectivity.</p>
+    <div class="meta">
+      <span><b>Status:</b> Draft v0.9</span>
+      <span><b>Author:</b> Platform Architecture Team</span>
+      <span><b>Date:</b> 2026-05-10</span>
+      <span><b>Depends On:</b> UC16-PayGuard, UC24-CustomerIntel</span>
+      <span><b>Classification:</b> Internal — Confidential</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════ 1. OVERVIEW ═══════════════ -->
+  <section id="overview">
+    <div class="section-title"><div class="icon">&#127760;</div> Architecture Overview</div>
+
+    <div class="card">
+      <h3>Problem Statement</h3>
+      <p>USSD remains the primary digital channel for MTN MoMo subscribers in low-connectivity markets (Ghana, Uganda, Cameroon, Rwanda, Ivory Coast, et al.). Traditional USSD is a rigid tree-menu system — users must memorise option codes and cannot perform complex or multi-step transactions conversationally. UC25 introduces a Natural Language Understanding layer over USSD that lets subscribers express intent in their own words (in English, French, or a local language), have that intent resolved to a MoMo API action, and receive a concise, formatted USSD response — all within the 182-character USSD message constraint and sub-2-second latency budget.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Business Objectives</h3>
+        <ul>
+          <li>Increase MoMo active usage by 18% in feature-phone segments</li>
+          <li>Reduce USSD session abandonment rate from ~34% to below 15%</li>
+          <li>Support at least 12 languages across 17 OpCo markets</li>
+          <li>Enable complex transactions (loan, savings, bill pay) over USSD without 5-level menus</li>
+          <li>Feed interaction telemetry into UC24 Customer Intelligence</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Scope</h3>
+        <ul>
+          <li>AI-powered session handler for inbound USSD sessions</li>
+          <li>Multilingual NLU pipeline (mBERT / XLM-R fine-tuned)</li>
+          <li>Intent-to-MoMo-API dispatch layer</li>
+          <li>Graceful fallback to legacy USSD tree menus</li>
+          <li>Per-OpCo gateway SDK adapters (Ericsson, Huawei, custom)</li>
+          <li>Integration with UC16 PayGuard for fraud pre-screening</li>
+          <li>Integration with UC24 for customer personalisation signals</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Constraints</h3>
+        <ul>
+          <li>USSD response payload ≤ 182 characters</li>
+          <li>Round-trip latency budget: 1 800 ms (P95)</li>
+          <li>No internet at handset — pure GSM-SS7 transport</li>
+          <li>Session TTL governed by telecom operator (60–180 s)</li>
+          <li>Zero PII in application logs — regulatory requirement (NDPR, DPA)</li>
+          <li>Must operate in active-active across two AWS regions</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 2. DESIGN PRINCIPLES ═══════════════ -->
+  <section id="principles">
+    <div class="section-title"><div class="icon">&#9881;</div> Design Principles</div>
+    <div class="principle-grid">
+      <div class="principle">
+        <h4>Conversational Simplicity</h4>
+        <p>Every AI interpretation must produce a response readable on a 2G Nokia screen. Complexity lives in the backend, not the UI.</p>
+      </div>
+      <div class="principle teal">
+        <h4>Graceful Degradation</h4>
+        <p>If NLU confidence falls below threshold or latency is at risk, the system falls back instantly to deterministic menu trees — no user-visible failure.</p>
+      </div>
+      <div class="principle amber">
+        <h4>Language Parity</h4>
+        <p>A subscriber in Swahili, Hausa, or Twi receives the same quality of service as one in English or French.</p>
+      </div>
+      <div class="principle sky">
+        <h4>Privacy-by-Architecture</h4>
+        <p>Session data is encrypted at rest and in transit. No MSISDN or financial amounts are written to application logs — only opaque session IDs.</p>
+      </div>
+      <div class="principle rose">
+        <h4>OpCo Autonomy</h4>
+        <p>Each MTN subsidiary can override intents, response templates, and fallback logic via per-OpCo configuration without platform code changes.</p>
+      </div>
+      <div class="principle">
+        <h4>Idempotent Dispatch</h4>
+        <p>Every MoMo API call is guarded by an idempotency key derived from session + intent hash, preventing duplicate financial transactions on retry.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 3. DATA FLOW DIAGRAM ═══════════════ -->
+  <section id="dataflow">
+    <div class="section-title"><div class="icon">&#8594;</div> End-to-End Data Flow</div>
+
+    <div class="flow-diagram">
+      <!-- Forward path -->
+      <p style="font-size:11px;color:var(--text-dim);margin-bottom:14px;text-align:center;">&#9654; Inbound request path (synchronous, &lt; 1 800 ms P95)</p>
+      <div class="flow-row">
+        <div class="flow-node sky">
+          <div class="icon2">&#128241;</div>
+          Phone<br/>Subscriber
+          <div class="flow-label">GSM/SS7</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-node">
+          USSD<br/>Gateway
+          <div class="flow-label">Ericsson/Huawei SDK</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-node primary">
+          Gateway<br/>Adapter
+          <div class="flow-label">Normalise &amp; Auth</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-node primary">
+          AI Session<br/>Handler
+          <div class="flow-label">FastAPI / Redis</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-node teal">
+          NLU<br/>Engine
+          <div class="flow-label">mBERT / XLM-R</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-node amber">
+          Intent<br/>Dispatcher
+          <div class="flow-label">Rule + ML routing</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-node">
+          MoMo Core<br/>API
+          <div class="flow-label">REST / gRPC</div>
+        </div>
+        <div class="flow-arrow">&#10230;</div>
+        <div class="flow-node teal">
+          Response<br/>Formatter
+          <div class="flow-label">≤182 chars</div>
+        </div>
+      </div>
+
+      <!-- Return path -->
+      <p style="font-size:11px;color:var(--text-dim);margin:20px 0 14px;text-align:center;">&#9664; Response return path (async write-back to session store)</p>
+      <div class="flow-return">
+        <div class="flow-node sky">
+          <div class="icon2">&#128241;</div>
+          Phone<br/>Screen
+          <div class="flow-label">USSD display</div>
+        </div>
+        <div class="flow-arrow" style="transform:scaleX(-1)">&#10230;</div>
+        <div class="flow-node">
+          USSD<br/>Gateway
+        </div>
+        <div class="flow-arrow" style="transform:scaleX(-1)">&#10230;</div>
+        <div class="flow-node primary">
+          Gateway<br/>Adapter
+        </div>
+        <div class="flow-arrow" style="transform:scaleX(-1)">&#10230;</div>
+        <div class="flow-node primary">
+          AI Session<br/>Handler
+          <div class="flow-label">Update state</div>
+        </div>
+      </div>
+
+      <!-- Side paths -->
+      <div style="margin-top:24px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;">
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;font-size:11px;color:var(--text-muted);max-width:220px;text-align:center;">
+          <div style="color:var(--rose);font-weight:700;margin-bottom:4px;">&#10555; PayGuard (UC16)</div>
+          Intent Dispatcher calls PayGuard fraud pre-screen before any send-money or payment intent is dispatched to MoMo Core
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;font-size:11px;color:var(--text-muted);max-width:220px;text-align:center;">
+          <div style="color:var(--sky);font-weight:700;margin-bottom:4px;">&#10555; Customer Intel (UC24)</div>
+          Session Handler enriches context with personalisation signals (preferred language, frequent payees, account tier)
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;font-size:11px;color:var(--text-muted);max-width:220px;text-align:center;">
+          <div style="color:var(--teal);font-weight:700;margin-bottom:4px;">&#10555; Fallback Generator</div>
+          If NLU confidence &lt; 0.65 or latency risk detected, Fallback Menu Generator injects deterministic USSD tree
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:10px 16px;font-size:11px;color:var(--text-muted);max-width:220px;text-align:center;">
+          <div style="color:var(--amber);font-weight:700;margin-bottom:4px;">&#10555; Telemetry Bus</div>
+          All intent classifications, latency samples, and fallback events are published to Kafka for monitoring &amp; UC24 training
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 4. SYSTEM COMPONENTS ═══════════════ -->
+  <section id="components">
+    <div class="section-title"><div class="icon">&#128736;</div> System Components</div>
+    <div class="comp-grid">
+
+      <div class="comp-card">
+        <h3>USSD Gateway Adapter</h3>
+        <div class="subtitle">Transport normalisation &amp; OpCo routing</div>
+        <p>Translates proprietary USSD gateway protocols (Ericsson UCP, Huawei USSD-GW, custom REST) into a unified internal <code>UssdSession</code> event. Handles session open/continue/close lifecycle, MSISDN hashing (SHA-256 with per-OpCo salt), and OpCo identification via PLMN prefix routing table.</p>
+        <div style="margin-top:10px;">
+          <span class="tag">Python FastAPI</span>
+          <span class="tag">Per-OpCo SDK</span>
+          <span class="tag">PLMN routing</span>
+          <span class="tag">MSISDN hashing</span>
+        </div>
+      </div>
+
+      <div class="comp-card teal">
+        <h3>Session Manager</h3>
+        <div class="subtitle">Stateful session tracking — Redis Cluster</div>
+        <p>Maintains the full conversation state across USSD hops. Each session is stored as a Redis hash keyed by <code>session:{opco}:{hash(msisdn)}:{ussd_session_id}</code> with TTL matching the network gateway timeout (default 120 s). Stores: current dialogue state, entity slots (amount, beneficiary, service code), NLU turn history, and idempotency keys.</p>
+        <ul>
+          <li>Redis Cluster — 3 shards, 2 replicas each</li>
+          <li>Encrypted at rest (AES-256) via Redis TLS + KMS</li>
+          <li>Lua scripting for atomic slot-fill + state transitions</li>
+          <li>Keyspace notifications for session expiry alerts</li>
+        </ul>
+        <div style="margin-top:10px;">
+          <span class="tag">Redis 7 Cluster</span>
+          <span class="tag">AES-256 at rest</span>
+          <span class="tag">Lua atomics</span>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <h3>NLU Engine</h3>
+        <div class="subtitle">Multilingual intent &amp; entity extraction</div>
+        <p>Fine-tuned multilingual transformer (mBERT or XLM-RoBERTa depending on OpCo language mix) hosted on Triton Inference Server with ONNX runtime. Performs intent classification (28 intents across 6 domains) and slot filling (amount, currency, beneficiary, service provider, date). Outputs a structured <code>NluResult</code> with confidence score per intent.</p>
+        <ul>
+          <li>Supported languages: English, French, Swahili, Hausa, Twi, Kinyarwanda, Lingala, Zulu, Xhosa, Amharic, Yoruba, Igbo</li>
+          <li>Inference latency: &lt; 180 ms P95 on A10G GPU (batch=1)</li>
+          <li>Confidence threshold: 0.65 (configurable per OpCo)</li>
+          <li>Fallback: rule-based keyword extractor below threshold</li>
+        </ul>
+        <div style="margin-top:10px;">
+          <span class="tag">mBERT / XLM-R</span>
+          <span class="tag">Triton Server</span>
+          <span class="tag">ONNX Runtime</span>
+          <span class="tag">12 languages</span>
+        </div>
+      </div>
+
+      <div class="comp-card amber">
+        <h3>Intent Dispatcher</h3>
+        <div class="subtitle">Route intents to MoMo capabilities</div>
+        <p>Maps NLU-classified intents to MoMo API operations. Enforces business rules (daily limits, KYC tier, market-specific product availability). Calls PayGuard (UC16) fraud pre-screen for monetary intents before dispatch. Handles multi-turn intent resolution when required slots are missing (e.g., "send money" without beneficiary triggers entity clarification turn).</p>
+        <ul>
+          <li>Intent catalogue: SendMoney, CheckBalance, PayBill, BuyAirtime, MicroLoan, SavingsDeposit, MiniStatement, PinChange, HelpMenu, LanguageSwitch, &hellip;</li>
+          <li>Per-OpCo product availability matrix (config-driven)</li>
+          <li>PayGuard integration: synchronous pre-screen &lt; 80 ms</li>
+          <li>Idempotency guard using session+intent+amount hash</li>
+        </ul>
+        <div style="margin-top:10px;">
+          <span class="tag">Rule + ML routing</span>
+          <span class="tag">PayGuard UC16</span>
+          <span class="tag">Idempotency</span>
+          <span class="tag">Multi-turn</span>
+        </div>
+      </div>
+
+      <div class="comp-card">
+        <h3>MoMo API Client</h3>
+        <div class="subtitle">Abstraction over per-OpCo MoMo backends</div>
+        <p>Provides a unified Python async client over the heterogeneous MoMo API landscape (MTN MOMO Open API v2, legacy USSD SMSC bridge APIs, and country-specific extensions). Handles OAuth2 token refresh with per-OpCo API keys stored in AWS Secrets Manager. Circuit-breaker pattern with exponential backoff. All financial amounts treated as Decimal to avoid float rounding errors.</p>
+        <div style="margin-top:10px;">
+          <span class="tag">MoMo Open API v2</span>
+          <span class="tag">OAuth2</span>
+          <span class="tag">Circuit breaker</span>
+          <span class="tag">Decimal math</span>
+        </div>
+      </div>
+
+      <div class="comp-card teal">
+        <h3>Response Formatter</h3>
+        <div class="subtitle">USSD-compliant message templating</div>
+        <p>Compresses structured API responses into USSD-compatible messages (≤ 182 chars, GSM-7 charset). Uses per-language, per-OpCo Jinja2 templates with dynamic truncation logic. Appends session navigation options (CON for continue, END for terminate). Handles currency formatting per market (NGN, GHS, UGX, etc.) and number localisation.</p>
+        <ul>
+          <li>Template engine: Jinja2 with custom USSD filters</li>
+          <li>Charset: GSM-7 (160 chars single, 182 extended)</li>
+          <li>Fallback truncation preserves key financial figures</li>
+        </ul>
+        <div style="margin-top:10px;">
+          <span class="tag">Jinja2</span>
+          <span class="tag">GSM-7</span>
+          <span class="tag">Multi-currency</span>
+        </div>
+      </div>
+
+      <div class="comp-card sky">
+        <h3>Language Detector</h3>
+        <div class="subtitle">Automatic language identification</div>
+        <p>Lightweight langdetect model (fastText LID-176) runs before NLU to identify the script/language of the subscriber input. Result stored in session state and used to route to the correct NLU model shard and response template set. Language can be explicitly overridden by subscriber via "switch to English" or "passer en français" type inputs.</p>
+        <div style="margin-top:10px;">
+          <span class="tag">fastText LID-176</span>
+          <span class="tag">&lt; 5 ms latency</span>
+          <span class="tag">Explicit override</span>
+        </div>
+      </div>
+
+      <div class="comp-card rose">
+        <h3>Fallback Menu Generator</h3>
+        <div class="subtitle">Deterministic USSD tree fallback</div>
+        <p>Generates a traditional numbered USSD menu from a per-OpCo menu configuration (JSON/YAML). Invoked when: NLU confidence below threshold, inference timeout, MoMo API error that cannot be retried, or subscriber explicitly requests menu mode. Ensures 100% functional coverage independent of AI availability. Designed for zero-latency render (no I/O, pure in-memory config lookup).</p>
+        <div style="margin-top:10px;">
+          <span class="tag">Zero-dependency</span>
+          <span class="tag">Per-OpCo config</span>
+          <span class="tag">Instant render</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════ 5. TECH STACK ═══════════════ -->
+  <section id="techstack">
+    <div class="section-title"><div class="icon">&#128187;</div> Technology Stack</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Layer</th>
+            <th>Technology</th>
+            <th>Version</th>
+            <th>Rationale</th>
+            <th>Env</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>API Runtime</td><td>Python FastAPI</td><td><code>0.111</code></td><td>Async-native, OpenAPI auto-docs, excellent ecosystem for ML integration</td><td><span class="pill indigo">All</span></td></tr>
+          <tr><td>ASGI Server</td><td>Uvicorn + Gunicorn</td><td><code>0.30</code></td><td>Production-grade multi-worker async server</td><td><span class="pill indigo">Prod</span></td></tr>
+          <tr><td>Session Store</td><td>Redis Cluster</td><td><code>7.2</code></td><td>Sub-millisecond read/write, TTL native, Lua scripting for atomics</td><td><span class="pill indigo">All</span></td></tr>
+          <tr><td>NLU Model</td><td>mBERT / XLM-RoBERTa</td><td>HF <code>4.40</code></td><td>Best multilingual coverage for African language mix; ONNX export for inference</td><td><span class="pill indigo">All</span></td></tr>
+          <tr><td>Inference Server</td><td>NVIDIA Triton</td><td><code>24.04</code></td><td>GPU batching, ONNX Runtime backend, dynamic shape, gRPC &amp; HTTP</td><td><span class="pill indigo">Prod/Stage</span></td></tr>
+          <tr><td>Language Detection</td><td>fastText LID-176</td><td><code>0.9.2</code></td><td>176-language model, &lt; 5 ms CPU, offline-capable binary</td><td><span class="pill indigo">All</span></td></tr>
+          <tr><td>Message Queue</td><td>Apache Kafka</td><td><code>3.7</code></td><td>Durable event bus for telemetry, UC24 feed, audit log</td><td><span class="pill indigo">Prod/Stage</span></td></tr>
+          <tr><td>Template Engine</td><td>Jinja2</td><td><code>3.1</code></td><td>Per-OpCo/language templates, sandboxed rendering</td><td><span class="pill indigo">All</span></td></tr>
+          <tr><td>Secrets</td><td>AWS Secrets Manager</td><td>—</td><td>Per-OpCo API keys and encryption keys, versioned rotation</td><td><span class="pill indigo">Prod/Stage</span></td></tr>
+          <tr><td>Service Mesh</td><td>AWS App Mesh / Envoy</td><td><code>1.30</code></td><td>mTLS between services, circuit-breaking, observability</td><td><span class="pill indigo">Prod</span></td></tr>
+          <tr><td>Container Runtime</td><td>Kubernetes (EKS)</td><td><code>1.30</code></td><td>Managed K8s, karpenter autoscaling, GPU node pools</td><td><span class="pill indigo">Prod/Stage</span></td></tr>
+          <tr><td>CI/CD</td><td>GitHub Actions + ArgoCD</td><td>—</td><td>GitOps promotion, per-OpCo Helm value overrides</td><td><span class="pill indigo">All</span></td></tr>
+          <tr><td>Observability</td><td>Prometheus + Grafana + Jaeger</td><td>—</td><td>Metrics, dashboards, distributed tracing across services</td><td><span class="pill indigo">Prod/Stage</span></td></tr>
+          <tr><td>Log Aggregation</td><td>OpenSearch (AWS)</td><td><code>2.13</code></td><td>PII-scrubbed structured logs, 30-day hot retention</td><td><span class="pill indigo">Prod</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 6. SESSION STATE MACHINE ═══════════════ -->
+  <section id="statemachine">
+    <div class="section-title"><div class="icon">&#9881;</div> Session State Machine</div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <p>Each USSD session is modelled as a finite state machine persisted in Redis. Transitions are atomic (Lua scripts). State determines which NLU context, slot-fill prompts, and response templates are applied. The machine supports concurrent clarification sub-states (e.g., confirming beneficiary while awaiting amount).</p>
+    </div>
+
+    <div class="state-grid">
+      <div class="state-box">
+        <div class="state-name">INIT</div>
+        <div class="state-desc">Session opened. Language detection in progress. No intent assigned.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>LANG_CONFIRMED</b> on lang detect</div>
+          <div class="trans-item">&#8594; <b>FALLBACK</b> on detect error</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">LANG_CONFIRMED</div>
+        <div class="state-desc">Language identified. Awaiting first subscriber utterance for NLU classification.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>INTENT_RESOLVED</b> on high-conf NLU</div>
+          <div class="trans-item">&#8594; <b>CLARIFYING</b> on low-conf or partial</div>
+          <div class="trans-item">&#8594; <b>FALLBACK</b> on timeout</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">CLARIFYING</div>
+        <div class="state-desc">Asking subscriber for missing slots (beneficiary, amount, PIN confirmation). Multi-turn sub-loop.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>INTENT_RESOLVED</b> on all slots filled</div>
+          <div class="trans-item">&#8594; <b>FALLBACK</b> on 3 failed clarifications</div>
+          <div class="trans-item">&#8594; <b>CANCELLED</b> on subscriber cancel keyword</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">INTENT_RESOLVED</div>
+        <div class="state-desc">Full intent + entity set confirmed. Awaiting PayGuard pre-screen and MoMo dispatch.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>FRAUD_SCREENED</b> on PayGuard clear</div>
+          <div class="trans-item">&#8594; <b>BLOCKED</b> on PayGuard reject</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">FRAUD_SCREENED</div>
+        <div class="state-desc">PayGuard cleared the transaction. MoMo Core API call in flight.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>COMPLETED</b> on MoMo success</div>
+          <div class="trans-item">&#8594; <b>PENDING</b> on MoMo async accept</div>
+          <div class="trans-item">&#8594; <b>FAILED</b> on MoMo error</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">PENDING</div>
+        <div class="state-desc">MoMo transaction accepted asynchronously. Session held open for callback or subscriber poll.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>COMPLETED</b> on callback received</div>
+          <div class="trans-item">&#8594; <b>FAILED</b> on timeout/callback error</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">COMPLETED</div>
+        <div class="state-desc">Transaction succeeded. Success response formatted and sent. Session closing (END signal).</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>CLOSED</b> on gateway END</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">FAILED</div>
+        <div class="state-desc">Transaction failed. Error response sent with retry or menu option. Idempotency key invalidated.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>INTENT_RESOLVED</b> on retry</div>
+          <div class="trans-item">&#8594; <b>FALLBACK</b> on subscriber fallback choice</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">FALLBACK</div>
+        <div class="state-desc">Deterministic USSD menu injected. NLU layer bypassed. Legacy option tree active.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>COMPLETED</b> on successful legacy flow</div>
+          <div class="trans-item">&#8594; <b>CLOSED</b> on session expiry</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">BLOCKED</div>
+        <div class="state-desc">PayGuard rejected the transaction. Subscriber informed. Session ends with fraud advisory.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>CLOSED</b> (terminal)</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">CANCELLED</div>
+        <div class="state-desc">Subscriber cancelled or used cancel keyword. State wiped. Session closed cleanly.</div>
+        <div class="transitions">
+          <div class="trans-item">&#8594; <b>CLOSED</b> (terminal)</div>
+        </div>
+      </div>
+      <div class="state-box">
+        <div class="state-name">CLOSED</div>
+        <div class="state-desc">Terminal state. Redis TTL runs down. Telemetry event emitted to Kafka. No further transitions.</div>
+        <div class="transitions"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 7. CODE SAMPLE ═══════════════ -->
+  <section id="code">
+    <div class="section-title"><div class="icon">&#128196;</div> Key Code Patterns</div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <h3>Session Handler — Core Entry Point (Python FastAPI)</h3>
+    </div>
+    <div class="code-block"><span class="cmt"># ussd_ai_assistant/handlers/session_handler.py</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> APIRouter, Depends, HTTPException
+<span class="kw">from</span> app.models <span class="kw">import</span> UssdRequest, UssdResponse
+<span class="kw">from</span> app.services <span class="kw">import</span> (
+    SessionManager, LanguageDetector, NluEngine,
+    IntentDispatcher, ResponseFormatter, FallbackMenuGenerator
+)
+<span class="kw">from</span> app.config <span class="kw">import</span> OpCoConfig
+<span class="kw">import</span> asyncio, logging
+
+router = APIRouter()
+log = logging.getLogger(<span class="str">"ussd.session"</span>)  <span class="cmt"># no PII in log records</span>
+
+<span class="kw">@router</span>.post(<span class="str">"/ussd/session"</span>)
+<span class="kw">async def</span> <span class="fn">handle_ussd_session</span>(
+    req: UssdRequest,
+    session_mgr: SessionManager = Depends(),
+    lang_det: LanguageDetector = Depends(),
+    nlu: NluEngine = Depends(),
+    dispatcher: IntentDispatcher = Depends(),
+    formatter: ResponseFormatter = Depends(),
+    fallback: FallbackMenuGenerator = Depends(),
+) -&gt; UssdResponse:
+
+    opco_cfg: OpCoConfig = OpCoConfig.for_plmn(req.plmn)
+    session = <span class="kw">await</span> session_mgr.get_or_create(req.session_id, opco_cfg)
+
+    <span class="kw">try</span>:
+        <span class="cmt"># 1. Language detection (5 ms)</span>
+        <span class="kw">if</span> session.language <span class="kw">is</span> <span class="kw">None</span>:
+            session.language = <span class="kw">await</span> lang_det.detect(req.user_input)
+
+        <span class="cmt"># 2. NLU classification (≤ 180 ms)</span>
+        nlu_result = <span class="kw">await</span> asyncio.wait_for(
+            nlu.classify(req.user_input, session.language, session.turn_history),
+            timeout=opco_cfg.nlu_timeout_s
+        )
+
+        <span class="cmt"># 3. Confidence gate → fallback if below threshold</span>
+        <span class="kw">if</span> nlu_result.confidence &lt; opco_cfg.confidence_threshold:
+            menu = fallback.generate(session.state, opco_cfg)
+            <span class="kw">return</span> formatter.as_ussd(menu, session, session_type=<span class="str">"CON"</span>)
+
+        <span class="cmt"># 4. Intent dispatch (includes PayGuard pre-screen for monetary)</span>
+        dispatch_result = <span class="kw">await</span> dispatcher.dispatch(nlu_result, session, opco_cfg)
+
+        <span class="cmt"># 5. Format response ≤ 182 chars</span>
+        <span class="kw">return</span> formatter.as_ussd(dispatch_result, session,
+                                  language=session.language,
+                                  session_type=dispatch_result.session_type)
+
+    <span class="kw">except</span> asyncio.TimeoutError:
+        log.warning(<span class="str">"nlu_timeout session_id=%s opco=%s"</span>, req.session_id, opco_cfg.opco_id)
+        menu = fallback.generate(session.state, opco_cfg)
+        <span class="kw">return</span> formatter.as_ussd(menu, session, session_type=<span class="str">"CON"</span>)
+    <span class="kw">except</span> Exception <span class="kw">as</span> exc:
+        log.error(<span class="str">"session_error session_id=%s err=%s"</span>, req.session_id, type(exc).__name__)
+        <span class="kw">raise</span> HTTPException(status_code=<span class="num">500</span>, detail=<span class="str">"USSD_SESSION_ERROR"</span>)
+    <span class="kw">finally</span>:
+        <span class="kw">await</span> session_mgr.persist(session)  <span class="cmt"># atomic Redis write</span>
+</div>
+
+    <div class="card" style="margin-top:16px;margin-bottom:12px;">
+      <h3>Redis Session Key Schema</h3>
+    </div>
+    <div class="code-block"><span class="cmt"># Key format (no raw MSISDN stored)</span>
+session:{opco_id}:{sha256(msisdn + opco_salt)[:16]}:{gateway_session_id}
+
+<span class="cmt"># Redis hash fields</span>
+state          → ENUM string (INIT, LANG_CONFIRMED, CLARIFYING, …)
+language       → ISO 639-1 code (en, fr, sw, ha, …)
+turn_history   → JSON array of {role, utterance_embedding_hash, intent}
+slots          → JSON {amount: null, beneficiary_hash: null, service: null}
+idempotency_key → sha256(session_id + intent + amount + timestamp_minute)
+opco_id        → string (MTN_GH, MTN_UG, MTN_NG, …)
+created_at     → Unix epoch (int)
+TTL            → 120 seconds (set on every write — sliding expiry)
+</div>
+
+    <div class="card" style="margin-top:16px;margin-bottom:12px;">
+      <h3>Intent Catalogue (28 Intents, 6 Domains)</h3>
+    </div>
+    <div class="code-block"><span class="cmt"># DOMAIN: TRANSFER</span>
+transfer.send_money         <span class="cmt"># "send 5000 to John"</span>
+transfer.request_money       <span class="cmt"># "ask Sarah to send me money"</span>
+transfer.bank_transfer       <span class="cmt"># "transfer to my bank account"</span>
+
+<span class="cmt"># DOMAIN: ACCOUNT</span>
+account.check_balance        <span class="cmt"># "what is my balance"</span>
+account.mini_statement       <span class="cmt"># "show last 5 transactions"</span>
+account.pin_change           <span class="cmt"># "change my PIN"</span>
+account.kyc_upgrade          <span class="cmt"># "upgrade my account"</span>
+
+<span class="cmt"># DOMAIN: PAYMENTS</span>
+payments.airtime_self        <span class="cmt"># "buy airtime for myself"</span>
+payments.airtime_other       <span class="cmt"># "recharge 0791234 with 500"</span>
+payments.pay_bill            <span class="cmt"># "pay electricity bill"</span>
+payments.merchant_pay        <span class="cmt"># "pay at shop"</span>
+payments.bulk_pay            <span class="cmt"># "pay salaries"</span>
+
+<span class="cmt"># DOMAIN: FINANCIAL_SERVICES</span>
+finserv.loan_apply           <span class="cmt"># "I need a loan"</span>
+finserv.loan_repay           <span class="cmt"># "repay my MoMo loan"</span>
+finserv.savings_deposit      <span class="cmt"># "put 2000 in savings"</span>
+finserv.savings_withdraw     <span class="cmt"># "take out 1000 from savings"</span>
+finserv.insurance_premium    <span class="cmt"># "pay my insurance"</span>
+
+<span class="cmt"># DOMAIN: NAVIGATION</span>
+nav.main_menu                <span class="cmt"># "menu" / "back"</span>
+nav.language_switch          <span class="cmt"># "switch to French"</span>
+nav.help                     <span class="cmt"># "help" / "I don't understand"</span>
+nav.cancel                   <span class="cmt"># "cancel" / "stop"</span>
+
+<span class="cmt"># DOMAIN: AGENT</span>
+agent.cash_in                <span class="cmt"># agent-side cash deposit</span>
+agent.cash_out               <span class="cmt"># agent-side withdrawal</span>
+agent.float_check            <span class="cmt"># "check my float"</span>
+
+<span class="cmt"># DOMAIN: UNKNOWN</span>
+unknown.unrecognised         <span class="cmt"># triggers clarification or fallback</span>
+unknown.out_of_scope         <span class="cmt"># recognised as non-MoMo topic</span>
+unknown.ambiguous            <span class="cmt"># multiple high-confidence intents</span>
+</div>
+  </section>
+
+  <!-- ═══════════════ 8. MULTI-OPCO DEPLOYMENT ═══════════════ -->
+  <section id="multiopco">
+    <div class="section-title"><div class="icon">&#127758;</div> Multi-OpCo Deployment Strategy</div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <p>UC25 is deployed as a shared platform service with per-OpCo configuration isolation. A single Kubernetes cluster per AWS region serves all OpCos in that region, with namespace-level isolation and per-OpCo Helm value files. OpCo-specific customisation is handled entirely through configuration — no forked codebases.</p>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>OpCo</th>
+            <th>Market</th>
+            <th>AWS Region</th>
+            <th>USSD Gateway</th>
+            <th>Primary Language(s)</th>
+            <th>NLU Model Variant</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>MTN GH</td><td>Ghana</td><td>af-south-1</td><td>Ericsson UCP</td><td>English, Twi, Ga</td><td>XLM-R (Ghanaian fine-tune)</td><td><span class="pill green">Wave 1</span></td></tr>
+          <tr><td>MTN UG</td><td>Uganda</td><td>af-south-1</td><td>Huawei USSD-GW</td><td>English, Luganda, Swahili</td><td>mBERT (EA cluster)</td><td><span class="pill green">Wave 1</span></td></tr>
+          <tr><td>MTN RW</td><td>Rwanda</td><td>af-south-1</td><td>Custom REST</td><td>Kinyarwanda, French, English</td><td>XLM-R (RW fine-tune)</td><td><span class="pill green">Wave 1</span></td></tr>
+          <tr><td>MTN CM</td><td>Cameroon</td><td>eu-west-1</td><td>Ericsson UCP</td><td>French, English, Fulfulde</td><td>mBERT (WA cluster)</td><td><span class="pill blue">Wave 2</span></td></tr>
+          <tr><td>MTN CI</td><td>Ivory Coast</td><td>eu-west-1</td><td>Ericsson UCP</td><td>French, Dioula</td><td>mBERT (WA cluster)</td><td><span class="pill blue">Wave 2</span></td></tr>
+          <tr><td>MTN NG</td><td>Nigeria</td><td>af-south-1</td><td>Custom REST (SMSC)</td><td>English, Hausa, Yoruba, Igbo</td><td>XLM-R (NG fine-tune, 4-lang)</td><td><span class="pill orange">Wave 3</span></td></tr>
+          <tr><td>MTN ZA</td><td>South Africa</td><td>af-south-1</td><td>Ericsson UCP</td><td>English, Zulu, Xhosa</td><td>XLM-R (SA fine-tune)</td><td><span class="pill orange">Wave 3</span></td></tr>
+          <tr><td>MTN ET</td><td>Ethiopia</td><td>af-south-1</td><td>Huawei USSD-GW</td><td>Amharic, English</td><td>mBERT + Amharic extension</td><td><span class="pill red">Backlog</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3>OpCo Configuration Override Hierarchy</h3>
+      <ul>
+        <li><b>Platform defaults</b> — Base Helm chart values, default NLU thresholds, default response templates</li>
+        <li><b>Region overrides</b> — AWS region-specific infra settings (VPC, subnets, KMS key ARNs)</li>
+        <li><b>OpCo overrides</b> — Per-OpCo Helm values: gateway SDK class, product matrix, language list, confidence thresholds, response template locale pack</li>
+        <li><b>Runtime config</b> — AWS AppConfig for hot-reload of confidence thresholds and fallback triggers without pod restart</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 9. SECURITY ═══════════════ -->
+  <section id="security">
+    <div class="section-title"><div class="icon">&#128274;</div> Security Architecture</div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>PII Protection — No-Log Mandate</h3>
+        <ul>
+          <li>MSISDN is hashed (SHA-256 + per-OpCo secret salt) at the Gateway Adapter boundary. Raw MSISDN never enters application code.</li>
+          <li>Financial amounts are excluded from all log statements. Only opaque session IDs and intent categories appear in logs.</li>
+          <li>Beneficiary identifiers are hashed before storage in Redis session slots.</li>
+          <li>Log schema enforced via a custom Pydantic log record model — fields not on the allowlist are silently dropped before emission.</li>
+          <li>OpenSearch index mappings configured to reject fields containing known PII patterns (phone number regex, email regex).</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Encrypted Session State</h3>
+        <ul>
+          <li>Redis Cluster configured with TLS 1.3 in-transit encryption.</li>
+          <li>At-rest encryption via AWS KMS CMK per OpCo — Redis persistence (RDB/AOF) encrypted at block-device level.</li>
+          <li>Sensitive slot values (amounts, beneficiary hashes) additionally envelope-encrypted with a session-scoped DEK derived from KMS.</li>
+          <li>DEK discarded on session CLOSED state — forward secrecy for session data.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Fraud Pre-Screening (UC16 PayGuard)</h3>
+        <ul>
+          <li>Every monetary intent (SendMoney, PayBill, BuyAirtime, Loan) triggers a synchronous PayGuard call before MoMo dispatch.</li>
+          <li>PayGuard receives: hashed MSISDN, intent type, amount, currency, beneficiary hash, OpCo, and time-of-day bucket.</li>
+          <li>PayGuard returns: CLEAR / REVIEW / BLOCK with a risk score. BLOCK transitions session to BLOCKED state immediately.</li>
+          <li>PayGuard SLA ≤ 80 ms P95 — guarded by circuit breaker; on PayGuard unavailability, high-risk transactions are held in PENDING until availability restored.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>API &amp; Transport Security</h3>
+        <ul>
+          <li>All internal service-to-service communication via mTLS (Envoy sidecar in App Mesh).</li>
+          <li>USSD Gateway Adapter authenticates gateway callbacks via HMAC-SHA256 shared secret per OpCo, stored in AWS Secrets Manager.</li>
+          <li>MoMo API Client uses OAuth2 client credentials per OpCo; tokens cached in Redis with 5-minute expiry buffer.</li>
+          <li>Per-OpCo API key rotation supported with zero-downtime dual-key window.</li>
+          <li>Network policies restrict pod-to-pod traffic to declared service graph only.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Idempotency &amp; Replay Protection</h3>
+        <ul>
+          <li>Idempotency key = SHA-256(session_id + intent + amount_cents + minute_bucket).</li>
+          <li>Keys stored in Redis with 10-minute TTL; duplicate requests within window return cached response without re-calling MoMo.</li>
+          <li>USSD gateway retries (common on poor signal) are safely handled without double-debiting.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Audit &amp; Compliance</h3>
+        <ul>
+          <li>All financial intent outcomes written to immutable audit log (Kafka → S3 → Glacier) with 7-year retention per financial regulation.</li>
+          <li>Audit records contain: session_id, opco, intent, outcome, timestamp — never PII.</li>
+          <li>SOC2 Type II controls applied; annual pen-test scope includes USSD AI layer.</li>
+          <li>NDPR (Nigeria), DPA (Uganda/Kenya), and Cameroonian data law compliance validated per-OpCo.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 10. SCALABILITY & HA ═══════════════ -->
+  <section id="scalability">
+    <div class="section-title"><div class="icon">&#128200;</div> Scalability &amp; High Availability Design</div>
+
+    <div class="tbl-wrap" style="margin-bottom:16px;">
+      <table>
+        <thead>
+          <tr><th>Component</th><th>Target TPS</th><th>Scaling Strategy</th><th>HA Model</th><th>RTO</th><th>RPO</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Gateway Adapter</td><td>5 000 TPS / OpCo</td><td>HPA on CPU + RPS, Karpenter node scale</td><td>Active-active, 3 AZs</td><td>&lt; 30 s</td><td>0 (stateless)</td></tr>
+          <tr><td>AI Session Handler</td><td>5 000 TPS / OpCo</td><td>HPA on CPU + Redis queue depth</td><td>Active-active, 3 AZs</td><td>&lt; 30 s</td><td>0 (stateless)</td></tr>
+          <tr><td>NLU Engine (Triton)</td><td>3 000 TPS (GPU batched)</td><td>KEDA on inference queue depth, GPU node pool</td><td>Active-active, 2 GPU AZs</td><td>&lt; 60 s</td><td>0</td></tr>
+          <tr><td>Redis Cluster</td><td>50 000 OPS</td><td>Cluster shards scale-out; ElastiCache auto-scaling</td><td>3 shards × 2 replicas</td><td>&lt; 60 s (replica promote)</td><td>&lt; 1 s (async repl)</td></tr>
+          <tr><td>Intent Dispatcher</td><td>4 000 TPS</td><td>HPA on CPU</td><td>Active-active, 3 AZs</td><td>&lt; 30 s</td><td>0</td></tr>
+          <tr><td>MoMo API Client</td><td>Per-OpCo MoMo limit</td><td>Connection pool per OpCo, circuit breaker</td><td>Multi-region failover</td><td>&lt; 5 min</td><td>0</td></tr>
+          <tr><td>Full Platform</td><td>20 000 TPS aggregate</td><td>Cross-region active-active (af-south-1 + eu-west-1)</td><td>Route 53 health-check routing</td><td>&lt; 2 min</td><td>&lt; 1 s</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Traffic Shaping &amp; Burst Handling</h3>
+      <ul>
+        <li>Token-bucket rate limiting per OpCo at Gateway Adapter layer (configurable via AppConfig).</li>
+        <li>NLU inference requests queued in Redis Stream during burst; KEDA spins up additional Triton pods within 45 s.</li>
+        <li>Fallback Menu Generator is pre-loaded in memory — no I/O — ensuring sub-5 ms response during NLU pod scale events.</li>
+        <li>Surge capacity headroom: platform pre-scales by 30% ahead of known high-traffic events (salary day, market days) via scheduled Karpenter provisioner expansion.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 11. KUBERNETES ═══════════════ -->
+  <section id="kubernetes">
+    <div class="section-title"><div class="icon">&#9783;</div> Kubernetes Deployment Architecture</div>
+
+    <div class="k8s-wrap">
+      <div class="k8s-cluster">
+        <div class="k8s-cluster-label">EKS Cluster — af-south-1 (Primary) / eu-west-1 (Secondary)</div>
+
+        <div class="k8s-namespace">
+          <div class="ns-label">Namespace: ussd-ai-ingress</div>
+          <div class="k8s-row">
+            <div class="k8s-pod">
+              <div class="pod-icon">&#127760;</div>
+              <div class="pod-name">ussd-gateway-adapter</div>
+              <div class="pod-detail">replicas: 6–30 (HPA)<br/>2 vCPU / 2 Gi</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#9881;</div>
+              <div class="pod-name">rate-limiter</div>
+              <div class="pod-detail">replicas: 3<br/>0.5 vCPU / 512 Mi</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128274;</div>
+              <div class="pod-name">auth-sidecar</div>
+              <div class="pod-detail">Envoy mTLS<br/>per pod</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="k8s-namespace">
+          <div class="ns-label">Namespace: ussd-ai-core</div>
+          <div class="k8s-row">
+            <div class="k8s-pod">
+              <div class="pod-icon">&#129504;</div>
+              <div class="pod-name">ai-session-handler</div>
+              <div class="pod-detail">replicas: 6–40 (HPA)<br/>4 vCPU / 4 Gi</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#127760;</div>
+              <div class="pod-name">lang-detector</div>
+              <div class="pod-detail">replicas: 3–10<br/>1 vCPU / 1 Gi</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128200;</div>
+              <div class="pod-name">intent-dispatcher</div>
+              <div class="pod-detail">replicas: 4–20 (HPA)<br/>2 vCPU / 2 Gi</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128248;</div>
+              <div class="pod-name">response-formatter</div>
+              <div class="pod-detail">replicas: 3–12<br/>1 vCPU / 1 Gi</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128196;</div>
+              <div class="pod-name">fallback-menu-gen</div>
+              <div class="pod-detail">replicas: 3 (fixed)<br/>0.5 vCPU / 512 Mi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="k8s-namespace">
+          <div class="ns-label">Namespace: ussd-ai-inference (GPU Node Pool)</div>
+          <div class="k8s-row">
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128169;</div>
+              <div class="pod-name">triton-nlu-server</div>
+              <div class="pod-detail">replicas: 2–8 (KEDA)<br/>8 vCPU / 32 Gi / 1× A10G GPU</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128225;</div>
+              <div class="pod-name">model-cache</div>
+              <div class="pod-detail">DaemonSet<br/>Shared NFS model store</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="k8s-namespace">
+          <div class="ns-label">Namespace: ussd-ai-data</div>
+          <div class="k8s-row">
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128190;</div>
+              <div class="pod-name">redis-cluster</div>
+              <div class="pod-detail">3 masters + 6 replicas<br/>ElastiCache (external)</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128228;</div>
+              <div class="pod-name">kafka-producer</div>
+              <div class="pod-detail">Sidecar per core pod<br/>MSK (external)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="k8s-namespace" style="border-color:rgba(251,191,36,.2)">
+          <div class="ns-label" style="color:var(--amber)">Namespace: ussd-ai-ops</div>
+          <div class="k8s-row">
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128202;</div>
+              <div class="pod-name">prometheus</div>
+              <div class="pod-detail">Metrics scrape<br/>15 s interval</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128065;</div>
+              <div class="pod-name">jaeger-agent</div>
+              <div class="pod-detail">Distributed tracing<br/>DaemonSet</div>
+            </div>
+            <div class="k8s-pod">
+              <div class="pod-icon">&#128737;</div>
+              <div class="pod-name">appconfig-agent</div>
+              <div class="pod-detail">Hot-reload config<br/>DaemonSet</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+      <h3>Helm Chart Structure</h3>
+      <ul>
+        <li><code>charts/ussd-ai-platform/</code> — base chart with all component deployments, services, HPAs, PodDisruptionBudgets, NetworkPolicies</li>
+        <li><code>charts/ussd-ai-platform/values.yaml</code> — platform defaults (image tags, resource limits, NLU thresholds)</li>
+        <li><code>charts/ussd-ai-platform/values-mtn-gh.yaml</code> — Ghana OpCo overrides (gateway class, language list, product matrix)</li>
+        <li>ArgoCD ApplicationSet generates one Application per OpCo from values file matrix</li>
+        <li>GitOps: all changes via PR; ArgoCD auto-sync on merge to <code>main</code></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 12. INTEGRATIONS ═══════════════ -->
+  <section id="integrations">
+    <div class="section-title"><div class="icon">&#128279;</div> System Integrations</div>
+
+    <div class="integration">
+      <div class="int-icon">&#128737;</div>
+      <div>
+        <h3>UC16 PayGuard — Fraud Pre-Screening</h3>
+        <p>PayGuard is invoked synchronously by the Intent Dispatcher for every monetary intent before the MoMo Core API call is made. The integration uses a gRPC service call over the internal App Mesh with mTLS.</p>
+        <ul>
+          <li>Request payload: hashed MSISDN, OpCo ID, intent type, amount (integer cents), beneficiary hash, device fingerprint (not available over USSD — absent field), time-of-day bucket</li>
+          <li>Response: <code>{verdict: CLEAR|REVIEW|BLOCK, risk_score: 0.0–1.0, rule_id: string}</code></li>
+          <li>CLEAR: proceed to MoMo Core. REVIEW: proceed but flag for manual review in PayGuard dashboard. BLOCK: reject immediately, session moves to BLOCKED state</li>
+          <li>SLA: ≤ 80 ms P95. Circuit breaker: open after 5 consecutive failures — on open, high-value transactions (&gt; threshold) are PENDING; low-value proceed with REVIEW flag</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="integration">
+      <div class="int-icon">&#128202;</div>
+      <div>
+        <h3>UC24 Customer Intelligence — Personalisation Signals</h3>
+        <p>At session INIT, the AI Session Handler fetches a lightweight personalisation context from UC24 Customer Intelligence to improve first-turn intent resolution and response personalisation.</p>
+        <ul>
+          <li>Fetch: preferred language, frequent payees (hashed), account tier, active products, last session intent, preferred airtime amount</li>
+          <li>Protocol: REST call to UC24 profile API, timeout 150 ms — result cached in session state; non-blocking (degraded gracefully if unavailable)</li>
+          <li>Write: on session CLOSED, session telemetry event published to Kafka topic <code>ussd.session.closed.v1</code> — UC24 consumes this for model retraining and churn signal updates</li>
+          <li>Kafka schema: Avro, schema registry enforced — fields: session_id, opco_id, intent_sequence (array), language, outcome, latency_p99, turn_count, fallback_triggered (bool)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="integration">
+      <div class="int-icon">&#128241;</div>
+      <div>
+        <h3>MoMo Core API — Financial Operations</h3>
+        <p>The MoMo API Client wraps the MTN MoMo Open API v2 (and legacy variants) providing a unified async interface for all financial operations.</p>
+        <ul>
+          <li>Operations: Collections, Disbursements, Remittances, Account Balance, Transaction Status, MicroLoan eligibility, Savings API</li>
+          <li>Auth: OAuth2 client credentials per OpCo; tokens stored in Redis with 5-min expiry buffer; rotation handled transparently</li>
+          <li>Idempotency: every call includes <code>X-Reference-Id</code> derived from session idempotency key</li>
+          <li>Error handling: 4xx errors mapped to user-friendly USSD messages; 5xx trigger exponential backoff (max 2 retries within latency budget); 3 retries exhausted → FAILED state</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 13. MONITORING ═══════════════ -->
+  <section id="monitoring">
+    <div class="section-title"><div class="icon">&#128202;</div> Monitoring &amp; Observability</div>
+
+    <div class="mon-grid">
+      <div class="mon-card">
+        <h4>Key Metrics (Prometheus)</h4>
+        <ul>
+          <li><code>ussd_session_total</code> — by opco, outcome</li>
+          <li><code>ussd_nlu_latency_seconds</code> — P50/P95/P99</li>
+          <li><code>ussd_intent_confidence</code> — histogram</li>
+          <li><code>ussd_fallback_rate</code> — by opco</li>
+          <li><code>ussd_session_end_to_end_latency_seconds</code></li>
+          <li><code>ussd_payguard_verdict_total</code> — CLEAR/REVIEW/BLOCK</li>
+          <li><code>ussd_momo_api_errors_total</code> — by opco, error_type</li>
+          <li><code>ussd_session_abandonment_rate</code></li>
+        </ul>
+      </div>
+      <div class="mon-card">
+        <h4>SLO Dashboard (Grafana)</h4>
+        <ul>
+          <li>End-to-end latency SLO: &lt; 1 800 ms P95</li>
+          <li>NLU availability SLO: 99.5%</li>
+          <li>Fallback rate SLO: &lt; 15% per OpCo</li>
+          <li>Session error rate SLO: &lt; 0.5%</li>
+          <li>Per-OpCo success rate breakdown</li>
+          <li>Language detection accuracy (sampled)</li>
+          <li>PayGuard block rate trend (anomaly alert)</li>
+        </ul>
+      </div>
+      <div class="mon-card">
+        <h4>Distributed Tracing (Jaeger)</h4>
+        <ul>
+          <li>Full trace from Gateway Adapter → Response Formatter</li>
+          <li>NLU inference span with model version tag</li>
+          <li>PayGuard call span with verdict tag</li>
+          <li>MoMo API call span (no amount in span tags)</li>
+          <li>Redis operation spans (slot reads/writes)</li>
+          <li>Trace sampling: 5% in prod, 100% in staging</li>
+        </ul>
+      </div>
+      <div class="mon-card">
+        <h4>Alerting Rules (PagerDuty)</h4>
+        <ul>
+          <li>P1: E2E latency P95 &gt; 2 000 ms for &gt; 2 min</li>
+          <li>P1: Session error rate &gt; 2% per OpCo</li>
+          <li>P1: NLU Triton pods &lt; 2 available</li>
+          <li>P2: Fallback rate &gt; 30% for any OpCo</li>
+          <li>P2: PayGuard circuit breaker OPEN</li>
+          <li>P2: Redis cluster replication lag &gt; 500 ms</li>
+          <li>P3: MoMo API error rate &gt; 5%</li>
+        </ul>
+      </div>
+      <div class="mon-card">
+        <h4>Log Strategy (OpenSearch)</h4>
+        <ul>
+          <li>Structured JSON logs (no PII — enforced at logger level)</li>
+          <li>Fields: timestamp, service, session_id, opco_id, state_transition, intent_category, latency_ms, error_type</li>
+          <li>Hot tier: 30 days (SSD), warm: 90 days (HDD), cold: 7 years (S3 Glacier)</li>
+          <li>Index lifecycle policy automated via ILM</li>
+          <li>PII scanner sidecar validates no phone numbers or amounts in log stream</li>
+        </ul>
+      </div>
+      <div class="mon-card">
+        <h4>NLU Model Monitoring</h4>
+        <ul>
+          <li>Confidence distribution tracked per intent, per OpCo</li>
+          <li>Concept drift detection: 7-day rolling confidence mean vs baseline</li>
+          <li>Automated retraining trigger if drift &gt; 5% absolute</li>
+          <li>A/B model shadow deployment for new fine-tunes before cutover</li>
+          <li>Human annotation queue fed from low-confidence sessions (consent-gated)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ 14. ADRs ═══════════════ -->
+  <section id="adrs">
+    <div class="section-title"><div class="icon">&#128221;</div> Architecture Decision Records</div>
+
+    <div class="adr">
+      <div class="adr-header">
+        <div>
+          <div class="adr-id">ADR-25-001</div>
+          <div class="adr-title">Use XLM-RoBERTa over GPT-class models for USSD NLU</div>
+        </div>
+        <div class="adr-status"><span class="pill green">Accepted</span></div>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Context</div>
+        <p>USSD NLU must run within a 180 ms inference budget, support 12 African languages, and be fine-tunable on proprietary MoMo transaction data. GPT-class models (GPT-4, Claude) were evaluated but present API latency, cost at scale, and data sovereignty concerns.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Decision</div>
+        <p>Use XLM-RoBERTa-base (fine-tuned per-language cluster) deployed on Triton Inference Server with ONNX export. mBERT used for OpCos with broader language mix where XLM-R per-language tuning is not yet complete.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Consequences</div>
+        <p>Inference within 180 ms P95 on A10G GPU. Requires ongoing fine-tuning pipeline investment. No dependency on external LLM API — full data sovereignty. Model quality may lag GPT-4 for edge-case utterances, mitigated by fallback menu for low-confidence outputs.</p>
+      </div>
+    </div>
+
+    <div class="adr">
+      <div class="adr-header">
+        <div>
+          <div class="adr-id">ADR-25-002</div>
+          <div class="adr-title">Redis for session state over DynamoDB</div>
+        </div>
+        <div class="adr-status"><span class="pill green">Accepted</span></div>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Context</div>
+        <p>USSD sessions require sub-millisecond state reads on every hop (typically 3–7 hops per session). DynamoDB was considered for its managed scale and global tables.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Decision</div>
+        <p>Redis Cluster (AWS ElastiCache) chosen for session state. DynamoDB used only for long-term session audit archival after session CLOSED.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Consequences</div>
+        <p>Sub-millisecond state access (&lt; 1 ms P99 on ElastiCache). Lua scripting enables atomic state machine transitions. Trade-off: Redis is in-memory — session data is lost on total cluster failure (mitigated by replica failover &lt; 60 s). DynamoDB archival provides durable audit trail.</p>
+      </div>
+    </div>
+
+    <div class="adr">
+      <div class="adr-header">
+        <div>
+          <div class="adr-id">ADR-25-003</div>
+          <div class="adr-title">Confidence-gated fallback instead of always-on AI</div>
+        </div>
+        <div class="adr-status"><span class="pill green">Accepted</span></div>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Context</div>
+        <p>Forcing NLU interpretation on all inputs risks incorrect financial transactions (wrong amount, wrong beneficiary) if confidence is low — particularly catastrophic in the MoMo context.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Decision</div>
+        <p>NLU confidence threshold of 0.65 (configurable per OpCo via AppConfig). Below threshold, deterministic USSD menu is injected. Threshold tuned per OpCo based on language model quality.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Consequences</div>
+        <p>Higher false-negative rate initially — some solvable requests fall to menu. This is acceptable: a menu is never wrong, an incorrect transaction is unrecoverable. Threshold will be relaxed as model quality improves per market.</p>
+      </div>
+    </div>
+
+    <div class="adr">
+      <div class="adr-header">
+        <div>
+          <div class="adr-id">ADR-25-004</div>
+          <div class="adr-title">Shared platform, per-OpCo config isolation (not multi-tenancy by cluster)</div>
+        </div>
+        <div class="adr-status"><span class="pill green">Accepted</span></div>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Context</div>
+        <p>17 OpCos × dedicated clusters = prohibitive infrastructure cost and ops overhead. Full multi-tenancy on a single cluster was considered but raises blast-radius concerns.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Decision</div>
+        <p>Regional clusters (af-south-1, eu-west-1) with Kubernetes namespace isolation per OpCo. Network policies, resource quotas, and separate Redis keyspaces provide logical isolation. No cross-namespace traffic permitted.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Consequences</div>
+        <p>Significant infra cost reduction vs per-OpCo clusters. Blast radius contained to namespace level — a misconfigured OpCo cannot impact others. Trade-off: a cluster-level failure affects all OpCos in that region — mitigated by active-active cross-region routing.</p>
+      </div>
+    </div>
+
+    <div class="adr">
+      <div class="adr-header">
+        <div>
+          <div class="adr-id">ADR-25-005</div>
+          <div class="adr-title">Synchronous PayGuard pre-screen over async risk scoring</div>
+        </div>
+        <div class="adr-status"><span class="pill green">Accepted</span></div>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Context</div>
+        <p>Async post-hoc fraud scoring would allow faster UX but would require rollback capability for fraudulent transactions already processed — complex and not universally supported by MoMo backends.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Decision</div>
+        <p>Synchronous PayGuard call before every monetary MoMo API call. PayGuard SLA capped at 80 ms P95 via dedicated circuit breaker.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Consequences</div>
+        <p>Adds 80 ms to monetary transaction path but prevents any fraudulent disbursements from reaching MoMo Core. Acceptable within overall 1 800 ms budget. If PayGuard is unavailable and circuit is open, high-value transactions are deferred — this is the correct conservative behaviour.</p>
+      </div>
+    </div>
+
+    <div class="adr">
+      <div class="adr-header">
+        <div>
+          <div class="adr-id">ADR-25-006</div>
+          <div class="adr-title">MSISDN hashing at Gateway boundary, never in application logs</div>
+        </div>
+        <div class="adr-status"><span class="pill green">Accepted</span></div>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Context</div>
+        <p>Multiple African data protection regulations (NDPR, DPA, POPIA) require that subscriber PII not be logged or stored beyond operational necessity. MSISDN is PII.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Decision</div>
+        <p>Raw MSISDN hashed (SHA-256 + per-OpCo salt from Secrets Manager) at the first application touch-point (Gateway Adapter). Hash used as internal subscriber identifier. Salt rotation supported with dual-key window.</p>
+      </div>
+      <div class="adr-section">
+        <div class="lbl">Consequences</div>
+        <p>Regulatory compliance met. Subscriber linkage across sessions requires access to the salt (held in Secrets Manager, audited access). Re-identification not possible without the salt. Log streams are safe for broader internal access.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <div style="border-top:1px solid var(--border2);padding-top:24px;margin-top:32px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div style="font-size:12px;color:var(--text-dim);">
+      UC25 USSD AI Assistant &bull; MTN Group Fintech &bull; Architecture Specification v0.9 &bull; 2026-05-10
+    </div>
+    <div style="font-size:12px;color:var(--text-dim);">
+      Depends on: <span style="color:var(--indigo-lt)">UC16-PayGuard</span> &bull; <span style="color:var(--indigo-lt)">UC24-CustomerIntel</span> &bull; MoMo Open API v2
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+</body>
+</html>

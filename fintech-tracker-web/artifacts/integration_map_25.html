@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UC25 — USSD AI Assistant | Integration Map</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-2: #263348;
+  --surface-3: #1a2540;
+  --border: rgba(255,255,255,.07);
+  --border2: rgba(255,255,255,.12);
+  --border-hover: rgba(99,102,241,.35);
+  --indigo: #818cf8;
+  --violet: #a78bfa;
+  --teal: #34d399;
+  --teal2: #2dd4bf;
+  --amber: #fbbf24;
+  --rose: #fb7185;
+  --green: #4ade80;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --indigo-soft: rgba(99,102,241,.12);
+  --violet-soft: rgba(167,139,250,.12);
+  --teal-soft: rgba(52,211,153,.12);
+  --amber-soft: rgba(251,191,36,.12);
+  --rose-soft: rgba(251,113,133,.12);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 100px;
+}
+
+/* ── HEADER ── */
+.doc-header {
+  margin: 64px 0 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border2);
+}
+.badge-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase;
+}
+.badge-uc { background: linear-gradient(135deg, #6366f1, #a78bfa); color: #fff; }
+.badge-status { background: var(--amber-soft); border: 1px solid rgba(251,191,36,.4); color: var(--amber); }
+.badge-domain { background: var(--teal-soft); border: 1px solid rgba(52,211,153,.3); color: var(--teal); }
+.badge-doc { background: var(--indigo-soft); border: 1px solid rgba(99,102,241,.3); color: var(--indigo); }
+
+.doc-title {
+  font-size: clamp(26px, 3.5vw, 38px);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: 1.15;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #818cf8 55%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.doc-subtitle {
+  font-size: 15px;
+  color: var(--text-muted);
+  max-width: 760px;
+  margin-bottom: 20px;
+}
+.meta-row {
+  display: flex; flex-wrap: wrap; gap: 24px;
+  font-size: 12px; color: var(--text-dim);
+}
+.meta-row span { display: flex; align-items: center; gap: 6px; }
+.meta-row strong { color: var(--text-muted); }
+
+/* ── SECTION ── */
+.section { margin-bottom: 56px; }
+.section-label {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--indigo);
+  margin-bottom: 12px;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(99,102,241,.3), transparent);
+}
+.section-title {
+  font-size: 20px; font-weight: 700; color: var(--text);
+  margin-bottom: 20px; letter-spacing: -.02em;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: border-color .2s;
+}
+.card:hover { border-color: var(--border-hover); }
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+.card-header {
+  display: flex; align-items: flex-start; gap: 14px;
+  margin-bottom: 18px;
+}
+.card-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.card-sub { font-size: 12px; color: var(--text-dim); }
+
+/* ── KV TABLE inside card ── */
+.kv { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.kv tr { border-bottom: 1px solid var(--border); }
+.kv tr:last-child { border-bottom: none; }
+.kv td { padding: 6px 0; font-size: 12px; vertical-align: top; }
+.kv td:first-child { color: var(--text-dim); width: 36%; padding-right: 8px; }
+.kv td:last-child { color: var(--text-muted); font-family: 'SFMono-Regular', Consolas, monospace; }
+
+/* ── ACCENT TAGS ── */
+.tag {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 11px; font-weight: 600; margin: 1px 2px;
+}
+.tag-indigo { background: var(--indigo-soft); color: var(--indigo); border: 1px solid rgba(99,102,241,.25); }
+.tag-teal   { background: var(--teal-soft);   color: var(--teal);   border: 1px solid rgba(52,211,153,.25); }
+.tag-violet { background: var(--violet-soft);  color: var(--violet); border: 1px solid rgba(167,139,250,.25); }
+.tag-amber  { background: var(--amber-soft);   color: var(--amber);  border: 1px solid rgba(251,191,36,.25); }
+.tag-rose   { background: var(--rose-soft);    color: var(--rose);   border: 1px solid rgba(251,113,133,.25); }
+.tag-green  { background: rgba(74,222,128,.1); color: var(--green);  border: 1px solid rgba(74,222,128,.25); }
+
+/* ── HUB-SPOKE DIAGRAM ── */
+.diagram-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  overflow-x: auto;
+}
+
+/* ── FULL-WIDTH CARD ── */
+.card-full {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.card-full:hover { border-color: var(--border-hover); }
+
+/* ── TABLE ── */
+.data-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12.5px;
+}
+.data-table th {
+  text-align: left; padding: 10px 12px;
+  background: var(--surface-2); color: var(--indigo);
+  font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border2);
+}
+.data-table th:first-child { border-radius: 8px 0 0 0; }
+.data-table th:last-child  { border-radius: 0 8px 0 0; }
+.data-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  vertical-align: top;
+}
+.data-table td code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 11.5px; color: var(--teal2);
+  background: rgba(45,212,191,.08); padding: 1px 5px; border-radius: 3px;
+}
+.data-table tr:hover td { background: rgba(255,255,255,.02); }
+
+/* ── SEQUENCE DIAGRAM ── */
+.seq-wrap {
+  background: #0b1120;
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 20px 24px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  overflow-x: auto;
+  white-space: pre;
+  color: var(--text-muted);
+}
+.seq-wrap .s-actor { color: var(--indigo); font-weight: 700; }
+.seq-wrap .s-arrow  { color: var(--teal2); }
+.seq-wrap .s-note   { color: var(--amber); }
+.seq-wrap .s-alt    { color: var(--violet); }
+.seq-wrap .s-ok     { color: var(--green); }
+.seq-wrap .s-err    { color: var(--rose); }
+
+/* ── RISK TABLE COLOR ── */
+.risk-critical { color: var(--rose); }
+.risk-high     { color: var(--amber); }
+.risk-medium   { color: #60a5fa; }
+.risk-low      { color: var(--teal); }
+
+/* ── GRID 2-col ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+@media (max-width: 800px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+/* ── CB = circuit-breaker panel ── */
+.cb-states {
+  display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap;
+}
+.cb-state {
+  flex: 1; min-width: 110px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  text-align: center;
+}
+.cb-state .state-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  margin: 0 auto 6px;
+}
+.cb-state .state-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.cb-state .state-desc { font-size: 11px; color: var(--text-dim); }
+
+/* ── SCROLL-SPY NAV ── */
+.toc {
+  position: fixed; top: 80px; right: 20px; width: 180px;
+  background: rgba(30,41,59,.9); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; z-index: 100;
+  backdrop-filter: blur(12px);
+}
+.toc-title { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: 10px; }
+.toc a {
+  display: block; font-size: 11px; color: var(--text-dim);
+  text-decoration: none; padding: 3px 0;
+  border-left: 2px solid transparent;
+  padding-left: 8px; margin-left: -8px;
+  transition: color .15s;
+}
+.toc a:hover { color: var(--indigo); border-left-color: var(--indigo); }
+@media (max-width: 1100px) { .toc { display: none; } }
+
+/* ── INLINE CODE ── */
+code { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 12px;
+  color: var(--teal2); background: rgba(45,212,191,.08);
+  padding: 1px 5px; border-radius: 3px; }
+
+/* ── INFO BOX ── */
+.info-box {
+  background: var(--indigo-soft); border: 1px solid rgba(99,102,241,.25);
+  border-radius: 8px; padding: 14px 16px;
+  font-size: 13px; color: var(--text-muted); margin-bottom: 16px;
+}
+.info-box strong { color: var(--indigo); }
+
+.warn-box {
+  background: var(--amber-soft); border: 1px solid rgba(251,191,36,.25);
+  border-radius: 8px; padding: 14px 16px;
+  font-size: 13px; color: var(--text-muted); margin-bottom: 16px;
+}
+.warn-box strong { color: var(--amber); }
+</style>
+</head>
+<body>
+
+<!-- BACK BUTTON -->
+<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">← Back to Tracker</a>
+
+<!-- TOC -->
+<nav class="toc">
+  <div class="toc-title">Contents</div>
+  <a href="#arch-overview">Architecture Overview</a>
+  <a href="#hub-diagram">Hub-Spoke Diagram</a>
+  <a href="#integration-cards">Integration Cards</a>
+  <a href="#seq-diagrams">Sequence Diagrams</a>
+  <a href="#api-contracts">API Contracts</a>
+  <a href="#circuit-breakers">Circuit Breakers</a>
+  <a href="#testing">Testing Strategy</a>
+  <a href="#gateway-table">Gateway Variations</a>
+  <a href="#risk-register">Risk Register</a>
+</nav>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- HEADER                                                      -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<header class="doc-header">
+  <div class="badge-row">
+    <span class="badge badge-uc">UC25</span>
+    <span class="badge badge-status">In Design</span>
+    <span class="badge badge-domain">Fintech · USSD · AI</span>
+    <span class="badge badge-doc">Integration Map v1.0</span>
+  </div>
+  <h1 class="doc-title">USSD AI Assistant — Integration Map</h1>
+  <p class="doc-subtitle">
+    End-to-end integration architecture for the intelligent middleware layer that sits between
+    per-country MTN OpCo USSD gateways and the Mobile Money core. Covers all 13 African markets,
+    8 integration touchpoints, and full error/circuit-breaker strategy.
+  </p>
+  <div class="meta-row">
+    <span><strong>Owner:</strong> MTN Group Fintech Platform Engineering</span>
+    <span><strong>Version:</strong> 1.0</span>
+    <span><strong>Date:</strong> 10 May 2026</span>
+    <span><strong>Markets:</strong> 13 African OpCos</span>
+    <span><strong>Related:</strong> UC24 · UC16</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §1  ARCHITECTURE OVERVIEW                                   -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="arch-overview">
+  <div class="section-label">Section 01</div>
+  <h2 class="section-title">Integration Architecture Overview</h2>
+
+  <div class="info-box">
+    <strong>Design Pattern:</strong> Hub-and-Spoke with Intelligent Middleware. The USSD AI Assistant
+    acts as the single integration hub, normalising heterogeneous per-OpCo gateway protocols into a
+    uniform internal event model before dispatching to downstream systems. All sessions are stateful
+    via Redis; downstream calls are async-where-possible to keep USSD response latency within the
+    <strong>2-second hard limit</strong> imposed by telecom network timeouts.
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--indigo-soft);">🏗️</div>
+        <div>
+          <div class="card-title">Architectural Principles</div>
+          <div class="card-sub">Guiding constraints for all integrations</div>
+        </div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--text-muted);">
+        <li>⟶ <strong style="color:var(--text);">Latency budget:</strong> ≤ 2 000 ms total USSD response time</li>
+        <li>⟶ <strong style="color:var(--text);">Stateless hub:</strong> all session state externalised to Redis cluster</li>
+        <li>⟶ <strong style="color:var(--text);">Protocol normalisation:</strong> SIGTRAN + HTTP adapters per OpCo, normalised to internal HTTP/2 JSON</li>
+        <li>⟶ <strong style="color:var(--text);">Async enrichment:</strong> UC24 &amp; UC16 called asynchronously; results cached in session</li>
+        <li>⟶ <strong style="color:var(--text);">Graceful degradation:</strong> circuit breakers on every downstream; USSD session never hangs</li>
+        <li>⟶ <strong style="color:var(--text);">Per-OpCo adapters:</strong> deployed as sidecar containers; updated independently</li>
+        <li>⟶ <strong style="color:var(--text);">Multi-tenancy:</strong> tenant ID = OpCo MCC-MNC, injected at gateway adapter layer</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--teal-soft);">📐</div>
+        <div>
+          <div class="card-title">Latency Budget Allocation</div>
+          <div class="card-sub">Target: &lt; 2 000 ms per USSD screen</div>
+        </div>
+      </div>
+      <table class="kv" style="font-size:13px;">
+        <tr><td>Gateway adapter (inbound parse)</td><td><span class="tag tag-teal">≤ 30 ms</span></td></tr>
+        <tr><td>Redis session read</td><td><span class="tag tag-teal">≤ 10 ms</span></td></tr>
+        <tr><td>Language detection</td><td><span class="tag tag-teal">≤ 40 ms</span></td></tr>
+        <tr><td>NLU intent/entity extraction</td><td><span class="tag tag-indigo">≤ 150 ms</span></td></tr>
+        <tr><td>UC24 enrichment (async, cached)</td><td><span class="tag tag-amber">≤ 200 ms p99</span></td></tr>
+        <tr><td>UC16 fraud pre-screen</td><td><span class="tag tag-amber">≤ 250 ms p99</span></td></tr>
+        <tr><td>MoMo API call</td><td><span class="tag tag-indigo">≤ 800 ms p99</span></td></tr>
+        <tr><td>Response render + Redis write</td><td><span class="tag tag-teal">≤ 30 ms</span></td></tr>
+        <tr><td style="font-weight:700;color:var(--text);">Total budget (parallel path)</td><td><span class="tag tag-indigo">≤ 1 700 ms</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §2  HUB-SPOKE DIAGRAM                                       -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="hub-diagram">
+  <div class="section-label">Section 02</div>
+  <h2 class="section-title">Hub-Spoke Integration Diagram</h2>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 900 620" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto;">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#6366f1" opacity=".7"/>
+        </marker>
+        <marker id="arr-teal" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#34d399" opacity=".7"/>
+        </marker>
+        <marker id="arr-amber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#fbbf24" opacity=".7"/>
+        </marker>
+        <marker id="arr-violet" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa" opacity=".7"/>
+        </marker>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+        <radialGradient id="hub-grad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#4f46e5" stop-opacity=".9"/>
+          <stop offset="100%" stop-color="#312e81" stop-opacity=".9"/>
+        </radialGradient>
+      </defs>
+
+      <!-- Background grid lines subtle -->
+      <line x1="450" y1="0" x2="450" y2="620" stroke="#1e293b" stroke-width="1"/>
+      <line x1="0" y1="310" x2="900" y2="310" stroke="#1e293b" stroke-width="1"/>
+
+      <!-- ── SPOKE LINES (drawn first, behind nodes) ── -->
+      <!-- USSD Gateways cluster (left) -->
+      <line x1="450" y1="310" x2="155" y2="150" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)" opacity=".6"/>
+      <line x1="450" y1="310" x2="125" y2="310" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)" opacity=".6"/>
+      <line x1="450" y1="310" x2="155" y2="470" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)" opacity=".6"/>
+
+      <!-- MoMo Core (right) -->
+      <line x1="450" y1="310" x2="760" y2="310" stroke="#34d399" stroke-width="2" marker-end="url(#arr-teal)" opacity=".7"/>
+
+      <!-- UC24 (top right) -->
+      <line x1="450" y1="310" x2="730" y2="145" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-violet)" opacity=".6"/>
+
+      <!-- UC16 PayGuard (bottom right) -->
+      <line x1="450" y1="310" x2="730" y2="475" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-amber)" opacity=".6"/>
+
+      <!-- Redis (top) -->
+      <line x1="450" y1="310" x2="450" y2="80" stroke="#34d399" stroke-width="1.5" marker-end="url(#arr-teal)" opacity=".6"/>
+
+      <!-- NLU (bottom left-ish) -->
+      <line x1="450" y1="310" x2="290" y2="520" stroke="#818cf8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)" opacity=".6"/>
+
+      <!-- Language Detection (bottom) -->
+      <line x1="450" y1="310" x2="450" y2="530" stroke="#818cf8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)" opacity=".6"/>
+
+      <!-- Observability (top right far) -->
+      <line x1="450" y1="310" x2="610" y2="80" stroke="#64748b" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arr)" opacity=".4"/>
+
+      <!-- ── HUB NODE ── -->
+      <circle cx="450" cy="310" r="68" fill="url(#hub-grad)" stroke="#6366f1" stroke-width="2" filter="url(#glow)"/>
+      <circle cx="450" cy="310" r="64" fill="none" stroke="#818cf8" stroke-width="1" stroke-dasharray="4,4" opacity=".5"/>
+      <text x="450" y="296" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="700" font-family="sans-serif">USSD AI</text>
+      <text x="450" y="311" text-anchor="middle" fill="#e0e7ff" font-size="11" font-weight="700" font-family="sans-serif">ASSISTANT</text>
+      <text x="450" y="328" text-anchor="middle" fill="#a5b4fc" font-size="9.5" font-family="sans-serif">Intelligent Middleware</text>
+      <text x="450" y="342" text-anchor="middle" fill="#a5b4fc" font-size="9" font-family="sans-serif">UC25 · 13 Markets</text>
+
+      <!-- ── GATEWAY NODES (left cluster) ── -->
+      <!-- Huawei USG -->
+      <rect x="60" y="110" width="130" height="82" rx="10" fill="#1e293b" stroke="#6366f1" stroke-width="1.5" opacity=".9"/>
+      <text x="125" y="138" text-anchor="middle" fill="#818cf8" font-size="10" font-weight="700" font-family="sans-serif">USSD GATEWAY</text>
+      <text x="125" y="153" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">Huawei USG</text>
+      <text x="125" y="167" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">NG, GH, CI, CM</text>
+      <text x="125" y="181" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">SIGTRAN / mTLS</text>
+
+      <!-- Ericsson GW -->
+      <rect x="30" y="268" width="130" height="82" rx="10" fill="#1e293b" stroke="#6366f1" stroke-width="1.5" opacity=".9"/>
+      <text x="95" y="296" text-anchor="middle" fill="#818cf8" font-size="10" font-weight="700" font-family="sans-serif">USSD GATEWAY</text>
+      <text x="95" y="311" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">Ericsson USSD GW</text>
+      <text x="95" y="325" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">ZA, UG, RW, ZM</text>
+      <text x="95" y="339" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">HTTP/2 · mTLS</text>
+
+      <!-- Custom GW -->
+      <rect x="60" y="428" width="130" height="82" rx="10" fill="#1e293b" stroke="#6366f1" stroke-width="1.5" opacity=".9"/>
+      <text x="125" y="456" text-anchor="middle" fill="#818cf8" font-size="10" font-weight="700" font-family="sans-serif">USSD GATEWAY</text>
+      <text x="125" y="471" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">Custom / MVNE</text>
+      <text x="125" y="485" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">BJ, GN, LR, SS, SD</text>
+      <text x="125" y="499" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">HTTP REST · mTLS</text>
+
+      <!-- ── MoMo Core (right) ── -->
+      <rect x="715" y="268" width="155" height="84" rx="10" fill="#1e293b" stroke="#34d399" stroke-width="1.5" opacity=".9"/>
+      <text x="792" y="295" text-anchor="middle" fill="#34d399" font-size="10" font-weight="700" font-family="sans-serif">MTN MOMO CORE</text>
+      <text x="792" y="310" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">MoMo Open API v1.1</text>
+      <text x="792" y="325" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">/transfer · /balance</text>
+      <text x="792" y="339" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">OAuth2 · Rate-limited</text>
+
+      <!-- ── UC24 (top-right) ── -->
+      <rect x="658" y="90" width="155" height="78" rx="10" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5" opacity=".9"/>
+      <text x="735" y="116" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700" font-family="sans-serif">UC24 CUSTOMER</text>
+      <text x="735" y="131" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="700" font-family="sans-serif">INTELLIGENCE</text>
+      <text x="735" y="148" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">Profile · Language · Behaviour</text>
+      <text x="735" y="162" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">REST/gRPC · Async enrichment</text>
+
+      <!-- ── UC16 PayGuard (bottom-right) ── -->
+      <rect x="658" y="436" width="155" height="78" rx="10" fill="#1e293b" stroke="#fbbf24" stroke-width="1.5" opacity=".9"/>
+      <text x="735" y="462" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="700" font-family="sans-serif">UC16 PAYGUARD</text>
+      <text x="735" y="477" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">Fraud Pre-Screen</text>
+      <text x="735" y="492" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">Risk Score · Async callback</text>
+      <text x="735" y="506" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">≤ 250 ms SLA</text>
+
+      <!-- ── Redis (top-centre) ── -->
+      <rect x="370" y="20" width="160" height="54" rx="10" fill="#1e293b" stroke="#34d399" stroke-width="1.5" opacity=".9"/>
+      <text x="450" y="43" text-anchor="middle" fill="#34d399" font-size="10" font-weight="700" font-family="sans-serif">REDIS SESSION STORE</text>
+      <text x="450" y="58" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">Cluster · TTL 120s · RESP3</text>
+
+      <!-- ── NLU Engine (bottom left) ── -->
+      <rect x="198" y="480" width="138" height="68" rx="10" fill="#1e293b" stroke="#818cf8" stroke-width="1.5" opacity=".9"/>
+      <text x="267" y="505" text-anchor="middle" fill="#818cf8" font-size="10" font-weight="700" font-family="sans-serif">NLU ENGINE</text>
+      <text x="267" y="520" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">Intent · Entity · Confidence</text>
+      <text x="267" y="536" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">Internal gRPC · Model v2</text>
+
+      <!-- ── Language Detection (bottom-centre) ── -->
+      <rect x="370" y="535" width="160" height="58" rx="10" fill="#1e293b" stroke="#818cf8" stroke-width="1.5" opacity=".9"/>
+      <text x="450" y="558" text-anchor="middle" fill="#818cf8" font-size="10" font-weight="700" font-family="sans-serif">LANGUAGE DETECTION</text>
+      <text x="450" y="573" text-anchor="middle" fill="#94a3b8" font-size="9.5" font-family="sans-serif">fastText · 14 Languages</text>
+      <text x="450" y="587" text-anchor="middle" fill="#64748b" font-size="9" font-family="sans-serif">USSD-optimised (short text)</text>
+
+      <!-- ── Observability (top right) ── -->
+      <rect x="555" y="20" width="138" height="54" rx="10" fill="#1e293b" stroke="#475569" stroke-width="1" opacity=".7"/>
+      <text x="624" y="43" text-anchor="middle" fill="#64748b" font-size="9.5" font-weight="700" font-family="sans-serif">OBSERVABILITY</text>
+      <text x="624" y="58" text-anchor="middle" fill="#475569" font-size="9" font-family="sans-serif">Datadog · Prometheus · Grafana</text>
+
+      <!-- ── Legend ── -->
+      <rect x="30" y="572" width="210" height="38" rx="6" fill="rgba(30,41,59,.6)" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+      <line x1="44" y1="585" x2="70" y2="585" stroke="#34d399" stroke-width="2"/>
+      <text x="76" y="589" fill="#94a3b8" font-size="9" font-family="sans-serif">Synchronous</text>
+      <line x1="44" y1="601" x2="70" y2="601" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4,2"/>
+      <text x="76" y="605" fill="#94a3b8" font-size="9" font-family="sans-serif">Async / Cached</text>
+      <line x1="135" y1="585" x2="161" y2="585" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="167" y="589" fill="#94a3b8" font-size="9" font-family="sans-serif">Metrics</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §3  PER-INTEGRATION DETAIL CARDS                           -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="integration-cards">
+  <div class="section-label">Section 03</div>
+  <h2 class="section-title">Per-Integration Detail Cards</h2>
+
+  <!-- 3.1 USSD Gateway Layer -->
+  <div class="card-full" style="border-color:rgba(99,102,241,.3);margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--indigo-soft);font-size:22px;">📡</div>
+      <div>
+        <div class="card-title" style="font-size:17px;">3.1 — USSD Gateway Layer (Per-OpCo Adapters)</div>
+        <div class="card-sub">Huawei USG · Ericsson USSD GW · Custom/MVNE — heterogeneous protocol normalisation</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <table class="kv">
+          <tr><td>Adapter pattern</td><td>Sidecar container per OpCo; deploys independently</td></tr>
+          <tr><td>Protocols</td><td>SIGTRAN (SS7/MAP) over IP for Huawei; HTTP/2 REST for Ericsson &amp; custom</td></tr>
+          <tr><td>Auth</td><td>Mutual TLS (mTLS) on all paths; cert rotation every 90 days via Vault</td></tr>
+          <tr><td>Payload format (inbound)</td><td>Variable: MAP XML, Ericsson JSON, custom ASCII — normalised to internal <code>UssdEvent</code> JSON</td></tr>
+          <tr><td>Session handling</td><td>USSD session ID passed in header; adapter maps to internal UUID; session state in Redis</td></tr>
+          <tr><td>Max payload</td><td>182 characters (USSD 2-phase limit); adapter enforces truncation</td></tr>
+          <tr><td>Timeout (inbound)</td><td>Network timeout: 4 s; adapter must respond within 2 s or send <code>END</code> session</td></tr>
+          <tr><td>Connection pool</td><td>Per-OpCo: min 5, max 50 persistent connections; keepalive 30 s</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Internal UssdEvent Schema</div>
+        <div class="seq-wrap" style="white-space:pre;font-size:11.5px;line-height:1.6;">
+{
+  "event_id": "uuid-v4",
+  "session_id": "opco:msisdn:timestamp",
+  "opco_id": "NG",          // MCC-MNC
+  "msisdn": "+234XXXXXXXXX",
+  "ussd_string": "*170*1*2#",
+  "input_text": "2",        // current menu input
+  "session_phase": "CONTINUE|BEGIN|END",
+  "sequence_no": 3,
+  "gateway_type": "HUAWEI_USG|ERICSSON|CUSTOM",
+  "received_at": "2026-05-10T10:00:00.123Z",
+  "language_hint": "ha"     // optional, from prior session
+}
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag tag-indigo">SIGTRAN/SS7</span>
+          <span class="tag tag-indigo">HTTP/2</span>
+          <span class="tag tag-teal">mTLS</span>
+          <span class="tag tag-violet">Session-aware</span>
+          <span class="tag tag-amber">182-char limit</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.2 MoMo Core -->
+  <div class="card-full" style="border-color:rgba(52,211,153,.3);margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--teal-soft);font-size:22px;">💳</div>
+      <div>
+        <div class="card-title" style="font-size:17px;">3.2 — MTN Mobile Money Core (MoMo Open API v1.1)</div>
+        <div class="card-sub">Primary transaction system — OAuth2 · Rate-limited · Per-OpCo sandboxes</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <table class="kv">
+          <tr><td>Base URL</td><td><code>https://api.mtn.com/collection/v1</code> (per-OpCo env)</td></tr>
+          <tr><td>Auth</td><td>OAuth2 Client Credentials; token TTL 3 600 s; refresh via token endpoint</td></tr>
+          <tr><td>Rate limit</td><td>200 req/min per OpCo subscription key; 429 triggers backoff</td></tr>
+          <tr><td>Idempotency</td><td>Required: <code>X-Reference-Id</code> UUID header on mutating calls</td></tr>
+          <tr><td>Callback model</td><td>Async: <code>POST /transfer</code> returns 202; callback to <code>/webhook/momo</code></td></tr>
+          <tr><td>Polling fallback</td><td><code>GET /transfer/{ref}</code> if callback not received within 15 s</td></tr>
+          <tr><td>Error codes</td><td>PAYER_NOT_FOUND · PAYEE_NOT_ALLOWED · NOT_ENOUGH_FUNDS · TRANSACTION_CANCELED</td></tr>
+          <tr><td>Sandbox</td><td>Per-OpCo sandbox available; test MSISDNs provisioned per environment</td></tr>
+          <tr><td>Circuit breaker</td><td>Opens at 5 failures/10 s; half-open probe every 30 s</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Key Endpoints</div>
+        <table class="data-table" style="font-size:11.5px;">
+          <thead>
+            <tr><th>Endpoint</th><th>Method</th><th>SLA</th><th>Notes</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>/token</code></td><td>POST</td><td>200 ms</td><td>OAuth2 token fetch</td></tr>
+            <tr><td><code>/requesttopay</code></td><td>POST</td><td>800 ms p99</td><td>Async; 202 accepted</td></tr>
+            <tr><td><code>/requesttopay/{id}</code></td><td>GET</td><td>300 ms</td><td>Status poll</td></tr>
+            <tr><td><code>/accountholder/{type}/{id}/basicuserinfo</code></td><td>GET</td><td>400 ms</td><td>Name lookup</td></tr>
+            <tr><td><code>/accountholder/{type}/{id}/active</code></td><td>GET</td><td>200 ms</td><td>Account active check</td></tr>
+            <tr><td><code>/accountbalance</code></td><td>GET</td><td>300 ms</td><td>Balance inquiry</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.3 UC24 -->
+  <div class="card-full" style="border-color:rgba(167,139,250,.3);margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--violet-soft);font-size:22px;">🧠</div>
+      <div>
+        <div class="card-title" style="font-size:17px;">3.3 — UC24 AI Customer Intelligence Layer</div>
+        <div class="card-sub">Profile enrichment · Preferred language · Behavioural context · Async pattern</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <table class="kv">
+          <tr><td>Integration type</td><td>REST (sync lookup) + gRPC streaming (async enrichment)</td></tr>
+          <tr><td>Auth</td><td>Internal mTLS + service account JWT; audience: <code>uc24.internal</code></td></tr>
+          <tr><td>Primary call</td><td><code>GET /v1/customer/{msisdn}/profile</code> — returns enriched profile</td></tr>
+          <tr><td>Async pattern</td><td>On session start, fire-and-forget enrichment; result written to Redis key <code>enrich:{session_id}</code></td></tr>
+          <tr><td>Cache strategy</td><td>TTL 300 s in Redis; stale-while-revalidate on cache miss</td></tr>
+          <tr><td>Preferred language</td><td>Returned in profile; used by NLU &amp; response renderer</td></tr>
+          <tr><td>Behavioural context</td><td>Transaction frequency, preferred time-of-day, product affinity — used for menu personalisation</td></tr>
+          <tr><td>Fallback</td><td>If UC24 unavailable: use detected language; default menu; no personalisation</td></tr>
+          <tr><td>SLA</td><td>p50 &lt; 80 ms · p99 &lt; 200 ms · timeout 500 ms</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">UC24 Enrichment Response (subset)</div>
+        <div class="seq-wrap" style="white-space:pre;font-size:11.5px;line-height:1.6;">
+{
+  "msisdn": "+234XXXXXXXXX",
+  "preferred_language": "ha",
+  "customer_segment": "ACTIVE_SAVER",
+  "avg_txn_amount_usd": 12.50,
+  "favourite_service": "AIRTIME_TOPUP",
+  "risk_tier": "LOW",
+  "name_preference": "Malam Usman",
+  "product_affinity": ["MOMO_TRANSFER",
+                        "BILL_PAY"],
+  "last_interaction_channel": "USSD",
+  "enriched_at": "2026-05-10T10:00:01Z"
+}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.4 UC16 PayGuard -->
+  <div class="card-full" style="border-color:rgba(251,191,36,.3);margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--amber-soft);font-size:22px;">🛡️</div>
+      <div>
+        <div class="card-title" style="font-size:17px;">3.4 — UC16 PayGuard (Fraud Pre-Screening)</div>
+        <div class="card-sub">Real-time risk score · Pre-transaction gate · Async callback pattern · 250 ms budget</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <table class="kv">
+          <tr><td>Endpoint</td><td><code>POST /v2/evaluate/ussd-transaction</code></td></tr>
+          <tr><td>Auth</td><td>Internal mTLS; service account; signed request body (HMAC-SHA256)</td></tr>
+          <tr><td>Call timing</td><td>Called in parallel with MoMo validation; before final transfer commit</td></tr>
+          <tr><td>Async callback</td><td>PayGuard posts result to <code>/webhook/payguard/{session_id}</code>; USSD layer waits max 250 ms then proceeds with cached or default risk</td></tr>
+          <tr><td>Risk levels</td><td>ALLOW · REVIEW · BLOCK; score 0.00–1.00</td></tr>
+          <tr><td>BLOCK behaviour</td><td>Session terminated with localised decline message; incident logged to SIEM</td></tr>
+          <tr><td>REVIEW behaviour</td><td>Transaction proceeds but flagged; async compliance notification sent</td></tr>
+          <tr><td>Latency budget</td><td>Hard timeout 250 ms; on timeout: treat as ALLOW + flag for review</td></tr>
+          <tr><td>Fallback</td><td>If PayGuard unreachable: circuit opens; all transactions proceed with REVIEW flag; alert fires</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">PayGuard Request / Response</div>
+        <div class="seq-wrap" style="white-space:pre;font-size:11.5px;line-height:1.6;">
+// REQUEST
+{
+  "session_id": "NG:+234XXX:1746867600",
+  "msisdn": "+234XXXXXXXXX",
+  "transaction_type": "TRANSFER",
+  "amount_usd": 25.00,
+  "payee_msisdn": "+234YYYYYYYYY",
+  "opco_id": "NG",
+  "channel": "USSD",
+  "nlu_intent": "SEND_MONEY",
+  "customer_risk_tier": "LOW"
+}
+
+// RESPONSE
+{
+  "decision": "ALLOW",
+  "risk_score": 0.12,
+  "signals": ["NEW_PAYEE"],
+  "evaluated_at": "2026-05-10T10:00:01.8Z"
+}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.5 Redis -->
+  <div class="card-full" style="border-color:rgba(52,211,153,.25);margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--teal-soft);font-size:22px;">⚡</div>
+      <div>
+        <div class="card-title" style="font-size:17px;">3.5 — Redis Session Store</div>
+        <div class="card-sub">Session state · Enrichment cache · Rate-limit counters · RESP3 protocol</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <table class="kv">
+          <tr><td>Cluster topology</td><td>3-node Redis Cluster (1 primary + 2 replicas per shard); 6 shards per region</td></tr>
+          <tr><td>Protocol</td><td>RESP3; TLS in transit; AES-256 at rest</td></tr>
+          <tr><td>Session TTL</td><td>120 s (USSD network session max); extended on each interaction</td></tr>
+          <tr><td>Enrichment cache TTL</td><td>300 s (<code>enrich:{session_id}</code>); 3 600 s for profile data (<code>profile:{msisdn}</code>)</td></tr>
+          <tr><td>Rate-limit keys</td><td><code>rl:momo:{opco}:{minute}</code> — sliding window counter</td></tr>
+          <tr><td>Key pattern</td><td><code>session:{opco}:{msisdn}:{session_id}</code></td></tr>
+          <tr><td>Eviction policy</td><td><code>allkeys-lru</code>; memory limit 32 GB per shard</td></tr>
+          <tr><td>Failover</td><td>Sentinel mode; failover &lt; 5 s; USSD adapter retries on replica during failover</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Session State Schema (Redis Hash)</div>
+        <div class="seq-wrap" style="white-space:pre;font-size:11.5px;line-height:1.6;">
+HSET session:NG:+234XXX:abc123
+  opco_id          "NG"
+  msisdn           "+234XXXXXXXXX"
+  session_phase    "CONTINUE"
+  current_menu     "MAIN:TRANSFER:CONFIRM"
+  language         "ha"
+  nlu_intent       "SEND_MONEY"
+  nlu_confidence   "0.93"
+  payee_msisdn     "+234YYYYYYYYY"
+  amount_ngn       "3750"
+  fraud_decision   "ALLOW"
+  fraud_score      "0.12"
+  seq_no           "4"
+  created_at       "1746867600123"
+  last_updated     "1746867603456"
+
+EXPIRE session:NG:+234XXX:abc123 120
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.6 NLU Engine -->
+  <div class="card-full" style="border-color:rgba(129,140,248,.25);margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--indigo-soft);font-size:22px;">🤖</div>
+      <div>
+        <div class="card-title" style="font-size:17px;">3.6 — NLU Engine (Internal)</div>
+        <div class="card-sub">Intent classification · Entity extraction · Confidence threshold routing · Model versioning</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <table class="kv">
+          <tr><td>Protocol</td><td>Internal gRPC (proto3); fallback REST endpoint for compatibility</td></tr>
+          <tr><td>Auth</td><td>Service mesh mTLS; no external exposure</td></tr>
+          <tr><td>Model versioning</td><td>Blue/green; version in request header <code>x-nlu-model-version: v2.3</code>; traffic split via Istio</td></tr>
+          <tr><td>Confidence routing</td><td>≥ 0.85 → direct action; 0.60–0.84 → confirmation prompt; &lt; 0.60 → fallback menu</td></tr>
+          <tr><td>Supported intents</td><td>SEND_MONEY · CHECK_BALANCE · BUY_AIRTIME · PAY_BILL · TRANSACTION_HISTORY · MAIN_MENU · HELP · CANCEL</td></tr>
+          <tr><td>Entities extracted</td><td>MSISDN · AMOUNT · CURRENCY · BILLER_CODE · DATE_RANGE</td></tr>
+          <tr><td>Input max tokens</td><td>30 tokens (USSD short-text constraint)</td></tr>
+          <tr><td>SLA</td><td>p50 &lt; 60 ms · p99 &lt; 150 ms · timeout 300 ms</td></tr>
+          <tr><td>Fallback</td><td>On timeout/error: intent = UNKNOWN; confidence = 0; menu-based flow engaged</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">NLU API Contract (gRPC → JSON representation)</div>
+        <div class="seq-wrap" style="white-space:pre;font-size:11.5px;line-height:1.6;">
+// REQUEST
+{
+  "text": "send 3750 to 0812345678",
+  "language": "en",
+  "session_context": {
+    "current_menu": "MAIN",
+    "prior_intent": null
+  }
+}
+
+// RESPONSE
+{
+  "intent": "SEND_MONEY",
+  "confidence": 0.96,
+  "entities": [
+    {"type": "AMOUNT",  "value": "3750",       "unit": "NGN"},
+    {"type": "MSISDN",  "value": "0812345678", "normalised": "+2348123456789"}
+  ],
+  "model_version": "v2.3",
+  "latency_ms": 48
+}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.7 Language Detection -->
+  <div class="card-full" style="border-color:rgba(129,140,248,.2);margin-bottom:24px;">
+    <div class="card-header">
+      <div class="card-icon" style="background:var(--indigo-soft);font-size:22px;">🌍</div>
+      <div>
+        <div class="card-title" style="font-size:17px;">3.7 — Language Detection Service</div>
+        <div class="card-sub">fastText model · USSD-optimised · 14 languages · Short-text specialisation</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <table class="kv">
+          <tr><td>Model</td><td>fastText lid.176.ftz — fine-tuned on USSD corpus (3.2M samples)</td></tr>
+          <tr><td>Protocol</td><td>Internal HTTP/1.1 REST; co-located with NLU engine</td></tr>
+          <tr><td>Input constraint</td><td>Minimum 2 characters; handles numeric-only inputs (default to OpCo language)</td></tr>
+          <tr><td>Confidence threshold</td><td>≥ 0.70 → use detected language; &lt; 0.70 → use UC24 preferred or OpCo default</td></tr>
+          <tr><td>SLA</td><td>p50 &lt; 15 ms · p99 &lt; 40 ms (CPU-bound, deployed with NLU)</td></tr>
+          <tr><td>Fallback chain</td><td>1. Detected language → 2. UC24 preferred → 3. Prior session language → 4. OpCo default</td></tr>
+        </table>
+        <div style="margin-top:14px;">
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Supported Languages</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="tag tag-teal">en — English</span>
+            <span class="tag tag-teal">fr — French</span>
+            <span class="tag tag-teal">ha — Hausa</span>
+            <span class="tag tag-teal">yo — Yoruba</span>
+            <span class="tag tag-teal">ig — Igbo</span>
+            <span class="tag tag-teal">sw — Swahili</span>
+            <span class="tag tag-teal">zu — Zulu</span>
+            <span class="tag tag-teal">xh — Xhosa</span>
+            <span class="tag tag-teal">am — Amharic</span>
+            <span class="tag tag-teal">rw — Kinyarwanda</span>
+            <span class="tag tag-teal">ln — Lingala</span>
+            <span class="tag tag-teal">ff — Fula</span>
+            <span class="tag tag-teal">tw — Twi</span>
+            <span class="tag tag-teal">bm — Bambara</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Detection API</div>
+        <div class="seq-wrap" style="white-space:pre;font-size:11.5px;line-height:1.6;">
+// REQUEST
+POST /v1/detect-language
+{
+  "text": "firimbi 3750 zuwa 0812345678",
+  "session_id": "NG:+234XXX:abc123",
+  "opco_default": "en"
+}
+
+// RESPONSE
+{
+  "detected_language": "ha",
+  "confidence": 0.91,
+  "fallback_used": false,
+  "model_version": "ussd-ft-v1.4",
+  "latency_ms": 12
+}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.8 Observability -->
+  <div class="card-full" style="border-color:rgba(100,116,139,.25);margin-bottom:0;">
+    <div class="card-header">
+      <div class="card-icon" style="background:rgba(100,116,139,.15);font-size:22px;">📊</div>
+      <div>
+        <div class="card-title" style="font-size:17px;">3.8 — Monitoring &amp; Observability Stack</div>
+        <div class="card-sub">Datadog APM · Prometheus metrics · Grafana dashboards · Distributed tracing</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div>
+        <table class="kv">
+          <tr><td>APM</td><td>Datadog APM; trace ID propagated via <code>x-datadog-trace-id</code> header across all hops</td></tr>
+          <tr><td>Metrics</td><td>Prometheus exposition on <code>:9090/metrics</code>; scraped every 15 s</td></tr>
+          <tr><td>Dashboards</td><td>Grafana Cloud; per-OpCo USSD latency breakdown, MoMo API success rate, fraud block rate</td></tr>
+          <tr><td>Alerting</td><td>PagerDuty integration; p99 latency &gt; 1 800 ms triggers P1; error rate &gt; 2% triggers P2</td></tr>
+          <tr><td>Log aggregation</td><td>Structured JSON logs → Datadog Log Management; PII masked at adapter layer</td></tr>
+          <tr><td>Key metrics</td><td><code>ussd_session_duration_ms</code> · <code>momo_api_latency_ms</code> · <code>nlu_confidence_histogram</code> · <code>fraud_decision_total</code> · <code>circuit_breaker_state</code></td></tr>
+          <tr><td>SLO targets</td><td>USSD response &lt; 2 s: 99.5% · MoMo success rate: 99.2% · Session error rate &lt; 0.5%</td></tr>
+        </table>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Key Prometheus Metrics (sample)</div>
+        <div class="seq-wrap" style="white-space:pre;font-size:11px;line-height:1.7;">
+# HELP ussd_session_duration_ms USSD response latency
+# TYPE ussd_session_duration_ms histogram
+ussd_session_duration_ms_bucket{opco="NG",le="500"} 12041
+ussd_session_duration_ms_bucket{opco="NG",le="1000"} 28901
+ussd_session_duration_ms_bucket{opco="NG",le="2000"} 30201
+
+# HELP momo_api_calls_total MoMo API call counter
+# TYPE momo_api_calls_total counter
+momo_api_calls_total{opco="NG",endpoint="/requesttopay",status="202"} 8821
+momo_api_calls_total{opco="NG",endpoint="/requesttopay",status="500"} 12
+
+# HELP circuit_breaker_state CB state (0=closed,1=open,2=half-open)
+# TYPE circuit_breaker_state gauge
+circuit_breaker_state{service="momo",opco="NG"} 0
+circuit_breaker_state{service="uc24"} 0
+circuit_breaker_state{service="payguard"} 0
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §4  SEQUENCE DIAGRAMS                                       -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="seq-diagrams">
+  <div class="section-label">Section 04</div>
+  <h2 class="section-title">Data Flow Sequence Diagrams</h2>
+
+  <!-- 4.1 Happy Path -->
+  <div class="card-full" style="margin-bottom:20px;">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">4.1 — Happy Path: Successful Money Transfer</div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Customer dials *170#, navigates to Send Money, confirms transfer — full success flow</div>
+    <div class="seq-wrap">
+<span class="s-actor">User         GW-Adapter   AI-Hub       Redis        LangDetect   NLU          UC24         PayGuard     MoMo-API</span>
+ |            |            |            |            |            |            |            |            |
+ |--*170*1*2#→|            |            |            |            |            |            |            |
+ |            |--UssdEvent→|            |            |            |            |            |            |
+ |            |            |--GET sess--→|            |            |            |            |            |
+ |            |            |←-miss------+            |            |            |            |            |
+ |            |            |--detect lg→|            |--"send 50"→|            |            |            |
+ |            |            |  (async)   |            |←-{en,0.88}-+            |            |            |
+ |            |            |--/profile--+------------+------------→|            |            |            |
+ |            |            |  (async)   |            |            |←-profile---+            |            |
+ |            |            |←-{ha,0.91}-+            |            |            |            |            |
+ |            |            |--NLU req---+------------→|            |            |            |            |
+ |            |            |←-{SEND_MONEY, 0.96, entities}--------+            |            |            |
+ |            |            |--HSET sess→|            |            |            |            |            |
+ |            |            |←-OK--------+            |            |            |            |            |
+<span class="s-note"> [Render confirmation screen: "Send NGN 3,750 to 0812345678 (Malam Usman)? 1=Yes 2=No"]         </span>
+ |←-screen---+            |            |            |            |            |            |            |
+ |--"1"-----→|            |            |            |            |            |            |            |
+ |            |--UssdEvent→|            |            |            |            |            |            |
+ |            |            |--GET sess--→|            |            |            |            |            |
+ |            |            |←-{session data}----------+            |            |            |            |
+<span class="s-note"> [Parallel: fraud pre-screen + MoMo account validation]                                           </span>
+ |            |            |--eval req--+------------+------------+--→|         |            |            |
+ |            |            |--acct chk--+------------+------------+------------+--/active---→|            |
+ |            |            |←-{ALLOW, 0.12}----------+------------+--+          |            |            |
+ |            |            |←-{account active}-------+------------+------------+--200--------+            |
+ |            |            |--/requesttopay +---------+------------+------------+------------→|            |
+ |            |            |←-202 accepted--+---------+------------+------------+------------+            |
+<span class="s-note"> [Wait for callback or poll after 15s]                                                             </span>
+ |            |            |←-callback: SUCCESSFUL---+------------+------------+------------→|            |
+ |            |            |--HSET sess: phase=END→  |            |            |            |            |
+<span class="s-ok"> [Render success: "NGN 3,750 sent to Malam Usman. New balance: NGN 12,250. Ref: TXN-8821"]        </span>
+ |←-success--+            |            |            |            |            |            |            |
+ |            |            |--metrics emit (Datadog/Prometheus)   |            |            |            |
+    </div>
+  </div>
+
+  <!-- 4.2 Fraud Flagged -->
+  <div class="card-full" style="margin-bottom:20px;">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">4.2 — Fraud-Flagged Transaction</div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">PayGuard returns BLOCK decision — transaction aborted, session terminated, SIEM notified</div>
+    <div class="seq-wrap">
+<span class="s-actor">User         GW-Adapter   AI-Hub       Redis        PayGuard     MoMo-API     SIEM</span>
+ |            |            |            |            |            |            |
+ |--confirm--→|            |            |            |            |            |
+ |            |--UssdEvent→|            |            |            |            |
+ |            |            |--GET sess--→|            |            |            |
+ |            |            |←-{session data}----------+            |            |
+<span class="s-note"> [Parallel fraud check + MoMo validation]                                    </span>
+ |            |            |--eval req--+------------→|            |            |
+ |            |            |--acct chk--+------------+------------>|            |
+ |            |            |←-acct OK---+            |            |←200---------+
+<span class="s-err"> PayGuard →  {decision:"BLOCK", risk_score:0.87, signals:["VELOCITY","NEW_DEVICE"]}           </span>
+ |            |            |←-{BLOCK, 0.87}-----------+            |            |
+<span class="s-note"> [MoMo call abandoned — do NOT proceed]                                      </span>
+ |            |            |--SIEM event+------------+------------+------------>|
+ |            |            |  (async)   |            |            |            |←logged
+ |            |            |--HSET sess: fraud_block=true, phase=END           |
+ |            |            |--EXPIRE 0 (immediate session cleanup)             |
+<span class="s-err"> [Render decline: "This transaction could not be completed. Call 180 for help."] </span>
+ |←-decline--+            |            |            |            |            |
+ |            |            |--metrics: fraud_decision_total{decision="BLOCK"} inc
+    </div>
+  </div>
+
+  <!-- 4.3 NLU Fallback -->
+  <div class="card-full" style="margin-bottom:0;">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;">4.3 — NLU Fallback Path</div>
+    <div style="font-size:12px;color:var(--text-dim);margin-bottom:16px;">Low-confidence intent or NLU timeout — system falls back to structured menu navigation</div>
+    <div class="seq-wrap">
+<span class="s-actor">User         GW-Adapter   AI-Hub       NLU          Redis        MenuEngine</span>
+ |            |            |            |            |            |
+ |--"hebu"--→|            |            |            |            |
+ |            |--UssdEvent→|            |            |            |
+ |            |            |--GET sess--+------------→|            |
+ |            |            |←-{lang=sw, menu=MAIN}---+            |
+ |            |            |--NLU req--→|            |            |
+<span class="s-alt"> [Case A: NLU returns low confidence]                              </span>
+ |            |            |←-{UNKNOWN, conf:0.42}   |            |
+<span class="s-alt"> [Case B: NLU times out after 300ms]                               </span>
+ |            |            |  ...timeout (300ms)      |            |
+ |            |            |  set intent=UNKNOWN, conf=0.0        |
+<span class="s-note"> [Both cases converge here — engage menu engine]                  </span>
+ |            |            |--render req+------------+------------>|
+ |            |            |  (lang=sw, menu=MAIN, context)       |
+ |            |            |←-{Swahili main menu}   +            |
+ |            |            |--HSET sess: nlu_fallback=true        |
+ |            |            |--metrics: nlu_fallback_total inc     |
+<span class="s-ok"> [Render: "Karibu MTN MoMo!\n1. Tuma Pesa\n2. Angalia Salio\n3. Nunua Airtime\n0. Msaada"] </span>
+ |←-sw menu--+            |            |            |            |
+ |--"1"-----→|            |            |            |            |
+ |            |  [Normal structured menu flow continues...]      |
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §5  API CONTRACT SUMMARY TABLE                             -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="api-contracts">
+  <div class="section-label">Section 05</div>
+  <h2 class="section-title">API Contract Summary Table</h2>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>System</th>
+          <th>Endpoint / Interface</th>
+          <th>Method</th>
+          <th>Auth</th>
+          <th>SLA (p99)</th>
+          <th>Rate Limit</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-indigo">USSD GW</span></td>
+          <td><code>SIGTRAN MAP / HTTP adapter</code></td>
+          <td>Inbound</td>
+          <td>mTLS</td>
+          <td>Receive &lt; 30 ms</td>
+          <td>Network-bound</td>
+          <td>Per-OpCo Telco</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">MoMo Core</span></td>
+          <td><code>/token</code></td>
+          <td>POST</td>
+          <td>Basic → Bearer</td>
+          <td>200 ms</td>
+          <td>10 req/min</td>
+          <td>MTN FinPlatform</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">MoMo Core</span></td>
+          <td><code>/requesttopay</code></td>
+          <td>POST</td>
+          <td>OAuth2 Bearer</td>
+          <td>800 ms</td>
+          <td>200 req/min</td>
+          <td>MTN FinPlatform</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">MoMo Core</span></td>
+          <td><code>/requesttopay/{id}</code></td>
+          <td>GET</td>
+          <td>OAuth2 Bearer</td>
+          <td>300 ms</td>
+          <td>500 req/min</td>
+          <td>MTN FinPlatform</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">MoMo Core</span></td>
+          <td><code>/accountholder/{type}/{id}/active</code></td>
+          <td>GET</td>
+          <td>OAuth2 Bearer</td>
+          <td>200 ms</td>
+          <td>500 req/min</td>
+          <td>MTN FinPlatform</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">MoMo Core</span></td>
+          <td><code>/accountbalance</code></td>
+          <td>GET</td>
+          <td>OAuth2 Bearer</td>
+          <td>300 ms</td>
+          <td>300 req/min</td>
+          <td>MTN FinPlatform</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-violet">UC24</span></td>
+          <td><code>/v1/customer/{msisdn}/profile</code></td>
+          <td>GET</td>
+          <td>mTLS + JWT</td>
+          <td>200 ms</td>
+          <td>1 000 req/min</td>
+          <td>AI Intelligence Team</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-amber">UC16 PayGuard</span></td>
+          <td><code>/v2/evaluate/ussd-transaction</code></td>
+          <td>POST</td>
+          <td>mTLS + HMAC</td>
+          <td>250 ms</td>
+          <td>500 req/min</td>
+          <td>Fraud &amp; Risk Eng</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">Redis</span></td>
+          <td><code>HGET / HSET / EXPIRE</code></td>
+          <td>RESP3</td>
+          <td>TLS + AUTH</td>
+          <td>10 ms</td>
+          <td>Cluster-bound</td>
+          <td>Platform Infra</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">NLU Engine</span></td>
+          <td><code>NluService.Predict</code> (gRPC)</td>
+          <td>Unary RPC</td>
+          <td>Service mesh mTLS</td>
+          <td>150 ms</td>
+          <td>2 000 req/min</td>
+          <td>AI/ML Platform</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">Lang Detect</span></td>
+          <td><code>/v1/detect-language</code></td>
+          <td>POST</td>
+          <td>Service mesh mTLS</td>
+          <td>40 ms</td>
+          <td>5 000 req/min</td>
+          <td>AI/ML Platform</td>
+        </tr>
+        <tr>
+          <td><span style="color:var(--text-dim);font-size:11px;">Observability</span></td>
+          <td><code>:9090/metrics</code> · Datadog APM</td>
+          <td>Passive</td>
+          <td>Internal only</td>
+          <td>N/A</td>
+          <td>N/A</td>
+          <td>Platform Infra</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §6  ERROR HANDLING & CIRCUIT BREAKER STRATEGY             -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="circuit-breakers">
+  <div class="section-label">Section 06</div>
+  <h2 class="section-title">Error Handling &amp; Circuit Breaker Strategy</h2>
+
+  <div class="info-box" style="margin-bottom:20px;">
+    <strong>Principle:</strong> USSD sessions must never hang. Every downstream integration has a defined timeout,
+    fallback behaviour, and circuit breaker. The system degrades gracefully — a user always receives a response
+    within 2 seconds even when multiple downstream systems are degraded.
+  </div>
+
+  <!-- CB State Machine -->
+  <div class="card-full" style="margin-bottom:20px;">
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;">Circuit Breaker State Machine (applies to all downstream integrations)</div>
+    <div class="cb-states">
+      <div class="cb-state">
+        <div class="state-dot" style="background:#34d399;box-shadow:0 0 6px #34d399;"></div>
+        <div class="state-name" style="color:#34d399;">CLOSED</div>
+        <div class="state-desc">Normal operation. All requests pass through. Failure counter tracked.</div>
+      </div>
+      <div class="cb-state">
+        <div class="state-dot" style="background:#fb7185;box-shadow:0 0 6px #fb7185;"></div>
+        <div class="state-name" style="color:#fb7185;">OPEN</div>
+        <div class="state-desc">Triggered at threshold. All requests immediately return fallback. Timer running.</div>
+      </div>
+      <div class="cb-state">
+        <div class="state-dot" style="background:#fbbf24;box-shadow:0 0 6px #fbbf24;"></div>
+        <div class="state-name" style="color:#fbbf24;">HALF-OPEN</div>
+        <div class="state-desc">Single probe request sent after cooldown. Success → CLOSED. Failure → OPEN again.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-integration CB table -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Integration</th>
+          <th>Timeout</th>
+          <th>Open Threshold</th>
+          <th>Cooldown</th>
+          <th>Fallback Behaviour</th>
+          <th>Alert Severity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-teal">MoMo Core</span></td>
+          <td>800 ms</td>
+          <td>5 failures / 10 s</td>
+          <td>30 s</td>
+          <td>Return "Service temporarily unavailable"; do not debit; session ends gracefully</td>
+          <td><span class="tag tag-rose">P1</span></td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-violet">UC24</span></td>
+          <td>500 ms</td>
+          <td>10 failures / 30 s</td>
+          <td>60 s</td>
+          <td>Use language detection only; serve default (non-personalised) menu</td>
+          <td><span class="tag tag-amber">P2</span></td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-amber">PayGuard</span></td>
+          <td>250 ms</td>
+          <td>5 failures / 10 s</td>
+          <td>30 s</td>
+          <td>Treat all txns as REVIEW; proceed with transaction; alert compliance team</td>
+          <td><span class="tag tag-rose">P1</span></td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">Redis</span></td>
+          <td>10 ms</td>
+          <td>3 failures / 5 s</td>
+          <td>10 s</td>
+          <td>In-process session state (single request only); no cross-hop state; very limited functionality</td>
+          <td><span class="tag tag-rose">P1</span></td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">NLU Engine</span></td>
+          <td>300 ms</td>
+          <td>10 failures / 30 s</td>
+          <td>60 s</td>
+          <td>intent=UNKNOWN; engage menu-based flow entirely</td>
+          <td><span class="tag tag-amber">P2</span></td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">Lang Detect</span></td>
+          <td>40 ms</td>
+          <td>10 failures / 30 s</td>
+          <td>30 s</td>
+          <td>Use UC24 preferred language → prior session language → OpCo default</td>
+          <td><span class="tag tag-amber">P3</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Error Code Mapping -->
+  <div class="card-full">
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px;">MoMo API Error Code Handling</div>
+    <div style="background:var(--surface-2);border-radius:8px;overflow:hidden;">
+      <table class="data-table" style="margin:0;">
+        <thead>
+          <tr><th>MoMo Error Code</th><th>HTTP Status</th><th>User-Facing Message (localised)</th><th>Retry?</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>PAYER_NOT_FOUND</code></td><td>404</td><td>"Your account was not found. Please call 180."</td><td>No</td><td>End session; log incident</td></tr>
+          <tr><td><code>NOT_ENOUGH_FUNDS</code></td><td>400</td><td>"Insufficient balance. Try a smaller amount."</td><td>No</td><td>Prompt retry with lower amount</td></tr>
+          <tr><td><code>PAYEE_NOT_ALLOWED</code></td><td>403</td><td>"This recipient cannot receive money at this time."</td><td>No</td><td>End session; suggest call centre</td></tr>
+          <tr><td><code>TRANSACTION_CANCELED</code></td><td>400</td><td>"Transaction was cancelled. No money was sent."</td><td>No</td><td>Return to main menu</td></tr>
+          <tr><td><code>SERVICE_UNAVAILABLE</code></td><td>503</td><td>"MoMo is temporarily unavailable. Please try again shortly."</td><td>1× after 5 s</td><td>CB increments failure count</td></tr>
+          <tr><td><code>RESOURCE_NOT_FOUND</code></td><td>404</td><td>"Transaction reference not found."</td><td>No</td><td>Poll fallback; log anomaly</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §7  INTEGRATION TESTING STRATEGY                           -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="testing">
+  <div class="section-label">Section 07</div>
+  <h2 class="section-title">Integration Testing Strategy</h2>
+
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--indigo-soft);">🧪</div>
+        <div>
+          <div class="card-title">Contract Testing</div>
+          <div class="card-sub">Pact-based consumer-driven contracts</div>
+        </div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-muted);">
+        <li>⟶ AI Hub defines consumer contracts for MoMo, UC24, PayGuard, NLU</li>
+        <li>⟶ Pact Broker publishes verified contracts; CI gate blocks merge on contract violation</li>
+        <li>⟶ Provider verification run in each downstream team's pipeline</li>
+        <li>⟶ Gateway adapter contracts: request/response schema validated with JSON Schema</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--teal-soft);">🔄</div>
+        <div>
+          <div class="card-title">End-to-End Integration Tests</div>
+          <div class="card-sub">Per-OpCo sandbox environments</div>
+        </div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-muted);">
+        <li>⟶ Full USSD session simulation via gateway adapter test harness</li>
+        <li>⟶ MoMo sandbox environments per OpCo; test MSISDNs pre-provisioned</li>
+        <li>⟶ Fraud scenarios: dedicated PayGuard sandbox with rule injection</li>
+        <li>⟶ NLU: 500-utterance multilingual test suite per intent per language</li>
+        <li>⟶ Run nightly in staging; blocking gate on happy path + fraud path tests</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--amber-soft);">⏱️</div>
+        <div>
+          <div class="card-title">Performance &amp; Latency Testing</div>
+          <div class="card-sub">k6 load tests · SLO validation</div>
+        </div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-muted);">
+        <li>⟶ k6 scripts simulate peak load: 5 000 concurrent USSD sessions per OpCo</li>
+        <li>⟶ Validates: p99 USSD response &lt; 2 000 ms under 5× normal peak</li>
+        <li>⟶ Chaos engineering: kill Redis replica, drop MoMo connection, NLU timeout injection</li>
+        <li>⟶ Circuit breaker tests: verify fallback triggers at defined thresholds</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:var(--violet-soft);">🌍</div>
+        <div>
+          <div class="card-title">Per-OpCo Gateway Conformance</div>
+          <div class="card-sub">Vendor-specific protocol validation</div>
+        </div>
+      </div>
+      <ul style="list-style:none;display:flex;flex-direction:column;gap:7px;font-size:13px;color:var(--text-muted);">
+        <li>⟶ Wiremock stubs for each gateway vendor (Huawei, Ericsson, custom)</li>
+        <li>⟶ Edge-case payloads: max 182-char input, malformed session IDs, duplicate events</li>
+        <li>⟶ SIGTRAN MAP encoding validation (NG, GH, CI, CM adapters)</li>
+        <li>⟶ Language detection: test corpus per market (short USSD phrases in all 14 languages)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-full">
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;">Testing Environment Matrix</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Environment</th><th>Gateway</th><th>MoMo</th><th>UC24</th><th>PayGuard</th><th>Redis</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>DEV</td><td>Wiremock stubs</td><td>Sandbox (shared)</td><td>Mock</td><td>Mock</td><td>Single node</td><td>Developer iteration</td></tr>
+        <tr><td>TEST</td><td>Wiremock + real adapter</td><td>Sandbox (per-OpCo)</td><td>Test instance</td><td>Test instance</td><td>3-node cluster</td><td>Integration + contract tests</td></tr>
+        <tr><td>STAGING</td><td>Real adapter (test GW)</td><td>Sandbox (full)</td><td>Staging</td><td>Staging</td><td>Full cluster</td><td>E2E, perf, chaos tests</td></tr>
+        <tr><td>PROD</td><td>Real OpCo GW</td><td>Production</td><td>Production</td><td>Production</td><td>Full HA cluster</td><td>Live traffic</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §8  PER-MARKET GATEWAY VARIATION TABLE                    -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="gateway-table">
+  <div class="section-label">Section 08</div>
+  <h2 class="section-title">Per-Market Gateway Variation Table</h2>
+
+  <div class="warn-box">
+    <strong>Note:</strong> Gateway vendor, protocol, and quirks vary significantly per OpCo. Each adapter is
+    deployed as an independent sidecar container. Adapter versions are managed separately from the core AI Hub.
+    All quirks documented below are captured from OpCo integration workshops and USSD gateway vendor documentation.
+  </div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Market</th>
+          <th>OpCo</th>
+          <th>Gateway Vendor</th>
+          <th>Protocol</th>
+          <th>Auth</th>
+          <th>Session ID Format</th>
+          <th>Known Quirks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag tag-indigo">NG</span></td>
+          <td>MTN Nigeria</td>
+          <td>Huawei USG 9000</td>
+          <td>SIGTRAN/MAP over IP</td>
+          <td>mTLS + MSISDN header</td>
+          <td><code>NG-{timestamp}-{seq}</code></td>
+          <td>MAP encoding varies by USSC; 7-bit GSM default encoding; retry on MAP timeout required</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-indigo">GH</span></td>
+          <td>MTN Ghana</td>
+          <td>Huawei USG 6000</td>
+          <td>SIGTRAN/MAP over IP</td>
+          <td>mTLS</td>
+          <td><code>GH-{msisdn}-{seq}</code></td>
+          <td>MSISDN sometimes omits country code; adapter normalises to +233; session IDs non-unique across restarts — add timestamp suffix</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">ZA</span></td>
+          <td>MTN South Africa</td>
+          <td>Ericsson USSD GW</td>
+          <td>HTTP/2 REST</td>
+          <td>mTLS + API key header</td>
+          <td><code>ZA-UUID-v4</code></td>
+          <td>Ericsson sends duplicate BEGIN events on network retry; adapter must deduplicate by session ID + seq; UTF-8 supported (Zulu/Xhosa chars)</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">UG</span></td>
+          <td>MTN Uganda</td>
+          <td>Ericsson USSD GW</td>
+          <td>HTTP/2 REST</td>
+          <td>mTLS</td>
+          <td><code>UG-{msisdn}-{rand6}</code></td>
+          <td>Gateway imposes 160-char limit (not 182); adapter enforces lower limit; occasional 30 s keepalive drops</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">RW</span></td>
+          <td>MTN Rwanda</td>
+          <td>Ericsson USSD GW</td>
+          <td>HTTP/2 REST</td>
+          <td>mTLS + JWT</td>
+          <td><code>RW-{sessionToken}</code></td>
+          <td>JWT signed by OpCo CA; adapter validates before processing; Kinyarwanda UTF-8 rendered correctly</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-teal">ZM</span></td>
+          <td>MTN Zambia</td>
+          <td>Ericsson USSD GW</td>
+          <td>HTTP/2 REST</td>
+          <td>mTLS</td>
+          <td><code>ZM-{msisdn}-{ts}</code></td>
+          <td>Intermittent gateway reconnects during peak; adapter implements exponential backoff with jitter</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-violet">CI</span></td>
+          <td>MTN Côte d'Ivoire</td>
+          <td>Huawei USG 6000</td>
+          <td>SIGTRAN/MAP over IP</td>
+          <td>mTLS</td>
+          <td><code>CI-{msisdn}-{seq}</code></td>
+          <td>French + Dioula inputs; MAP encoding issues with accented characters — adapter applies ISO-8859-1 fallback</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-violet">CM</span></td>
+          <td>MTN Cameroon</td>
+          <td>Huawei USG 9000</td>
+          <td>SIGTRAN/MAP over IP</td>
+          <td>mTLS + shared secret</td>
+          <td><code>CM-{rand8}</code></td>
+          <td>Bilingual (FR/EN) switching mid-session; adapter detects language change per USSD response and updates session; short session IDs increase collision risk — adapter adds MSISDN prefix</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-amber">BJ</span></td>
+          <td>MTN Benin</td>
+          <td>Custom/MVNE REST</td>
+          <td>HTTP/1.1 REST</td>
+          <td>mTLS + Basic Auth</td>
+          <td><code>BJ-{uuid}</code></td>
+          <td>HTTP/1.1 only (no HTTP/2); payload max 150 chars enforced by MVNE; adapter re-chunks responses; response time SLA 3 s (relaxed market)</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-amber">GN</span></td>
+          <td>MTN Guinea</td>
+          <td>Custom/MVNE REST</td>
+          <td>HTTP/1.1 REST</td>
+          <td>mTLS</td>
+          <td><code>GN-{msisdn}-{rand4}</code></td>
+          <td>Gateway frequently sends malformed JSON on errors; adapter adds defensive parse with fallback to plain text extraction; Fula script not supported — Latin transliteration used</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-amber">LR</span></td>
+          <td>MTN Liberia</td>
+          <td>Custom/MVNE REST</td>
+          <td>HTTP/1.1 REST</td>
+          <td>mTLS + IP whitelist</td>
+          <td><code>LR-{rand12}</code></td>
+          <td>IP whitelist enforced at gateway; adapter deployed in fixed-IP NAT pool; English only; no multilingual requirement</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-amber">SS</span></td>
+          <td>MTN South Sudan</td>
+          <td>Custom/MVNE REST</td>
+          <td>HTTP/1.1 REST</td>
+          <td>mTLS</td>
+          <td><code>SS-{msisdn}-{ts}</code></td>
+          <td>Intermittent connectivity; adapter implements aggressive retry (3× with 500 ms backoff); low transaction volume; single NLU language model (en)</td>
+        </tr>
+        <tr>
+          <td><span class="tag tag-amber">SD</span></td>
+          <td>MTN Sudan</td>
+          <td>Custom/MVNE REST</td>
+          <td>HTTP/1.1 REST</td>
+          <td>mTLS + API key</td>
+          <td><code>SD-{uuid}</code></td>
+          <td>Arabic script inputs; adapter converts Arabizi to Arabic for NLU; RTL rendering irrelevant on USSD; compliance: sanctions screening applied at MoMo layer</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ -->
+<!-- §9  DEPENDENCY RISK REGISTER                               -->
+<!-- ══════════════════════════════════════════════════════════ -->
+<section class="section" id="risk-register">
+  <div class="section-label">Section 09</div>
+  <h2 class="section-title">Dependency Risk Register</h2>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Dependency</th>
+          <th>Risk</th>
+          <th>Severity</th>
+          <th>Likelihood</th>
+          <th>Impact</th>
+          <th>Mitigation</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-01</td>
+          <td><span class="tag tag-teal">MoMo Core</span></td>
+          <td>MoMo API degradation blocks all transactions across 13 markets</td>
+          <td><span class="risk-critical">Critical</span></td>
+          <td>Low</td>
+          <td>Full transaction outage</td>
+          <td>Circuit breaker; graceful decline message; P1 PagerDuty alert; MTN FinPlatform incident escalation path defined</td>
+          <td>MTN FinPlatform</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-02</td>
+          <td><span class="tag tag-teal">Redis Cluster</span></td>
+          <td>Redis cluster failure loses all session state — USSD sessions become stateless</td>
+          <td><span class="risk-critical">Critical</span></td>
+          <td>Low</td>
+          <td>Session continuity lost; degraded UX; potential double-spend risk</td>
+          <td>3-node HA cluster; Sentinel failover &lt; 5 s; in-process state cache for single-hop; idempotency keys on MoMo prevent double-spend</td>
+          <td>Platform Infra</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-03</td>
+          <td><span class="tag tag-amber">PayGuard</span></td>
+          <td>PayGuard unavailability disables fraud pre-screening — financial exposure</td>
+          <td><span class="risk-critical">Critical</span></td>
+          <td>Low</td>
+          <td>Fraud transactions may proceed undetected</td>
+          <td>Circuit breaker: REVIEW mode (not bypass) on outage; compliance team alerted; post-hoc PayGuard batch re-screening of all transactions during outage window</td>
+          <td>Fraud &amp; Risk Eng</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-04</td>
+          <td><span class="tag tag-indigo">Per-OpCo GW</span></td>
+          <td>Gateway vendor changes protocol or encoding without notice (historically common)</td>
+          <td><span class="risk-high">High</span></td>
+          <td>Medium</td>
+          <td>Adapter failure for affected OpCo only</td>
+          <td>Adapter versioned independently; schema validation on inbound; adapter health dashboard; OpCo change notification SLA in vendor contracts</td>
+          <td>Per-OpCo Telco</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-05</td>
+          <td><span class="tag tag-violet">UC24</span></td>
+          <td>UC24 latency spike pushes total USSD response beyond 2 s</td>
+          <td><span class="risk-high">High</span></td>
+          <td>Medium</td>
+          <td>Session timeouts; degraded customer experience</td>
+          <td>Async enrichment pattern; 500 ms hard timeout; Redis cache (300 s TTL) absorbs most requests; fallback to default menu on miss</td>
+          <td>AI Intelligence Team</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-06</td>
+          <td><span class="tag tag-indigo">NLU Engine</span></td>
+          <td>NLU model accuracy degrades on new slang/dialect inputs — intent misclassification</td>
+          <td><span class="risk-high">High</span></td>
+          <td>Medium</td>
+          <td>Wrong transactions initiated; customer complaints</td>
+          <td>Confidence threshold routing (≥0.85 for auto-action); confirmation prompts for ambiguous intents; monthly retraining with new utterance corpus; A/B model testing via Istio</td>
+          <td>AI/ML Platform</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-07</td>
+          <td><span class="tag tag-indigo">MoMo OAuth2</span></td>
+          <td>OAuth2 token expiry causes burst of 401 errors during token refresh</td>
+          <td><span class="risk-medium">Medium</span></td>
+          <td>High</td>
+          <td>Transaction failures for 1–2 s during refresh window</td>
+          <td>Proactive token refresh at 80% TTL; token stored in Redis with TTL; parallel refresh prevents single point of failure; retry-once on 401</td>
+          <td>MTN FinPlatform</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-08</td>
+          <td><span class="tag tag-amber">MoMo Rate Limit</span></td>
+          <td>Peak USSD traffic exceeds 200 req/min MoMo rate limit per OpCo</td>
+          <td><span class="risk-medium">Medium</span></td>
+          <td>High (NG, ZA peak hours)</td>
+          <td>429 errors; transaction failures at peak</td>
+          <td>Redis sliding-window rate limiter; request queuing with priority (balance/active checks over transfers); quota increase SLA in MoMo contract; per-OpCo quota monitoring dashboard</td>
+          <td>MTN FinPlatform</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-09</td>
+          <td><span class="tag tag-indigo">Lang Detect</span></td>
+          <td>Language misdetection for very short USSD inputs (1–3 chars) causes wrong language served</td>
+          <td><span class="risk-low">Low</span></td>
+          <td>High</td>
+          <td>Wrong language menus; poor UX</td>
+          <td>Minimum 2-char threshold before detection; numeric-only inputs default to OpCo language; UC24 preferred language override available</td>
+          <td>AI/ML Platform</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-dim);font-size:11px;">R-10</td>
+          <td><span class="tag tag-amber">Vendor Lock-in</span></td>
+          <td>Dependency on proprietary Huawei USG SIGTRAN stack for 4 markets</td>
+          <td><span class="risk-medium">Medium</span></td>
+          <td>Low</td>
+          <td>Migration complexity if vendor changes</td>
+          <td>Adapter abstraction layer isolates core hub from vendor specifics; OpenAPI spec defined for internal adapter interface; migration playbook documented</td>
+          <td>Platform Engineering</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div style="margin-top:64px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+  <div style="font-size:12px;color:var(--text-dim);">
+    UC25 USSD AI Assistant — Integration Map v1.0 · MTN Group Fintech · 10 May 2026
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <span class="tag tag-indigo">13 Markets</span>
+    <span class="tag tag-teal">8 Integrations</span>
+    <span class="tag tag-violet">3 Sequence Flows</span>
+    <span class="tag tag-amber">10 Risk Items</span>
+  </div>
+</div>
+
+</div><!-- /container -->
+</body>
+</html>
