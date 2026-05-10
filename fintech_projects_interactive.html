@@ -3562,7 +3562,7 @@ function renderCharts() {
     el.style.height = H+'px';
   })();
 
-  // ── 4. Pipeline / Roadmap (Not Started UCs) ───────────────
+  // ── 4. Pipeline / Roadmap swimlane chart ─────────────────
   (function() {
     const el = document.getElementById('chart-pipeline');
     if (!el) return;
@@ -3572,37 +3572,92 @@ function renderCharts() {
       return;
     }
 
-    // Group by category / tag
-    const groups = {};
-    ns.forEach(r => {
-      const cat = (r.tags && r.tags[0]) || r.sq || 'General';
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(r);
-    });
+    // Category by id range
+    function pipelineCat(r) {
+      if (r.id >= 20 && r.id <= 24) return { label:'Security & Intelligence', icon:'🔐', color:'#a78bfa' };
+      if (r.id >= 25 && r.id <= 30) return { label:'USSD Feature Phone Stack', icon:'📟', color:'#34d399' };
+      if (r.id >= 31 && r.id <= 36) return { label:'MoMo Consumer App',        icon:'💳', color:'#60a5fa' };
+      if (r.id >= 37 && r.id <= 38) return { label:'MoMo Merchant App',        icon:'🏪', color:'#fdab3d' };
+      return { label:'General', icon:'🗂️', color:'#8b93c4' };
+    }
 
     const priColor = p => p===1?'#ef4444':p===2?'#f97316':p===3?'#fdab3d':p===4?'#60a5fa':'#8b93c4';
-    const priLabel = p => 'P'+p;
 
-    let html = `<div style="padding:12px 16px 8px;display:flex;flex-wrap:wrap;gap:20px;">`;
-    Object.entries(groups).forEach(([cat, items]) => {
-      html += `<div style="flex:1;min-width:220px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#555e8a;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.06);">${esc(cat)} <span style="background:rgba(59,68,120,.5);color:#8b93c4;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:600;">${items.length}</span></div>`;
-      items.forEach(r => {
-        html += `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;"
-          onclick="filterFromStatCard('pipeline')" title="Click to filter table to pipeline UCs">
-          <span style="flex-shrink:0;font-size:9px;font-weight:700;color:#3d4270;background:#1a1d3a;border:1px solid #2e3358;padding:2px 5px;border-radius:4px;margin-top:1px;">UC-${r.id}</span>
-          <span style="flex-shrink:0;font-size:9px;font-weight:600;color:${priColor(r.priority)};background:rgba(0,0,0,.3);border:1px solid ${priColor(r.priority)}33;padding:2px 4px;border-radius:3px;margin-top:1px;">${priLabel(r.priority)}</span>
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:11px;color:#8b93c4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(r.project)}</div>
-            <div style="font-size:10px;color:#3d4270;margin-top:1px;">${esc(r.owner||'—')}</div>
-          </div>
-        </div>`;
+    // Group into ordered categories
+    const CAT_ORDER = ['Security & Intelligence','USSD Feature Phone Stack','MoMo Consumer App','MoMo Merchant App','General'];
+    const groups = {};
+    CAT_ORDER.forEach(k => { groups[k] = []; });
+    ns.forEach(r => { const c = pipelineCat(r); if (groups[c.label]) groups[c.label].push(r); });
+    const cats = CAT_ORDER.map(k => ({ meta: ns.length ? pipelineCat(ns.find(r=>pipelineCat(r).label===k)||ns[0]) : {label:k,icon:'',color:'#8b93c4'}, items: groups[k] })).filter(c=>c.items.length>0);
+
+    // SVG layout constants
+    const W      = 1120;
+    const padL   = 14, padR = 14, padT = 14, padB = 32;
+    const labelW = 158;
+    const gapCat = 10;
+    const tileW  = 148, tileH = 52, tileGap = 8;
+    const rowH   = tileH + 12;
+
+    const H = padT + cats.length * (rowH + gapCat) - gapCat + padB;
+
+    let svg = `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="display:block;font-family:Inter,sans-serif">`;
+
+    cats.forEach(({ meta, items }, gi) => {
+      const y = padT + gi * (rowH + gapCat);
+      const midY = y + rowH / 2;
+
+      // Category lane background (full width)
+      svg += `<rect x="${padL}" y="${y}" width="${W - padL - padR}" height="${rowH}" rx="8" fill="rgba(26,29,58,.6)" stroke="rgba(${meta.color.replace('#','').match(/../g).map(h=>parseInt(h,16)).join(',')},0.18)" stroke-width="1"/>`;
+
+      // Category label block
+      svg += `<rect x="${padL}" y="${y}" width="${labelW}" height="${rowH}" rx="8" fill="${meta.color}18"/>`;
+      svg += `<text x="${padL + labelW/2}" y="${midY - 7}" text-anchor="middle" fill="${meta.color}" font-size="12" font-weight="700">${meta.icon} ${meta.label}</text>`;
+      svg += `<text x="${padL + labelW/2}" y="${midY + 9}" text-anchor="middle" fill="${meta.color}99" font-size="10">${items.length} use case${items.length>1?'s':''} · planning</text>`;
+
+      // Divider line
+      svg += `<line x1="${padL + labelW + 1}" y1="${y + 6}" x2="${padL + labelW + 1}" y2="${y + rowH - 6}" stroke="${meta.color}30" stroke-width="1"/>`;
+
+      // UC tiles
+      const tilesStartX = padL + labelW + 12;
+      items.forEach((r, ti) => {
+        const tx = tilesStartX + ti * (tileW + tileGap);
+        const ty = y + (rowH - tileH) / 2;
+        const pc = priColor(r.priority);
+        const ucName = r.project.length > 20 ? r.project.slice(0, 19) + '…' : r.project;
+
+        // Tile body
+        svg += `<rect x="${tx}" y="${ty}" width="${tileW}" height="${tileH}" rx="7" fill="#1e2240" stroke="${pc}55" stroke-width="1.5" style="cursor:pointer" onclick="filterFromStatCard('pipeline')"/>`;
+        // Priority colour stripe at top (thicker for visibility)
+        svg += `<rect x="${tx}" y="${ty}" width="${tileW}" height="4" rx="3" fill="${pc}" opacity=".9"/>`;
+
+        // UC-id pill (bright white on priority-tinted background)
+        svg += `<rect x="${tx + 6}" y="${ty + 8}" width="38" height="14" rx="4" fill="${pc}33"/>`;
+        svg += `<text x="${tx + 25}" y="${ty + 19}" text-anchor="middle" fill="#ffffff" font-size="10" font-weight="800">${'UC-'+r.id}</text>`;
+        // Priority badge
+        svg += `<rect x="${tx + tileW - 30}" y="${ty + 8}" width="24" height="14" rx="4" fill="${pc}"/>`;
+        svg += `<text x="${tx + tileW - 18}" y="${ty + 19}" text-anchor="middle" fill="#fff" font-size="9" font-weight="800">${'P'+r.priority}</text>`;
+
+        // UC name
+        svg += `<text x="${tx + tileW/2}" y="${ty + 34}" text-anchor="middle" fill="#dde0f8" font-size="10" font-weight="500">${ucName}</text>`;
+        // Owner first name
+        const ownerFirst = (r.owner||'').split(' ')[0];
+        svg += `<text x="${tx + tileW/2}" y="${ty + 47}" text-anchor="middle" fill="#4a5080" font-size="9">${ownerFirst}</text>`;
       });
-      html += `</div>`;
     });
-    html += `</div>`;
-    html += `<div style="padding:4px 16px 10px;font-size:10px;color:#3d4270;text-align:right;">Click any row to filter table · ${ns.length} UCs in pipeline not counted in active stats or avg completion</div>`;
-    el.innerHTML = html;
+
+    // Priority legend
+    const legendY = padT + cats.length * (rowH + gapCat) - gapCat + gapCat + 4;
+    svg += `<text x="${padL}" y="${legendY + 9}" fill="#3d4270" font-size="9" font-weight="600">PRIORITY →</text>`;
+    [1,2,3,4].forEach((p, i) => {
+      const lx = padL + 72 + i * 62;
+      svg += `<rect x="${lx}" y="${legendY}" width="10" height="10" rx="2" fill="${priColor(p)}"/>`;
+      svg += `<text x="${lx + 14}" y="${legendY + 9}" fill="#555e8a" font-size="9">P${p} · ${p===1?'Critical':p===2?'High':p===3?'Medium':'Low'}</text>`;
+    });
+    svg += `<text x="${W - padR}" y="${legendY + 9}" text-anchor="end" fill="#3d4270" font-size="9" style="cursor:pointer" onclick="filterFromStatCard('pipeline')">${ns.length} UCs · click tile to filter table ↑</text>`;
+
+    svg += `</svg>`;
+    el.innerHTML = svg;
+    el.style.height = H + 'px';
   })();
 }
 
