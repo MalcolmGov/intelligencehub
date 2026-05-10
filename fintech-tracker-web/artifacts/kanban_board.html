@@ -636,7 +636,7 @@ function loadData(){
     const ks=Object.keys(localStorage).filter(k=>k.startsWith('fintech_projects_v')).sort().reverse();
     for(const k of ks){ try{const p=JSON.parse(localStorage.getItem(k));if(p&&p.data&&p.data.length){data=p.data;break;}}catch(e){} }
   }
-  if(!data.length){
+  if(!data.length || data.length < INITIAL_DATA.length){
     data=JSON.parse(JSON.stringify(INITIAL_DATA));
     try{ localStorage.setItem(STORE_KEY,JSON.stringify({data,nextId:39})); }catch(e){}
   }
@@ -650,6 +650,7 @@ function progColor(pct,s){ if(s==='Done') return '#00c875'; if(s==='In progress'
 function sCls(s){ if(s==='Done') return 's-dn'; if(s==='In progress') return 's-ip'; if(s==='In review') return 's-ir'; return 's-bl'; }
 function sKls(s){ if(s==='Done') return 's-dn'; if(s==='In progress') return 's-ip'; if(s==='In review') return 's-ir'; return 's-bl'; }
 function getAssignee(r){ return r.status==='In progress' ? MALCOLM : (r.assignedTo||r.owner||MALCOLM); }
+function isOB(r){ return (r.owner||'').toLowerCase().includes('malcolm'); }
 
 function getFiltered(){
   const q=(document.getElementById('srchInput').value||'').toLowerCase().trim();
@@ -735,6 +736,7 @@ function renderTable(){
       const sLabel=r.status==='Not started'?'Backlog':r.status;
       const sDot={'Done':'#00c875','In progress':'#fdab3d','In review':'#a78bfa'}[r.status]||'#555e8a';
       const assignee=getAssignee(r);
+      const ob=isOB(r);
       const aom=oMeta(assignee);
       const oom=oMeta(r.owner);
       const cat=ucCat(r);
