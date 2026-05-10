@@ -8,17 +8,18 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #0d0f1c;
-  --surface:   #12152a;
-  --surface2:  #181b34;
-  --surface3:  #1e2240;
+  --bg:        #0b0d1a;
+  --surface:   #10132a;
+  --surface2:  #151830;
+  --surface3:  #1b1f38;
+  --surface4:  #20253f;
   --border:    rgba(255,255,255,.07);
-  --border2:   rgba(255,255,255,.12);
-  --text-1:    #e8eaff;
+  --border2:   rgba(255,255,255,.13);
+  --text-1:    #eaecff;
   --text-2:    #8b93c4;
-  --text-3:    #555e8a;
-  --radius:    10px;
-  --col-w:     290px;
+  --text-3:    #515a85;
+  --radius:    12px;
+  --col-w:     320px;
 
   --c-backlog: #555e8a;
   --c-prog:    #fdab3d;
@@ -28,12 +29,13 @@
   --c-p2:      #f97316;
   --c-p3:      #fdab3d;
   --c-p4:      #60a5fa;
+  --c-p5:      #8b93c4;
   --rainbow:   linear-gradient(90deg, #03fafa 0%, #9878f1 50%, #6161ff 100%);
 }
 
 html, body { height: 100%; }
 body {
-  font-family: Inter, system-ui, sans-serif;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
   background: var(--bg);
   color: var(--text-1);
   min-height: 100vh;
@@ -42,11 +44,11 @@ body {
 
 /* ── Cursor glow ─────────────────────────────── */
 #cg {
-  position: fixed; width: 340px; height: 340px; border-radius: 50%;
+  position: fixed; width: 380px; height: 380px; border-radius: 50%;
   pointer-events: none; z-index: 9999; top: 0; left: 0;
   transform: translate(-50%,-50%);
-  background: radial-gradient(circle, rgba(3,250,250,.06) 0%, rgba(152,120,241,.04) 35%, transparent 70%);
-  opacity: 0; transition: opacity .4s;
+  background: radial-gradient(circle, rgba(3,250,250,.065) 0%, rgba(152,120,241,.045) 35%, transparent 70%);
+  opacity: 0; transition: opacity .4s; will-change: left, top;
 }
 .cursor-ripple {
   position: fixed; width: 100px; height: 100px; border-radius: 50%;
@@ -63,25 +65,34 @@ body {
 /* ── Header ──────────────────────────────────── */
 .header {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(13,15,28,.92);
-  backdrop-filter: blur(16px);
+  background: rgba(11,13,26,.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  height: 56px;
+  padding: 0 28px;
+  height: 58px;
   display: flex; align-items: center; gap: 16px;
 }
-.header-logo {
-  font-size: 13px; font-weight: 800; letter-spacing: .04em;
-  color: var(--text-1);
-  display: flex; align-items: center; gap: 8px;
+.header-brand {
+  display: flex; align-items: center; gap: 9px;
 }
-.header-logo-dot {
-  width: 8px; height: 8px; border-radius: 50%;
+.brand-gem {
+  width: 26px; height: 26px; border-radius: 7px;
   background: var(--rainbow);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(3,250,250,.25);
 }
-.header-sep { width: 1px; height: 20px; background: var(--border2); }
-.board-name {
-  font-size: 14px; font-weight: 600; color: var(--text-1);
+.brand-name {
+  font-size: 13px; font-weight: 800; letter-spacing: .02em; color: var(--text-1);
+}
+.brand-sub {
+  font-size: 10px; color: var(--text-3); font-weight: 500;
+}
+.header-sep { width: 1px; height: 22px; background: var(--border2); flex-shrink: 0; }
+.board-title {
+  font-size: 14px; font-weight: 700; color: var(--text-1);
+  background: var(--rainbow); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   white-space: nowrap;
 }
 .header-spacer { flex: 1; }
@@ -90,109 +101,110 @@ body {
   display: flex; gap: 2px;
   background: var(--surface3);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 3px;
+  border-radius: 9px; padding: 3px;
 }
 .view-btn {
   background: none; border: none; cursor: pointer;
-  padding: 5px 12px; border-radius: 6px;
+  padding: 5px 13px; border-radius: 7px;
   font-size: 12px; font-weight: 600; color: var(--text-2);
-  transition: all .15s;
-  display: flex; align-items: center; gap: 5px;
+  transition: all .15s; display: flex; align-items: center; gap: 5px;
 }
 .view-btn.active {
-  background: var(--surface2);
-  color: var(--text-1);
-  box-shadow: 0 1px 4px rgba(0,0,0,.4);
+  background: var(--surface2); color: var(--text-1);
+  box-shadow: 0 1px 4px rgba(0,0,0,.5);
 }
 .view-btn:hover:not(.active) { color: var(--text-1); }
 
 .back-btn {
   display: flex; align-items: center; gap: 6px;
-  padding: 6px 12px; border-radius: 7px;
+  padding: 6px 13px; border-radius: 8px;
   background: var(--surface3); border: 1px solid var(--border);
   color: var(--text-2); font-size: 12px; font-weight: 500;
   cursor: pointer; text-decoration: none; transition: all .15s;
 }
-.back-btn:hover { color: var(--text-1); border-color: var(--border2); }
+.back-btn:hover { color: var(--text-1); border-color: var(--border2); background: var(--surface4); }
 
-/* ── Sub-header (stats bar + filters) ─────────── */
+/* ── Sub-header ──────────────────────────────── */
 .subheader {
-  padding: 10px 24px;
+  padding: 10px 28px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
-  display: flex; align-items: center; gap: 16px;
-  flex-wrap: wrap;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .stat-pill {
   display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--text-2);
-  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; color: var(--text-2); font-weight: 500;
+  padding: 5px 11px; border-radius: 20px;
   background: var(--surface3); border: 1px solid var(--border);
-  cursor: pointer; transition: all .15s;
+  cursor: pointer; transition: all .15s; user-select: none;
 }
 .stat-pill:hover { border-color: var(--border2); color: var(--text-1); }
 .stat-pill.active { border-color: rgba(3,250,250,.4); color: #03fafa; background: rgba(3,250,250,.08); }
-.stat-dot { width: 8px; height: 8px; border-radius: 50%; }
-.stat-val { font-weight: 700; color: var(--text-1); }
-.subheader-sep { flex: 1; }
+.stat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.stat-val { font-weight: 800; color: var(--text-1); }
+.subheader-sep { flex: 1; min-width: 20px; }
 .search-box {
   display: flex; align-items: center; gap: 8px;
   background: var(--surface3); border: 1px solid var(--border);
-  border-radius: 8px; padding: 5px 10px;
+  border-radius: 9px; padding: 6px 12px;
+  transition: border-color .15s;
 }
+.search-box:focus-within { border-color: rgba(3,250,250,.3); }
 .search-box input {
   background: none; border: none; outline: none;
-  color: var(--text-1); font-size: 12px; width: 180px;
+  color: var(--text-1); font-size: 12px; width: 200px;
 }
 .search-box input::placeholder { color: var(--text-3); }
 
 /* ── Kanban board ────────────────────────────── */
 .kanban-wrap {
-  padding: 20px 24px 40px;
-  display: flex; gap: 16px;
+  padding: 20px 28px 50px;
+  display: flex; gap: 14px;
   overflow-x: auto;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 118px);
   align-items: flex-start;
 }
+.kanban-wrap::-webkit-scrollbar { height: 6px; }
+.kanban-wrap::-webkit-scrollbar-thumb { background: var(--surface4); border-radius: 3px; }
+
 .kanban-col {
   flex-shrink: 0;
   width: var(--col-w);
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex; flex-direction: column;
-  max-height: calc(100vh - 140px);
+  max-height: calc(100vh - 138px);
   position: relative;
+  transition: border-color .2s;
 }
-/* Colour top stripe per column */
 .kanban-col::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  border-radius: 12px 12px 0 0;
+  border-radius: 14px 14px 0 0;
 }
 .col-backlog::before { background: var(--c-backlog); }
-.col-prog::before    { background: var(--c-prog); }
-.col-review::before  { background: var(--c-review); }
-.col-done::before    { background: var(--c-done); }
+.col-prog::before    { background: linear-gradient(90deg, #fdab3d, #f97316); }
+.col-review::before  { background: linear-gradient(90deg, #a78bfa, #818cf8); }
+.col-done::before    { background: linear-gradient(90deg, #00c875, #00a86b); }
 
 .col-header {
-  padding: 14px 14px 10px;
-  display: flex; align-items: center; gap: 8px;
+  padding: 14px 16px 12px;
+  display: flex; align-items: center; gap: 9px;
   border-bottom: 1px solid var(--border);
   position: sticky; top: 0;
   background: var(--surface2);
-  border-radius: 12px 12px 0 0;
+  border-radius: 14px 14px 0 0;
   z-index: 2;
 }
-.col-icon { font-size: 14px; }
-.col-title { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.col-icon { font-size: 15px; line-height: 1; }
+.col-title { font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
 .col-count {
   margin-left: auto;
   font-size: 11px; font-weight: 700;
-  padding: 2px 7px; border-radius: 10px;
-  background: rgba(255,255,255,.07);
-  color: var(--text-2);
+  padding: 2px 8px; border-radius: 10px;
+  background: rgba(255,255,255,.07); color: var(--text-2);
+  min-width: 24px; text-align: center;
 }
 .col-backlog .col-title { color: var(--c-backlog); }
 .col-prog .col-title    { color: var(--c-prog); }
@@ -202,233 +214,269 @@ body {
 .col-cards {
   padding: 10px;
   display: flex; flex-direction: column; gap: 8px;
-  overflow-y: auto;
-  flex: 1;
+  overflow-y: auto; flex: 1;
 }
 .col-cards::-webkit-scrollbar { width: 4px; }
-.col-cards::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 2px; }
+.col-cards::-webkit-scrollbar-thumb { background: var(--surface4); border-radius: 2px; }
 
 /* ── Kanban Card ─────────────────────────────── */
 .k-card {
   background: var(--surface3);
   border: 1px solid var(--border);
-  border-radius: 9px;
-  padding: 11px 12px;
+  border-radius: 11px;
+  padding: 12px 13px;
   cursor: pointer;
-  transition: transform .15s, box-shadow .15s, border-color .15s;
+  transition: transform .15s, box-shadow .18s, border-color .15s;
   position: relative;
   overflow: hidden;
   user-select: none;
 }
+/* Status stripe left */
 .k-card::before {
   content: '';
   position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
-  border-radius: 9px 0 0 9px;
+  border-radius: 11px 0 0 11px;
 }
 .k-card.s-backlog::before { background: var(--c-backlog); }
-.k-card.s-prog::before    { background: var(--c-prog); }
-.k-card.s-review::before  { background: var(--c-review); }
-.k-card.s-done::before    { background: var(--c-done); }
+.k-card.s-prog::before    { background: linear-gradient(180deg, #fdab3d, #f97316); }
+.k-card.s-review::before  { background: linear-gradient(180deg, #a78bfa, #818cf8); }
+.k-card.s-done::before    { background: linear-gradient(180deg, #00c875, #00a86b); }
 
 .k-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,.4);
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
   border-color: var(--border2);
 }
-.k-card.drag-over { border-color: #03fafa88; background: rgba(3,250,250,.06); }
-.k-card[draggable]:active { opacity: .6; }
+.k-card.drag-over { border-color: rgba(3,250,250,.5); background: rgba(3,250,250,.06); }
+.k-card[draggable]:active { opacity: .55; transform: scale(.98); }
 
+/* Card top row: badge + title + priority */
 .k-card-top {
   display: flex; align-items: flex-start; gap: 8px;
-  margin-bottom: 7px;
+  margin-bottom: 9px;
+  padding-left: 6px; /* offset for left stripe */
 }
 .k-uc-badge {
-  flex-shrink: 0;
-  font-size: 9px; font-weight: 800;
+  flex-shrink: 0; margin-top: 2px;
+  font-size: 9px; font-weight: 800; letter-spacing: .04em;
   padding: 2px 6px; border-radius: 4px;
-  background: rgba(255,255,255,.07);
-  color: var(--text-2);
-  margin-top: 1px;
+  background: rgba(255,255,255,.08); color: var(--text-2);
+  border: 1px solid rgba(255,255,255,.06);
+  white-space: nowrap;
 }
 .k-title {
-  font-size: 12px; font-weight: 600; color: var(--text-1);
-  line-height: 1.4; flex: 1;
+  font-size: 12.5px; font-weight: 600; color: var(--text-1);
+  line-height: 1.45; flex: 1;
+  /* Allow full text — no truncation */
+  word-break: break-word;
 }
 .k-pri {
-  flex-shrink: 0;
+  flex-shrink: 0; margin-top: 2px;
   font-size: 9px; font-weight: 800;
-  padding: 2px 5px; border-radius: 4px;
-  margin-top: 1px;
+  padding: 2px 6px; border-radius: 4px;
+  white-space: nowrap; letter-spacing: .02em;
 }
-.k-pri.p1 { background: rgba(239,68,68,.2);  color: #ef4444; }
-.k-pri.p2 { background: rgba(249,115,22,.2); color: #f97316; }
-.k-pri.p3 { background: rgba(253,171,61,.2); color: #fdab3d; }
-.k-pri.p4 { background: rgba(96,165,250,.2); color: #60a5fa; }
-.k-pri.p5 { background: rgba(139,147,196,.15); color: #8b93c4; }
+.k-pri.p1 { background: rgba(239,68,68,.18);  color: #ef4444; border: 1px solid rgba(239,68,68,.25); }
+.k-pri.p2 { background: rgba(249,115,22,.18); color: #f97316; border: 1px solid rgba(249,115,22,.25); }
+.k-pri.p3 { background: rgba(253,171,61,.15); color: #fdab3d; border: 1px solid rgba(253,171,61,.2); }
+.k-pri.p4 { background: rgba(96,165,250,.15); color: #60a5fa; border: 1px solid rgba(96,165,250,.2); }
+.k-pri.p5 { background: rgba(139,147,196,.12); color: #8b93c4; border: 1px solid rgba(139,147,196,.18); }
 
+/* Category tag */
+.k-category {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600; color: var(--text-3);
+  padding: 2px 7px; border-radius: 4px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.05);
+  margin-left: 6px; margin-bottom: 8px;
+  letter-spacing: .02em;
+}
+
+/* Card meta row */
 .k-card-meta {
   display: flex; align-items: center; gap: 8px;
-  margin-top: 8px;
+  margin-top: 9px; padding-left: 6px;
 }
-.k-owner {
-  font-size: 10px; color: var(--text-3);
-  display: flex; align-items: center; gap: 4px;
+.k-assignee {
+  display: flex; align-items: center; gap: 6px;
+  flex: 1; min-width: 0;
 }
 .k-avatar {
-  width: 18px; height: 18px; border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1, #818cf8);
+  width: 20px; height: 20px; border-radius: 50%;
   font-size: 8px; font-weight: 700; color: #fff;
   display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.08);
+}
+.k-owner-name {
+  font-size: 10.5px; color: var(--text-2); font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .k-pct {
-  margin-left: auto;
-  font-size: 10px; font-weight: 700; color: var(--text-2);
+  font-size: 11px; font-weight: 700; color: var(--text-2);
+  white-space: nowrap; flex-shrink: 0;
 }
+
+/* Progress bar */
 .k-progress {
-  margin-top: 8px;
-  height: 3px; border-radius: 2px;
-  background: rgba(255,255,255,.06);
-  overflow: hidden;
+  margin-top: 8px; margin-left: 6px;
+  height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,.06); overflow: hidden;
 }
 .k-progress-fill {
-  height: 100%; border-radius: 2px;
-  transition: width .3s;
+  height: 100%; border-radius: 2px; transition: width .4s ease;
 }
 
 /* Column footer */
 .col-footer {
-  padding: 8px 10px;
-  border-top: 1px solid var(--border);
+  padding: 8px 10px; border-top: 1px solid var(--border);
 }
 .col-add-btn {
-  width: 100%; background: none; border: 1px dashed var(--border);
-  color: var(--text-3); font-size: 11px; padding: 7px;
-  border-radius: 7px; cursor: pointer; transition: all .15s;
+  width: 100%; background: none; border: 1px dashed rgba(255,255,255,.1);
+  color: var(--text-3); font-size: 11px; padding: 7px; border-radius: 8px;
+  cursor: pointer; transition: all .15s; font-family: inherit;
 }
-.col-add-btn:hover { border-color: var(--border2); color: var(--text-2); background: var(--surface3); }
+.col-add-btn:hover { border-color: var(--border2); color: var(--text-2); background: var(--surface4); }
 
-/* Drop zone */
-.kanban-col.drag-target { border-color: #03fafa55; background: rgba(3,250,250,.04); }
+/* Drop target */
+.kanban-col.drag-target { border-color: rgba(3,250,250,.35); background: rgba(3,250,250,.03); }
+
+/* Empty column */
+.col-empty {
+  padding: 30px 12px; text-align: center;
+  color: var(--text-3); font-size: 11px;
+}
+.col-empty-icon { font-size: 26px; margin-bottom: 8px; opacity: .5; }
 
 /* ── Table / Backlog view ────────────────────── */
-.table-wrap { padding: 0 24px 40px; display: none; }
+.table-wrap { padding: 0 28px 50px; display: none; }
 .backlog-table {
   width: 100%; border-collapse: collapse; font-size: 12.5px;
   margin-top: 16px;
 }
 .backlog-table thead th {
-  padding: 10px 14px;
+  padding: 11px 14px;
   background: var(--surface2);
   color: var(--text-2); font-weight: 700; font-size: 11px;
   text-transform: uppercase; letter-spacing: .04em;
   border-bottom: 1px solid var(--border);
-  text-align: left;
-  position: sticky; top: 56px; z-index: 5;
-  cursor: pointer; user-select: none;
-  white-space: nowrap;
+  text-align: left; position: sticky; top: 58px; z-index: 5;
+  cursor: pointer; user-select: none; white-space: nowrap;
 }
 .backlog-table thead th:hover { color: var(--text-1); }
-.backlog-table thead th .sort-icon { opacity: .4; font-size: 10px; }
-.backlog-table thead th.sorted .sort-icon { opacity: 1; color: #03fafa; }
+.sort-icon { opacity: .4; font-size: 10px; }
+.sorted .sort-icon { opacity: 1; color: #03fafa; }
 
 .backlog-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  cursor: pointer; transition: background .12s;
+  border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s;
 }
-.backlog-table tbody tr:hover { background: rgba(255,255,255,.03); }
-
+.backlog-table tbody tr:hover { background: rgba(255,255,255,.025); }
 .backlog-table td { padding: 10px 14px; vertical-align: middle; }
-.td-id { color: var(--text-3); font-size: 11px; font-weight: 700; width: 52px; }
-.td-name { font-weight: 500; color: var(--text-1); max-width: 340px; }
-.td-name small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
-.td-pri { width: 56px; }
+.td-id { color: var(--text-3); font-size: 11px; font-weight: 700; width: 52px; white-space: nowrap; }
+.td-name { font-weight: 500; color: var(--text-1); max-width: 360px; }
+.td-name small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; }
+.td-pri { width: 60px; }
 .td-owner { color: var(--text-2); font-size: 12px; white-space: nowrap; }
-.td-status { width: 120px; }
+.td-status { width: 130px; }
 .status-chip {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
 }
-.status-chip.s-ns   { background: rgba(85,94,138,.2); color: var(--c-backlog); }
-.status-chip.s-ip   { background: rgba(253,171,61,.15); color: var(--c-prog); }
-.status-chip.s-ir   { background: rgba(167,139,250,.15); color: var(--c-review); }
-.status-chip.s-done { background: rgba(0,200,117,.15); color: var(--c-done); }
+.status-chip.s-ns   { background: rgba(85,94,138,.18); color: var(--c-backlog); }
+.status-chip.s-ip   { background: rgba(253,171,61,.14); color: var(--c-prog); }
+.status-chip.s-ir   { background: rgba(167,139,250,.14); color: var(--c-review); }
+.status-chip.s-done { background: rgba(0,200,117,.14); color: var(--c-done); }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; }
-
-.td-pct { width: 90px; }
+.td-pct { width: 100px; }
 .pct-wrap { display: flex; align-items: center; gap: 7px; }
 .pct-bar { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
 .pct-fill { height: 100%; border-radius: 2px; }
 .pct-label { font-size: 10px; color: var(--text-2); font-weight: 600; min-width: 28px; text-align: right; }
 
 .group-header td {
-  padding: 12px 14px 6px;
-  font-size: 11px; font-weight: 700; color: var(--text-3);
+  padding: 14px 14px 6px;
+  font-size: 10.5px; font-weight: 700; color: var(--text-3);
   text-transform: uppercase; letter-spacing: .06em;
-  background: var(--surface);
-  border-bottom: none !important;
+  background: var(--surface); border-bottom: none !important;
 }
-.group-header td span {
-  display: inline-flex; align-items: center; gap: 8px;
-}
+.group-header td span { display: inline-flex; align-items: center; gap: 8px; }
 .group-count {
   font-size: 10px; padding: 1px 7px; border-radius: 10px;
-  background: rgba(255,255,255,.07); color: var(--text-3);
-  font-weight: 600;
+  background: rgba(255,255,255,.07); color: var(--text-3); font-weight: 600;
 }
 
-/* ── Empty column ────────────────────────────── */
-.col-empty {
-  padding: 24px 12px; text-align: center;
-  color: var(--text-3); font-size: 11px;
-}
-.col-empty-icon { font-size: 22px; margin-bottom: 6px; }
-
-/* ── Card modal (quick detail) ───────────────── */
+/* ── Card detail modal ───────────────────────── */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 500;
-  background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
-  display: none; align-items: center; justify-content: center;
-  padding: 24px;
+  background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 24px;
 }
 .modal-overlay.open { display: flex; }
 .modal-box {
   background: var(--surface2);
-  border: 1px solid var(--border2);
-  border-radius: 14px;
-  width: 100%; max-width: 560px;
-  max-height: 80vh; overflow-y: auto;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  width: 100%; max-width: 580px;
+  max-height: 82vh; overflow-y: auto;
   position: relative;
-  box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  box-shadow: 0 30px 70px rgba(0,0,0,.7);
 }
 .modal-box::before {
   content: '';
-  position: absolute; inset: -6px; border-radius: 20px;
-  background: var(--rainbow); filter: blur(8px); z-index: -1; opacity: .3;
+  position: absolute; inset: -7px; border-radius: 23px;
+  background: var(--rainbow); filter: blur(10px); z-index: -1; opacity: .28;
+  pointer-events: none;
 }
 .modal-header {
-  padding: 20px 20px 14px;
+  padding: 22px 22px 16px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: flex-start; gap: 12px;
 }
-.modal-uc { font-size: 10px; font-weight: 800; color: var(--text-3); padding: 3px 8px; background: var(--surface3); border-radius: 5px; flex-shrink:0; margin-top:2px; }
-.modal-title { font-size: 15px; font-weight: 700; color: var(--text-1); flex: 1; line-height: 1.4; }
-.modal-close { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 18px; padding: 4px; flex-shrink:0; }
-.modal-close:hover { color: var(--text-1); }
-.modal-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
-.modal-row { display: flex; align-items: center; gap: 10px; }
-.modal-label { font-size: 11px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; min-width: 80px; }
-.modal-val { font-size: 13px; color: var(--text-1); }
-.modal-desc { font-size: 12px; color: var(--text-2); line-height: 1.6; padding: 10px 12px; background: var(--surface3); border-radius: 8px; border: 1px solid var(--border); }
-.modal-pct-wrap { flex: 1; }
-.modal-pct-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.06); overflow: hidden; margin-top: 4px; }
-.modal-open-btn {
-  display: block; width: 100%;
-  padding: 10px; border-radius: 8px; text-align: center;
-  background: rgba(3,250,250,.1); border: 1px solid rgba(3,250,250,.3);
-  color: #03fafa; font-size: 12px; font-weight: 600;
-  cursor: pointer; text-decoration: none; transition: all .15s;
+.modal-uc {
+  font-size: 10px; font-weight: 800; color: var(--text-3);
+  padding: 3px 8px; background: var(--surface3); border-radius: 5px;
+  flex-shrink: 0; margin-top: 3px; letter-spacing: .04em;
 }
-.modal-open-btn:hover { background: rgba(3,250,250,.18); }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text-1); flex: 1; line-height: 1.4; }
+.modal-close {
+  background: none; border: none; color: var(--text-3); cursor: pointer;
+  font-size: 18px; padding: 4px; flex-shrink: 0; border-radius: 6px;
+  transition: color .15s, background .15s; line-height: 1;
+}
+.modal-close:hover { color: var(--text-1); background: var(--surface4); }
+.modal-body { padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 13px; }
+.modal-row { display: flex; align-items: center; gap: 12px; }
+.modal-label {
+  font-size: 11px; color: var(--text-3); font-weight: 700;
+  text-transform: uppercase; letter-spacing: .05em; min-width: 85px; flex-shrink: 0;
+}
+.modal-val { font-size: 13px; color: var(--text-1); }
+.modal-desc {
+  font-size: 12.5px; color: var(--text-2); line-height: 1.65;
+  padding: 12px 14px; background: var(--surface3); border-radius: 9px;
+  border: 1px solid var(--border);
+}
+.modal-pct-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.06); overflow: hidden; margin-top: 6px; }
+.modal-open-btn {
+  display: block; width: 100%; padding: 11px;
+  border-radius: 9px; text-align: center;
+  background: rgba(3,250,250,.1); border: 1px solid rgba(3,250,250,.3);
+  color: #03fafa; font-size: 12.5px; font-weight: 700;
+  cursor: pointer; text-decoration: none; transition: all .15s; font-family: inherit;
+}
+.modal-open-btn:hover { background: rgba(3,250,250,.18); box-shadow: 0 4px 16px rgba(3,250,250,.15); }
+
+/* ── Assignee list badges ─────────────────────── */
+.assignee-list {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.assignee-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; color: var(--text-1);
+  border: 1px solid rgba(255,255,255,.1);
+}
 </style>
 </head>
 <body>
@@ -436,12 +484,15 @@ body {
 
 <!-- Header -->
 <header class="header">
-  <div class="header-logo">
-    <div class="header-logo-dot"></div>
-    MTN Fintech AI
+  <div class="header-brand">
+    <div class="brand-gem">🤖</div>
+    <div>
+      <div class="brand-name">MTN Fintech AI</div>
+      <div class="brand-sub">Intelligence Hub</div>
+    </div>
   </div>
   <div class="header-sep"></div>
-  <div class="board-name">🎯 AI Programme Board</div>
+  <div class="board-title">🎯 AI Programme Board</div>
   <div class="header-spacer"></div>
   <div class="view-toggle">
     <button class="view-btn active" id="btnKanban" onclick="setView('kanban')">
@@ -449,17 +500,20 @@ body {
       Kanban
     </button>
     <button class="view-btn" id="btnTable" onclick="setView('table')">
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="16" height="3" rx="1"/><rect x="0" y="5" width="16" height="3" rx="1"/><rect x="0" y="10" width="16" height="3" rx="1"/><rect x="0" y="15" width="16" height="1" rx="0.5"/></svg>
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="16" height="3" rx="1"/><rect x="0" y="5" width="16" height="3" rx="1"/><rect x="0" y="10" width="16" height="3" rx="1"/><rect x="0" y="14" width="16" height="2" rx="1"/></svg>
       Backlog
     </button>
   </div>
-  <a href="../index.html" class="back-btn">← Tracker</a>
+  <a href="../index.html" class="back-btn">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>
+    Tracker
+  </a>
 </header>
 
 <!-- Stats sub-header -->
 <div class="subheader">
   <div class="stat-pill active" id="pill-all" onclick="setFilter('all')">
-    <span class="stat-dot" style="background:#8b93c4"></span>
+    <span class="stat-dot" style="background:linear-gradient(90deg,#03fafa,#9878f1)"></span>
     All <span class="stat-val" id="cnt-all">0</span>
   </div>
   <div class="stat-pill" id="pill-ns" onclick="setFilter('Not started')">
@@ -487,44 +541,56 @@ body {
 
 <!-- Kanban view -->
 <div class="kanban-wrap" id="kanbanView">
-  <div class="kanban-col col-backlog" id="col-ns" ondragover="onDragOver(event,'Not started')" ondrop="onDrop(event,'Not started')" ondragleave="onDragLeave(event)">
+  <div class="kanban-col col-backlog" id="col-ns"
+    ondragover="onDragOver(event,'Not started')"
+    ondrop="onDrop(event,'Not started')"
+    ondragleave="onDragLeave(event)">
     <div class="col-header">
       <span class="col-icon">📋</span>
       <span class="col-title">Backlog</span>
       <span class="col-count" id="cnt-col-ns">0</span>
     </div>
     <div class="col-cards" id="cards-ns"></div>
-    <div class="col-footer"><button class="col-add-btn">+ Add item</button></div>
+    <div class="col-footer"><button class="col-add-btn">＋ Add item</button></div>
   </div>
 
-  <div class="kanban-col col-prog" id="col-ip" ondragover="onDragOver(event,'In progress')" ondrop="onDrop(event,'In progress')" ondragleave="onDragLeave(event)">
+  <div class="kanban-col col-prog" id="col-ip"
+    ondragover="onDragOver(event,'In progress')"
+    ondrop="onDrop(event,'In progress')"
+    ondragleave="onDragLeave(event)">
     <div class="col-header">
       <span class="col-icon">🚀</span>
       <span class="col-title">In Progress</span>
       <span class="col-count" id="cnt-col-ip">0</span>
     </div>
     <div class="col-cards" id="cards-ip"></div>
-    <div class="col-footer"><button class="col-add-btn">+ Add item</button></div>
+    <div class="col-footer"><button class="col-add-btn">＋ Add item</button></div>
   </div>
 
-  <div class="kanban-col col-review" id="col-ir" ondragover="onDragOver(event,'In review')" ondrop="onDrop(event,'In review')" ondragleave="onDragLeave(event)">
+  <div class="kanban-col col-review" id="col-ir"
+    ondragover="onDragOver(event,'In review')"
+    ondrop="onDrop(event,'In review')"
+    ondragleave="onDragLeave(event)">
     <div class="col-header">
       <span class="col-icon">🔍</span>
       <span class="col-title">In Review</span>
       <span class="col-count" id="cnt-col-ir">0</span>
     </div>
     <div class="col-cards" id="cards-ir"></div>
-    <div class="col-footer"><button class="col-add-btn">+ Add item</button></div>
+    <div class="col-footer"><button class="col-add-btn">＋ Add item</button></div>
   </div>
 
-  <div class="kanban-col col-done" id="col-done" ondragover="onDragOver(event,'Done')" ondrop="onDrop(event,'Done')" ondragleave="onDragLeave(event)">
+  <div class="kanban-col col-done" id="col-done"
+    ondragover="onDragOver(event,'Done')"
+    ondrop="onDrop(event,'Done')"
+    ondragleave="onDragLeave(event)">
     <div class="col-header">
       <span class="col-icon">✅</span>
       <span class="col-title">Done</span>
       <span class="col-count" id="cnt-col-done">0</span>
     </div>
     <div class="col-cards" id="cards-done"></div>
-    <div class="col-footer"><button class="col-add-btn">+ Add item</button></div>
+    <div class="col-footer"><button class="col-add-btn">＋ Add item</button></div>
   </div>
 </div>
 
@@ -534,9 +600,9 @@ body {
     <thead>
       <tr>
         <th onclick="sortBy('id')">ID <span class="sort-icon" id="sort-id">↕</span></th>
-        <th onclick="sortBy('project')">Name <span class="sort-icon" id="sort-project">↕</span></th>
+        <th onclick="sortBy('project')">Use Case <span class="sort-icon" id="sort-project">↕</span></th>
         <th onclick="sortBy('priority')">Pri <span class="sort-icon" id="sort-priority">↕</span></th>
-        <th onclick="sortBy('owner')">Owner <span class="sort-icon" id="sort-owner">↕</span></th>
+        <th onclick="sortBy('owner')">Lead <span class="sort-icon" id="sort-owner">↕</span></th>
         <th onclick="sortBy('status')">Status <span class="sort-icon" id="sort-status">↕</span></th>
         <th onclick="sortBy('pct')">Progress <span class="sort-icon" id="sort-pct">↕</span></th>
       </tr>
@@ -567,20 +633,20 @@ body {
         <span class="modal-val" id="mOwner"></span>
       </div>
       <div class="modal-row">
-        <span class="modal-label">Assigned</span>
-        <span class="modal-val" id="mAssigned"></span>
+        <span class="modal-label">Assigned To</span>
+        <div id="mAssigned"></div>
       </div>
       <div class="modal-row" style="align-items:flex-start;flex-direction:column;gap:6px">
         <span class="modal-label">Progress</span>
-        <div class="modal-pct-wrap" style="width:100%">
-          <div style="display:flex;justify-content:space-between;font-size:12px">
+        <div style="width:100%">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
             <span style="color:var(--text-2)" id="mPctLabel">0%</span>
           </div>
           <div class="modal-pct-bar"><div id="mPctFill" style="height:100%;border-radius:3px;transition:width .3s"></div></div>
         </div>
       </div>
-      <div style="margin-top:4px">
-        <div class="modal-label" style="margin-bottom:6px">Description</div>
+      <div style="margin-top:2px">
+        <div class="modal-label" style="margin-bottom:7px">Description</div>
         <div class="modal-desc" id="mDesc"></div>
       </div>
       <a class="modal-open-btn" id="mOpenLink" href="../index.html">Open in Tracker →</a>
@@ -589,8 +655,41 @@ body {
 </div>
 
 <script>
-// ── Data ─────────────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────
 const STORE_KEY = 'fintech_projects_v70';
+const MALCOLM = 'Malcolm Govender';
+
+// Owner → avatar gradient + initials
+const OWNER_META = {
+  'Anupam': { bg: 'linear-gradient(135deg,#6366f1,#818cf8)', init: 'AN' },
+  'Stan':    { bg: 'linear-gradient(135deg,#ec4899,#f472b6)', init: 'ST' },
+  'Herman':  { bg: 'linear-gradient(135deg,#0ea5e9,#38bdf8)', init: 'HE' },
+  'Peter':   { bg: 'linear-gradient(135deg,#f59e0b,#fbbf24)', init: 'PE' },
+  'Malcolm': { bg: 'linear-gradient(135deg,#03fafa,#9878f1)', init: 'MG' },
+  'Malcolm Govender': { bg: 'linear-gradient(135deg,#03fafa,#9878f1)', init: 'MG' },
+};
+function ownerMeta(name) {
+  if (!name) return { bg: 'linear-gradient(135deg,#6366f1,#818cf8)', init: '?' };
+  const first = name.split(' ')[0];
+  return OWNER_META[name] || OWNER_META[first] || { bg: 'linear-gradient(135deg,#6366f1,#818cf8)', init: (name[0]||'?').toUpperCase() };
+}
+
+// Category from UC id range
+function ucCategory(r) {
+  const id = r.id;
+  if (id >= 1  && id <= 12) return { label: 'Quality Engineering', icon: '🧪' };
+  if (id === 13)             return { label: 'CI/CD',              icon: '⚙️' };
+  if (id === 14)             return { label: 'Delivery Mgmt',      icon: '📦' };
+  if (id >= 15 && id <= 16) return { label: 'Fraud & Copilot',    icon: '🛡️' };
+  if (id >= 17 && id <= 19) return { label: 'AIOps / Voice',      icon: '🔊' };
+  if (id >= 20 && id <= 24) return { label: 'Security & Intel',   icon: '🔐' };
+  if (id >= 25 && id <= 30) return { label: 'USSD Stack',         icon: '📟' };
+  if (id >= 31 && id <= 36) return { label: 'MoMo Consumer',      icon: '💳' };
+  if (id >= 37 && id <= 38) return { label: 'MoMo Merchant',      icon: '🏪' };
+  return { label: 'General', icon: '🗂️' };
+}
+
+// ── Data ─────────────────────────────────────────────────────
 let data = [];
 let activeFilter = 'all';
 let sortCol = 'id', sortAsc = true;
@@ -599,20 +698,13 @@ let dragId = null;
 function loadData() {
   try {
     const saved = localStorage.getItem(STORE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      data = parsed.data || [];
-    }
+    if (saved) { const p = JSON.parse(saved); data = p.data || []; }
   } catch(e) {}
-  // Fallback: try adjacent keys
   if (!data.length) {
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('fintech_projects_v'));
+    const keys = Object.keys(localStorage).filter(k=>k.startsWith('fintech_projects_v'));
     keys.sort().reverse();
     for (const k of keys) {
-      try {
-        const p = JSON.parse(localStorage.getItem(k));
-        if (p && p.data && p.data.length) { data = p.data; break; }
-      } catch(e) {}
+      try { const p = JSON.parse(localStorage.getItem(k)); if (p&&p.data&&p.data.length){data=p.data;break;} } catch(e){}
     }
   }
 }
@@ -633,32 +725,36 @@ function esc(s) {
 // ── Helpers ────────────────────────────────────────────────────
 function priClass(p) { return 'p'+(p||5); }
 function progColor(pct, status) {
-  if (status === 'Done') return '#00c875';
-  if (status === 'In progress') return '#fdab3d';
-  if (status === 'In review') return '#a78bfa';
+  if (status==='Done')        return '#00c875';
+  if (status==='In progress') return '#fdab3d';
+  if (status==='In review')   return '#a78bfa';
   return '#555e8a';
 }
 function statusClass(s) {
-  if (s==='Done') return 's-done';
+  if (s==='Done')        return 's-done';
   if (s==='In progress') return 's-ip';
-  if (s==='In review') return 's-ir';
+  if (s==='In review')   return 's-ir';
   return 's-ns';
 }
 function statusKlass(s) {
-  if (s==='Done') return 's-done';
+  if (s==='Done')        return 's-done';
   if (s==='In progress') return 's-prog';
-  if (s==='In review') return 's-review';
+  if (s==='In review')   return 's-review';
   return 's-backlog';
 }
-function initials(name) {
-  return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+// Who is assigned to this card (override in-progress → Malcolm)
+function getAssignee(r) {
+  if (r.status === 'In progress') return MALCOLM;
+  return r.assignedTo || r.owner || MALCOLM;
 }
+
 function getFiltered() {
   const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
   return data.filter(r => {
-    const matchFilter = activeFilter==='all' || r.status===activeFilter;
-    const matchQ = !q || r.project.toLowerCase().includes(q) || (r.owner||'').toLowerCase().includes(q) || String(r.id).includes(q);
-    return matchFilter && matchQ;
+    const mf = activeFilter==='all' || r.status===activeFilter;
+    const mq = !q || r.project.toLowerCase().includes(q) || (r.owner||'').toLowerCase().includes(q) || String(r.id).includes(q);
+    return mf && mq;
   });
 }
 
@@ -679,35 +775,40 @@ function updateStats() {
 function renderKanban() {
   const filtered = getFiltered();
   const cols = {
-    'Not started': { el: 'cards-ns',   cnt: 'cnt-col-ns' },
-    'In progress': { el: 'cards-ip',   cnt: 'cnt-col-ip' },
-    'In review':   { el: 'cards-ir',   cnt: 'cnt-col-ir' },
-    'Done':        { el: 'cards-done', cnt: 'cnt-col-done' },
+    'Not started': { el:'cards-ns',   cnt:'cnt-col-ns' },
+    'In progress': { el:'cards-ip',   cnt:'cnt-col-ip' },
+    'In review':   { el:'cards-ir',   cnt:'cnt-col-ir' },
+    'Done':        { el:'cards-done', cnt:'cnt-col-done' },
   };
+
   Object.entries(cols).forEach(([status, cfg]) => {
     const rows = filtered.filter(r=>r.status===status);
     document.getElementById(cfg.cnt).textContent = rows.length;
     const el = document.getElementById(cfg.el);
     if (!rows.length) {
-      el.innerHTML = `<div class="col-empty"><div class="col-empty-icon">${status==='Done'?'✅':status==='In progress'?'🚀':status==='In review'?'🔍':'📋'}</div>No items</div>`;
+      const icons = { 'Not started':'📋','In progress':'🚀','In review':'🔍','Done':'✅' };
+      el.innerHTML = `<div class="col-empty"><div class="col-empty-icon">${icons[status]||'📋'}</div>No items</div>`;
       return;
     }
     el.innerHTML = rows.map(r => {
-      const color = progColor(r.pct, r.status);
-      const short = r.project.length > 52 ? r.project.slice(0,51)+'…' : r.project;
+      const color    = progColor(r.pct, r.status);
+      const cat      = ucCategory(r);
+      const assignee = getAssignee(r);
+      const om       = ownerMeta(assignee);
       return `<div class="k-card ${statusKlass(r.status)}" draggable="true"
         data-id="${r.id}"
         ondragstart="onDragStart(event,${r.id})"
         onclick="openModal(${r.id})">
         <div class="k-card-top">
           <span class="k-uc-badge">UC-${r.id}</span>
-          <span class="k-title">${esc(short)}</span>
+          <span class="k-title">${esc(r.project)}</span>
           <span class="k-pri ${priClass(r.priority)}">P${r.priority}</span>
         </div>
+        <span class="k-category">${cat.icon} ${esc(cat.label)}</span>
         <div class="k-card-meta">
-          <span class="k-owner">
-            <span class="k-avatar">${esc(initials(r.assignedTo||r.owner))}</span>
-            ${esc((r.assignedTo||r.owner||'').split(' ')[0])}
+          <span class="k-assignee">
+            <span class="k-avatar" style="background:${om.bg}">${om.init}</span>
+            <span class="k-owner-name">${esc(assignee)}</span>
           </span>
           <span class="k-pct">${r.pct}%</span>
         </div>
@@ -728,7 +829,6 @@ function renderTable() {
     return sortAsc ? (va>vb?1:va<vb?-1:0) : (va<vb?1:va>vb?-1:0);
   });
 
-  // Group by owner when not sorted
   const groups = {};
   filtered.forEach(r => {
     const g = r.owner || 'Unassigned';
@@ -738,75 +838,34 @@ function renderTable() {
 
   let html = '';
   Object.entries(groups).forEach(([owner, rows]) => {
-    html += `<tr class="group-header"><td colspan="6"><span>${esc(owner)} <span class="group-count">${rows.length}</span></span></td></tr>`;
+    const om = ownerMeta(owner);
+    html += `<tr class="group-header"><td colspan="6"><span>
+      <span style="display:inline-flex;align-items:center;gap:7px;">
+        <span style="width:22px;height:22px;border-radius:50%;background:${om.bg};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;">${om.init}</span>
+        ${esc(owner)}
+      </span>
+      <span class="group-count">${rows.length}</span>
+    </span></td></tr>`;
     rows.forEach(r => {
       const color = progColor(r.pct, r.status);
-      const sc = statusClass(r.status);
-      const sLabel = r.status==='Not started'?'Backlog':r.status;
+      const sc    = statusClass(r.status);
+      const sLabel= r.status==='Not started'?'Backlog':r.status;
+      const sDot  = { 'Done':'#00c875','In progress':'#fdab3d','In review':'#a78bfa' }[r.status]||'#555e8a';
       html += `<tr onclick="openModal(${r.id})">
         <td class="td-id">UC-${r.id}</td>
-        <td class="td-name">${esc(r.project)}<small>${esc((r.desc||'').slice(0,80))}${r.desc&&r.desc.length>80?'…':''}</small></td>
+        <td class="td-name">${esc(r.project)}<small>${esc((r.desc||'').slice(0,90))}${r.desc&&r.desc.length>90?'…':''}</small></td>
         <td class="td-pri"><span class="k-pri ${priClass(r.priority)}">P${r.priority}</span></td>
-        <td class="td-owner">${esc((r.owner||'').split(' ')[0])}</td>
-        <td class="td-status">
-          <span class="status-chip ${sc}">
-            <span class="status-dot" style="background:${color}"></span>
-            ${esc(sLabel)}
-          </span>
-        </td>
-        <td class="td-pct">
-          <div class="pct-wrap">
-            <div class="pct-bar"><div class="pct-fill" style="width:${r.pct}%;background:${color}"></div></div>
-            <span class="pct-label">${r.pct}%</span>
-          </div>
-        </td>
+        <td class="td-owner">${esc(r.owner||'—')}</td>
+        <td class="td-status"><span class="status-chip ${sc}"><span class="status-dot" style="background:${sDot}"></span>${esc(sLabel)}</span></td>
+        <td class="td-pct"><div class="pct-wrap">
+          <div class="pct-bar"><div class="pct-fill" style="width:${r.pct}%;background:${color}"></div></div>
+          <span class="pct-label">${r.pct}%</span>
+        </div></td>
       </tr>`;
     });
   });
+
   document.getElementById('tableBody').innerHTML = html;
-
-  // Update sort icons
-  ['id','project','priority','owner','status','pct'].forEach(col => {
-    const el = document.getElementById('sort-'+col);
-    if (!el) return;
-    el.textContent = col===sortCol ? (sortAsc?'↑':'↓') : '↕';
-    el.closest('th').classList.toggle('sorted', col===sortCol);
-  });
-}
-
-function render() {
-  updateStats();
-  renderKanban();
-  renderTable();
-}
-
-// ── View toggle ─────────────────────────────────────────────
-let currentView = 'kanban';
-function setView(v) {
-  currentView = v;
-  document.getElementById('kanbanView').style.display = v==='kanban' ? 'flex' : 'none';
-  document.getElementById('tableView').style.display  = v==='table'  ? 'block': 'none';
-  document.getElementById('btnKanban').classList.toggle('active', v==='kanban');
-  document.getElementById('btnTable').classList.toggle('active', v==='table');
-}
-
-// ── Filter ───────────────────────────────────────────────────
-function setFilter(f) {
-  activeFilter = f;
-  ['all','ns','ip','ir','done'].forEach(id => {
-    document.getElementById('pill-'+id).classList.toggle('active', false);
-  });
-  const map = { 'all':'all','Not started':'ns','In progress':'ip','In review':'ir','Done':'done' };
-  const key = map[f] || 'all';
-  document.getElementById('pill-'+key).classList.add('active');
-  render();
-}
-
-// ── Sort ─────────────────────────────────────────────────────
-function sortBy(col) {
-  if (sortCol === col) sortAsc = !sortAsc;
-  else { sortCol = col; sortAsc = true; }
-  renderTable();
 }
 
 // ── Drag & drop ───────────────────────────────────────────────
@@ -817,47 +876,54 @@ function onDragStart(e, id) {
 function onDragOver(e, status) {
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
-  const colEl = document.getElementById('col-'+statusToKey(status));
-  if (colEl) colEl.classList.add('drag-target');
+  e.currentTarget.classList.add('drag-target');
 }
 function onDragLeave(e) {
-  document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-target'));
+  e.currentTarget.classList.remove('drag-target');
 }
-function onDrop(e, newStatus) {
+function onDrop(e, status) {
   e.preventDefault();
-  document.querySelectorAll('.kanban-col').forEach(c => c.classList.remove('drag-target'));
-  if (!dragId) return;
-  const r = data.find(x => x.id === dragId);
-  if (!r || r.status === newStatus) return;
-  r.status = newStatus;
-  // Auto-update pct on status change
-  if (newStatus === 'Done' && r.pct < 100) r.pct = 100;
-  if (newStatus === 'Not started' && r.pct === 100) r.pct = 0;
-  saveData();
-  render();
+  e.currentTarget.classList.remove('drag-target');
+  if (dragId === null) return;
+  const r = data.find(x=>x.id===dragId);
+  if (r) {
+    r.status = status;
+    if (status === 'Done') r.pct = 100;
+    saveData();
+    render();
+  }
   dragId = null;
-}
-function statusToKey(s) {
-  if (s==='Not started') return 'ns';
-  if (s==='In progress') return 'ip';
-  if (s==='In review')   return 'ir';
-  return 'done';
 }
 
 // ── Modal ─────────────────────────────────────────────────────
 function openModal(id) {
-  const r = data.find(x => x.id === id);
+  const r = data.find(x=>x.id===id);
   if (!r) return;
-  const color = progColor(r.pct, r.status);
-  document.getElementById('mUcId').textContent    = 'UC-'+r.id;
+  const color    = progColor(r.pct, r.status);
+  const assignee = getAssignee(r);
+  const om       = ownerMeta(assignee);
+  const cat      = ucCategory(r);
+  const sLabel   = r.status==='Not started'?'Backlog':r.status;
+  const sDot     = { 'Done':'#00c875','In progress':'#fdab3d','In review':'#a78bfa' }[r.status]||'#555e8a';
+  const sc       = statusClass(r.status);
+
+  document.getElementById('mUcId').textContent    = `UC-${r.id}`;
   document.getElementById('mTitle').textContent   = r.project;
-  document.getElementById('mStatus').innerHTML    = `<span class="status-chip ${statusClass(r.status)}" style="padding:3px 9px;font-size:11px"><span class="status-dot" style="background:${color};width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px"></span>${r.status==='Not started'?'Backlog':r.status}</span>`;
-  document.getElementById('mPri').innerHTML       = `<span class="k-pri ${priClass(r.priority)}" style="padding:3px 8px;font-size:11px;border-radius:4px">P${r.priority} · ${r.priority===1?'Critical':r.priority===2?'High':r.priority===3?'Medium':'Low'}</span>`;
+  document.getElementById('mStatus').innerHTML    = `<span class="status-chip ${sc}"><span class="status-dot" style="background:${sDot}"></span>${sLabel}</span>`;
+  document.getElementById('mPri').innerHTML       = `<span class="k-pri ${priClass(r.priority)}">P${r.priority}</span>`;
   document.getElementById('mOwner').textContent   = r.owner || '—';
-  document.getElementById('mAssigned').textContent= r.assignedTo || r.owner || '—';
-  document.getElementById('mPctLabel').textContent= r.pct + '% complete';
-  document.getElementById('mPctFill').style.cssText = `width:${r.pct}%;background:${color};border-radius:3px`;
-  document.getElementById('mDesc').textContent    = (r.desc||'No description.').slice(0,320)+(r.desc&&r.desc.length>320?'…':'');
+  document.getElementById('mAssigned').innerHTML  = `<div class="assignee-list">
+    <span class="assignee-badge" style="background:rgba(3,250,250,.08);border-color:rgba(3,250,250,.2);">
+      <span class="k-avatar" style="background:${om.bg}">${om.init}</span>
+      ${esc(assignee)}
+    </span>
+    <span class="k-category">${cat.icon} ${esc(cat.label)}</span>
+  </div>`;
+  document.getElementById('mPctLabel').textContent= `${r.pct}% complete`;
+  document.getElementById('mPctFill').style.cssText= `width:${r.pct}%;background:${color};border-radius:3px;transition:width .4s`;
+  document.getElementById('mDesc').textContent    = r.desc || 'No description available.';
+  document.getElementById('mOpenLink').href       = '../index.html';
+
   document.getElementById('modal').classList.add('open');
 }
 function closeModal(e) {
@@ -867,30 +933,60 @@ function closeModalBtn() {
   document.getElementById('modal').classList.remove('open');
 }
 
+// ── Filter / sort / view ──────────────────────────────────────
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.stat-pill').forEach(p => p.classList.remove('active'));
+  const pillMap = { all:'pill-all','Not started':'pill-ns','In progress':'pill-ip','In review':'pill-ir','Done':'pill-done' };
+  const el = document.getElementById(pillMap[f]);
+  if (el) el.classList.add('active');
+  render();
+}
+
+function sortBy(col) {
+  sortAsc = sortCol===col ? !sortAsc : true;
+  sortCol = col;
+  document.querySelectorAll('.sort-icon').forEach(s=>s.textContent='↕');
+  document.getElementById(`sort-${col}`)&&(document.getElementById(`sort-${col}`).textContent = sortAsc?'↑':'↓');
+  document.querySelectorAll('thead th').forEach(th=>th.classList.remove('sorted'));
+  renderTable();
+}
+
+function setView(v) {
+  document.getElementById('kanbanView').style.display = v==='kanban' ? 'flex' : 'none';
+  document.getElementById('tableView').style.display  = v==='table'  ? 'block' : 'none';
+  document.getElementById('btnKanban').classList.toggle('active', v==='kanban');
+  document.getElementById('btnTable').classList.toggle('active',  v==='table');
+}
+
+function render() {
+  updateStats();
+  renderKanban();
+  renderTable();
+}
+
+// ── Init ──────────────────────────────────────────────────────
+loadData();
+render();
+
 // ── Cursor glow ───────────────────────────────────────────────
 (function() {
-  const g = document.getElementById('cg');
-  if (!g) return;
-  let raf = null, cx=0, cy=0;
-  function upd() { g.style.left=cx+'px'; g.style.top=cy+'px'; raf=null; }
+  const glow = document.getElementById('cg');
+  let rafId = null, cx = 0, cy = 0;
+  function upd() { glow.style.left=cx+'px'; glow.style.top=cy+'px'; rafId=null; }
   document.addEventListener('mousemove', e => {
-    cx=e.clientX; cy=e.clientY; g.style.opacity='1';
-    if (!raf) raf=requestAnimationFrame(upd);
+    cx=e.clientX; cy=e.clientY; glow.style.opacity='1';
+    if (!rafId) rafId=requestAnimationFrame(upd);
   }, {passive:true});
-  document.addEventListener('mouseleave', () => g.style.opacity='0');
+  document.addEventListener('mouseleave', () => { glow.style.opacity='0'; });
   document.addEventListener('click', e => {
-    const r=document.createElement('div');
+    const r = document.createElement('div');
     r.className='cursor-ripple';
     r.style.left=e.clientX+'px'; r.style.top=e.clientY+'px';
     document.body.appendChild(r);
     r.addEventListener('animationend', ()=>r.remove());
   }, {passive:true});
 })();
-
-// ── Init ──────────────────────────────────────────────────────
-loadData();
-render();
-setView('kanban');
 </script>
 </body>
 </html>
