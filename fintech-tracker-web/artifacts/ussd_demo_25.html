@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTN USSD AI Assistant — Interactive Demo</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:24px 16px 40px}
+
+/* Back button */
+.back-btn{position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);transition:all .2s}
+.back-btn:hover{background:rgba(99,102,241,.2);border-color:#6366f1}
+
+/* Header */
+.header{text-align:center;margin:0 0 28px;padding-top:8px}
+.header-badges{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}
+.badge-mtn{background:#ffcc00;color:#000;font-weight:900;font-size:13px;padding:4px 12px;border-radius:6px;letter-spacing:.5px}
+.badge-uc{background:rgba(99,102,241,.2);border:1px solid #6366f1;color:#a5b4fc;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.badge-live{background:rgba(52,211,153,.15);border:1px solid #34d399;color:#34d399;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:4px}
+.live-dot{width:6px;height:6px;background:#34d399;border-radius:50%;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.header h1{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px}
+.header p{color:#64748b;font-size:14px}
+
+/* Layout */
+.layout{display:flex;gap:32px;align-items:flex-start;max-width:940px;width:100%}
+
+/* Phone */
+.phone{width:295px;flex-shrink:0;background:linear-gradient(160deg,#2d2d2d,#1a1a1a);border-radius:50px;padding:14px;box-shadow:0 0 0 1.5px #3a3a3a,0 0 0 3px #2a2a2a,0 40px 100px rgba(0,0,0,.8),0 0 80px rgba(99,102,241,.1);position:relative}
+.phone::before{content:'';position:absolute;left:-3.5px;top:90px;width:3.5px;height:28px;background:#2a2a2a;border-radius:2px 0 0 2px;box-shadow:0 42px 0 #2a2a2a,0 84px 0 #2a2a2a}
+.phone::after{content:'';position:absolute;right:-3.5px;top:130px;width:3.5px;height:54px;background:#2a2a2a;border-radius:0 2px 2px 0}
+
+.screen{background:#000;border-radius:38px;overflow:hidden;position:relative}
+
+.island{width:88px;height:26px;background:#000;border-radius:20px;margin:10px auto 0;position:relative;z-index:5;box-shadow:0 0 0 1px #111}
+
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:5px 18px 4px;font-size:11px;font-weight:600;color:#fff}
+.s-time{font-size:13px;font-weight:700}
+.s-carrier{font-size:11px;color:#ffcc00;font-weight:800}
+.s-icons{display:flex;align-items:center;gap:5px}
+.signal{display:flex;align-items:flex-end;gap:1.5px}
+.signal span{background:#fff;border-radius:1px;width:3px}
+.signal span:nth-child(1){height:4px}
+.signal span:nth-child(2){height:7px}
+.signal span:nth-child(3){height:10px}
+.signal span:nth-child(4){height:13px}
+.bat{width:21px;height:11px;border:1.5px solid #fff;border-radius:2px;position:relative;padding:1.5px}
+.bat::after{content:'';position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:2px;height:5px;background:#fff;border-radius:0 1px 1px 0}
+.bat-fill{background:#4ade80;width:72%;height:100%;border-radius:1px}
+
+.screen-body{min-height:520px;display:flex;flex-direction:column}
+
+/* Lock */
+.s-lock{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(170deg,#000 0%,#001800 60%,#001200 100%);padding:20px;cursor:pointer;transition:background .3s;-webkit-tap-highlight-color:transparent}
+.s-lock:hover{background:linear-gradient(170deg,#000 0%,#002000 60%,#001800 100%)}
+.lock-logo{font-size:32px;font-weight:900;color:#ffcc00;letter-spacing:-1px}
+.lock-sub{color:#4ade80;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:32px}
+.lock-time{font-size:58px;font-weight:200;color:#fff;line-height:1;margin-bottom:6px;font-variant-numeric:tabular-nums}
+.lock-date{color:#64748b;font-size:12px;margin-bottom:40px}
+.lock-hint{color:#4ade80;font-size:11px;animation:pulse 2s infinite}
+
+/* Dialer */
+.s-dialer{flex:1;background:#060606;display:none;flex-direction:column}
+.dial-display{padding:20px 16px 12px;text-align:center;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dial-number{font-family:monospace;font-size:26px;color:#fff;letter-spacing:3px;min-height:36px}
+.dial-hint{color:#374151;font-size:11px;margin-top:4px}
+.dial-preset{background:#0d1a0d;border:1px solid #14532d;border-radius:8px;color:#4ade80;font-size:11px;padding:8px 16px;cursor:pointer;margin:0 14px 10px;width:calc(100% - 28px);text-align:center;transition:all .2s;font-weight:600}
+.dial-preset:hover{background:#14532d33;border-color:#22c55e}
+.dial-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#111;margin:0 14px;border-radius:12px;overflow:hidden}
+.dial-key{background:#111;padding:14px 6px;text-align:center;cursor:pointer;transition:background .1s;-webkit-tap-highlight-color:transparent;user-select:none}
+.dial-key:hover{background:#1a1a1a}
+.dial-key:active{background:#222}
+.k-num{font-size:22px;color:#fff;display:block;line-height:1}
+.k-let{font-size:7px;color:#555;letter-spacing:1px;display:block;margin-top:2px;font-weight:600}
+.dial-actions{display:flex;justify-content:space-around;align-items:center;padding:14px 16px 10px}
+.btn-call{background:#22c55e;border:none;border-radius:50%;width:58px;height:58px;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0}
+.btn-call:hover{background:#16a34a}
+.btn-del{background:none;border:none;color:#64748b;font-size:22px;cursor:pointer;padding:16px;transition:color .2s}
+.btn-del:hover{color:#94a3b8}
+
+/* USSD */
+.s-ussd{flex:1;background:#000e00;display:none;flex-direction:column}
+.ussd-hdr{background:#001400;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #00ff4118}
+.ussd-title{color:#4ade80;font-size:10px;font-family:monospace;font-weight:700;letter-spacing:.5px}
+.ussd-timer{color:#ef4444;font-size:11px;font-family:monospace;font-weight:800}
+.ussd-timer.warn{animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.ussd-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px;scroll-behavior:smooth}
+.ussd-msgs::-webkit-scrollbar{width:3px}
+.ussd-msgs::-webkit-scrollbar-track{background:transparent}
+.ussd-msgs::-webkit-scrollbar-thumb{background:#00ff4122;border-radius:2px}
+.msg-sys{background:#001800;border:1px solid #00ff4115;border-radius:7px;padding:8px 10px;font-family:monospace;font-size:11px;color:#00c835;white-space:pre-wrap}
+.msg-user{background:#002800;border:1px solid #00ff4130;border-radius:7px;padding:7px 10px;font-family:monospace;font-size:11px;color:#86efac;align-self:flex-end;max-width:90%}
+.msg-user::before{content:'▶ ';color:#4ade80}
+.msg-ai{background:#000e00;border:1px solid #4ade8030;border-radius:7px;padding:9px 10px;font-family:monospace;font-size:11px;color:#4ade80;white-space:pre-wrap}
+.intent-badge{display:inline-block;background:rgba(99,102,241,.25);border:1px solid rgba(99,102,241,.5);color:#a5b4fc;font-size:9px;padding:1px 7px;border-radius:10px;margin-bottom:5px;font-weight:700}
+.msg-think{display:flex;align-items:center;gap:6px;padding:8px 10px;color:#4ade8055;font-family:monospace;font-size:11px}
+.dots span{animation:dp 1.4s infinite;display:inline-block;font-size:14px}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,80%,100%{opacity:.2;transform:scale(.7)}40%{opacity:1;transform:scale(1)}}
+.char-count{font-size:9px;color:#374151;text-align:right;padding:0 10px 3px;font-family:monospace}
+.char-count.warn{color:#f59e0b}
+.char-count.over{color:#ef4444}
+.ussd-foot{background:#000e00;border-top:1px solid #00ff4115;padding:7px;display:flex;gap:5px}
+.ussd-input{flex:1;background:#001400;border:1px solid #00ff4125;border-radius:6px;color:#00ff41;font-family:monospace;font-size:12px;padding:7px 9px;outline:none;transition:border-color .2s}
+.ussd-input::placeholder{color:#00ff4130}
+.ussd-input:focus{border-color:#4ade80}
+.btn-send{background:#22c55e;border:none;border-radius:6px;color:#000;font-weight:800;font-size:12px;padding:7px 12px;cursor:pointer;transition:background .2s;flex-shrink:0}
+.btn-send:hover{background:#16a34a}
+.btn-end{background:#200000;border:1px solid #7f1d1d;border-radius:6px;color:#fca5a5;font-size:10px;padding:7px 9px;cursor:pointer;transition:all .2s;flex-shrink:0;font-weight:600}
+.btn-end:hover{background:#7f1d1d}
+
+.home-ind{background:#000;padding:8px 0 5px;display:flex;justify-content:center}
+.home-bar{width:110px;height:4px;background:#222;border-radius:2px}
+
+/* Right panel */
+.panel{flex:1;min-width:0}
+.p-title{font-size:17px;font-weight:800;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.p-title .dot{width:9px;height:9px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite}
+.sec-label{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+
+/* Quick actions */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px}
+.qa{background:#0f1f2e;border:1px solid #1e3a5f;border-radius:10px;padding:11px 13px;cursor:pointer;transition:all .2s;text-align:left}
+.qa:hover{background:#162d44;border-color:#6366f1;transform:translateY(-1px)}
+.qa-icon{font-size:22px;margin-bottom:5px;display:block}
+.qa-label{font-size:12px;font-weight:700;color:#e2e8f0;display:block}
+.qa-eg{font-size:10px;color:#64748b;margin-top:2px;font-family:monospace;display:block}
+
+/* Scenarios */
+.scenarios{margin-bottom:22px}
+.scen{width:100%;background:#0a1a0a;border:1px solid #14532d;border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;text-align:left}
+.scen:hover{background:#14532d25;border-color:#22c55e}
+.s-em{font-size:16px;flex-shrink:0}
+.s-info{flex:1}
+.s-name{font-size:12px;font-weight:700;color:#86efac;display:block}
+.s-cmd{font-size:10px;color:#4ade8066;font-family:monospace}
+.s-lang{font-size:9px;background:#1e3a2f;color:#4ade80;padding:2px 7px;border-radius:10px;flex-shrink:0;font-weight:700;border:1px solid #14532d}
+
+/* Info box */
+.info-box{background:#0f1f2e;border:1px solid #1e3a5f;border-radius:10px;padding:14px}
+.ib-title{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+.i-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.i-row:last-child{margin-bottom:0}
+.i-key{font-size:12px;color:#475569}
+.i-val{font-size:12px;font-weight:700;color:#e2e8f0;font-family:monospace}
+.i-val.green{color:#4ade80}
+.i-val.yellow{color:#fbbf24}
+.i-val.red{color:#f87171}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px}
+.dot-green{background:#22c55e}
+.dot-yellow{background:#fbbf24;animation:pulse .8s infinite}
+
+@media(max-width:720px){.layout{flex-direction:column;align-items:center}.panel{width:100%;max-width:340px}}
+</style>
+</head>
+<body>
+
+<a href="../" class="back-btn">← Back to Tracker</a>
+
+<div class="header">
+  <div class="header-badges">
+    <span class="badge-mtn">MTN</span>
+    <span class="badge-uc">UC25</span>
+    <span class="badge-live"><span class="live-dot"></span>Interactive Demo</span>
+  </div>
+  <h1>USSD AI Assistant</h1>
+  <p>Natural language over USSD · No internet required · 13 African markets</p>
+</div>
+
+<div class="layout">
+  <!-- ══ PHONE ══ -->
+  <div class="phone">
+    <div class="screen">
+      <div class="island"></div>
+      <div class="status-bar">
+        <span class="s-time" id="clock">10:24</span>
+        <span class="s-carrier">MTN</span>
+        <div class="s-icons">
+          <div class="signal"><span></span><span></span><span></span><span></span></div>
+          <div class="bat"><div class="bat-fill"></div></div>
+        </div>
+      </div>
+
+      <div class="screen-body">
+
+        <!-- LOCK -->
+        <div class="s-lock" id="sLock" onclick="showDialer()">
+          <div class="lock-logo">MTN</div>
+          <div class="lock-sub">MoMo · AI Assistant</div>
+          <div class="lock-time" id="lTime">10:24</div>
+          <div class="lock-date" id="lDate">Sunday, 10 May 2026</div>
+          <div class="lock-hint">Tap to start</div>
+        </div>
+
+        <!-- DIALER -->
+        <div class="s-dialer" id="sDialer">
+          <div class="dial-display">
+            <div class="dial-number" id="dNum"></div>
+            <div class="dial-hint">Enter number or USSD code</div>
+          </div>
+          <div class="dial-preset" onclick="autoFill()">✨ Dial *121*AI# — USSD AI Assistant</div>
+          <div class="dial-grid">
+            <div class="dial-key" onclick="kp('1')"><span class="k-num">1</span><span class="k-let">&nbsp;</span></div>
+            <div class="dial-key" onclick="kp('2')"><span class="k-num">2</span><span class="k-let">ABC</span></div>
+            <div class="dial-key" onclick="kp('3')"><span class="k-num">3</span><span class="k-let">DEF</span></div>
+            <div class="dial-key" onclick="kp('4')"><span class="k-num">4</span><span class="k-let">GHI</span></div>
+            <div class="dial-key" onclick="kp('5')"><span class="k-num">5</span><span class="k-let">JKL</span></div>
+            <div class="dial-key" onclick="kp('6')"><span class="k-num">6</span><span class="k-let">MNO</span></div>
+            <div class="dial-key" onclick="kp('7')"><span class="k-num">7</span><span class="k-let">PQRS</span></div>
+            <div class="dial-key" onclick="kp('8')"><span class="k-num">8</span><span class="k-let">TUV</span></div>
+            <div class="dial-key" onclick="kp('9')"><span class="k-num">9</span><span class="k-let">WXYZ</span></div>
+            <div class="dial-key" onclick="kp('*')"><span class="k-num">*</span><span class="k-let">&nbsp;</span></div>
+            <div class="dial-key" onclick="kp('0')"><span class="k-num">0</span><span class="k-let">+</span></div>
+            <div class="dial-key" onclick="kp('#')"><span class="k-num">#</span><span class="k-let">&nbsp;</span></div>
+          </div>
+          <div class="dial-actions">
+            <div style="width:58px"></div>
+            <button class="btn-call" onclick="callUSSD()">📞</button>
+            <button class="btn-del" onclick="kd()">⌫</button>
+          </div>
+        </div>
+
+        <!-- USSD SESSION -->
+        <div class="s-ussd" id="sUssd">
+          <div class="ussd-hdr">
+            <div class="ussd-title">⚡ *121*AI# — MTN AI</div>
+            <div class="ussd-timer" id="uTimer">3:00</div>
+          </div>
+          <div class="ussd-msgs" id="uMsgs"></div>
+          <div class="char-count" id="charCnt">160 chars</div>
+          <div class="ussd-foot">
+            <input class="ussd-input" id="uInput" placeholder="Type your request…" maxlength="160"
+              onkeydown="if(event.key==='Enter')sendMsg()"
+              oninput="updateCC()"/>
+            <button class="btn-send" onclick="sendMsg()">Send</button>
+            <button class="btn-end" onclick="endSess()">End</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="home-ind"><div class="home-bar"></div></div>
+    </div>
+  </div>
+
+  <!-- ══ PANEL ══ -->
+  <div class="panel">
+    <div class="p-title"><span class="dot"></span>Demo Controls</div>
+
+    <div class="sec-label">Quick Actions — click to auto-send</div>
+    <div class="qa-grid">
+      <div class="qa" onclick="inject('send 500 to John')">
+        <span class="qa-icon">💸</span>
+        <span class="qa-label">Send Money</span>
+        <span class="qa-eg">send 500 to John</span>
+      </div>
+      <div class="qa" onclick="inject('check my balance')">
+        <span class="qa-icon">💰</span>
+        <span class="qa-label">Check Balance</span>
+        <span class="qa-eg">check my balance</span>
+      </div>
+      <div class="qa" onclick="inject('show last 5 transactions')">
+        <span class="qa-icon">📋</span>
+        <span class="qa-label">Transactions</span>
+        <span class="qa-eg">last 5 txns</span>
+      </div>
+      <div class="qa" onclick="inject('reset my PIN')">
+        <span class="qa-icon">🔐</span>
+        <span class="qa-label">PIN Reset</span>
+        <span class="qa-eg">reset my PIN</span>
+      </div>
+    </div>
+
+    <div class="sec-label">Demo Scenarios</div>
+    <div class="scenarios">
+      <div class="scen" onclick="inject('send 9500 to unknown')">
+        <span class="s-em">🚫</span>
+        <div class="s-info"><span class="s-name">Fraud Detection Block</span><span class="s-cmd">send 9500 to unknown</span></div>
+        <span class="s-lang">EN</span>
+      </div>
+      <div class="scen" onclick="inject('tuma 300 kwa Mary')">
+        <span class="s-em">🇰🇪</span>
+        <div class="s-info"><span class="s-name">Swahili — Tuma Pesa</span><span class="s-cmd">tuma 300 kwa Mary</span></div>
+        <span class="s-lang">SW</span>
+      </div>
+      <div class="scen" onclick="inject('vérifier mon solde')">
+        <span class="s-em">🇨🇮</span>
+        <div class="s-info"><span class="s-name">French — Vérifier Solde</span><span class="s-cmd">vérifier mon solde</span></div>
+        <span class="s-lang">FR</span>
+      </div>
+      <div class="scen" onclick="inject('send')">
+        <span class="s-em">🤔</span>
+        <div class="s-info"><span class="s-name">Slot-fill — Missing Info</span><span class="s-cmd">send (no amount or recipient)</span></div>
+        <span class="s-lang">EN</span>
+      </div>
+      <div class="scen" onclick="inject('envoyer 200 à Peter')">
+        <span class="s-em">🇨🇲</span>
+        <div class="s-info"><span class="s-name">French Send Money</span><span class="s-cmd">envoyer 200 à Peter</span></div>
+        <span class="s-lang">FR</span>
+      </div>
+      <div class="scen" onclick="inject('xyzabc??!!')">
+        <span class="s-em">❓</span>
+        <div class="s-info"><span class="s-name">NLU Fallback to Menu</span><span class="s-cmd">xyzabc??!! (gibberish)</span></div>
+        <span class="s-lang">EN</span>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <div class="ib-title">Live Session Info</div>
+      <div class="i-row"><span class="i-key">Account</span><span class="i-val">Malcolm G.</span></div>
+      <div class="i-row"><span class="i-key">MSISDN</span><span class="i-val">+27 83 123 4567</span></div>
+      <div class="i-row"><span class="i-key">Balance</span><span class="i-val green" id="dBal">R 1,250.75</span></div>
+      <div class="i-row"><span class="i-key">Market</span><span class="i-val">South Africa 🇿🇦</span></div>
+      <div class="i-row"><span class="i-key">NLU Engine</span><span class="i-val green"><span class="status-dot dot-green"></span>Online</span></div>
+      <div class="i-row"><span class="i-key">PayGuard</span><span class="i-val green"><span class="status-dot dot-green"></span>Active</span></div>
+      <div class="i-row"><span class="i-key">Last intent</span><span class="i-val yellow" id="dIntent">—</span></div>
+      <div class="i-row"><span class="i-key">Language</span><span class="i-val" id="dLang">—</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let sessActive=false,sessTimer=null,sessSeconds=180;
+let state='IDLE'; // IDLE LISTENING CONFIRM_SEND AWAIT_AMOUNT AWAIT_RECIP PIN_OTP PIN_NEW PAGINATING
+let pend={};
+let dNum='';
+
+const acct={
+  name:'Malcolm',bal:1250.75,cur:'R',
+  contacts:{
+    john:{name:'John Dlamini',msisdn:'27831110001'},
+    mary:{name:'Mary Okonkwo',msisdn:'27731110002'},
+    peter:{name:'Peter Mokoena',msisdn:'27761110003'},
+    sarah:{name:'Sarah Ndlovu',msisdn:'27831110004'},
+  },
+  txns:[
+    {date:'09 May',desc:'Rcvd from John',amt:+500},
+    {date:'08 May',desc:'Sent to Mary',amt:-200},
+    {date:'07 May',desc:'Airtime purchase',amt:-50},
+    {date:'06 May',desc:'MoMo top-up',amt:+1000},
+    {date:'05 May',desc:'Electricity bill',amt:-250},
+    {date:'04 May',desc:'Sent to Peter',amt:-150},
+    {date:'03 May',desc:'Rcvd from Sarah',amt:+300},
+    {date:'02 May',desc:'Data bundle',amt:-79},
+  ]
+};
+
+// ── Clock ──────────────────────────────────────────────────────────────────
+function tick(){
+  const n=new Date();
+  const t=n.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit',hour12:false});
+  document.getElementById('clock').textContent=t;
+  document.getElementById('lTime').textContent=t;
+  document.getElementById('lDate').textContent=n.toLocaleDateString('en-ZA',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+tick();setInterval(tick,1000);
+
+// ── Screens ────────────────────────────────────────────────────────────────
+function show(id){['sLock','sDialer','sUssd'].forEach(s=>{
+  const el=document.getElementById(s);
+  el.style.display=s===id?(s==='sLock'?'flex':'flex'):'none';
+  if(s===id&&(s==='sDialer'||s==='sLock'))el.style.flexDirection='column';
+})}
+function showDialer(){show('sDialer')}
+function showLock(){show('sLock')}
+function showUssd(){show('sUssd');setTimeout(()=>document.getElementById('uInput').focus(),100)}
+
+// ── Dialer ─────────────────────────────────────────────────────────────────
+function kp(k){dNum+=k;document.getElementById('dNum').textContent=dNum}
+function kd(){dNum=dNum.slice(0,-1);document.getElementById('dNum').textContent=dNum}
+function autoFill(){dNum='*121*AI#';document.getElementById('dNum').textContent=dNum}
+function callUSSD(){if(dNum)startSess()}
+
+// ── Session ────────────────────────────────────────────────────────────────
+function startSess(){
+  sessActive=true;sessSeconds=180;state='LISTENING';pend={};
+  showUssd();
+  document.getElementById('uMsgs').innerHTML='';
+  document.getElementById('dIntent').textContent='—';
+  document.getElementById('dLang').textContent='EN';
+  startTimer();
+  addSys('Connecting to MTN AI...');
+  setTimeout(()=>{
+    addAI('WELCOME',`Welcome to MTN AI, ${acct.name}!\n\nJust tell me what you need:\n• "send 200 to John"\n• "check my balance"\n• "last 5 transactions"\n• "reset my PIN"\n\nWhat can I do for you?`);
+  },900);
+}
+
+function startTimer(){
+  if(sessTimer)clearInterval(sessTimer);
+  sessTimer=setInterval(()=>{
+    sessSeconds--;
+    const m=Math.floor(sessSeconds/60),s=sessSeconds%60;
+    const el=document.getElementById('uTimer');
+    el.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+    if(sessSeconds<=30)el.classList.add('warn');
+    if(sessSeconds<=0)endSess(true);
+  },1000);
+}
+
+function endSess(timeout=false){
+  if(sessTimer)clearInterval(sessTimer);
+  sessActive=false;state='IDLE';
+  addAI(null,timeout
+    ?'Session timed out.\n\nDial *121*AI# to start a new session.'
+    :'Session ended. Thank you for using MTN AI!\n\nDial *121*AI# anytime.');
+  setTimeout(()=>{dNum='';document.getElementById('dNum').textContent='';},500);
+  setTimeout(showLock,2800);
+}
+
+// ── Messages ───────────────────────────────────────────────────────────────
+function addSys(t){ap('msg-sys',null,t)}
+function addUser(t){ap('msg-user',null,t)}
+function addAI(intent,t){
+  rmThink();
+  const el=document.createElement('div');
+  el.className='msg-ai';
+  let h='';
+  if(intent){h+=`<span class="intent-badge">⚡ ${intent}</span><br>`;setIntent(intent);}
+  el.innerHTML=h+esc(t);
+  document.getElementById('uMsgs').appendChild(el);
+  scroll();
+}
+function ap(cls,_,t){
+  const el=document.createElement('div');
+  el.className=cls;el.textContent=t;
+  document.getElementById('uMsgs').appendChild(el);scroll();
+}
+function addThink(){
+  const el=document.createElement('div');el.className='msg-think';el.id='think';
+  el.innerHTML='<span style="color:#4ade80;font-weight:700">AI</span> <span class="dots"><span>●</span><span>●</span><span>●</span></span>';
+  document.getElementById('uMsgs').appendChild(el);scroll();
+}
+function rmThink(){const e=document.getElementById('think');if(e)e.remove();}
+function scroll(){const m=document.getElementById('uMsgs');m.scrollTop=m.scrollHeight;}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}
+function setIntent(i){document.getElementById('dIntent').textContent=i;}
+
+// ── Char counter ───────────────────────────────────────────────────────────
+function updateCC(){
+  const inp=document.getElementById('uInput');
+  const r=160-inp.value.length;
+  const el=document.getElementById('charCnt');
+  el.textContent=r+' chars';
+  el.className='char-count'+(r<20?' warn':'')+(r<0?' over':'');
+}
+
+// ── NLU ────────────────────────────────────────────────────────────────────
+function classify(t){
+  const l=t.toLowerCase();
+  const amt=t.match(/(\d+(?:[.,]\d+)?)/);
+  const amount=amt?parseFloat(amt[1].replace(',','.')):null;
+  const rm=t.match(/(?:to|kwa|[àa]|pour)\s+([A-Za-zÀ-ÿ]+)/i);
+  const rname=rm?rm[1].toLowerCase():null;
+  const recip=rname?acct.contacts[rname]:null;
+
+  if(/send|tuma|envoyer|pay|transfer|payer/i.test(l))return{intent:'SEND',amount,recip,rname};
+  if(/balance|bakaa|solde|vérifier|kiasi|how much/i.test(l))return{intent:'BALANCE'};
+  if(/transaction|history|last|recent|txn|shughuli|historique|taarifa|statement/i.test(l)){
+    const cn=t.match(/(\d+)/);return{intent:'HISTORY',count:cn?parseInt(cn[1]):5};
+  }
+  if(/pin|password|reset|forgot|nywila|mot de passe/i.test(l))return{intent:'PIN'};
+  if(/help|aide|msaada|what can|menu|\?$|options/i.test(l))return{intent:'HELP'};
+  if(/stop|quit|exit|cancel|opt.?out|acha/i.test(l))return{intent:'OPTOUT'};
+  return{intent:'UNKNOWN'};
+}
+
+function detectLang(t){
+  if(/tuma|kwa|bakaa|pesa|msaada|acha|shughuli/i.test(t)){document.getElementById('dLang').textContent='SW 🇰🇪';return'Swahili';}
+  if(/envoyer|solde|vérifier|montant|historique|aide|arrête|[àáâãäé]/i.test(t)){document.getElementById('dLang').textContent='FR 🇨🇮';return'French';}
+  document.getElementById('dLang').textContent='EN 🇿🇦';return'English';
+}
+
+function isFraud(amount,recip){return amount>5000||(amount>1000&&!recip);}
+
+// ── Send message ───────────────────────────────────────────────────────────
+function sendMsg(){
+  const inp=document.getElementById('uInput');
+  const txt=inp.value.trim();
+  if(!txt||!sessActive)return;
+  inp.value='';updateCC();
+  addUser(txt);
+  sessSeconds=Math.max(sessSeconds,30);
+  setTimeout(()=>{addThink();setTimeout(()=>process(txt),600+Math.random()*500);},150);
+}
+
+function process(txt){
+  const lang=detectLang(txt);
+  if(lang!=='English')addSys('Language detected: '+lang);
+
+  // State handlers
+  if(state==='CONFIRM_SEND'){
+    if(/^1$|yes|confirm|ok|sure|yebo|ndio|oui|proceed/i.test(txt))doSend();
+    else{addAI(null,'Transfer cancelled.\n\nWhat else can I help you with?');state='LISTENING';pend={};}
+    return;
+  }
+  if(state==='AWAIT_AMOUNT'){
+    const am=txt.match(/(\d+(?:[.,]\d+)?)/);
+    if(am){pend.amount=parseFloat(am[1]);handleSend(pend);}
+    else addAI('SEND',`Please enter a valid amount.\nExample: "500" or "R200"`);
+    return;
+  }
+  if(state==='AWAIT_RECIP'){
+    const n=txt.toLowerCase().trim();
+    const r=acct.contacts[n]||Object.values(acct.contacts).find(c=>c.name.toLowerCase().includes(n));
+    if(r){pend.recip=r;pend.rname=r.name;handleSend(pend);}
+    else addAI('SEND',`Contact "${txt}" not found.\n\nAvailable:\n• John\n• Mary\n• Peter\n• Sarah\n\nOr enter a phone number:`);
+    return;
+  }
+  if(state==='PAGINATING'){
+    if(/^1$|next|more/i.test(txt))showPage(pend.page+1);
+    else{addAI(null,'OK. What else can I help you with?');state='LISTENING';}
+    return;
+  }
+  if(state==='PIN_OTP'){
+    if(/^\d{6}$/.test(txt))addAI('PIN_RESET','✓ OTP verified.\n\nEnter your new 5-digit PIN:'),state='PIN_NEW';
+    else addAI('PIN_RESET','Invalid OTP. Enter the 6-digit code sent to +27 83 *** 4567.\n\nOTP expires in 5 mins.');
+    return;
+  }
+  if(state==='PIN_NEW'){
+    if(/^\d{5}$/.test(txt)){
+      addAI('✅ PIN_RESET','PIN updated successfully!\n\n✓ New PIN is active immediately\n✓ Ref: PIN'+Date.now().toString().slice(-6)+'\n✓ SMS confirmation sent\n\nWhat else can I help you with?');
+      state='LISTENING';
+    }else addAI('PIN_RESET','PIN must be exactly 5 digits.\n\nEnter your new 5-digit PIN:');
+    return;
+  }
+
+  const r=classify(txt);
+  switch(r.intent){
+    case'SEND':handleSend(r);break;
+    case'BALANCE':handleBal();break;
+    case'HISTORY':handleHist(r.count);break;
+    case'PIN':handlePIN();break;
+    case'HELP':handleHelp();break;
+    case'OPTOUT':handleOpt();break;
+    default:addAI('NLU_FALLBACK',`I didn\'t quite get that.\n\nPlease choose:\n1. Send money\n2. Check balance\n3. View transactions\n4. Reset PIN\n5. Help\n\nOr type what you need:`);
+  }
+}
+
+// ── Intent handlers ────────────────────────────────────────────────────────
+function handleSend(d){
+  if(!d.amount&&!d.recip&&!d.rname){
+    state='AWAIT_AMOUNT';pend={};
+    addAI('SEND','I\'ll help you send money.\n\nHow much would you like to send?\n(e.g. "500" or "R200")');return;
+  }
+  if(!d.amount){
+    state='AWAIT_AMOUNT';pend={recip:d.recip,rname:d.rname};
+    addAI('SEND',`Send to ${d.recip?d.recip.name:d.rname}.\n\nHow much?`);return;
+  }
+  if(!d.recip&&!d.rname){
+    state='AWAIT_RECIP';pend={amount:d.amount};
+    addAI('SEND',`Send ${acct.cur}${d.amount}.\n\nWho should I send it to?`);return;
+  }
+  if(isFraud(d.amount,d.recip)){
+    addAI('⚠️ FRAUD_BLOCK',`Transaction BLOCKED\n\nPayGuard (UC16) risk engine flagged:\n• Amount: ${acct.cur}${d.amount}\n• Recipient: ${d.recip?d.recip.name:d.rname||'Unknown'}\n• Risk score: HIGH (unusual amount)\n\nTo proceed, call *135* or visit MTN store.\nRef: FRD-${Date.now().toString().slice(-6)}`);
+    state='LISTENING';return;
+  }
+  if(d.amount>acct.bal){
+    addAI('SEND',`Insufficient balance.\n\nYour balance: ${acct.cur}${acct.bal.toFixed(2)}\nAmount: ${acct.cur}${d.amount}\nShortfall: ${acct.cur}${(d.amount-acct.bal).toFixed(2)}\n\nWould you like to top up first?`);
+    state='LISTENING';return;
+  }
+  pend={amount:d.amount,recip:d.recip,rname:d.recip?d.recip.name:d.rname};
+  state='CONFIRM_SEND';
+  addAI('SEND — CONFIRM',`Please confirm:\n\nSend: ${acct.cur}${d.amount.toFixed(2)}\nTo: ${pend.rname}\nBalance after: ${acct.cur}${(acct.bal-d.amount).toFixed(2)}\n\nReply:\n1. Confirm\n2. Cancel`);
+}
+
+function doSend(){
+  acct.bal-=pend.amount;
+  acct.txns.unshift({date:'Now',desc:'Sent to '+pend.rname,amt:-pend.amount});
+  document.getElementById('dBal').textContent=`${acct.cur} ${acct.bal.toFixed(2)}`;
+  addAI('✅ SEND — SUCCESS',`Money Sent!\n\n✓ ${acct.cur}${pend.amount.toFixed(2)} → ${pend.rname}\n✓ New balance: ${acct.cur}${acct.bal.toFixed(2)}\n✓ Ref: TXN${Date.now().toString().slice(-8)}\n\nRecipient notified by SMS.\n\nWhat else can I do for you?`);
+  state='LISTENING';pend={};
+}
+
+function handleBal(){
+  addAI('CHECK_BALANCE',`Your MoMo Balance:\n\n${acct.cur} ${acct.bal.toFixed(2)}\n\nAs of ${new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'})}\n\nNeed anything else?`);
+}
+
+function handleHist(count){
+  const all=acct.txns.slice(0,Math.min(count||5,acct.txns.length));
+  const pp=3,pages=Math.ceil(all.length/pp);
+  pend={txns:all,pp,pages,page:0};
+  if(pages<=1){
+    let m=`Recent Transactions:\n\n`;
+    all.forEach(t=>{m+=`${t.date}: ${t.desc}\n  ${t.amt>0?'+':''}${acct.cur}${Math.abs(t.amt).toFixed(2)}\n`;});
+    m+=`\nBalance: ${acct.cur}${acct.bal.toFixed(2)}`;
+    addAI('TRANSACTION_HISTORY',m);
+  }else{state='PAGINATING';showPage(0);}
+}
+
+function showPage(p){
+  pend.page=p;
+  const {txns,pp,pages}=pend;
+  const sl=txns.slice(p*pp,(p+1)*pp);
+  let m=`Transactions (${p+1}/${pages}):\n\n`;
+  sl.forEach(t=>{m+=`${t.date}: ${t.desc}\n  ${t.amt>0?'+':''}${acct.cur}${Math.abs(t.amt).toFixed(2)}\n`;});
+  if(p+1<pages)m+=`\n1. Next page  2. Done`;
+  else{m+=`\nBalance: ${acct.cur}${acct.bal.toFixed(2)}`;state='LISTENING';}
+  addAI('TRANSACTION_HISTORY',m);
+}
+
+function handlePIN(){
+  state='PIN_OTP';
+  addAI('PIN_RESET',`PIN Reset\n\nFor security, a one-time code will be sent to +27 83 *** 4567.\n\nEnter the OTP you receive:\n(Check your SMS)`);
+  setTimeout(()=>addSys('OTP sent to +27 83 *** 4567'),800);
+}
+
+function handleHelp(){
+  addAI('HELP',`MTN AI Assistant — What I can do:\n\n💸 Send money\n   "send 200 to John"\n\n💰 Check balance\n   "what\'s my balance"\n\n📋 Transactions\n   "last 5 transactions"\n\n🔐 PIN\n   "reset my PIN"\n\n🌍 Languages:\n   English · Français · Kiswahili\n\nType STOP to end AI mode.`);
+}
+
+function handleOpt(){
+  addAI('OPT_OUT',`AI session ending.\n\nPreference saved. You can use *121# for standard USSD menu.\n\nDial *121*AI# anytime to return to AI mode.\n\nThanks for using MTN AI!`);
+  setTimeout(()=>endSess(),2200);
+}
+
+// ── Inject / scenarios ─────────────────────────────────────────────────────
+function inject(cmd){
+  if(!sessActive){
+    dNum='*121*AI#';
+    startSess();
+    setTimeout(()=>{
+      const inp=document.getElementById('uInput');
+      inp.value=cmd;updateCC();inp.focus();
+    },2200);
+  }else{
+    const inp=document.getElementById('uInput');
+    inp.value=cmd;updateCC();inp.focus();
+  }
+}
+</script>
+</body>
+</html>
