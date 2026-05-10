@@ -523,9 +523,10 @@ function renderTable(){
           </div>
         </td>
         <td class="td-assignee">
-          <div class="td-asn-inner">
+          <div class="td-asn-inner" style="flex-wrap:wrap;gap:6px;">
             <span class="td-av" style="background:${aom.bg};width:28px;height:28px;">${aom.init}</span>
             <span style="font-size:12px;font-weight:600;color:var(--t1);">${esc(assignee)}</span>
+            ${ob?`<span class="builder-pill">⚡ Builder</span>`:''}
           </div>
         </td>
         <td class="td-status"><span class="schip ${sc}"><span class="sdot" style="background:${sDot}"></span>${esc(sLabel)}</span></td>
@@ -555,6 +556,7 @@ function openDrawer(id){
   const artifacts=r.artifacts||[];
   const bv=r.bv||{};
   const descClean=(r.desc||'No description available.').replace(/\[.*?\]/g,'').trim();
+  const ob=isOB(r);
 
   document.getElementById('d-uc').textContent=`UC-${r.id}`;
   document.getElementById('d-title').textContent=r.project;
@@ -604,6 +606,7 @@ function openDrawer(id){
       <span class="schip ${sc}"><span class="sdot" style="background:${sDot}"></span>${sLabel}</span>
       <span class="pri-badge ${priCls(r.priority)}" style="font-size:11px;padding:3px 8px;">P${r.priority} Priority</span>
       <span class="card-cat">${cat.icon} ${cat.label}</span>
+      ${ob?`<span class="dwr-ob-badge">⚡ Owner · Builder</span>`:''}
     </div>
 
     <!-- Progress -->
@@ -619,6 +622,15 @@ function openDrawer(id){
     <div class="dwr-section">
       <div class="dwr-sec-title">👥 Team</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
+        ${ob?`
+        <div class="assignee-block" style="background:linear-gradient(135deg,rgba(3,250,250,.07),rgba(152,120,241,.07));border-color:rgba(3,250,250,.25);position:relative;overflow:hidden;">
+          <span class="av-lg" style="background:${ownerOm.bg};box-shadow:0 0 0 3px rgba(3,250,250,.2);">${ownerOm.init}</span>
+          <div style="flex:1;">
+            <div class="av-name">${esc(r.owner||'—')}</div>
+            <div class="av-role" style="color:var(--t3);">Use Case Lead</div>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;background:linear-gradient(90deg,rgba(3,250,250,.12),rgba(152,120,241,.12));border:1px solid rgba(3,250,250,.25);color:#03fafa;flex-shrink:0;">⚡ Building this</span>
+        </div>`:`
         <div class="assignee-block">
           <span class="av-lg" style="background:${ownerOm.bg}">${ownerOm.init}</span>
           <div><div class="av-name">${esc(r.owner||'—')}</div><div class="av-role">Use Case Lead</div></div>
@@ -627,6 +639,7 @@ function openDrawer(id){
           <span class="av-lg" style="background:${om.bg}">${om.init}</span>
           <div><div class="av-name">${esc(assignee)}</div><div class="av-role">Assigned To</div></div>
         </div>`:''}
+        `}
       </div>
     </div>
 
