@@ -6,986 +6,641 @@
 <title>AI Programme Board — MTN Group Fintech</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg:        #0b0d1a;
-  --surface:   #10132a;
-  --surface2:  #151830;
-  --surface3:  #1b1f38;
-  --surface4:  #20253f;
-  --border:    rgba(255,255,255,.07);
-  --border2:   rgba(255,255,255,.13);
-  --text-1:    #eaecff;
-  --text-2:    #8b93c4;
-  --text-3:    #515a85;
-  --radius:    12px;
-  --col-w:     320px;
+  --bg:       #0b0d1a;
+  --surface:  #10132a;
+  --s2:       #151830;
+  --s3:       #1b1f38;
+  --s4:       #20253f;
+  --border:   rgba(255,255,255,.07);
+  --b2:       rgba(255,255,255,.13);
+  --t1:       #eaecff;
+  --t2:       #8b93c4;
+  --t3:       #515a85;
+  --col-w:    360px;
+  --c-bl:     #555e8a;
+  --c-ip:     #fdab3d;
+  --c-ir:     #a78bfa;
+  --c-dn:     #00c875;
+  --rainbow:  linear-gradient(90deg,#03fafa 0%,#9878f1 50%,#6161ff 100%);
+}
+html,body{height:100%;}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden;}
 
-  --c-backlog: #555e8a;
-  --c-prog:    #fdab3d;
-  --c-review:  #a78bfa;
-  --c-done:    #00c875;
-  --c-p1:      #ef4444;
-  --c-p2:      #f97316;
-  --c-p3:      #fdab3d;
-  --c-p4:      #60a5fa;
-  --c-p5:      #8b93c4;
-  --rainbow:   linear-gradient(90deg, #03fafa 0%, #9878f1 50%, #6161ff 100%);
-}
+/* ── Cursor glow ── */
+#cg{position:fixed;width:380px;height:380px;border-radius:50%;pointer-events:none;z-index:9999;top:0;left:0;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(3,250,250,.06) 0%,rgba(152,120,241,.04) 35%,transparent 70%);opacity:0;transition:opacity .4s;will-change:left,top;}
+.ripple{position:fixed;width:100px;height:100px;border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%) scale(0);background:radial-gradient(circle,rgba(3,250,250,.28),rgba(152,120,241,.18),transparent 70%);animation:rpl 600ms linear forwards;}
+@keyframes rpl{0%{transform:translate(-50%,-50%) scale(0);opacity:1;filter:blur(0);}100%{transform:translate(-50%,-50%) scale(4.5);opacity:0;filter:blur(12px);}}
 
-html, body { height: 100%; }
-body {
-  font-family: Inter, system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text-1);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
+/* ── Header ── */
+.hdr{position:sticky;top:0;z-index:100;background:rgba(11,13,26,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:14px;}
+.hdr-gem{width:28px;height:28px;border-radius:8px;background:var(--rainbow);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 12px rgba(3,250,250,.22);flex-shrink:0;}
+.hdr-brand{font-size:13px;font-weight:800;letter-spacing:.02em;}
+.hdr-sub{font-size:10px;color:var(--t3);font-weight:500;}
+.hdr-sep{width:1px;height:22px;background:var(--b2);}
+.hdr-title{font-size:14px;font-weight:700;background:var(--rainbow);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hdr-space{flex:1;}
+.view-tog{display:flex;gap:2px;background:var(--s3);border:1px solid var(--border);border-radius:9px;padding:3px;}
+.vbtn{background:none;border:none;cursor:pointer;padding:5px 13px;border-radius:7px;font-size:12px;font-weight:600;color:var(--t2);transition:all .15s;display:flex;align-items:center;gap:5px;font-family:inherit;}
+.vbtn.active{background:var(--s2);color:var(--t1);box-shadow:0 1px 4px rgba(0,0,0,.5);}
+.vbtn:hover:not(.active){color:var(--t1);}
+.back{display:flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;background:var(--s3);border:1px solid var(--border);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .15s;}
+.back:hover{color:var(--t1);border-color:var(--b2);}
 
-/* ── Cursor glow ─────────────────────────────── */
-#cg {
-  position: fixed; width: 380px; height: 380px; border-radius: 50%;
-  pointer-events: none; z-index: 9999; top: 0; left: 0;
-  transform: translate(-50%,-50%);
-  background: radial-gradient(circle, rgba(3,250,250,.065) 0%, rgba(152,120,241,.045) 35%, transparent 70%);
-  opacity: 0; transition: opacity .4s; will-change: left, top;
-}
-.cursor-ripple {
-  position: fixed; width: 100px; height: 100px; border-radius: 50%;
-  pointer-events: none; z-index: 9998;
-  transform: translate(-50%,-50%) scale(0);
-  background: radial-gradient(circle, rgba(3,250,250,.3), rgba(152,120,241,.2), transparent 70%);
-  animation: ripple 600ms linear forwards;
-}
-@keyframes ripple {
-  0%   { transform: translate(-50%,-50%) scale(0);   opacity:1; filter:blur(0); }
-  100% { transform: translate(-50%,-50%) scale(4.5); opacity:0; filter:blur(12px); }
-}
+/* ── Sub-header ── */
+.sub{padding:10px 24px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.pill{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);font-weight:500;padding:5px 11px;border-radius:20px;background:var(--s3);border:1px solid var(--border);cursor:pointer;transition:all .15s;user-select:none;}
+.pill:hover{border-color:var(--b2);color:var(--t1);}
+.pill.active{border-color:rgba(3,250,250,.4);color:#03fafa;background:rgba(3,250,250,.08);}
+.pdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.pval{font-weight:800;color:var(--t1);}
+.sub-sep{flex:1;min-width:20px;}
+.srch{display:flex;align-items:center;gap:8px;background:var(--s3);border:1px solid var(--border);border-radius:9px;padding:6px 12px;transition:border-color .15s;}
+.srch:focus-within{border-color:rgba(3,250,250,.3);}
+.srch input{background:none;border:none;outline:none;color:var(--t1);font-size:12px;width:200px;font-family:inherit;}
+.srch input::placeholder{color:var(--t3);}
 
-/* ── Header ──────────────────────────────────── */
-.header {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(11,13,26,.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 28px;
-  height: 58px;
-  display: flex; align-items: center; gap: 16px;
-}
-.header-brand {
-  display: flex; align-items: center; gap: 9px;
-}
-.brand-gem {
-  width: 26px; height: 26px; border-radius: 7px;
-  background: var(--rainbow);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; flex-shrink: 0;
-  box-shadow: 0 2px 10px rgba(3,250,250,.25);
-}
-.brand-name {
-  font-size: 13px; font-weight: 800; letter-spacing: .02em; color: var(--text-1);
-}
-.brand-sub {
-  font-size: 10px; color: var(--text-3); font-weight: 500;
-}
-.header-sep { width: 1px; height: 22px; background: var(--border2); flex-shrink: 0; }
-.board-title {
-  font-size: 14px; font-weight: 700; color: var(--text-1);
-  background: var(--rainbow); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  white-space: nowrap;
-}
-.header-spacer { flex: 1; }
+/* ── Kanban ── */
+.board{padding:20px 24px 50px;display:flex;gap:14px;overflow-x:auto;min-height:calc(100vh - 116px);align-items:flex-start;}
+.board::-webkit-scrollbar{height:5px;}
+.board::-webkit-scrollbar-thumb{background:var(--s4);border-radius:3px;}
 
-.view-toggle {
-  display: flex; gap: 2px;
-  background: var(--surface3);
-  border: 1px solid var(--border);
-  border-radius: 9px; padding: 3px;
-}
-.view-btn {
-  background: none; border: none; cursor: pointer;
-  padding: 5px 13px; border-radius: 7px;
-  font-size: 12px; font-weight: 600; color: var(--text-2);
-  transition: all .15s; display: flex; align-items: center; gap: 5px;
-}
-.view-btn.active {
-  background: var(--surface2); color: var(--text-1);
-  box-shadow: 0 1px 4px rgba(0,0,0,.5);
-}
-.view-btn:hover:not(.active) { color: var(--text-1); }
+.col{flex-shrink:0;width:var(--col-w);background:var(--s2);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;max-height:calc(100vh - 136px);transition:border-color .2s;}
+.col::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:14px 14px 0 0;}
+.col{position:relative;}
+.col-bl::before{background:var(--c-bl);}
+.col-ip::before{background:linear-gradient(90deg,#fdab3d,#f97316);}
+.col-ir::before{background:linear-gradient(90deg,#a78bfa,#818cf8);}
+.col-dn::before{background:linear-gradient(90deg,#00c875,#00a86b);}
+.col.drag-on{border-color:rgba(3,250,250,.35);background:rgba(3,250,250,.03);}
 
-.back-btn {
-  display: flex; align-items: center; gap: 6px;
-  padding: 6px 13px; border-radius: 8px;
-  background: var(--surface3); border: 1px solid var(--border);
-  color: var(--text-2); font-size: 12px; font-weight: 500;
-  cursor: pointer; text-decoration: none; transition: all .15s;
-}
-.back-btn:hover { color: var(--text-1); border-color: var(--border2); background: var(--surface4); }
+.col-hdr{padding:14px 16px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--s2);border-radius:14px 14px 0 0;z-index:2;}
+.col-ico{font-size:15px;line-height:1;}
+.col-ttl{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;}
+.col-cnt{margin-left:auto;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.07);color:var(--t2);min-width:24px;text-align:center;}
+.col-bl .col-ttl{color:var(--c-bl);} .col-ip .col-ttl{color:var(--c-ip);} .col-ir .col-ttl{color:var(--c-ir);} .col-dn .col-ttl{color:var(--c-dn);}
 
-/* ── Sub-header ──────────────────────────────── */
-.subheader {
-  padding: 10px 28px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.stat-pill {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--text-2); font-weight: 500;
-  padding: 5px 11px; border-radius: 20px;
-  background: var(--surface3); border: 1px solid var(--border);
-  cursor: pointer; transition: all .15s; user-select: none;
-}
-.stat-pill:hover { border-color: var(--border2); color: var(--text-1); }
-.stat-pill.active { border-color: rgba(3,250,250,.4); color: #03fafa; background: rgba(3,250,250,.08); }
-.stat-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-.stat-val { font-weight: 800; color: var(--text-1); }
-.subheader-sep { flex: 1; min-width: 20px; }
-.search-box {
-  display: flex; align-items: center; gap: 8px;
-  background: var(--surface3); border: 1px solid var(--border);
-  border-radius: 9px; padding: 6px 12px;
-  transition: border-color .15s;
-}
-.search-box:focus-within { border-color: rgba(3,250,250,.3); }
-.search-box input {
-  background: none; border: none; outline: none;
-  color: var(--text-1); font-size: 12px; width: 200px;
-}
-.search-box input::placeholder { color: var(--text-3); }
+.col-body{padding:10px;display:flex;flex-direction:column;gap:9px;overflow-y:auto;flex:1;}
+.col-body::-webkit-scrollbar{width:4px;}
+.col-body::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px;}
 
-/* ── Kanban board ────────────────────────────── */
-.kanban-wrap {
-  padding: 20px 28px 50px;
-  display: flex; gap: 14px;
-  overflow-x: auto;
-  min-height: calc(100vh - 118px);
-  align-items: flex-start;
-}
-.kanban-wrap::-webkit-scrollbar { height: 6px; }
-.kanban-wrap::-webkit-scrollbar-thumb { background: var(--surface4); border-radius: 3px; }
+/* ── Card ── */
+.card{background:var(--s3);border:1px solid var(--border);border-radius:12px;padding:14px 14px 12px;cursor:pointer;transition:transform .15s,box-shadow .18s,border-color .15s;position:relative;overflow:hidden;user-select:none;}
+.card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;border-radius:12px 0 0 12px;}
+.card.s-bl::before{background:var(--c-bl);}
+.card.s-ip::before{background:linear-gradient(180deg,#fdab3d,#f97316);}
+.card.s-ir::before{background:linear-gradient(180deg,#a78bfa,#818cf8);}
+.card.s-dn::before{background:linear-gradient(180deg,#00c875,#00a86b);}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.55);border-color:var(--b2);}
+.card.drag-ov{border-color:rgba(3,250,250,.5);background:rgba(3,250,250,.06);}
 
-.kanban-col {
-  flex-shrink: 0;
-  width: var(--col-w);
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  display: flex; flex-direction: column;
-  max-height: calc(100vh - 138px);
-  position: relative;
-  transition: border-color .2s;
-}
-.kanban-col::before {
-  content: '';
-  position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  border-radius: 14px 14px 0 0;
-}
-.col-backlog::before { background: var(--c-backlog); }
-.col-prog::before    { background: linear-gradient(90deg, #fdab3d, #f97316); }
-.col-review::before  { background: linear-gradient(90deg, #a78bfa, #818cf8); }
-.col-done::before    { background: linear-gradient(90deg, #00c875, #00a86b); }
+/* Card header row */
+.card-top{display:flex;align-items:flex-start;gap:8px;padding-left:8px;margin-bottom:8px;}
+.uc-badge{flex-shrink:0;font-size:9px;font-weight:800;letter-spacing:.04em;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.08);color:var(--t2);border:1px solid rgba(255,255,255,.06);white-space:nowrap;margin-top:2px;}
+.card-title{font-size:13px;font-weight:700;color:var(--t1);line-height:1.45;flex:1;word-break:break-word;}
+.pri-badge{flex-shrink:0;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;white-space:nowrap;margin-top:2px;}
+.pri-badge.p1{background:rgba(239,68,68,.18);color:#ef4444;border:1px solid rgba(239,68,68,.25);}
+.pri-badge.p2{background:rgba(249,115,22,.18);color:#f97316;border:1px solid rgba(249,115,22,.25);}
+.pri-badge.p3{background:rgba(253,171,61,.15);color:#fdab3d;border:1px solid rgba(253,171,61,.2);}
+.pri-badge.p4{background:rgba(96,165,250,.15);color:#60a5fa;border:1px solid rgba(96,165,250,.2);}
+.pri-badge.p5{background:rgba(139,147,196,.12);color:#8b93c4;border:1px solid rgba(139,147,196,.18);}
 
-.col-header {
-  padding: 14px 16px 12px;
-  display: flex; align-items: center; gap: 9px;
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0;
-  background: var(--surface2);
-  border-radius: 14px 14px 0 0;
-  z-index: 2;
-}
-.col-icon { font-size: 15px; line-height: 1; }
-.col-title { font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
-.col-count {
-  margin-left: auto;
-  font-size: 11px; font-weight: 700;
-  padding: 2px 8px; border-radius: 10px;
-  background: rgba(255,255,255,.07); color: var(--text-2);
-  min-width: 24px; text-align: center;
-}
-.col-backlog .col-title { color: var(--c-backlog); }
-.col-prog .col-title    { color: var(--c-prog); }
-.col-review .col-title  { color: var(--c-review); }
-.col-done .col-title    { color: var(--c-done); }
+/* Description */
+.card-desc{padding-left:8px;font-size:11.5px;color:var(--t2);line-height:1.55;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 
-.col-cards {
-  padding: 10px;
-  display: flex; flex-direction: column; gap: 8px;
-  overflow-y: auto; flex: 1;
-}
-.col-cards::-webkit-scrollbar { width: 4px; }
-.col-cards::-webkit-scrollbar-thumb { background: var(--surface4); border-radius: 2px; }
+/* Category + divider */
+.card-cat{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--t3);padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05);margin-left:8px;margin-bottom:10px;}
 
-/* ── Kanban Card ─────────────────────────────── */
-.k-card {
-  background: var(--surface3);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 12px 13px;
-  cursor: pointer;
-  transition: transform .15s, box-shadow .18s, border-color .15s;
-  position: relative;
-  overflow: hidden;
-  user-select: none;
-}
-/* Status stripe left */
-.k-card::before {
-  content: '';
-  position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
-  border-radius: 11px 0 0 11px;
-}
-.k-card.s-backlog::before { background: var(--c-backlog); }
-.k-card.s-prog::before    { background: linear-gradient(180deg, #fdab3d, #f97316); }
-.k-card.s-review::before  { background: linear-gradient(180deg, #a78bfa, #818cf8); }
-.k-card.s-done::before    { background: linear-gradient(180deg, #00c875, #00a86b); }
-
-.k-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,.5);
-  border-color: var(--border2);
-}
-.k-card.drag-over { border-color: rgba(3,250,250,.5); background: rgba(3,250,250,.06); }
-.k-card[draggable]:active { opacity: .55; transform: scale(.98); }
-
-/* Card top row: badge + title + priority */
-.k-card-top {
-  display: flex; align-items: flex-start; gap: 8px;
-  margin-bottom: 9px;
-  padding-left: 6px; /* offset for left stripe */
-}
-.k-uc-badge {
-  flex-shrink: 0; margin-top: 2px;
-  font-size: 9px; font-weight: 800; letter-spacing: .04em;
-  padding: 2px 6px; border-radius: 4px;
-  background: rgba(255,255,255,.08); color: var(--text-2);
-  border: 1px solid rgba(255,255,255,.06);
-  white-space: nowrap;
-}
-.k-title {
-  font-size: 12.5px; font-weight: 600; color: var(--text-1);
-  line-height: 1.45; flex: 1;
-  /* Allow full text — no truncation */
-  word-break: break-word;
-}
-.k-pri {
-  flex-shrink: 0; margin-top: 2px;
-  font-size: 9px; font-weight: 800;
-  padding: 2px 6px; border-radius: 4px;
-  white-space: nowrap; letter-spacing: .02em;
-}
-.k-pri.p1 { background: rgba(239,68,68,.18);  color: #ef4444; border: 1px solid rgba(239,68,68,.25); }
-.k-pri.p2 { background: rgba(249,115,22,.18); color: #f97316; border: 1px solid rgba(249,115,22,.25); }
-.k-pri.p3 { background: rgba(253,171,61,.15); color: #fdab3d; border: 1px solid rgba(253,171,61,.2); }
-.k-pri.p4 { background: rgba(96,165,250,.15); color: #60a5fa; border: 1px solid rgba(96,165,250,.2); }
-.k-pri.p5 { background: rgba(139,147,196,.12); color: #8b93c4; border: 1px solid rgba(139,147,196,.18); }
-
-/* Category tag */
-.k-category {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 10px; font-weight: 600; color: var(--text-3);
-  padding: 2px 7px; border-radius: 4px;
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.05);
-  margin-left: 6px; margin-bottom: 8px;
-  letter-spacing: .02em;
-}
-
-/* Card meta row */
-.k-card-meta {
-  display: flex; align-items: center; gap: 8px;
-  margin-top: 9px; padding-left: 6px;
-}
-.k-assignee {
-  display: flex; align-items: center; gap: 6px;
-  flex: 1; min-width: 0;
-}
-.k-avatar {
-  width: 20px; height: 20px; border-radius: 50%;
-  font-size: 8px; font-weight: 700; color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 0 0 2px rgba(255,255,255,.08);
-}
-.k-owner-name {
-  font-size: 10.5px; color: var(--text-2); font-weight: 500;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.k-pct {
-  font-size: 11px; font-weight: 700; color: var(--text-2);
-  white-space: nowrap; flex-shrink: 0;
-}
+/* Assignee row */
+.card-footer{display:flex;align-items:center;gap:10px;padding:9px 8px 0;border-top:1px solid rgba(255,255,255,.05);margin-top:2px;}
+.assignee-row{display:flex;align-items:center;gap:7px;flex:1;min-width:0;}
+.av{width:22px;height:22px;border-radius:50%;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.1);}
+.assignee-name{font-size:11px;color:var(--t2);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pct-label{font-size:11px;font-weight:800;color:var(--t2);flex-shrink:0;}
+.artifacts-count{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:3px;flex-shrink:0;}
 
 /* Progress bar */
-.k-progress {
-  margin-top: 8px; margin-left: 6px;
-  height: 4px; border-radius: 2px;
-  background: rgba(255,255,255,.06); overflow: hidden;
-}
-.k-progress-fill {
-  height: 100%; border-radius: 2px; transition: width .4s ease;
-}
+.prog{margin-top:9px;height:4px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden;}
+.prog-fill{height:100%;border-radius:2px;transition:width .4s;}
 
 /* Column footer */
-.col-footer {
-  padding: 8px 10px; border-top: 1px solid var(--border);
-}
-.col-add-btn {
-  width: 100%; background: none; border: 1px dashed rgba(255,255,255,.1);
-  color: var(--text-3); font-size: 11px; padding: 7px; border-radius: 8px;
-  cursor: pointer; transition: all .15s; font-family: inherit;
-}
-.col-add-btn:hover { border-color: var(--border2); color: var(--text-2); background: var(--surface4); }
+.col-foot{padding:8px 10px;border-top:1px solid var(--border);}
+.add-btn{width:100%;background:none;border:1px dashed rgba(255,255,255,.1);color:var(--t3);font-size:11px;padding:7px;border-radius:8px;cursor:pointer;transition:all .15s;font-family:inherit;}
+.add-btn:hover{border-color:var(--b2);color:var(--t2);background:var(--s4);}
 
-/* Drop target */
-.kanban-col.drag-target { border-color: rgba(3,250,250,.35); background: rgba(3,250,250,.03); }
+.col-empty{padding:30px 12px;text-align:center;color:var(--t3);font-size:11px;}
+.col-empty-ico{font-size:28px;margin-bottom:8px;opacity:.4;}
 
-/* Empty column */
-.col-empty {
-  padding: 30px 12px; text-align: center;
-  color: var(--text-3); font-size: 11px;
-}
-.col-empty-icon { font-size: 26px; margin-bottom: 8px; opacity: .5; }
+/* ── Table view ── */
+.tbl-wrap{padding:0 24px 50px;display:none;}
+.btbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:16px;}
+.btbl thead th{padding:11px 14px;background:var(--s2);color:var(--t2);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);text-align:left;position:sticky;top:56px;z-index:5;cursor:pointer;user-select:none;white-space:nowrap;}
+.btbl thead th:hover{color:var(--t1);}
+.si{opacity:.4;font-size:10px;}
+.sorted .si{opacity:1;color:#03fafa;}
+.btbl tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s;}
+.btbl tbody tr:hover{background:rgba(255,255,255,.025);}
+.btbl td{padding:10px 14px;vertical-align:middle;}
+.td-id{color:var(--t3);font-size:11px;font-weight:700;width:52px;white-space:nowrap;}
+.td-name{font-weight:500;color:var(--t1);max-width:360px;}
+.td-name small{display:block;font-size:10px;color:var(--t3);font-weight:400;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:360px;}
+.td-owner{color:var(--t2);font-size:12px;white-space:nowrap;}
+.schip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.schip.s-ns{background:rgba(85,94,138,.18);color:var(--c-bl);}
+.schip.s-ip{background:rgba(253,171,61,.14);color:var(--c-ip);}
+.schip.s-ir{background:rgba(167,139,250,.14);color:var(--c-ir);}
+.schip.s-dn{background:rgba(0,200,117,.14);color:var(--c-dn);}
+.sdot{width:6px;height:6px;border-radius:50%;}
+.pct-wrap{display:flex;align-items:center;gap:7px;}
+.pct-bar{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden;}
+.pct-fill{height:100%;border-radius:2px;}
+.pct-lbl{font-size:10px;color:var(--t2);font-weight:600;min-width:28px;text-align:right;}
+.grp-hdr td{padding:14px 14px 6px;font-size:10.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;background:var(--surface);border-bottom:none!important;}
+.grp-hdr td span{display:inline-flex;align-items:center;gap:8px;}
+.grp-cnt{font-size:10px;padding:1px 7px;border-radius:10px;background:rgba(255,255,255,.07);color:var(--t3);font-weight:600;}
 
-/* ── Table / Backlog view ────────────────────── */
-.table-wrap { padding: 0 28px 50px; display: none; }
-.backlog-table {
-  width: 100%; border-collapse: collapse; font-size: 12.5px;
-  margin-top: 16px;
-}
-.backlog-table thead th {
-  padding: 11px 14px;
-  background: var(--surface2);
-  color: var(--text-2); font-weight: 700; font-size: 11px;
-  text-transform: uppercase; letter-spacing: .04em;
-  border-bottom: 1px solid var(--border);
-  text-align: left; position: sticky; top: 58px; z-index: 5;
-  cursor: pointer; user-select: none; white-space: nowrap;
-}
-.backlog-table thead th:hover { color: var(--text-1); }
-.sort-icon { opacity: .4; font-size: 10px; }
-.sorted .sort-icon { opacity: 1; color: #03fafa; }
+/* ── Detail drawer (slides in from right) ── */
+.drawer-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:none;}
+.drawer-overlay.open{display:block;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(600px,100vw);background:var(--s2);border-left:1px solid var(--b2);z-index:401;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow:hidden;}
+.drawer.open{transform:translateX(0);}
+.drawer-glow{position:absolute;top:-100px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(3,250,250,.05) 0%,rgba(152,120,241,.03) 50%,transparent 70%);pointer-events:none;}
 
-.backlog-table tbody tr {
-  border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s;
-}
-.backlog-table tbody tr:hover { background: rgba(255,255,255,.025); }
-.backlog-table td { padding: 10px 14px; vertical-align: middle; }
-.td-id { color: var(--text-3); font-size: 11px; font-weight: 700; width: 52px; white-space: nowrap; }
-.td-name { font-weight: 500; color: var(--text-1); max-width: 360px; }
-.td-name small { display: block; font-size: 10px; color: var(--text-3); font-weight: 400; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 360px; }
-.td-pri { width: 60px; }
-.td-owner { color: var(--text-2); font-size: 12px; white-space: nowrap; }
-.td-status { width: 130px; }
-.status-chip {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
-}
-.status-chip.s-ns   { background: rgba(85,94,138,.18); color: var(--c-backlog); }
-.status-chip.s-ip   { background: rgba(253,171,61,.14); color: var(--c-prog); }
-.status-chip.s-ir   { background: rgba(167,139,250,.14); color: var(--c-review); }
-.status-chip.s-done { background: rgba(0,200,117,.14); color: var(--c-done); }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; }
-.td-pct { width: 100px; }
-.pct-wrap { display: flex; align-items: center; gap: 7px; }
-.pct-bar { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.06); overflow: hidden; }
-.pct-fill { height: 100%; border-radius: 2px; }
-.pct-label { font-size: 10px; color: var(--text-2); font-weight: 600; min-width: 28px; text-align: right; }
+/* Drawer header */
+.dwr-hdr{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;flex-shrink:0;}
+.dwr-uc{font-size:10px;font-weight:800;color:var(--t3);padding:3px 8px;background:var(--s3);border-radius:5px;flex-shrink:0;margin-top:3px;letter-spacing:.05em;}
+.dwr-title{font-size:16px;font-weight:800;color:var(--t1);flex:1;line-height:1.4;}
+.dwr-close{background:none;border:none;color:var(--t3);cursor:pointer;font-size:20px;padding:4px 6px;border-radius:6px;flex-shrink:0;transition:color .15s,background .15s;line-height:1;font-family:inherit;}
+.dwr-close:hover{color:var(--t1);background:var(--s4);}
 
-.group-header td {
-  padding: 14px 14px 6px;
-  font-size: 10.5px; font-weight: 700; color: var(--text-3);
-  text-transform: uppercase; letter-spacing: .06em;
-  background: var(--surface); border-bottom: none !important;
-}
-.group-header td span { display: inline-flex; align-items: center; gap: 8px; }
-.group-count {
-  font-size: 10px; padding: 1px 7px; border-radius: 10px;
-  background: rgba(255,255,255,.07); color: var(--text-3); font-weight: 600;
-}
+/* Drawer body */
+.dwr-body{padding:0 22px 24px;overflow-y:auto;flex:1;}
+.dwr-body::-webkit-scrollbar{width:4px;}
+.dwr-body::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px;}
 
-/* ── Card detail modal ───────────────────────── */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 500;
-  background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
-  display: none; align-items: center; justify-content: center; padding: 24px;
-}
-.modal-overlay.open { display: flex; }
-.modal-box {
-  background: var(--surface2);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 16px;
-  width: 100%; max-width: 580px;
-  max-height: 82vh; overflow-y: auto;
-  position: relative;
-  box-shadow: 0 30px 70px rgba(0,0,0,.7);
-}
-.modal-box::before {
-  content: '';
-  position: absolute; inset: -7px; border-radius: 23px;
-  background: var(--rainbow); filter: blur(10px); z-index: -1; opacity: .28;
-  pointer-events: none;
-}
-.modal-header {
-  padding: 22px 22px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: flex-start; gap: 12px;
-}
-.modal-uc {
-  font-size: 10px; font-weight: 800; color: var(--text-3);
-  padding: 3px 8px; background: var(--surface3); border-radius: 5px;
-  flex-shrink: 0; margin-top: 3px; letter-spacing: .04em;
-}
-.modal-title { font-size: 16px; font-weight: 700; color: var(--text-1); flex: 1; line-height: 1.4; }
-.modal-close {
-  background: none; border: none; color: var(--text-3); cursor: pointer;
-  font-size: 18px; padding: 4px; flex-shrink: 0; border-radius: 6px;
-  transition: color .15s, background .15s; line-height: 1;
-}
-.modal-close:hover { color: var(--text-1); background: var(--surface4); }
-.modal-body { padding: 18px 22px 22px; display: flex; flex-direction: column; gap: 13px; }
-.modal-row { display: flex; align-items: center; gap: 12px; }
-.modal-label {
-  font-size: 11px; color: var(--text-3); font-weight: 700;
-  text-transform: uppercase; letter-spacing: .05em; min-width: 85px; flex-shrink: 0;
-}
-.modal-val { font-size: 13px; color: var(--text-1); }
-.modal-desc {
-  font-size: 12.5px; color: var(--text-2); line-height: 1.65;
-  padding: 12px 14px; background: var(--surface3); border-radius: 9px;
-  border: 1px solid var(--border);
-}
-.modal-pct-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.06); overflow: hidden; margin-top: 6px; }
-.modal-open-btn {
-  display: block; width: 100%; padding: 11px;
-  border-radius: 9px; text-align: center;
-  background: rgba(3,250,250,.1); border: 1px solid rgba(3,250,250,.3);
-  color: #03fafa; font-size: 12.5px; font-weight: 700;
-  cursor: pointer; text-decoration: none; transition: all .15s; font-family: inherit;
-}
-.modal-open-btn:hover { background: rgba(3,250,250,.18); box-shadow: 0 4px 16px rgba(3,250,250,.15); }
+/* Status bar row */
+.dwr-statusbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:14px 0 16px;border-bottom:1px solid var(--border);}
 
-/* ── Assignee list badges ─────────────────────── */
-.assignee-list {
-  display: flex; flex-wrap: wrap; gap: 6px;
-}
-.assignee-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px; border-radius: 20px;
-  font-size: 11px; font-weight: 600; color: var(--text-1);
-  border: 1px solid rgba(255,255,255,.1);
-}
+/* Section */
+.dwr-section{margin-top:18px;}
+.dwr-sec-title{font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.dwr-sec-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.05);}
+
+/* Description box */
+.desc-box{font-size:13px;color:var(--t2);line-height:1.7;padding:12px 14px;background:var(--s3);border-radius:10px;border:1px solid var(--border);}
+
+/* Progress section */
+.prog-big{margin-top:10px;}
+.prog-big-bar{height:8px;border-radius:4px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:6px;}
+.prog-big-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+.prog-pct-row{display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-top:5px;}
+
+/* Meta grid */
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.meta-item{background:var(--s3);border:1px solid var(--border);border-radius:9px;padding:11px 13px;}
+.meta-label{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
+.meta-val{font-size:13px;color:var(--t1);font-weight:600;display:flex;align-items:center;gap:7px;}
+
+/* Assignee block */
+.assignee-block{display:flex;align-items:center;gap:10px;background:var(--s3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;}
+.av-lg{width:36px;height:36px;border-radius:50%;font-size:13px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 3px rgba(255,255,255,.1);}
+.av-name{font-size:13px;font-weight:700;color:var(--t1);}
+.av-role{font-size:11px;color:var(--t3);margin-top:2px;}
+
+/* Artifacts */
+.artifacts-list{display:flex;flex-direction:column;gap:7px;}
+.artifact-row{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--s3);border:1px solid var(--border);border-radius:9px;text-decoration:none;transition:border-color .15s,background .15s;cursor:pointer;}
+.artifact-row:hover{border-color:rgba(3,250,250,.3);background:rgba(3,250,250,.04);}
+.art-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.art-label{font-size:12.5px;font-weight:600;color:var(--t1);flex:1;}
+.art-type{font-size:10px;color:var(--t3);margin-top:1px;}
+.art-arrow{color:var(--t3);font-size:14px;flex-shrink:0;}
+.artifact-row:hover .art-arrow{color:var(--t1);}
+
+/* Next steps */
+.nextsteps-box{font-size:12.5px;color:var(--t2);line-height:1.7;padding:12px 14px;background:var(--s3);border-radius:10px;border:1px solid var(--border);white-space:pre-wrap;}
+
+/* Business value */
+.bv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.bv-item{background:var(--s3);border:1px solid var(--border);border-radius:9px;padding:10px 13px;}
+.bv-label{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.bv-val{font-size:12.5px;color:var(--t1);font-weight:600;}
+.bv-impact-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;}
+.bv-impact-item{display:flex;gap:8px;font-size:12px;color:var(--t2);line-height:1.5;}
+.bv-impact-item::before{content:'›';color:var(--c-ir);font-weight:700;flex-shrink:0;}
+
+/* Open in tracker CTA */
+.cta{display:block;width:100%;padding:12px;border-radius:10px;text-align:center;background:rgba(3,250,250,.1);border:1px solid rgba(3,250,250,.3);color:#03fafa;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:all .15s;font-family:inherit;margin-top:18px;}
+.cta:hover{background:rgba(3,250,250,.18);box-shadow:0 4px 18px rgba(3,250,250,.15);}
+
+/* Tier badge */
+.tier-badge{display:inline-flex;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:700;}
+.tier-High{background:rgba(0,200,117,.15);color:#00c875;border:1px solid rgba(0,200,117,.25);}
+.tier-Medium{background:rgba(253,171,61,.15);color:#fdab3d;border:1px solid rgba(253,171,61,.25);}
+.tier-Low{background:rgba(139,147,196,.12);color:#8b93c4;border:1px solid rgba(139,147,196,.2);}
 </style>
 </head>
 <body>
 <div id="cg"></div>
 
-<!-- Header -->
-<header class="header">
-  <div class="header-brand">
-    <div class="brand-gem">🤖</div>
-    <div>
-      <div class="brand-name">MTN Fintech AI</div>
-      <div class="brand-sub">Intelligence Hub</div>
-    </div>
-  </div>
-  <div class="header-sep"></div>
-  <div class="board-title">🎯 AI Programme Board</div>
-  <div class="header-spacer"></div>
-  <div class="view-toggle">
-    <button class="view-btn active" id="btnKanban" onclick="setView('kanban')">
+<header class="hdr">
+  <div class="hdr-gem">🤖</div>
+  <div><div class="hdr-brand">MTN Fintech AI</div><div class="hdr-sub">Intelligence Hub</div></div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-title">🎯 AI Programme Board</div>
+  <div class="hdr-space"></div>
+  <div class="view-tog">
+    <button class="vbtn active" id="btnK" onclick="setView('kanban')">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="4" height="16" rx="1"/><rect x="6" y="0" width="4" height="12" rx="1"/><rect x="12" y="0" width="4" height="10" rx="1"/></svg>
       Kanban
     </button>
-    <button class="view-btn" id="btnTable" onclick="setView('table')">
+    <button class="vbtn" id="btnT" onclick="setView('table')">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><rect x="0" y="0" width="16" height="3" rx="1"/><rect x="0" y="5" width="16" height="3" rx="1"/><rect x="0" y="10" width="16" height="3" rx="1"/><rect x="0" y="14" width="16" height="2" rx="1"/></svg>
       Backlog
     </button>
   </div>
-  <a href="../index.html" class="back-btn">
+  <a href="../index.html" class="back">
     <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg>
     Tracker
   </a>
 </header>
 
-<!-- Stats sub-header -->
-<div class="subheader">
-  <div class="stat-pill active" id="pill-all" onclick="setFilter('all')">
-    <span class="stat-dot" style="background:linear-gradient(90deg,#03fafa,#9878f1)"></span>
-    All <span class="stat-val" id="cnt-all">0</span>
-  </div>
-  <div class="stat-pill" id="pill-ns" onclick="setFilter('Not started')">
-    <span class="stat-dot" style="background:var(--c-backlog)"></span>
-    Backlog <span class="stat-val" id="cnt-ns">0</span>
-  </div>
-  <div class="stat-pill" id="pill-ip" onclick="setFilter('In progress')">
-    <span class="stat-dot" style="background:var(--c-prog)"></span>
-    In Progress <span class="stat-val" id="cnt-ip">0</span>
-  </div>
-  <div class="stat-pill" id="pill-ir" onclick="setFilter('In review')">
-    <span class="stat-dot" style="background:var(--c-review)"></span>
-    In Review <span class="stat-val" id="cnt-ir">0</span>
-  </div>
-  <div class="stat-pill" id="pill-done" onclick="setFilter('Done')">
-    <span class="stat-dot" style="background:var(--c-done)"></span>
-    Done <span class="stat-val" id="cnt-done">0</span>
-  </div>
-  <div class="subheader-sep"></div>
-  <div class="search-box">
+<div class="sub">
+  <div class="pill active" id="pill-all" onclick="setFilter('all')"><span class="pdot" style="background:linear-gradient(90deg,#03fafa,#9878f1)"></span>All <span class="pval" id="cnt-all">0</span></div>
+  <div class="pill" id="pill-ns"   onclick="setFilter('Not started')"><span class="pdot" style="background:var(--c-bl)"></span>Backlog <span class="pval" id="cnt-ns">0</span></div>
+  <div class="pill" id="pill-ip"   onclick="setFilter('In progress')"><span class="pdot" style="background:var(--c-ip)"></span>In Progress <span class="pval" id="cnt-ip">0</span></div>
+  <div class="pill" id="pill-ir"   onclick="setFilter('In review')"><span class="pdot" style="background:var(--c-ir)"></span>In Review <span class="pval" id="cnt-ir">0</span></div>
+  <div class="pill" id="pill-dn"   onclick="setFilter('Done')"><span class="pdot" style="background:var(--c-dn)"></span>Done <span class="pval" id="cnt-dn">0</span></div>
+  <div class="sub-sep"></div>
+  <div class="srch">
     <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" opacity=".4"><path d="M11.742 10.344a6.5 6.5 0 10-1.397 1.398l3.85 3.85a1 1 0 001.415-1.415l-3.868-3.833zm-5.242 1.406a5 5 0 110-10 5 5 0 010 10z"/></svg>
-    <input type="text" id="searchInput" placeholder="Search use cases…" oninput="render()"/>
+    <input type="text" id="srchInput" placeholder="Search use cases…" oninput="render()"/>
   </div>
 </div>
 
-<!-- Kanban view -->
-<div class="kanban-wrap" id="kanbanView">
-  <div class="kanban-col col-backlog" id="col-ns"
-    ondragover="onDragOver(event,'Not started')"
-    ondrop="onDrop(event,'Not started')"
-    ondragleave="onDragLeave(event)">
-    <div class="col-header">
-      <span class="col-icon">📋</span>
-      <span class="col-title">Backlog</span>
-      <span class="col-count" id="cnt-col-ns">0</span>
-    </div>
-    <div class="col-cards" id="cards-ns"></div>
-    <div class="col-footer"><button class="col-add-btn">＋ Add item</button></div>
+<!-- Kanban -->
+<div class="board" id="boardView">
+  <div class="col col-bl" id="col-ns" ondragover="onDragOver(event,'Not started')" ondrop="onDrop(event,'Not started')" ondragleave="onDL(event)">
+    <div class="col-hdr"><span class="col-ico">📋</span><span class="col-ttl">Backlog</span><span class="col-cnt" id="cc-ns">0</span></div>
+    <div class="col-body" id="cards-ns"></div>
+    <div class="col-foot"><button class="add-btn">＋ Add item</button></div>
   </div>
-
-  <div class="kanban-col col-prog" id="col-ip"
-    ondragover="onDragOver(event,'In progress')"
-    ondrop="onDrop(event,'In progress')"
-    ondragleave="onDragLeave(event)">
-    <div class="col-header">
-      <span class="col-icon">🚀</span>
-      <span class="col-title">In Progress</span>
-      <span class="col-count" id="cnt-col-ip">0</span>
-    </div>
-    <div class="col-cards" id="cards-ip"></div>
-    <div class="col-footer"><button class="col-add-btn">＋ Add item</button></div>
+  <div class="col col-ip" id="col-ip" ondragover="onDragOver(event,'In progress')" ondrop="onDrop(event,'In progress')" ondragleave="onDL(event)">
+    <div class="col-hdr"><span class="col-ico">🚀</span><span class="col-ttl">In Progress</span><span class="col-cnt" id="cc-ip">0</span></div>
+    <div class="col-body" id="cards-ip"></div>
+    <div class="col-foot"><button class="add-btn">＋ Add item</button></div>
   </div>
-
-  <div class="kanban-col col-review" id="col-ir"
-    ondragover="onDragOver(event,'In review')"
-    ondrop="onDrop(event,'In review')"
-    ondragleave="onDragLeave(event)">
-    <div class="col-header">
-      <span class="col-icon">🔍</span>
-      <span class="col-title">In Review</span>
-      <span class="col-count" id="cnt-col-ir">0</span>
-    </div>
-    <div class="col-cards" id="cards-ir"></div>
-    <div class="col-footer"><button class="col-add-btn">＋ Add item</button></div>
+  <div class="col col-ir" id="col-ir" ondragover="onDragOver(event,'In review')" ondrop="onDrop(event,'In review')" ondragleave="onDL(event)">
+    <div class="col-hdr"><span class="col-ico">🔍</span><span class="col-ttl">In Review</span><span class="col-cnt" id="cc-ir">0</span></div>
+    <div class="col-body" id="cards-ir"></div>
+    <div class="col-foot"><button class="add-btn">＋ Add item</button></div>
   </div>
-
-  <div class="kanban-col col-done" id="col-done"
-    ondragover="onDragOver(event,'Done')"
-    ondrop="onDrop(event,'Done')"
-    ondragleave="onDragLeave(event)">
-    <div class="col-header">
-      <span class="col-icon">✅</span>
-      <span class="col-title">Done</span>
-      <span class="col-count" id="cnt-col-done">0</span>
-    </div>
-    <div class="col-cards" id="cards-done"></div>
-    <div class="col-footer"><button class="col-add-btn">＋ Add item</button></div>
+  <div class="col col-dn" id="col-dn" ondragover="onDragOver(event,'Done')" ondrop="onDrop(event,'Done')" ondragleave="onDL(event)">
+    <div class="col-hdr"><span class="col-ico">✅</span><span class="col-ttl">Done</span><span class="col-cnt" id="cc-dn">0</span></div>
+    <div class="col-body" id="cards-dn"></div>
+    <div class="col-foot"><button class="add-btn">＋ Add item</button></div>
   </div>
 </div>
 
-<!-- Backlog / Table view -->
-<div class="table-wrap" id="tableView">
-  <table class="backlog-table">
-    <thead>
-      <tr>
-        <th onclick="sortBy('id')">ID <span class="sort-icon" id="sort-id">↕</span></th>
-        <th onclick="sortBy('project')">Use Case <span class="sort-icon" id="sort-project">↕</span></th>
-        <th onclick="sortBy('priority')">Pri <span class="sort-icon" id="sort-priority">↕</span></th>
-        <th onclick="sortBy('owner')">Lead <span class="sort-icon" id="sort-owner">↕</span></th>
-        <th onclick="sortBy('status')">Status <span class="sort-icon" id="sort-status">↕</span></th>
-        <th onclick="sortBy('pct')">Progress <span class="sort-icon" id="sort-pct">↕</span></th>
-      </tr>
-    </thead>
-    <tbody id="tableBody"></tbody>
+<!-- Table view -->
+<div class="tbl-wrap" id="tableView">
+  <table class="btbl">
+    <thead><tr>
+      <th onclick="sortBy('id')">ID <span class="si" id="s-id">↕</span></th>
+      <th onclick="sortBy('project')">Use Case <span class="si" id="s-project">↕</span></th>
+      <th onclick="sortBy('priority')">Pri <span class="si" id="s-priority">↕</span></th>
+      <th onclick="sortBy('owner')">Lead <span class="si" id="s-owner">↕</span></th>
+      <th onclick="sortBy('status')">Status <span class="si" id="s-status">↕</span></th>
+      <th onclick="sortBy('pct')">Progress <span class="si" id="s-pct">↕</span></th>
+    </tr></thead>
+    <tbody id="tblBody"></tbody>
   </table>
 </div>
 
-<!-- Card detail modal -->
-<div class="modal-overlay" id="modal" onclick="closeModal(event)">
-  <div class="modal-box" id="modalBox">
-    <div class="modal-header">
-      <span class="modal-uc" id="mUcId"></span>
-      <span class="modal-title" id="mTitle"></span>
-      <button class="modal-close" onclick="closeModalBtn()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="modal-row">
-        <span class="modal-label">Status</span>
-        <span class="modal-val" id="mStatus"></span>
-      </div>
-      <div class="modal-row">
-        <span class="modal-label">Priority</span>
-        <span class="modal-val" id="mPri"></span>
-      </div>
-      <div class="modal-row">
-        <span class="modal-label">Owner</span>
-        <span class="modal-val" id="mOwner"></span>
-      </div>
-      <div class="modal-row">
-        <span class="modal-label">Assigned To</span>
-        <div id="mAssigned"></div>
-      </div>
-      <div class="modal-row" style="align-items:flex-start;flex-direction:column;gap:6px">
-        <span class="modal-label">Progress</span>
-        <div style="width:100%">
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-            <span style="color:var(--text-2)" id="mPctLabel">0%</span>
-          </div>
-          <div class="modal-pct-bar"><div id="mPctFill" style="height:100%;border-radius:3px;transition:width .3s"></div></div>
-        </div>
-      </div>
-      <div style="margin-top:2px">
-        <div class="modal-label" style="margin-bottom:7px">Description</div>
-        <div class="modal-desc" id="mDesc"></div>
-      </div>
-      <a class="modal-open-btn" id="mOpenLink" href="../index.html">Open in Tracker →</a>
-    </div>
+<!-- Drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-glow"></div>
+  <div class="dwr-hdr">
+    <span class="dwr-uc" id="d-uc"></span>
+    <span class="dwr-title" id="d-title"></span>
+    <button class="dwr-close" onclick="closeDrawer()">✕</button>
   </div>
+  <div class="dwr-body" id="d-body"></div>
 </div>
 
 <script>
-// ── Constants ─────────────────────────────────────────────────
 const STORE_KEY = 'fintech_projects_v70';
 const MALCOLM = 'Malcolm Govender';
 
-// Owner → avatar gradient + initials
 const OWNER_META = {
-  'Anupam': { bg: 'linear-gradient(135deg,#6366f1,#818cf8)', init: 'AN' },
-  'Stan':    { bg: 'linear-gradient(135deg,#ec4899,#f472b6)', init: 'ST' },
-  'Herman':  { bg: 'linear-gradient(135deg,#0ea5e9,#38bdf8)', init: 'HE' },
-  'Peter':   { bg: 'linear-gradient(135deg,#f59e0b,#fbbf24)', init: 'PE' },
-  'Malcolm': { bg: 'linear-gradient(135deg,#03fafa,#9878f1)', init: 'MG' },
-  'Malcolm Govender': { bg: 'linear-gradient(135deg,#03fafa,#9878f1)', init: 'MG' },
+  'Anupam Sharma': { bg:'linear-gradient(135deg,#6366f1,#818cf8)', init:'AS' },
+  'Anupam':        { bg:'linear-gradient(135deg,#6366f1,#818cf8)', init:'AS' },
+  'Stan':          { bg:'linear-gradient(135deg,#ec4899,#f472b6)', init:'ST' },
+  'Herman':        { bg:'linear-gradient(135deg,#0ea5e9,#38bdf8)', init:'HE' },
+  'Peter':         { bg:'linear-gradient(135deg,#f59e0b,#fbbf24)', init:'PE' },
+  'Malcolm Govender': { bg:'linear-gradient(135deg,#03fafa,#9878f1)', init:'MG' },
+  'Malcolm':       { bg:'linear-gradient(135deg,#03fafa,#9878f1)', init:'MG' },
 };
-function ownerMeta(name) {
-  if (!name) return { bg: 'linear-gradient(135deg,#6366f1,#818cf8)', init: '?' };
-  const first = name.split(' ')[0];
-  return OWNER_META[name] || OWNER_META[first] || { bg: 'linear-gradient(135deg,#6366f1,#818cf8)', init: (name[0]||'?').toUpperCase() };
+function oMeta(n){ if(!n) return {bg:'linear-gradient(135deg,#6366f1,#818cf8)',init:'?'}; const f=n.split(' ')[0]; return OWNER_META[n]||OWNER_META[f]||{bg:'linear-gradient(135deg,#6366f1,#818cf8)',init:(n[0]||'?').toUpperCase()}; }
+
+function ucCat(r){
+  const id=r.id;
+  if(id>=1&&id<=12) return {label:'Quality Engineering',icon:'🧪'};
+  if(id===13)       return {label:'CI/CD',icon:'⚙️'};
+  if(id===14)       return {label:'Delivery Mgmt',icon:'📦'};
+  if(id>=15&&id<=16)return {label:'Fraud & Copilot',icon:'🛡️'};
+  if(id>=17&&id<=19)return {label:'AIOps / Voice',icon:'🔊'};
+  if(id>=20&&id<=24)return {label:'Security & Intel',icon:'🔐'};
+  if(id>=25&&id<=30)return {label:'USSD Stack',icon:'📟'};
+  if(id>=31&&id<=36)return {label:'MoMo Consumer',icon:'💳'};
+  if(id>=37&&id<=38)return {label:'MoMo Merchant',icon:'🏪'};
+  return {label:'General',icon:'🗂️'};
 }
 
-// Category from UC id range
-function ucCategory(r) {
-  const id = r.id;
-  if (id >= 1  && id <= 12) return { label: 'Quality Engineering', icon: '🧪' };
-  if (id === 13)             return { label: 'CI/CD',              icon: '⚙️' };
-  if (id === 14)             return { label: 'Delivery Mgmt',      icon: '📦' };
-  if (id >= 15 && id <= 16) return { label: 'Fraud & Copilot',    icon: '🛡️' };
-  if (id >= 17 && id <= 19) return { label: 'AIOps / Voice',      icon: '🔊' };
-  if (id >= 20 && id <= 24) return { label: 'Security & Intel',   icon: '🔐' };
-  if (id >= 25 && id <= 30) return { label: 'USSD Stack',         icon: '📟' };
-  if (id >= 31 && id <= 36) return { label: 'MoMo Consumer',      icon: '💳' };
-  if (id >= 37 && id <= 38) return { label: 'MoMo Merchant',      icon: '🏪' };
-  return { label: 'General', icon: '🗂️' };
-}
+const ART_META = {
+  github: { icon:'⚙️', bg:'rgba(99,102,241,.15)', color:'#818cf8', lbl:'GitHub' },
+  py:     { icon:'🐍', bg:'rgba(253,171,61,.12)',  color:'#fdab3d', lbl:'Python' },
+  html:   { icon:'📄', bg:'rgba(96,165,250,.12)',  color:'#60a5fa', lbl:'Document' },
+  doc:    { icon:'📄', bg:'rgba(96,165,250,.12)',  color:'#60a5fa', lbl:'Document' },
+  ts:     { icon:'🔷', bg:'rgba(99,102,241,.12)',  color:'#818cf8', lbl:'TypeScript' },
+  md:     { icon:'📝', bg:'rgba(139,147,196,.1)',  color:'#8b93c4', lbl:'Markdown' },
+};
+function artMeta(t){ return ART_META[t]||{icon:'📎',bg:'rgba(255,255,255,.06)',color:'#8b93c4',lbl:t||'File'}; }
 
-// ── Data ─────────────────────────────────────────────────────
-let data = [];
-let activeFilter = 'all';
-let sortCol = 'id', sortAsc = true;
-let dragId = null;
+let data=[], activeFilter='all', sortCol='id', sortAsc=true, dragId=null;
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORE_KEY);
-    if (saved) { const p = JSON.parse(saved); data = p.data || []; }
-  } catch(e) {}
-  if (!data.length) {
-    const keys = Object.keys(localStorage).filter(k=>k.startsWith('fintech_projects_v'));
-    keys.sort().reverse();
-    for (const k of keys) {
-      try { const p = JSON.parse(localStorage.getItem(k)); if (p&&p.data&&p.data.length){data=p.data;break;} } catch(e){}
-    }
+function loadData(){
+  try{ const s=localStorage.getItem(STORE_KEY); if(s){const p=JSON.parse(s);data=p.data||[];} }catch(e){}
+  if(!data.length){
+    const ks=Object.keys(localStorage).filter(k=>k.startsWith('fintech_projects_v')).sort().reverse();
+    for(const k of ks){ try{const p=JSON.parse(localStorage.getItem(k));if(p&&p.data&&p.data.length){data=p.data;break;}}catch(e){} }
   }
 }
+function saveData(){
+  try{ const s=localStorage.getItem(STORE_KEY); const p=s?JSON.parse(s):{}; p.data=data; localStorage.setItem(STORE_KEY,JSON.stringify(p)); }catch(e){}
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function priCls(p){ return 'p'+(p||5); }
+function progColor(pct,s){ if(s==='Done') return '#00c875'; if(s==='In progress') return '#fdab3d'; if(s==='In review') return '#a78bfa'; return '#555e8a'; }
+function sCls(s){ if(s==='Done') return 's-dn'; if(s==='In progress') return 's-ip'; if(s==='In review') return 's-ir'; return 's-bl'; }
+function sKls(s){ if(s==='Done') return 's-dn'; if(s==='In progress') return 's-ip'; if(s==='In review') return 's-ir'; return 's-bl'; }
+function getAssignee(r){ return r.status==='In progress' ? MALCOLM : (r.assignedTo||r.owner||MALCOLM); }
 
-function saveData() {
-  try {
-    const saved = localStorage.getItem(STORE_KEY);
-    const parsed = saved ? JSON.parse(saved) : {};
-    parsed.data = data;
-    localStorage.setItem(STORE_KEY, JSON.stringify(parsed));
-  } catch(e) {}
-}
-
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── Helpers ────────────────────────────────────────────────────
-function priClass(p) { return 'p'+(p||5); }
-function progColor(pct, status) {
-  if (status==='Done')        return '#00c875';
-  if (status==='In progress') return '#fdab3d';
-  if (status==='In review')   return '#a78bfa';
-  return '#555e8a';
-}
-function statusClass(s) {
-  if (s==='Done')        return 's-done';
-  if (s==='In progress') return 's-ip';
-  if (s==='In review')   return 's-ir';
-  return 's-ns';
-}
-function statusKlass(s) {
-  if (s==='Done')        return 's-done';
-  if (s==='In progress') return 's-prog';
-  if (s==='In review')   return 's-review';
-  return 's-backlog';
-}
-
-// Who is assigned to this card (override in-progress → Malcolm)
-function getAssignee(r) {
-  if (r.status === 'In progress') return MALCOLM;
-  return r.assignedTo || r.owner || MALCOLM;
-}
-
-function getFiltered() {
-  const q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
-  return data.filter(r => {
-    const mf = activeFilter==='all' || r.status===activeFilter;
-    const mq = !q || r.project.toLowerCase().includes(q) || (r.owner||'').toLowerCase().includes(q) || String(r.id).includes(q);
-    return mf && mq;
+function getFiltered(){
+  const q=(document.getElementById('srchInput').value||'').toLowerCase().trim();
+  return data.filter(r=>{
+    const mf=activeFilter==='all'||r.status===activeFilter;
+    const mq=!q||r.project.toLowerCase().includes(q)||(r.owner||'').toLowerCase().includes(q)||String(r.id).includes(q);
+    return mf&&mq;
   });
 }
 
-// ── Stats ──────────────────────────────────────────────────────
-function updateStats() {
-  const ns   = data.filter(r=>r.status==='Not started').length;
-  const ip   = data.filter(r=>r.status==='In progress').length;
-  const ir   = data.filter(r=>r.status==='In review').length;
-  const done = data.filter(r=>r.status==='Done').length;
-  document.getElementById('cnt-all').textContent  = data.length;
-  document.getElementById('cnt-ns').textContent   = ns;
-  document.getElementById('cnt-ip').textContent   = ip;
-  document.getElementById('cnt-ir').textContent   = ir;
-  document.getElementById('cnt-done').textContent = done;
+function updateStats(){
+  const ns=data.filter(r=>r.status==='Not started').length;
+  const ip=data.filter(r=>r.status==='In progress').length;
+  const ir=data.filter(r=>r.status==='In review').length;
+  const dn=data.filter(r=>r.status==='Done').length;
+  document.getElementById('cnt-all').textContent=data.length;
+  document.getElementById('cnt-ns').textContent=ns;
+  document.getElementById('cnt-ip').textContent=ip;
+  document.getElementById('cnt-ir').textContent=ir;
+  document.getElementById('cnt-dn').textContent=dn;
 }
 
-// ── Kanban render ──────────────────────────────────────────────
-function renderKanban() {
-  const filtered = getFiltered();
-  const cols = {
-    'Not started': { el:'cards-ns',   cnt:'cnt-col-ns' },
-    'In progress': { el:'cards-ip',   cnt:'cnt-col-ip' },
-    'In review':   { el:'cards-ir',   cnt:'cnt-col-ir' },
-    'Done':        { el:'cards-done', cnt:'cnt-col-done' },
-  };
-
-  Object.entries(cols).forEach(([status, cfg]) => {
-    const rows = filtered.filter(r=>r.status===status);
-    document.getElementById(cfg.cnt).textContent = rows.length;
-    const el = document.getElementById(cfg.el);
-    if (!rows.length) {
-      const icons = { 'Not started':'📋','In progress':'🚀','In review':'🔍','Done':'✅' };
-      el.innerHTML = `<div class="col-empty"><div class="col-empty-icon">${icons[status]||'📋'}</div>No items</div>`;
-      return;
-    }
-    el.innerHTML = rows.map(r => {
-      const color    = progColor(r.pct, r.status);
-      const cat      = ucCategory(r);
-      const assignee = getAssignee(r);
-      const om       = ownerMeta(assignee);
-      return `<div class="k-card ${statusKlass(r.status)}" draggable="true"
-        data-id="${r.id}"
-        ondragstart="onDragStart(event,${r.id})"
-        onclick="openModal(${r.id})">
-        <div class="k-card-top">
-          <span class="k-uc-badge">UC-${r.id}</span>
-          <span class="k-title">${esc(r.project)}</span>
-          <span class="k-pri ${priClass(r.priority)}">P${r.priority}</span>
+function renderKanban(){
+  const filtered=getFiltered();
+  const cols={'Not started':{el:'cards-ns',cnt:'cc-ns'},'In progress':{el:'cards-ip',cnt:'cc-ip'},'In review':{el:'cards-ir',cnt:'cc-ir'},'Done':{el:'cards-dn',cnt:'cc-dn'}};
+  const icons={'Not started':'📋','In progress':'🚀','In review':'🔍','Done':'✅'};
+  Object.entries(cols).forEach(([status,cfg])=>{
+    const rows=filtered.filter(r=>r.status===status);
+    document.getElementById(cfg.cnt).textContent=rows.length;
+    const el=document.getElementById(cfg.el);
+    if(!rows.length){ el.innerHTML=`<div class="col-empty"><div class="col-empty-ico">${icons[status]}</div>No items here</div>`; return; }
+    el.innerHTML=rows.map(r=>{
+      const color=progColor(r.pct,r.status);
+      const assignee=getAssignee(r);
+      const om=oMeta(assignee);
+      const cat=ucCat(r);
+      const artCount=(r.artifacts||[]).length;
+      const descShort=(r.desc||'').replace(/\[.*?\]/g,'').trim();
+      return `<div class="card ${sKls(r.status)}" draggable="true" data-id="${r.id}"
+        ondragstart="onDS(event,${r.id})" onclick="openDrawer(${r.id})">
+        <div class="card-top">
+          <span class="uc-badge">UC-${r.id}</span>
+          <span class="card-title">${esc(r.project)}</span>
+          <span class="pri-badge ${priCls(r.priority)}">P${r.priority}</span>
         </div>
-        <span class="k-category">${cat.icon} ${esc(cat.label)}</span>
-        <div class="k-card-meta">
-          <span class="k-assignee">
-            <span class="k-avatar" style="background:${om.bg}">${om.init}</span>
-            <span class="k-owner-name">${esc(assignee)}</span>
-          </span>
-          <span class="k-pct">${r.pct}%</span>
+        ${descShort ? `<div class="card-desc">${esc(descShort)}</div>` : ''}
+        <span class="card-cat">${cat.icon} ${esc(cat.label)}</span>
+        <div class="card-footer">
+          <div class="assignee-row">
+            <span class="av" style="background:${om.bg}">${om.init}</span>
+            <span class="assignee-name">${esc(assignee)}</span>
+          </div>
+          ${artCount ? `<span class="artifacts-count">📎 ${artCount}</span>` : ''}
+          <span class="pct-label">${r.pct}%</span>
         </div>
-        <div class="k-progress">
-          <div class="k-progress-fill" style="width:${r.pct}%;background:${color}"></div>
-        </div>
+        <div class="prog"><div class="prog-fill" style="width:${r.pct}%;background:${color}"></div></div>
       </div>`;
     }).join('');
   });
 }
 
-// ── Table render ──────────────────────────────────────────────
-function renderTable() {
-  const filtered = [...getFiltered()].sort((a,b) => {
-    let va = a[sortCol], vb = b[sortCol];
-    if (typeof va === 'string') va = va.toLowerCase();
-    if (typeof vb === 'string') vb = vb.toLowerCase();
-    return sortAsc ? (va>vb?1:va<vb?-1:0) : (va<vb?1:va>vb?-1:0);
+function renderTable(){
+  const filtered=[...getFiltered()].sort((a,b)=>{
+    let va=a[sortCol],vb=b[sortCol];
+    if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}
+    return sortAsc?(va>vb?1:va<vb?-1:0):(va<vb?1:va>vb?-1:0);
   });
-
-  const groups = {};
-  filtered.forEach(r => {
-    const g = r.owner || 'Unassigned';
-    if (!groups[g]) groups[g] = [];
-    groups[g].push(r);
-  });
-
-  let html = '';
-  Object.entries(groups).forEach(([owner, rows]) => {
-    const om = ownerMeta(owner);
-    html += `<tr class="group-header"><td colspan="6"><span>
-      <span style="display:inline-flex;align-items:center;gap:7px;">
-        <span style="width:22px;height:22px;border-radius:50%;background:${om.bg};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;">${om.init}</span>
-        ${esc(owner)}
-      </span>
-      <span class="group-count">${rows.length}</span>
-    </span></td></tr>`;
-    rows.forEach(r => {
-      const color = progColor(r.pct, r.status);
-      const sc    = statusClass(r.status);
-      const sLabel= r.status==='Not started'?'Backlog':r.status;
-      const sDot  = { 'Done':'#00c875','In progress':'#fdab3d','In review':'#a78bfa' }[r.status]||'#555e8a';
-      html += `<tr onclick="openModal(${r.id})">
+  const groups={};
+  filtered.forEach(r=>{ const g=r.owner||'Unassigned'; if(!groups[g])groups[g]=[]; groups[g].push(r); });
+  let html='';
+  Object.entries(groups).forEach(([owner,rows])=>{
+    const om=oMeta(owner);
+    html+=`<tr class="grp-hdr"><td colspan="6"><span>
+      <span style="width:22px;height:22px;border-radius:50%;background:${om.bg};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;">${om.init}</span>
+      ${esc(owner)}</span><span class="grp-cnt">${rows.length}</span></td></tr>`;
+    rows.forEach(r=>{
+      const color=progColor(r.pct,r.status);
+      const sc=sCls(r.status);
+      const sLabel=r.status==='Not started'?'Backlog':r.status;
+      const sDot={'Done':'#00c875','In progress':'#fdab3d','In review':'#a78bfa'}[r.status]||'#555e8a';
+      html+=`<tr onclick="openDrawer(${r.id})">
         <td class="td-id">UC-${r.id}</td>
-        <td class="td-name">${esc(r.project)}<small>${esc((r.desc||'').slice(0,90))}${r.desc&&r.desc.length>90?'…':''}</small></td>
-        <td class="td-pri"><span class="k-pri ${priClass(r.priority)}">P${r.priority}</span></td>
+        <td class="td-name">${esc(r.project)}<small>${esc((r.desc||'').slice(0,80))}${(r.desc||'').length>80?'…':''}</small></td>
+        <td><span class="pri-badge ${priCls(r.priority)}">P${r.priority}</span></td>
         <td class="td-owner">${esc(r.owner||'—')}</td>
-        <td class="td-status"><span class="status-chip ${sc}"><span class="status-dot" style="background:${sDot}"></span>${esc(sLabel)}</span></td>
-        <td class="td-pct"><div class="pct-wrap">
-          <div class="pct-bar"><div class="pct-fill" style="width:${r.pct}%;background:${color}"></div></div>
-          <span class="pct-label">${r.pct}%</span>
-        </div></td>
+        <td><span class="schip ${sc}"><span class="sdot" style="background:${sDot}"></span>${esc(sLabel)}</span></td>
+        <td><div class="pct-wrap"><div class="pct-bar"><div class="pct-fill" style="width:${r.pct}%;background:${color}"></div></div><span class="pct-lbl">${r.pct}%</span></div></td>
       </tr>`;
     });
   });
-
-  document.getElementById('tableBody').innerHTML = html;
+  document.getElementById('tblBody').innerHTML=html;
 }
 
-// ── Drag & drop ───────────────────────────────────────────────
-function onDragStart(e, id) {
-  dragId = id;
-  e.dataTransfer.effectAllowed = 'move';
-}
-function onDragOver(e, status) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  e.currentTarget.classList.add('drag-target');
-}
-function onDragLeave(e) {
-  e.currentTarget.classList.remove('drag-target');
-}
-function onDrop(e, status) {
-  e.preventDefault();
-  e.currentTarget.classList.remove('drag-target');
-  if (dragId === null) return;
-  const r = data.find(x=>x.id===dragId);
-  if (r) {
-    r.status = status;
-    if (status === 'Done') r.pct = 100;
-    saveData();
-    render();
+// ── Detail Drawer ────────────────────────────────────────────────
+function openDrawer(id){
+  const r=data.find(x=>x.id===id); if(!r) return;
+  const color=progColor(r.pct,r.status);
+  const assignee=getAssignee(r);
+  const om=oMeta(assignee);
+  const ownerOm=oMeta(r.owner);
+  const cat=ucCat(r);
+  const sLabel=r.status==='Not started'?'Backlog':r.status;
+  const sDot={'Done':'#00c875','In progress':'#fdab3d','In review':'#a78bfa'}[r.status]||'#555e8a';
+  const sc=sCls(r.status);
+  const artifacts=r.artifacts||[];
+  const bv=r.bv||{};
+  const descClean=(r.desc||'No description available.').replace(/\[.*?\]/g,'').trim();
+
+  document.getElementById('d-uc').textContent=`UC-${r.id}`;
+  document.getElementById('d-title').textContent=r.project;
+
+  let artsHtml='';
+  if(artifacts.length){
+    artsHtml=`<div class="dwr-section">
+      <div class="dwr-sec-title">📎 Artifacts &amp; Links</div>
+      <div class="artifacts-list">
+        ${artifacts.map(a=>{
+          const am=artMeta(a.t);
+          return `<a class="artifact-row" href="${esc(a.u)}" target="_blank" rel="noopener">
+            <span class="art-icon" style="background:${am.bg}">${am.icon}</span>
+            <span><div class="art-label">${esc(a.l)}</div><div class="art-type" style="color:${am.color}">${am.lbl}</div></span>
+            <span class="art-arrow">→</span>
+          </a>`;
+        }).join('')}
+      </div>
+    </div>`;
   }
-  dragId = null;
+
+  let bvHtml='';
+  if(bv.tier||bv.value){
+    const impacts=(bv.impact||[]).map(i=>`<div class="bv-impact-item">${esc(i)}</div>`).join('');
+    bvHtml=`<div class="dwr-section">
+      <div class="dwr-sec-title">💰 Business Value</div>
+      <div class="bv-grid">
+        ${bv.tier?`<div class="bv-item"><div class="bv-label">Value Tier</div><div class="bv-val"><span class="tier-badge tier-${esc(bv.tier)}">${esc(bv.tier)}</span></div></div>`:''}
+        ${bv.driver?`<div class="bv-item"><div class="bv-label">Driver</div><div class="bv-val">${esc(bv.driver)}</div></div>`:''}
+        ${bv.value?`<div class="bv-item" style="grid-column:1/-1"><div class="bv-label">Estimated Value</div><div class="bv-val" style="color:var(--c-dn);font-size:15px;">${esc(bv.value)}</div></div>`:''}
+      </div>
+      ${impacts?`<div class="bv-impact-list">${impacts}</div>`:''}
+    </div>`;
+  }
+
+  let nsHtml='';
+  if(r.nextSteps){
+    nsHtml=`<div class="dwr-section">
+      <div class="dwr-sec-title">⏭️ Next Steps</div>
+      <div class="nextsteps-box">${esc(r.nextSteps)}</div>
+    </div>`;
+  }
+
+  document.getElementById('d-body').innerHTML=`
+    <!-- Status bar -->
+    <div class="dwr-statusbar">
+      <span class="schip ${sc}"><span class="sdot" style="background:${sDot}"></span>${sLabel}</span>
+      <span class="pri-badge ${priCls(r.priority)}" style="font-size:11px;padding:3px 8px;">P${r.priority} Priority</span>
+      <span class="card-cat">${cat.icon} ${cat.label}</span>
+    </div>
+
+    <!-- Progress -->
+    <div class="dwr-section">
+      <div class="dwr-sec-title">📊 Progress</div>
+      <div class="prog-big">
+        <div class="prog-big-bar"><div class="prog-big-fill" style="width:${r.pct}%;background:${color}"></div></div>
+        <div class="prog-pct-row"><span style="color:${color};font-weight:700;font-size:15px;">${r.pct}%</span><span>${r.pct===100?'Complete':'In progress'}</span></div>
+      </div>
+    </div>
+
+    <!-- Team -->
+    <div class="dwr-section">
+      <div class="dwr-sec-title">👥 Team</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="assignee-block">
+          <span class="av-lg" style="background:${ownerOm.bg}">${ownerOm.init}</span>
+          <div><div class="av-name">${esc(r.owner||'—')}</div><div class="av-role">Use Case Lead</div></div>
+        </div>
+        ${assignee!==r.owner?`<div class="assignee-block" style="background:rgba(3,250,250,.04);border-color:rgba(3,250,250,.15);">
+          <span class="av-lg" style="background:${om.bg}">${om.init}</span>
+          <div><div class="av-name">${esc(assignee)}</div><div class="av-role">Assigned To</div></div>
+        </div>`:''}
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="dwr-section">
+      <div class="dwr-sec-title">📋 Description</div>
+      <div class="desc-box">${esc(descClean)}</div>
+    </div>
+
+    ${artsHtml}
+    ${nsHtml}
+    ${bvHtml}
+
+    <a class="cta" href="../index.html" target="_blank">Open Full Tracker →</a>
+  `;
+
+  document.getElementById('drawerOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('drawer').classList.add('open'),10);
 }
 
-// ── Modal ─────────────────────────────────────────────────────
-function openModal(id) {
-  const r = data.find(x=>x.id===id);
-  if (!r) return;
-  const color    = progColor(r.pct, r.status);
-  const assignee = getAssignee(r);
-  const om       = ownerMeta(assignee);
-  const cat      = ucCategory(r);
-  const sLabel   = r.status==='Not started'?'Backlog':r.status;
-  const sDot     = { 'Done':'#00c875','In progress':'#fdab3d','In review':'#a78bfa' }[r.status]||'#555e8a';
-  const sc       = statusClass(r.status);
-
-  document.getElementById('mUcId').textContent    = `UC-${r.id}`;
-  document.getElementById('mTitle').textContent   = r.project;
-  document.getElementById('mStatus').innerHTML    = `<span class="status-chip ${sc}"><span class="status-dot" style="background:${sDot}"></span>${sLabel}</span>`;
-  document.getElementById('mPri').innerHTML       = `<span class="k-pri ${priClass(r.priority)}">P${r.priority}</span>`;
-  document.getElementById('mOwner').textContent   = r.owner || '—';
-  document.getElementById('mAssigned').innerHTML  = `<div class="assignee-list">
-    <span class="assignee-badge" style="background:rgba(3,250,250,.08);border-color:rgba(3,250,250,.2);">
-      <span class="k-avatar" style="background:${om.bg}">${om.init}</span>
-      ${esc(assignee)}
-    </span>
-    <span class="k-category">${cat.icon} ${esc(cat.label)}</span>
-  </div>`;
-  document.getElementById('mPctLabel').textContent= `${r.pct}% complete`;
-  document.getElementById('mPctFill').style.cssText= `width:${r.pct}%;background:${color};border-radius:3px;transition:width .4s`;
-  document.getElementById('mDesc').textContent    = r.desc || 'No description available.';
-  document.getElementById('mOpenLink').href       = '../index.html';
-
-  document.getElementById('modal').classList.add('open');
-}
-function closeModal(e) {
-  if (e.target === document.getElementById('modal')) closeModalBtn();
-}
-function closeModalBtn() {
-  document.getElementById('modal').classList.remove('open');
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
 }
 
-// ── Filter / sort / view ──────────────────────────────────────
-function setFilter(f) {
-  activeFilter = f;
-  document.querySelectorAll('.stat-pill').forEach(p => p.classList.remove('active'));
-  const pillMap = { all:'pill-all','Not started':'pill-ns','In progress':'pill-ip','In review':'pill-ir','Done':'pill-done' };
-  const el = document.getElementById(pillMap[f]);
-  if (el) el.classList.add('active');
+// ESC key
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDrawer(); });
+
+// ── Drag & Drop ──────────────────────────────────────────────────
+function onDS(e,id){ dragId=id; e.dataTransfer.effectAllowed='move'; }
+function onDragOver(e,s){ e.preventDefault(); e.dataTransfer.dropEffect='move'; e.currentTarget.classList.add('drag-on'); }
+function onDL(e){ e.currentTarget.classList.remove('drag-on'); }
+function onDrop(e,s){
+  e.preventDefault(); e.currentTarget.classList.remove('drag-on');
+  if(dragId===null) return;
+  const r=data.find(x=>x.id===dragId);
+  if(r){ r.status=s; if(s==='Done') r.pct=100; saveData(); render(); }
+  dragId=null;
+}
+
+// ── Filter / sort / view ──────────────────────────────────────────
+function setFilter(f){
+  activeFilter=f;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  const m={all:'pill-all','Not started':'pill-ns','In progress':'pill-ip','In review':'pill-ir','Done':'pill-dn'};
+  document.getElementById(m[f])?.classList.add('active');
   render();
 }
-
-function sortBy(col) {
-  sortAsc = sortCol===col ? !sortAsc : true;
-  sortCol = col;
-  document.querySelectorAll('.sort-icon').forEach(s=>s.textContent='↕');
-  document.getElementById(`sort-${col}`)&&(document.getElementById(`sort-${col}`).textContent = sortAsc?'↑':'↓');
-  document.querySelectorAll('thead th').forEach(th=>th.classList.remove('sorted'));
+function sortBy(col){
+  sortAsc=sortCol===col?!sortAsc:true; sortCol=col;
+  document.querySelectorAll('.si').forEach(s=>s.textContent='↕');
+  const el=document.getElementById(`s-${col}`); if(el) el.textContent=sortAsc?'↑':'↓';
   renderTable();
 }
-
-function setView(v) {
-  document.getElementById('kanbanView').style.display = v==='kanban' ? 'flex' : 'none';
-  document.getElementById('tableView').style.display  = v==='table'  ? 'block' : 'none';
-  document.getElementById('btnKanban').classList.toggle('active', v==='kanban');
-  document.getElementById('btnTable').classList.toggle('active',  v==='table');
+function setView(v){
+  document.getElementById('boardView').style.display=v==='kanban'?'flex':'none';
+  document.getElementById('tableView').style.display=v==='table'?'block':'none';
+  document.getElementById('btnK').classList.toggle('active',v==='kanban');
+  document.getElementById('btnT').classList.toggle('active',v==='table');
 }
+function render(){ updateStats(); renderKanban(); renderTable(); }
 
-function render() {
-  updateStats();
-  renderKanban();
-  renderTable();
-}
-
-// ── Init ──────────────────────────────────────────────────────
 loadData();
 render();
 
-// ── Cursor glow ───────────────────────────────────────────────
-(function() {
-  const glow = document.getElementById('cg');
-  let rafId = null, cx = 0, cy = 0;
-  function upd() { glow.style.left=cx+'px'; glow.style.top=cy+'px'; rafId=null; }
-  document.addEventListener('mousemove', e => {
-    cx=e.clientX; cy=e.clientY; glow.style.opacity='1';
-    if (!rafId) rafId=requestAnimationFrame(upd);
-  }, {passive:true});
-  document.addEventListener('mouseleave', () => { glow.style.opacity='0'; });
-  document.addEventListener('click', e => {
-    const r = document.createElement('div');
-    r.className='cursor-ripple';
-    r.style.left=e.clientX+'px'; r.style.top=e.clientY+'px';
-    document.body.appendChild(r);
-    r.addEventListener('animationend', ()=>r.remove());
-  }, {passive:true});
+// ── Cursor glow ───────────────────────────────────────────────────
+(function(){
+  const g=document.getElementById('cg'); let raf=null,cx=0,cy=0;
+  function upd(){g.style.left=cx+'px';g.style.top=cy+'px';raf=null;}
+  document.addEventListener('mousemove',e=>{cx=e.clientX;cy=e.clientY;g.style.opacity='1';if(!raf)raf=requestAnimationFrame(upd);},{passive:true});
+  document.addEventListener('mouseleave',()=>{g.style.opacity='0';});
+  document.addEventListener('click',e=>{
+    const r=document.createElement('div');r.className='ripple';
+    r.style.left=e.clientX+'px';r.style.top=e.clientY+'px';
+    document.body.appendChild(r);r.addEventListener('animationend',()=>r.remove());
+  },{passive:true});
 })();
 </script>
 </body>
