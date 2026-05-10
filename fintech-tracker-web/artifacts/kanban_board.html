@@ -600,16 +600,37 @@ function openDrawer(id){
     </div>`;
   }
 
+  // Build team block separately to avoid triple-nested template literals
+  let teamHtml = '';
+  if(ob){
+    teamHtml = '<div class="assignee-block" style="background:linear-gradient(135deg,rgba(3,250,250,.07),rgba(152,120,241,.07));border-color:rgba(3,250,250,.25);position:relative;overflow:hidden;">'
+      + '<span class="av-lg" style="background:' + ownerOm.bg + ';box-shadow:0 0 0 3px rgba(3,250,250,.2);">' + ownerOm.init + '</span>'
+      + '<div style="flex:1;"><div class="av-name">' + esc(r.owner||'—') + '</div><div class="av-role" style="color:var(--t3);">Use Case Lead · Builder</div></div>'
+      + '<span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;background:linear-gradient(90deg,rgba(3,250,250,.12),rgba(152,120,241,.12));border:1px solid rgba(3,250,250,.25);color:#03fafa;flex-shrink:0;">⚡ Building this</span>'
+      + '</div>';
+  } else {
+    teamHtml = '<div class="assignee-block">'
+      + '<span class="av-lg" style="background:' + ownerOm.bg + '">' + ownerOm.init + '</span>'
+      + '<div><div class="av-name">' + esc(r.owner||'—') + '</div><div class="av-role">Use Case Lead</div></div>'
+      + '</div>';
+    if(assignee !== r.owner){
+      teamHtml += '<div class="assignee-block" style="background:rgba(3,250,250,.04);border-color:rgba(3,250,250,.15);">'
+        + '<span class="av-lg" style="background:' + om.bg + '">' + om.init + '</span>'
+        + '<div><div class="av-name">' + esc(assignee) + '</div><div class="av-role">Assigned To</div></div>'
+        + '</div>';
+    }
+  }
+
+  const obBadge = ob ? '<span class="dwr-ob-badge">⚡ Owner · Builder</span>' : '';
+
   document.getElementById('d-body').innerHTML=`
-    <!-- Status bar -->
     <div class="dwr-statusbar">
       <span class="schip ${sc}"><span class="sdot" style="background:${sDot}"></span>${sLabel}</span>
       <span class="pri-badge ${priCls(r.priority)}" style="font-size:11px;padding:3px 8px;">P${r.priority} Priority</span>
       <span class="card-cat">${cat.icon} ${cat.label}</span>
-      ${ob?`<span class="dwr-ob-badge">⚡ Owner · Builder</span>`:''}
+      ${obBadge}
     </div>
 
-    <!-- Progress -->
     <div class="dwr-section">
       <div class="dwr-sec-title">📊 Progress</div>
       <div class="prog-big">
@@ -618,32 +639,11 @@ function openDrawer(id){
       </div>
     </div>
 
-    <!-- Team -->
     <div class="dwr-section">
       <div class="dwr-sec-title">👥 Team</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${ob?`
-        <div class="assignee-block" style="background:linear-gradient(135deg,rgba(3,250,250,.07),rgba(152,120,241,.07));border-color:rgba(3,250,250,.25);position:relative;overflow:hidden;">
-          <span class="av-lg" style="background:${ownerOm.bg};box-shadow:0 0 0 3px rgba(3,250,250,.2);">${ownerOm.init}</span>
-          <div style="flex:1;">
-            <div class="av-name">${esc(r.owner||'—')}</div>
-            <div class="av-role" style="color:var(--t3);">Use Case Lead</div>
-          </div>
-          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;background:linear-gradient(90deg,rgba(3,250,250,.12),rgba(152,120,241,.12));border:1px solid rgba(3,250,250,.25);color:#03fafa;flex-shrink:0;">⚡ Building this</span>
-        </div>`:`
-        <div class="assignee-block">
-          <span class="av-lg" style="background:${ownerOm.bg}">${ownerOm.init}</span>
-          <div><div class="av-name">${esc(r.owner||'—')}</div><div class="av-role">Use Case Lead</div></div>
-        </div>
-        ${assignee!==r.owner?`<div class="assignee-block" style="background:rgba(3,250,250,.04);border-color:rgba(3,250,250,.15);">
-          <span class="av-lg" style="background:${om.bg}">${om.init}</span>
-          <div><div class="av-name">${esc(assignee)}</div><div class="av-role">Assigned To</div></div>
-        </div>`:''}
-        `}
-      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">${teamHtml}</div>
     </div>
 
-    <!-- Description -->
     <div class="dwr-section">
       <div class="dwr-sec-title">📋 Description</div>
       <div class="desc-box">${esc(descClean)}</div>
