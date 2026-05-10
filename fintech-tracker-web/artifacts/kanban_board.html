@@ -130,6 +130,22 @@ body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--bg);c
 .prog{margin-top:9px;height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;}
 .prog-fill{height:100%;border-radius:3px;transition:width .4s;}
 
+/* Owner·Builder highlights */
+.card.ob::before{background:linear-gradient(180deg,#03fafa,#9878f1,#6161ff)!important;}
+.card.ob{border-color:rgba(3,250,250,.18);}
+.ob-chip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;letter-spacing:.02em;
+  padding:3px 10px 3px 8px;border-radius:20px;margin:0 8px 10px;
+  background:linear-gradient(90deg,rgba(3,250,250,.1),rgba(152,120,241,.1));
+  border:1px solid rgba(3,250,250,.22);color:#03fafa;width:fit-content;}
+.builder-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:10px;margin-left:7px;white-space:nowrap;
+  background:linear-gradient(90deg,rgba(3,250,250,.1),rgba(152,120,241,.1));
+  border:1px solid rgba(3,250,250,.2);color:#03fafa;}
+.dwr-ob-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;letter-spacing:.02em;
+  padding:5px 12px;border-radius:20px;
+  background:linear-gradient(90deg,rgba(3,250,250,.1),rgba(152,120,241,.1));
+  border:1px solid rgba(3,250,250,.25);color:#03fafa;}
+
 /* Column footer */
 .col-foot{padding:8px 10px;border-top:1px solid var(--border);}
 .add-btn{width:100%;background:none;border:1px dashed rgba(255,255,255,.1);color:var(--t3);font-size:11px;padding:7px;border-radius:8px;cursor:pointer;transition:all .15s;font-family:inherit;}
@@ -685,11 +701,12 @@ function renderKanban(){
     el.innerHTML=rows.map(r=>{
       const color=progColor(r.pct,r.status);
       const assignee=getAssignee(r);
+      const ob=isOB(r);
       const om=oMeta(assignee);
       const cat=ucCat(r);
       const artCount=(r.artifacts||[]).length;
       const descShort=(r.desc||'').replace(/\[.*?\]/g,'').trim();
-      return `<div class="card ${sKls(r.status)}" draggable="true" data-id="${r.id}"
+      return `<div class="card ${sKls(r.status)}${ob?' ob':''}" draggable="true" data-id="${r.id}"
         ondragstart="onDS(event,${r.id})" onclick="openDrawer(${r.id})">
         <div class="card-top">
           <span class="uc-badge">UC-${r.id}</span>
@@ -697,6 +714,7 @@ function renderKanban(){
           <span class="pri-badge ${priCls(r.priority)}">P${r.priority}</span>
         </div>
         ${descShort ? `<div class="card-desc">${esc(descShort)}</div>` : ''}
+        ${ob ? '<div class="ob-chip"><span>⚡</span>Owner · Builder</div>' : ''}
         <span class="card-cat">${cat.icon} ${esc(cat.label)}</span>
         <div class="card-footer">
           <div class="assignee-row">
