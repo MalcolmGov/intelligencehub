@@ -2411,7 +2411,7 @@ tbody tr.data-row td a { cursor: auto; }
             <span class="chart-card-title">Status Distribution</span>
             <span class="chart-card-sub">by use case count</span>
           </div>
-          <div id="chart-status" style="height:220px;"></div>
+          <div id="chart-status" style="height:228px;"></div>
         </div>
         <div class="chart-card">
           <div class="chart-card-header">
@@ -4392,44 +4392,46 @@ function renderCharts() {
   (function() {
     const el = document.getElementById('chart-status');
     if (!el) return;
-    const active   = data.filter(r => r.status !== 'Not started');
-    const done     = active.filter(r=>r.status==='Done').length;
-    const inProg   = active.filter(r=>r.status==='In progress').length;
-    const inRev    = active.filter(r=>r.status==='In review').length;
-    const total    = active.length;
-    const avgRaw   = total ? active.reduce((a,d)=>a+d.pct,0)/total : 0;
-    const avg      = Math.round(avgRaw);
-    const segs = [
+    const active  = data.filter(r => r.status !== 'Not started');
+    const done    = active.filter(r=>r.status==='Done').length;
+    const inProg  = active.filter(r=>r.status==='In progress').length;
+    const inRev   = active.filter(r=>r.status==='In review').length;
+    const total   = active.length;
+    const avg     = total ? Math.round(active.reduce((a,d)=>a+d.pct,0)/total) : 0;
+
+    // All segs for arcs (skip zero-value slices)
+    const allSegs = [
       { label:'Done',        value:done,   color:'#00c875' },
       { label:'In Progress', value:inProg, color:'#fdab3d' },
       { label:'In Review',   value:inRev,  color:'#a78bfa' },
-    ].filter(s=>s.value>0);
+    ];
+    const segs = allSegs.filter(s=>s.value>0);
 
-    // Layout: donut left, legend right
-    const W=290, H=178, cx=88, cy=86, R=66, ri=42, gap=3;
-    const lx=172; // legend x start
+    // ── Layout: donut centered, stat pills below ─────────────
+    // Card inner width ~280px (320px card - 40px padding)
+    const W=280, H=228, cx=140, cy=98, R=76, ri=48, gap=3;
     const uid = 'donut_' + Date.now();
     const valId = uid+'_val', subId = uid+'_sub';
 
-    let html = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;display:block;width:100%;max-width:${W}px">`;
+    let html = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;width:100%">`;
 
     html += `<style>
       .dseg { cursor:pointer; transition:opacity .18s, transform .18s; transform-box:fill-box; transform-origin:${cx}px ${cy}px; }
       .dseg:hover { opacity:1 !important; transform:scale(1.06); }
     </style>`;
 
-    // arcs
+    // Arcs
     let startAngle = -Math.PI/2;
     segs.forEach(seg => {
       const pct = Math.round((seg.value/total)*100);
       const sweep = (seg.value/total)*(Math.PI*2) - (gap*Math.PI/180);
       const endAngle = startAngle + sweep;
-      const x1=cx+R*Math.cos(startAngle),  y1=cy+R*Math.sin(startAngle);
-      const x2=cx+R*Math.cos(endAngle),    y2=cy+R*Math.sin(endAngle);
+      const x1=cx+R*Math.cos(startAngle), y1=cy+R*Math.sin(startAngle);
+      const x2=cx+R*Math.cos(endAngle),   y2=cy+R*Math.sin(endAngle);
       const ix1=cx+ri*Math.cos(startAngle),iy1=cy+ri*Math.sin(startAngle);
       const ix2=cx+ri*Math.cos(endAngle),  iy2=cy+ri*Math.sin(endAngle);
       const lg = sweep > Math.PI ? 1 : 0;
-      const d  = `M${x1.toFixed(2)} ${y1.toFixed(2)} A${R} ${R} 0 ${lg} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${ix2.toFixed(2)} ${iy2.toFixed(2)} A${ri} ${ri} 0 ${lg} 0 ${ix1.toFixed(2)} ${iy1.toFixed(2)} Z`;
+      const d = `M${x1.toFixed(2)} ${y1.toFixed(2)} A${R} ${R} 0 ${lg} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${ix2.toFixed(2)} ${iy2.toFixed(2)} A${ri} ${ri} 0 ${lg} 0 ${ix1.toFixed(2)} ${iy1.toFixed(2)} Z`;
       html += `<path class="dseg" d="${d}" fill="${seg.color}" opacity=".88"
         onmouseenter="var v=document.getElementById('${valId}'),s=document.getElementById('${subId}');
           if(v){v.textContent='${pct}%';v.setAttribute('fill','${seg.color}');}
@@ -4441,35 +4443,35 @@ function renderCharts() {
     });
 
     // Centre text
-    html += `<text id="${valId}" x="${cx}" y="${cy+7}" text-anchor="middle" fill="#e8eaff" font-size="22" font-weight="700" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">${avg}%</text>`;
-    html += `<text id="${subId}" x="${cx}" y="${cy+21}" text-anchor="middle" fill="#6b7280" font-size="9.5" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">avg complete</text>`;
+    html += `<text id="${valId}" x="${cx}" y="${cy+9}" text-anchor="middle" fill="#e8eaff" font-size="26" font-weight="700" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">${avg}%</text>`;
+    html += `<text id="${subId}" x="${cx}" y="${cy+25}" text-anchor="middle" fill="#6b7280" font-size="10" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">avg complete</text>`;
 
-    // Legend panel (right side)
-    // Summary header
-    html += `<text x="${lx}" y="22" fill="#94a3b8" font-size="10" font-weight="600" font-family="Inter,sans-serif">ACTIVE UCs</text>`;
-    html += `<text x="${lx+84}" y="22" text-anchor="end" fill="#e8eaff" font-size="13" font-weight="700" font-family="Inter,sans-serif">${total}</text>`;
-    html += `<line x1="${lx}" y1="28" x2="${lx+84}" y2="28" stroke="#2e3358" stroke-width="1"/>`;
+    // Divider
+    html += `<line x1="16" y1="${cy+R+14}" x2="${W-16}" y2="${cy+R+14}" stroke="#252942" stroke-width="1"/>`;
 
-    // Legend rows
-    const legendSegs = [
-      { label:'Done',        value:done,   color:'#00c875' },
-      { label:'In Progress', value:inProg, color:'#fdab3d' },
-      { label:'In Review',   value:inRev,  color:'#a78bfa' },
-    ];
-    legendSegs.forEach((seg, i) => {
-      const ly = 50 + i * 34;
+    // ── Stat pills row (3 columns below donut) ───────────────
+    const statY = cy + R + 22; // top of stat area
+    const cols = [W/6, W/2, (5*W)/6]; // centers at ~47, 140, 233
+    allSegs.forEach((seg, i) => {
+      const bx  = cols[i];
       const pct = total ? Math.round((seg.value/total)*100) : 0;
-      // Color dot
-      html += `<circle cx="${lx+5}" cy="${ly}" r="5" fill="${seg.color}" opacity=".9"/>`;
-      // Label
-      html += `<text x="${lx+16}" y="${ly+4}" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif">${seg.label}</text>`;
-      // Count (right-aligned)
-      html += `<text x="${lx+84}" y="${ly-2}" text-anchor="end" fill="#e8eaff" font-size="14" font-weight="700" font-family="Inter,sans-serif">${seg.value}</text>`;
-      html += `<text x="${lx+84}" y="${ly+10}" text-anchor="end" fill="${seg.color}" font-size="9" font-family="Inter,sans-serif">${pct}%</text>`;
+      // Pill background
+      const pillW = 52, pillH = 24, pillRx = 12;
+      html += `<rect x="${bx-pillW/2}" y="${statY}" width="${pillW}" height="${pillH}" rx="${pillRx}"
+        fill="${seg.color}" opacity="${seg.value > 0 ? '.15' : '.07'}" />`;
+      // Count inside pill
+      html += `<text x="${bx}" y="${statY+16}" text-anchor="middle"
+        fill="${seg.value > 0 ? '#e8eaff' : '#3d4580'}" font-size="15" font-weight="700"
+        font-family="Inter,sans-serif">${seg.value}</text>`;
+      // Dot + label below pill
+      html += `<circle cx="${bx-18}" cy="${statY+pillH+12}" r="3.5" fill="${seg.color}" opacity="${seg.value > 0 ? '.9' : '.4'}"/>`;
+      html += `<text x="${bx-10}" y="${statY+pillH+16}" fill="${seg.value > 0 ? '#94a3b8' : '#3d4580'}"
+        font-size="9.5" font-family="Inter,sans-serif">${seg.label}</text>`;
+      // Pct below label
+      html += `<text x="${bx}" y="${statY+pillH+29}" text-anchor="middle"
+        fill="${seg.value > 0 ? seg.color : '#2e3358'}" font-size="9" font-weight="600"
+        font-family="Inter,sans-serif">${pct}%</text>`;
     });
-
-    // Bottom footnote
-    html += `<text x="${lx}" y="${H-4}" fill="#3d4580" font-size="8.5" font-family="Inter,sans-serif">hover to explore</text>`;
 
     html += `</svg>`;
     el.innerHTML = html;
