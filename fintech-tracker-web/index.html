@@ -3890,6 +3890,7 @@ function toggleCharts() {
 let _pfVisible = false;
 let _pfFilter  = 'all';
 let _ucChartFilter = 'all'; // all | done | on-track | at-risk | delayed
+let _ucOwnerFilter = 'all'; // all | first name of owner
 const _ucStatusOvr = {};    // id → 'On Track'|'At Risk'|'In Progress'|'Paused'|'Need Info'
 
 function togglePortfolio() {
@@ -3908,6 +3909,11 @@ function pfSetFilter(f, btn) {
 }
 function ucChartSetFilter(f) {
   _ucChartFilter = f;
+  renderCharts();
+}
+
+function ucOwnerSetFilter(name) {
+  _ucOwnerFilter = name;
   renderCharts();
 }
 
@@ -4370,6 +4376,14 @@ function renderCharts() {
     let grpOnTrack = rows.filter(r => r.status !== 'Done' && r.pct >= 90);
     let grpAtRisk  = rows.filter(r => r.status !== 'Done' && r.pct >= 50 && r.pct < 90);
     let grpDelayed = rows.filter(r => r.status !== 'Done' && r.pct < 50);
+    // Apply owner filter first
+    if (_ucOwnerFilter !== 'all') {
+      const filterFn = r => (r.owner || '').split(' ')[0] === _ucOwnerFilter;
+      grpDone    = grpDone.filter(filterFn);
+      grpOnTrack = grpOnTrack.filter(filterFn);
+      grpAtRisk  = grpAtRisk.filter(filterFn);
+      grpDelayed = grpDelayed.filter(filterFn);
+    }
     if (_ucChartFilter !== 'all') {
       if (_ucChartFilter !== 'done')     grpDone    = [];
       if (_ucChartFilter !== 'on-track') grpOnTrack = [];
@@ -4402,6 +4416,16 @@ function renderCharts() {
               const ia=_ucChartFilter===f;
               return `<button onclick="ucChartSetFilter('${f}')" style="padding:3px 10px;border-radius:99px;border:1px solid ${ia?'rgba(14,220,255,.4)':'rgba(255,255,255,.08)'};background:${ia?'rgba(14,220,255,.1)':'transparent'};color:${ia?'#22d3ee':'#606880'};font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;">${lbl[f]}</button>`;
             }).join('')}
+            <div style="width:1px;height:14px;background:rgba(255,255,255,.06);margin:0 4px;"></div>
+            ${Object.entries(OWNER_META).map(([name,om])=>{
+              const first = name.split(' ')[0];
+              const isAct = _ucOwnerFilter === first;
+              return `<button onclick="ucOwnerSetFilter('${first}')" title="${name}" style="padding:2px 8px;border-radius:99px;border:1px solid ${isAct?om.color:'rgba(255,255,255,.08)'};background:${isAct?om.bg:'transparent'};color:${isAct?om.color:'#606880'};font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:4px;transition:all .15s;">
+                <span style="width:16px;height:16px;border-radius:50%;background:${om.bg};color:${om.color};font-size:7px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">${om.initials}</span>
+                ${first}
+              </button>`;
+            }).join('')}
+            <button onclick="ucOwnerSetFilter('all')" style="padding:2px 8px;border-radius:99px;border:1px solid ${_ucOwnerFilter==='all'?'rgba(14,220,255,.4)':'rgba(255,255,255,.08)'};background:${_ucOwnerFilter==='all'?'rgba(14,220,255,.1)':'transparent'};color:${_ucOwnerFilter==='all'?'#22d3ee':'#606880'};font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;">All owners</button>
             <div style="width:1px;height:14px;background:rgba(255,255,255,.06);margin:0 6px;"></div>
             <div style="display:flex;align-items:center;gap:5px;">
               <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span>
