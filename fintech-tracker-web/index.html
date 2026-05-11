@@ -7107,7 +7107,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function deliverLatestReport(q) {
-      const { html: reportHtml } = generateHTMLReport();
+      let reportHtml;
+      try { reportHtml = generateHTMLReport().html; } catch(genErr) {
+        console.error('[ZARA] generateHTMLReport failed:', genErr);
+        return `I couldn't generate the report right now (${genErr.message}). Please try again or use the Export button in the toolbar.`;
+      }
       if (!/email|send|mail/i.test(q)) {
         downloadReport(reportHtml);
         return `I've generated the latest portfolio report and downloaded it to your device.`;
