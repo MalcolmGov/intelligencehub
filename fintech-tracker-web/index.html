@@ -2297,6 +2297,13 @@ tbody tr.data-row td a { cursor: auto; }
         </div>
         <div id="chart-uc" style="height:340px;"></div>
       </div>
+      <div class="chart-card" style="margin-top:1.5rem;">
+        <div class="chart-card-header">
+          <span class="chart-card-title">Programme Coverage</span>
+          <span class="chart-card-sub">use case count per owner — by status</span>
+        </div>
+        <div id="chart-coverage" style="height:200px;"></div>
+      </div>
       <!-- AI Pipeline section hidden — tracked in Kanban board -->
       <div class="chart-card" style="display:none;margin-top:1.5rem;border-color:rgba(59,68,120,.5);background:rgba(20,22,48,.55);">
         <div class="chart-card-header">
@@ -3929,6 +3936,111 @@ function renderCharts() {
     html += `</svg>`;
     el.innerHTML = html;
     el.style.height = H+'px';
+  })();
+
+  // ── 3b. Programme Coverage — stacked UC count per owner by status ───
+  (function() {
+    const el = document.getElementById('chart-coverage');
+    if (!el) return;
+
+    // Build per-owner status buckets
+    const STATUS_COLORS = {
+      'Done':        { fill:'#22c55e', light:'#4ade80', label:'Done' },
+      'In progress': { fill:'#f59e0b', light:'#fbbf24', label:'In Progress' },
+      'In review':   { fill:'#a78bfa', light:'#c4b5fd', label:'In Review' },
+      'Not started': { fill:'#2e3560', light:'#3d4580', label:'Pipeline' },
+    };
+    const STATUS_ORDER = ['Done', 'In progress', 'In review', 'Not started'];
+
+    const ownerBuckets = {};
+    Object.keys(OWNER_META).forEach(name => { ownerBuckets[name] = {'Done':0,'In progress':0,'In review':0,'Not started':0}; });
+    data.forEach(r => {
+      if (!r.owner || !OWNER_META[r.owner]) return;
+      const st = r.status || 'Not started';
+      ownerBuckets[r.owner][st] = (ownerBuckets[r.owner][st] || 0) + 1;
+    });
+
+    const rows = Object.entries(ownerBuckets)
+      .map(([name, counts]) => ({
+        name, short: name.split(' ')[0],
+        counts,
+        total: Object.values(counts).reduce((s,v) => s+v, 0),
+        color: OWNER_META[name].color,
+      }))
+      .filter(r => r.total > 0)
+      .sort((a,b) => b.total - a.total);
+
+    const maxTotal = Math.max(...rows.map(r => r.total));
+    const barH = 20, rowH = 32, padL = 88, padR = 120, padT = 10;
+    const W = 900, H = padT + rows.length * rowH + 28;
+    const barW = W - padL - padR;
+
+    // Gradient defs per owner + status
+    let gradDefs = rows.flatMap((row, ri) =>
+      STATUS_ORDER.map((st, si) => {
+        const c = STATUS_COLORS[st];
+        return `<linearGradient id="cg${ri}_${si}" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="${c.fill}"/><stop offset="100%" stop-color="${c.light}"/></linearGradient>`;
+      })
+    ).join('');
+
+    let html = `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="${svgNS}" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      ${gradDefs}
+      <filter id="cov-glow" x="-3%" y="-60%" width="110%" height="220%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>`;
+
+    // Tick lines
+    [0, 5, 10, 15, 20].filter(t => t <= maxTotal + 1).forEach(t => {
+      const x = padL + (t / maxTotal) * barW;
+      html += `<line x1="${x}" y1="${padT}" x2="${x}" y2="${H-20}" stroke="#2e3560" stroke-width="1" stroke-dasharray="3,4"/>`;
+      html += `<text x="${x}" y="${H-6}" text-anchor="middle" fill="#7c8db8" font-size="9" font-weight="500" font-family="Inter,sans-serif">${t}</text>`;
+    });
+
+    rows.forEach((row, ri) => {
+      const y = padT + ri * rowH + (rowH - barH) / 2;
+      // Owner label
+      html += `<text x="${padL-8}" y="${y+barH/2+4}" text-anchor="end" fill="#b0b8e0" font-size="11" font-weight="500" font-family="Inter,sans-serif">${row.short}</text>`;
+      // Track
+      html += `<rect x="${padL}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="#181b36"/>`;
+
+      // Stacked segments
+      let xCursor = padL;
+      STATUS_ORDER.forEach((st, si) => {
+        const cnt = row.counts[st] || 0;
+        if (cnt === 0) return;
+        const segW = (cnt / maxTotal) * barW;
+        const isFirst = xCursor === padL;
+        const isLast = STATUS_ORDER.slice(si+1).every(s => (row.counts[s]||0) === 0);
+        const rx = isFirst ? '4 0 0 4' : (isLast ? '0 4 4 0' : '0');
+        html += `<rect x="${xCursor.toFixed(1)}" y="${y}" width="${segW.toFixed(1)}" height="${barH}" rx="${rx}" fill="url(#cg${ri}_${si})" filter="url(#cov-glow)" opacity=".9"/>`;
+        // Segment count label (only if wide enough)
+        if (segW > 20) {
+          html += `<text x="${(xCursor + segW/2).toFixed(1)}" y="${y+barH/2+4}" text-anchor="middle" fill="rgba(255,255,255,.85)" font-size="9" font-weight="700" font-family="Inter,sans-serif">${cnt}</text>`;
+        }
+        xCursor += segW;
+      });
+
+      // Total badge
+      html += `<text x="${padL+barW+10}" y="${y+barH/2+4}" fill="#e8eaff" font-size="11" font-weight="700" font-family="Inter,sans-serif">${row.total} UC</text>`;
+    });
+
+    // Legend
+    const legendX = padL + barW + 52;
+    const legendStartY = padT + 4;
+    STATUS_ORDER.forEach((st, i) => {
+      const c = STATUS_COLORS[st];
+      const lx = legendX + (i % 2) * 0;
+      const ly = legendStartY + i * 14;
+      html += `<rect x="${lx}" y="${ly-8}" width="10" height="10" rx="2" fill="${c.fill}"/>`;
+      html += `<text x="${lx+14}" y="${ly}" fill="#8b93c4" font-size="9" font-family="Inter,sans-serif">${c.label}</text>`;
+    });
+
+    html += `</svg>`;
+    el.innerHTML = html;
+    el.style.height = H + 'px';
   })();
 
   // ── 4. Pipeline / Roadmap swimlane chart ─────────────────
