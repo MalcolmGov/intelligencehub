@@ -7933,18 +7933,21 @@ document.addEventListener('keydown', e => {
 
 /* ─── Business Impact Strip ─────────────────────────────── */
 function renderImpactStrip() {
-  // Compute from live data
+  // Only count UCs where actual work has been done (not pipeline / not started)
+  const activeStatuses = ['Done','In Progress','In Review'];
   let tradMonths = 0, aiWeeksTotal = 0, activeCount = 0;
   data.forEach(uc => {
+    const isActive = uc.status && activeStatuses.some(s => uc.status.toLowerCase().includes(s.toLowerCase()));
+    if (!isActive) return;
+    activeCount++;
     const te = uc.traditionalEst;
     if (te) {
       tradMonths   += (te.devs || 2) * (te.months || 2);
       aiWeeksTotal += (te.aiWeeks || 2);
     } else {
-      tradMonths   += 6; // default 2 devs × 3 months
+      tradMonths   += 6;
       aiWeeksTotal += 2;
     }
-    if (uc.status && uc.status !== 'Not started') activeCount++;
   });
 
   const devRate      = 192000;          // R192k / dev-month (R1200/hr × 160hrs)
