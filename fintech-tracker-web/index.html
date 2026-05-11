@@ -57,14 +57,13 @@ body {
 
 /* ── Header ─────────────────────────────────────────────── */
 .header {
-  position: relative; overflow: hidden;
+  position: relative; overflow: visible;
   border-radius: 20px;
   padding: 26px 30px 22px;
   margin-bottom: 16px;
-  background: rgba(11,15,35,.60);
-  backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(99,120,200,.11);
-  box-shadow: 0 8px 42px rgba(0,0,0,.28), 0 -1px 0 rgba(255,255,255,.04) inset;
+  background: rgba(28,32,54,.82);
+  border: 1px solid rgba(99,120,200,.16);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.04) inset, 0 8px 48px rgba(0,0,0,.45), 0 0 80px rgba(34,211,238,.04);
   display: flex; align-items: center; justify-content: space-between;
   gap: 24px; flex-wrap: wrap;
 }
@@ -644,15 +643,65 @@ td:hover .demo-edit-icon { opacity:1; }
 ::selection { background: rgba(0,115,234,.3); color: #fff; }
 
 /* ── Header — premium ────────────────────────────────────── */
-.header {
-  background: linear-gradient(135deg, #0c0f1f 0%, #131628 30%, #191c32 60%, #161929 100%);
-  border: 1px solid rgba(100,116,200,.28);
-  border-radius: var(--radius-l);
-  padding: 1.6rem 1.75rem 1.8rem;
-  position: relative;
-  overflow: hidden;
-  min-height: 108px;
-  box-shadow: 0 4px 32px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.04) inset;
+/* ── Atmospheric orb layers ─────────────────────────────── */
+.hdr-atm {
+  position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
+  filter: blur(60px); opacity: .45; will-change: transform;
+}
+.hdr-atm-1 {
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(34,211,238,.22) 0%, transparent 70%);
+  top: -80px; left: -60px;
+  animation: hdrAtmFloat 14s ease-in-out infinite;
+}
+.hdr-atm-2 {
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(99,102,241,.18) 0%, transparent 70%);
+  top: -40px; right: -30px;
+  animation: hdrAtmFloat2 18s ease-in-out infinite;
+}
+.hdr-atm-3 {
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(16,185,129,.12) 0%, transparent 70%);
+  bottom: -50px; left: 40%;
+  animation: hdrAtmFloat 22s ease-in-out infinite reverse;
+}
+.hdr-grid {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: 20px; overflow: hidden;
+  background-image: linear-gradient(rgba(99,120,200,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(99,120,200,.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 40%, transparent 100%);
+}
+.hdr-title-glow {
+  position: absolute; top: -60px; left: 50%; transform: translateX(-50%);
+  width: 500px; height: 180px; border-radius: 50%; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse, rgba(34,211,238,.06) 0%, transparent 70%);
+  filter: blur(30px);
+}
+
+/* ── Keyframes ───────────────────────────────────────────── */
+@keyframes hdrGradShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes hdrAtmFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(20px, -15px) scale(1.05); }
+  66%       { transform: translate(-10px, 10px) scale(.96); }
+}
+@keyframes hdrAtmFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%       { transform: translate(-18px, 12px) scale(1.04); }
+  70%       { transform: translate(12px, -8px) scale(.97); }
+}
+@keyframes hdrDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .4; transform: scale(.7); }
+}
+@keyframes hdrBriefPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,211,238,.0), 0 4px 20px rgba(34,211,238,.12); }
+  50%       { box-shadow: 0 0 0 6px rgba(34,211,238,.08), 0 4px 24px rgba(34,211,238,.22); }
 }
 
 /* Dot-grid texture */
@@ -668,7 +717,7 @@ td:hover .demo-edit-icon { opacity:1; }
 /* Live row */
 .hdr-live-row { display:flex; align-items:center; gap:7px; margin-bottom:12px; }
 .hdr-live-dot { width:6px; height:6px; border-radius:50%; background:#22d3ee; flex-shrink:0; animation:hdrDotPulse 2s ease-in-out infinite; }
-.hdr-live-text { font-size:11px; color:#283650; font-weight:500; letter-spacing:.01em; }
+.hdr-live-text { font-size:11px; color:#5a7a9a; font-weight:500; letter-spacing:.01em; }
 
 /* KPI meta pills */
 .header-kpi { display:flex; gap:5px; align-items:center; flex-wrap:wrap; margin-top:0; }
@@ -706,7 +755,7 @@ td:hover .demo-edit-icon { opacity:1; }
 
 /* Tertiary buttons */
 .hdr-ter-row { display:flex; gap:2px; }
-.hdr-ter-btn { display:flex; align-items:center; gap:5px; padding:6px 10px; border-radius:8px; border:none; background:transparent; color:#283650; font-size:11px; font-weight:500; letter-spacing:.01em; cursor:pointer; transition:all .16s ease; }
+.hdr-ter-btn { display:flex; align-items:center; gap:5px; padding:6px 10px; border-radius:8px; border:none; background:transparent; color:#556880; font-size:11px; font-weight:500; letter-spacing:.01em; cursor:pointer; transition:all .16s ease; }
 .hdr-ter-btn:hover { background:rgba(99,120,200,.08); color:#64748b; transform:translateY(-1px); }
 .hdr-ter-btn.btn-danger { color:#6b3030; }
 .hdr-ter-btn.btn-danger:hover { background:rgba(248,113,113,.08); color:#f87171; }
