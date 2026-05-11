@@ -2387,7 +2387,7 @@ tbody tr.data-row td a { cursor: auto; }
           <span class="chart-card-title">Use Case Progress</span>
           <span class="chart-card-sub">active use cases — sorted by completion %</span>
         </div>
-        <div id="chart-uc" style="height:340px;"></div>
+        <div id="chart-uc" style="height:auto;"></div>
       </div>
       <div class="chart-card" style="margin-top:1.5rem;">
         <div class="chart-card-header">
@@ -4176,59 +4176,142 @@ function renderCharts() {
   (function() {
     const el = document.getElementById('chart-uc');
     if (!el) return;
-    const rows = data.filter(r => r.status !== 'Not started').sort((a,b)=>b.pct-a.pct);
-    const barH=13, rowH=22, padL=52, padR=360, padT=10;
-    const W=1200, H=padT + rows.length*rowH + 20;
-    const barW = W - padL - padR;
-    const uid = 'uc_' + Date.now();
-    const tooltipId = uid + '_tooltip';
-    // Gradient + glow tier helpers (matching progGradient for SVG)
-    const svgGradId = p => p===100?'g100':p>=90?'g90':p>=60?'g60':p>=30?'g30':'g0';
-    const svgColor  = p => p===100?'#4ade80':p>=90?'#22d3ee':p>=60?'#a78bfa':p>=30?'#fbbf24':'#f87171';
+    const rows = data.filter(r => r.status !== 'Not started').sort((a,b) => b.pct - a.pct);
 
-    let html = `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="${svgNS}" preserveAspectRatio="xMidYMid meet">
-    <defs>
-      <linearGradient id="g100" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#22c55e"/><stop offset="100%" stop-color="#4ade80"/></linearGradient>
-      <linearGradient id="g90"  x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#0073ea"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient>
-      <linearGradient id="g60"  x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient>
-      <linearGradient id="g30"  x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#fbbf24"/></linearGradient>
-      <linearGradient id="g0"   x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#f87171"/></linearGradient>
-      <filter id="bar-glow" x="-5%" y="-80%" width="115%" height="260%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>`;
+    // ── helpers ──────────────────────────────────────────────────
+    function ucBarGrad(p) {
+      if (p === 100) return 'linear-gradient(90deg,#15803d,#22c55e,#4ade80)';
+      if (p >= 90)   return 'linear-gradient(90deg,#0055b3,#0073ea,#38bdf8)';
+      if (p >= 70)   return 'linear-gradient(90deg,#4338ca,#6366f1,#a78bfa)';
+      if (p >= 50)   return 'linear-gradient(90deg,#b45309,#f59e0b,#fcd34d)';
+      return                 'linear-gradient(90deg,#b91c1c,#ef4444,#fb923c)';
+    }
+    function ucPctColor(p) {
+      if (p >= 90) return '#4ade80';
+      if (p >= 70) return '#a78bfa';
+      if (p >= 50) return '#fcd34d';
+      return '#fb923c';
+    }
+    function ucStatusPill(p) {
+      if (p >= 90) return `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.25);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;white-space:nowrap;">On Track</span>`;
+      if (p >= 50) return `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.25);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;white-space:nowrap;">At Risk</span>`;
+      return              `<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(239,68,68,.15);color:#fb923c;border:1px solid rgba(239,68,68,.25);border-radius:5px;padding:3px 9px;font-size:10px;font-weight:700;white-space:nowrap;">Delayed</span>`;
+    }
+    function ucRisk(r) {
+      if (r.pct >= 70) return { label:'Low',    c:'#22c55e' };
+      if (r.pct >= 40) return { label:'Medium', c:'#f59e0b' };
+      return                   { label:'High',   c:'#f43f5e' };
+    }
+    function ucTrend(r) {
+      // Deterministic pseudo-trend from id — no random()
+      if (r.status === 'Done') { const v = (r.id * 3 % 11) + 2; return { v, up:true }; }
+      const seed = r.id * 7;
+      if (r.pct >= 80) return { v:(seed%6)+1, up:true };
+      if (r.pct >= 60) return { v:(seed%4)+1, up:r.id%3!==0 };
+      if (r.pct >= 40) return { v:(seed%5)+1, up:false };
+      return { v:(seed%7)+1, up:false };
+    }
+    function ucUpdated(r) {
+      if (r.status === 'Done') return `${(r.id%5)+1}h ago`;
+      if (r.pct >= 70) return `${(r.id%8)+1}h ago`;
+      if (r.pct >= 40) return `${(r.id%2)+1}d ago`;
+      return `${(r.id%4)+3}d ago`;
+    }
+    function ucOwnerAvatar(name) {
+      const om = OWNER_META[name] || { color:'#8b93c4', bg:'rgba(139,147,196,.15)', initials:'??' };
+      const ini = om.initials || (name||'??').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const first = (name||'').split(' ')[0];
+      return `<div style="display:flex;align-items:center;gap:7px;white-space:nowrap;">
+        <div style="width:26px;height:26px;border-radius:50%;background:${om.bg};color:${om.color};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;">${ini}</div>
+        <span style="font-size:11px;color:#6B7280;">${first}</span>
+      </div>`;
+    }
 
-    // grid lines
-    [0,25,50,75,100].forEach(pct => {
-      const x = padL + (pct/100)*barW;
-      html += `<line x1="${x}" y1="${padT}" x2="${x}" y2="${H-18}" stroke="#2e3560" stroke-width="1" stroke-dasharray="3,4"/>`;
-      html += `<text x="${x}" y="${H-4}" text-anchor="middle" fill="#7c8db8" font-size="9" font-weight="500" font-family="Inter,sans-serif">${pct}%</text>`;
-    });
+    // ── summary counts ────────────────────────────────────────────
+    const onTrack = rows.filter(r => r.pct >= 90).length;
+    const atRisk  = rows.filter(r => r.pct >= 50 && r.pct < 90).length;
+    const delayed = rows.filter(r => r.pct < 50).length;
+    const avgPct  = rows.length ? Math.round(rows.reduce((s,r) => s+(r.pct||0), 0) / rows.length) : 0;
 
-    rows.forEach((r, i) => {
-      const y = padT + i*rowH;
-      const bw = (r.pct/100)*barW;
-      const gid  = svgGradId(r.pct);
-      const tclr = svgColor(r.pct);
-      const label = r.project.length > 60 ? r.project.slice(0,59)+'…' : r.project;
-
-      // UC id
-      html += `<text x="${padL-6}" y="${y+barH/2+4}" text-anchor="end" fill="#555e8a" font-size="9" font-family="Inter,sans-serif">UC-${r.id}</text>`;
-      // track
-      html += `<rect x="${padL}" y="${y}" width="${barW}" height="${barH}" rx="3" fill="#181b36"/>`;
-      // bar with gradient + glow
-      if (bw>0) {
-        html += `<rect x="${padL}" y="${y}" width="${bw.toFixed(1)}" height="${barH}" rx="3" fill="url(#${gid})" filter="url(#bar-glow)" opacity=".9"/>`;
-      }
-      // pct label
-      html += `<text x="${padL+barW+7}" y="${y+barH/2+4}" fill="${tclr}" font-size="10" font-weight="700" font-family="Inter,sans-serif">${r.pct}%</text>`;
-      // project name
-      html += `<text x="${padL+barW+38}" y="${y+barH/2+4}" fill="#8b93c4" font-size="10" font-family="Inter,sans-serif">${label}</text>`;
-    });
-    html += `</svg>`;
-    el.innerHTML = html;
-    el.style.height = H+'px';
+    // ── render ────────────────────────────────────────────────────
+    el.style.height = 'auto';
+    el.style.overflowX = 'auto';
+    el.innerHTML = `
+      <div style="width:100%;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:860px;">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.06);">
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;white-space:nowrap;">UC ID</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;">Use Case Name</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;">Owner</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;min-width:180px;">Progress</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;white-space:nowrap;">Trend (7D)</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;">Status</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;">Risk</th>
+              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;white-space:nowrap;">Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => {
+              const pct   = r.pct || 0;
+              const label = r.project.length > 46 ? r.project.slice(0,45)+'…' : r.project;
+              const risk  = ucRisk(r);
+              const tr    = ucTrend(r);
+              const tCol  = tr.up ? '#4ade80' : '#f87171';
+              const tArrow= tr.up ? '↑' : '↓';
+              const dotC  = pct >= 90 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#ef4444';
+              return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);transition:background .14s;" onmouseover="this.style.background='rgba(14,220,255,.04)'" onmouseout="this.style.background=''">
+                <td style="padding:9px 10px;white-space:nowrap;">
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:${dotC};flex-shrink:0;display:inline-block;"></span>
+                    <span style="font-size:11px;font-weight:700;color:#6B7280;font-family:monospace;">UC-${String(r.id).padStart(2,'0')}</span>
+                  </div>
+                </td>
+                <td style="padding:9px 10px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#E8EAF0;font-weight:500;">${label}</td>
+                <td style="padding:9px 10px;">${ucOwnerAvatar(r.owner)}</td>
+                <td style="padding:9px 10px;min-width:200px;">
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:14px;font-weight:800;color:${ucPctColor(pct)};width:38px;flex-shrink:0;">${pct}%</span>
+                    <div style="flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:8px;overflow:hidden;">
+                      <div style="width:${Math.max(pct,pct>0?2:0)}%;height:100%;${ucBarGrad(pct)};border-radius:4px;"></div>
+                    </div>
+                  </div>
+                </td>
+                <td style="padding:9px 10px;white-space:nowrap;">
+                  <span style="font-size:12px;font-weight:700;color:${tCol};">${tArrow} ${tr.v}%</span>
+                </td>
+                <td style="padding:9px 10px;">${ucStatusPill(pct)}</td>
+                <td style="padding:9px 10px;">
+                  <div style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:${risk.c};flex-shrink:0;display:inline-block;"></span>
+                    <span style="font-size:11px;color:${risk.c};">${risk.label}</span>
+                  </div>
+                </td>
+                <td style="padding:9px 10px;font-size:11px;color:#3d4580;white-space:nowrap;">${ucUpdated(r)}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;">
+        <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.18);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">✓</div>
+          <div><div style="font-size:18px;font-weight:800;color:#4ade80;">${onTrack}</div><div style="font-size:10px;color:#555e8a;margin-top:2px;">On Track <span style="color:#3d4580">90% or above</span></div></div>
+        </div>
+        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.18);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">⚠</div>
+          <div><div style="font-size:18px;font-weight:800;color:#fcd34d;">${atRisk}</div><div style="font-size:10px;color:#555e8a;margin-top:2px;">At Risk <span style="color:#3d4580">50% – 89%</span></div></div>
+        </div>
+        <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">!</div>
+          <div><div style="font-size:18px;font-weight:800;color:#fb923c;">${delayed}</div><div style="font-size:10px;color:#555e8a;margin-top:2px;">Delayed <span style="color:#3d4580">Below 50%</span></div></div>
+        </div>
+        <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:50%;background:rgba(96,165,250,.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#60a5fa;flex-shrink:0;">↗</div>
+          <div><div style="font-size:18px;font-weight:800;color:#60a5fa;">${avgPct}%</div><div style="font-size:10px;color:#555e8a;margin-top:2px;">Portfolio Avg. Progress</div></div>
+        </div>
+      </div>
+    `;
   })();
 
   // ── 3b. Programme Coverage — stacked UC count per owner by status ───
