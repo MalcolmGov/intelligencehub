@@ -2215,6 +2215,73 @@ tbody tr.data-row td a { cursor: auto; }
 }
 .pf-metric-val { font-size: 20px; font-weight: 800; }
 .pf-metric-sub { font-size: 10px; color: #2e3560; margin-top: 3px; }
+
+/* ── Presentation Mode ─────────────────────────────────── */
+body.present-mode .controls        { display:none !important; }
+body.present-mode .filter-chips-bar{ display:none !important; }
+body.present-mode .legend          { display:none !important; }
+body.present-mode .hdr-ter-row     { display:none !important; }
+body.present-mode .col-drag        { display:none !important; }
+body.present-mode .row-actions     { display:none !important; }
+body.present-mode                  { padding-bottom:58px; }
+#btn-present { color:#94a3b8; border-color:rgba(148,163,184,.25); background:transparent; transition:all .2s; }
+body.present-mode #btn-present     { background:rgba(96,165,250,.12); border-color:#60a5fa; color:#60a5fa; }
+
+/* ── Business Impact Strip ─────────────────────────────── */
+.impact-strip {
+  display:flex; align-items:stretch;
+  background:rgba(16,19,38,.7);
+  border:1px solid rgba(99,120,200,.14);
+  border-radius:14px;
+  margin-bottom:14px;
+  overflow:hidden;
+  backdrop-filter:blur(8px);
+}
+.impact-metric {
+  flex:1; display:flex; flex-direction:column; justify-content:center;
+  padding:14px 20px; position:relative; gap:2px;
+}
+.impact-metric + .impact-metric { border-left:1px solid rgba(99,120,200,.1); }
+.impact-metric-icon { position:absolute; top:10px; right:14px; font-size:18px; opacity:.15; }
+.impact-metric-val  { font-size:20px; font-weight:800; letter-spacing:-.03em; line-height:1; }
+.impact-metric-lbl  { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:#94a3b8; margin-top:2px; }
+.impact-metric-sub  { font-size:10px; color:#475569; margin-top:1px; }
+.impact-bar-accent  { position:absolute; bottom:0; left:0; right:0; height:2px; }
+
+/* ── Live Activity Reel ────────────────────────────────── */
+.live-reel {
+  position:fixed; bottom:0; left:0; right:0; z-index:200; height:36px;
+  background:rgba(10,12,26,.95); border-top:1px solid rgba(99,120,200,.14);
+  display:flex; align-items:center; overflow:hidden; backdrop-filter:blur(12px);
+}
+.live-reel-label {
+  flex-shrink:0; padding:0 14px 0 16px; display:flex; align-items:center;
+  gap:7px; border-right:1px solid rgba(99,120,200,.14); height:100%;
+}
+.live-reel-pulse {
+  width:7px; height:7px; border-radius:50%; background:#00c875;
+  animation:reel-pulse 2s ease infinite;
+}
+@keyframes reel-pulse {
+  0%   { box-shadow:0 0 0 0 rgba(0,200,117,.6); }
+  70%  { box-shadow:0 0 0 7px rgba(0,200,117,0); }
+  100% { box-shadow:0 0 0 0 rgba(0,200,117,0); }
+}
+.live-reel-label-text { font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#00c875; white-space:nowrap; }
+.live-reel-track { flex:1; overflow:hidden; }
+.live-reel-inner { display:flex; align-items:center; animation:reel-scroll 60s linear infinite; white-space:nowrap; }
+.live-reel-inner:hover { animation-play-state:paused; }
+@keyframes reel-scroll {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+.reel-item { display:inline-flex; align-items:center; gap:7px; padding:0 20px 0 0; flex-shrink:0; }
+.reel-dot  { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.reel-uc   { font-size:10px; font-weight:700; color:#4A5170; font-family:monospace; }
+.reel-name { font-size:11px; font-weight:500; color:#6b7280; }
+.reel-evt  { font-size:11px; color:#94a3b8; }
+.reel-time { font-size:10px; color:#334155; margin-left:2px; }
+.reel-sep  { width:1px; height:14px; background:rgba(99,120,200,.15); margin:0 8px; flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -2349,6 +2416,10 @@ tbody tr.data-row td a { cursor: auto; }
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="4" height="12" rx="1"/><rect x="6" y="2" width="4" height="8" rx="1"/><rect x="11" y="2" width="4" height="10" rx="1"/></svg>
           Kanban
         </a>
+        <button id="btn-present" class="hdr-sec-btn" onclick="togglePresentMode()" title="Presentation mode — hides editing controls for CTIO review">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="9" rx="1.5"/><path d="M5 12l-1 2M11 12l1 2M4 14h8"/></svg>
+          Present
+        </button>
         <button class="hdr-sec-btn btn-share" onclick="exportSnapshot()" title="Export shareable snapshot">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="3" r="1.5"/><circle cx="12" cy="13" r="1.5"/><circle cx="4" cy="8" r="1.5"/><path d="M10.5 3.75L5.5 7.25M10.5 12.25L5.5 8.75"/></svg>
           Share
@@ -2395,6 +2466,46 @@ tbody tr.data-row td a { cursor: auto; }
     </a>
   </div>
 
+
+  <!-- Business Impact Strip -->
+  <div class="impact-strip" id="impact-strip">
+    <div class="impact-metric">
+      <span class="impact-metric-icon">💰</span>
+      <div class="impact-metric-val" id="imp-cost" style="color:#34d399;">—</div>
+      <div class="impact-metric-lbl">Cost Avoided</div>
+      <div class="impact-metric-sub" id="imp-cost-sub">vs traditional delivery</div>
+      <div class="impact-bar-accent" style="background:linear-gradient(90deg,#00c875,transparent)"></div>
+    </div>
+    <div class="impact-metric">
+      <span class="impact-metric-icon">⚡</span>
+      <div class="impact-metric-val" id="imp-speed" style="color:#60a5fa;">—</div>
+      <div class="impact-metric-lbl">Delivery Speed</div>
+      <div class="impact-metric-sub" id="imp-speed-sub">vs traditional team</div>
+      <div class="impact-bar-accent" style="background:linear-gradient(90deg,#3b82f6,transparent)"></div>
+    </div>
+    <div class="impact-metric">
+      <span class="impact-metric-icon">👥</span>
+      <div class="impact-metric-val" id="imp-fte" style="color:#a78bfa;">—</div>
+      <div class="impact-metric-lbl">FTE Equivalent</div>
+      <div class="impact-metric-sub" id="imp-fte-sub">developer-months delivered</div>
+      <div class="impact-bar-accent" style="background:linear-gradient(90deg,#8b5cf6,transparent)"></div>
+    </div>
+    <div class="impact-metric">
+      <span class="impact-metric-icon">🗓️</span>
+      <div class="impact-metric-val" id="imp-time" style="color:#fbbf24;">—</div>
+      <div class="impact-metric-lbl">Months Saved</div>
+      <div class="impact-metric-sub" id="imp-time-sub">calendar time advantage</div>
+      <div class="impact-bar-accent" style="background:linear-gradient(90deg,#f59e0b,transparent)"></div>
+    </div>
+    <div class="impact-metric">
+      <span class="impact-metric-icon">📦</span>
+      <div class="impact-metric-val" id="imp-ucs" style="color:#fb923c;">—</div>
+      <div class="impact-metric-lbl">Active Use Cases</div>
+      <div class="impact-metric-sub" id="imp-ucs-sub">in delivery or done</div>
+      <div class="impact-bar-accent" style="background:linear-gradient(90deg,#f97316,transparent)"></div>
+    </div>
+  </div>
+
   <!-- Stats -->
   <div class="stats" id="stats"></div>
 
@@ -2411,7 +2522,7 @@ tbody tr.data-row td a { cursor: auto; }
             <span class="chart-card-title">Status Distribution</span>
             <span class="chart-card-sub">by use case count</span>
           </div>
-          <div id="chart-status" style="height:228px;"></div>
+          <div id="chart-status" style="height:196px;"></div>
         </div>
         <div class="chart-card">
           <div class="chart-card-header">
@@ -4407,9 +4518,9 @@ function renderCharts() {
     ];
     const segs = allSegs.filter(s=>s.value>0);
 
-    // ── Layout: donut centered, stat pills below ─────────────
+    // ── Layout: donut centered ───────────────────────────────
     // Card inner width ~280px (320px card - 40px padding)
-    const W=280, H=228, cx=140, cy=98, R=76, ri=48, gap=3;
+    const W=280, H=196, cx=140, cy=96, R=76, ri=48, gap=3;
     const uid = 'donut_' + Date.now();
     const valId = uid+'_val', subId = uid+'_sub';
 
@@ -4445,33 +4556,6 @@ function renderCharts() {
     // Centre text
     html += `<text id="${valId}" x="${cx}" y="${cy+9}" text-anchor="middle" fill="#e8eaff" font-size="26" font-weight="700" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">${avg}%</text>`;
     html += `<text id="${subId}" x="${cx}" y="${cy+25}" text-anchor="middle" fill="#6b7280" font-size="10" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">avg complete</text>`;
-
-    // Divider
-    html += `<line x1="16" y1="${cy+R+14}" x2="${W-16}" y2="${cy+R+14}" stroke="#252942" stroke-width="1"/>`;
-
-    // ── Stat pills row (3 columns below donut) ───────────────
-    const statY = cy + R + 22; // top of stat area
-    const cols = [W/6, W/2, (5*W)/6]; // centers at ~47, 140, 233
-    allSegs.forEach((seg, i) => {
-      const bx  = cols[i];
-      const pct = total ? Math.round((seg.value/total)*100) : 0;
-      // Pill background
-      const pillW = 52, pillH = 24, pillRx = 12;
-      html += `<rect x="${bx-pillW/2}" y="${statY}" width="${pillW}" height="${pillH}" rx="${pillRx}"
-        fill="${seg.color}" opacity="${seg.value > 0 ? '.15' : '.07'}" />`;
-      // Count inside pill
-      html += `<text x="${bx}" y="${statY+16}" text-anchor="middle"
-        fill="${seg.value > 0 ? '#e8eaff' : '#3d4580'}" font-size="15" font-weight="700"
-        font-family="Inter,sans-serif">${seg.value}</text>`;
-      // Dot + label below pill
-      html += `<circle cx="${bx-18}" cy="${statY+pillH+12}" r="3.5" fill="${seg.color}" opacity="${seg.value > 0 ? '.9' : '.4'}"/>`;
-      html += `<text x="${bx-10}" y="${statY+pillH+16}" fill="${seg.value > 0 ? '#94a3b8' : '#3d4580'}"
-        font-size="9.5" font-family="Inter,sans-serif">${seg.label}</text>`;
-      // Pct below label
-      html += `<text x="${bx}" y="${statY+pillH+29}" text-anchor="middle"
-        fill="${seg.value > 0 ? seg.color : '#2e3358'}" font-size="9" font-weight="600"
-        font-family="Inter,sans-serif">${pct}%</text>`;
-    });
 
     html += `</svg>`;
     el.innerHTML = html;
@@ -4570,13 +4654,14 @@ function renderCharts() {
       const first=o.name.split(' ')[0]; const rest=o.name.split(' ').slice(1).join(' ');
       const hin=`this.style.background='rgba(14,220,255,.022)';this.style.boxShadow='inset 0 0 60px rgba(14,220,255,.035)'`;
       const hout=`this.style.background='';this.style.boxShadow=''`;
+      const safeN = o.name.replace(/'/g,"\\'");
       return `<div style="display:flex;align-items:center;padding:12px 18px;border-radius:11px;transition:background .18s,box-shadow .18s;cursor:default;" onmouseover="${hin}" onmouseout="${hout}">
         <div style="width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-right:10px;">
           <div style="width:22px;height:22px;border-radius:6px;background:${rb.bg};border:1px solid ${rb.b};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:${rb.c};font-family:Inter,sans-serif;">${rank}</div>
         </div>
-        <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,${o.g.g1},${o.g.g2});display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.95);letter-spacing:-.01em;box-shadow:0 4px 12px ${o.glow},0 0 0 1px rgba(255,255,255,.07);font-family:Inter,sans-serif;">${o.initials}</div>
+        <div onclick="filterByOwner('${safeN}')" title="Click to filter table by ${o.name}" style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,${o.g.g1},${o.g.g2});display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.95);letter-spacing:-.01em;box-shadow:0 4px 12px ${o.glow},0 0 0 1px rgba(255,255,255,.07);font-family:Inter,sans-serif;cursor:pointer;transition:transform .15s,box-shadow .15s;" onmouseover="this.style.transform='scale(1.12)';this.style.boxShadow='0 6px 18px ${o.glow},0 0 0 2px rgba(255,255,255,.18)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 12px ${o.glow},0 0 0 1px rgba(255,255,255,.07)'">${o.initials}</div>
         <div style="margin-left:11px;flex:0 0 168px;">
-          <div style="font-size:12px;font-weight:600;color:#E2E8F0;letter-spacing:-.01em;line-height:1.25;font-family:Inter,sans-serif;">${first} <span style="color:#475569;font-weight:400;">${rest}</span></div>
+          <div onclick="filterByOwner('${safeN}')" title="Click to filter table by ${o.name}" style="font-size:12px;font-weight:600;color:#E2E8F0;letter-spacing:-.01em;line-height:1.25;font-family:Inter,sans-serif;cursor:pointer;display:inline-block;" onmouseover="this.style.color='#60a5fa';this.style.textDecoration='underline'" onmouseout="this.style.color='#E2E8F0';this.style.textDecoration='none'">${first} <span style="color:#475569;font-weight:400;">${rest}</span></div>
           <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
             <span style="font-size:10px;color:#475569;font-family:Inter,sans-serif;">${o.count} use cases</span>
             <span style="width:2px;height:2px;border-radius:50%;background:#1e293b;display:inline-block;"></span>
@@ -5142,6 +5227,20 @@ function renderCharts() {
   })();
 }
 
+function filterByOwner(name) {
+  const sel = document.getElementById('selOwner');
+  if (!sel) return;
+  // Toggle: if already filtering by this owner, clear it
+  if (sel.value === name) {
+    sel.value = '';
+  } else {
+    sel.value = name;
+  }
+  renderTable();
+  const anchor = document.getElementById('table-anchor');
+  if (anchor) anchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function refreshOwnerFilter() {
   const sel = document.getElementById('selOwner');
   const cur = sel.value;
@@ -5537,6 +5636,18 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f4f3ef;color:#1818
   <div style="text-align:center;margin-top:24px;font-size:11px;color:#a1a1aa">
     Fintech AI Transformation Programme · Exported ${dateStr}
   </div>
+
+  <!-- Live Activity Reel -->
+  <div class="live-reel" id="live-reel">
+    <div class="live-reel-label">
+      <div class="live-reel-pulse"></div>
+      <span class="live-reel-label-text">Live</span>
+    </div>
+    <div class="live-reel-track">
+      <div class="live-reel-inner" id="reel-inner"></div>
+    </div>
+  </div>
+
 </div>
 </body>
 </html>`;
@@ -5559,6 +5670,8 @@ function resetData() {
 load();
 refreshOwnerFilter();
 toggleSort('priority');
+renderImpactStrip();
+startLiveReel();
 
 
 
@@ -7493,6 +7606,101 @@ Be concise, authoritative, and warm. If uncertain, say so briefly.`;
     ripple.addEventListener('animationend', () => ripple.remove());
   }, { passive: true });
 })();
+
+
+/* ─── Presentation Mode ─────────────────────────────────── */
+function togglePresentMode() {
+  const on = document.body.classList.toggle('present-mode');
+  const btn = document.getElementById('btn-present');
+  if (btn) btn.title = on ? 'Exit presentation mode (Esc)' : 'Presentation mode';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.body.classList.contains('present-mode')) {
+    document.body.classList.remove('present-mode');
+  }
+});
+
+/* ─── Business Impact Strip ─────────────────────────────── */
+function renderImpactStrip() {
+  // Compute from live data
+  let tradMonths = 0, aiWeeksTotal = 0, activeCount = 0;
+  data.forEach(uc => {
+    const te = uc.traditionalEst;
+    if (te) {
+      tradMonths   += (te.devs || 2) * (te.months || 2);
+      aiWeeksTotal += (te.aiWeeks || 2);
+    } else {
+      tradMonths   += 6; // default 2 devs × 3 months
+      aiWeeksTotal += 2;
+    }
+    if (uc.status && uc.status !== 'Not started') activeCount++;
+  });
+
+  const devRate      = 85000;           // R85k / dev-month (SA senior dev)
+  const costAvoided  = tradMonths * devRate;
+  const aiMonths     = aiWeeksTotal / 4.33;
+  const actualMonths = 3;              // programme running ~3 months
+  const speedMult    = Math.round(tradMonths / actualMonths);
+  const fteEquiv     = tradMonths;     // dev-months of work delivered
+  const monthsSaved  = Math.round(tradMonths / 3) - actualMonths; // if 3-person team
+
+  function fmt(n) {
+    if (n >= 1000000) return 'R' + (n/1000000).toFixed(1) + 'M';
+    if (n >= 1000)    return 'R' + Math.round(n/1000) + 'k';
+    return 'R' + n;
+  }
+
+  const set = (id, v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('imp-cost',     fmt(costAvoided));
+  set('imp-cost-sub', `${tradMonths} dev-months vs actual delivery`);
+  set('imp-speed',    speedMult + '×');
+  set('imp-speed-sub',`faster than a traditional team of 3`);
+  set('imp-fte',      fteEquiv + ' dev-months');
+  set('imp-fte-sub',  `delivered by 1 person + AI`);
+  set('imp-time',     monthsSaved + ' months');
+  set('imp-time-sub', `calendar time advantage vs traditional`);
+  set('imp-ucs',      activeCount);
+  set('imp-ucs-sub',  `of ${data.length} tracked use cases`);
+}
+
+/* ─── Live Activity Reel ─────────────────────────────────── */
+function startLiveReel() {
+  const ITEMS = [
+    { uc:'UC-17', name:'AIOps Anomaly Detection', evt:'Alert pipeline active — 1,247 incidents classified today', color:'#00c875', t:'live' },
+    { uc:'UC-18', name:'ARIA Voice Agent',         evt:'ElevenLabs synthesis endpoint responding · avg 94ms latency', color:'#a78bfa', t:'live' },
+    { uc:'UC-19', name:'LNC Orchestration',        evt:'12 microservices registered · CISO approval pending', color:'#60a5fa', t:'live' },
+    { uc:'UC-39', name:'Agent Studio',             evt:'117 workflow templates loaded · Fraud Guardian demo ready', color:'#fbbf24', t:'2m ago' },
+    { uc:'UC-01', name:'API Test Intelligence',    evt:'SentinelQA coverage 94.2% · last run passed', color:'#34d399', t:'5m ago' },
+    { uc:'UC-13', name:'AI-Driven CI/CD Pipeline', evt:'Build pipeline optimised · 38% faster avg cycle time', color:'#38bdf8', t:'8m ago' },
+    { uc:'UC-25', name:'USSD AI Assistant',        evt:'isiZulu + Sesotho NLP models warm · ready for UAT', color:'#fb923c', t:'12m ago' },
+    { uc:'UC-16', name:'Fraud Guardian ML',        evt:'AML transaction model training — epoch 47/100 complete', color:'#f472b6', t:'18m ago' },
+    { uc:'UC-04', name:'Predictive Change Risk',   evt:'Risk scoring model — 89.3% accuracy on holdout set', color:'#818cf8', t:'22m ago' },
+    { uc:'UC-39', name:'Agent Studio',             evt:'New agent deployed: "Regulatory Compliance Checker"', color:'#fbbf24', t:'31m ago' },
+    { uc:'UC-18', name:'ARIA Voice Agent',         evt:'POPIA audit complete — data residency confirmed ZA', color:'#a78bfa', t:'45m ago' },
+    { uc:'UC-17', name:'AIOps Anomaly Detection',  evt:'Grafana bridge synced — 3 dashboards updated', color:'#00c875', t:'1h ago' },
+    { uc:'UC-19', name:'LNC Orchestration',        evt:'Retry logic validated — zero message loss on 10k load test', color:'#60a5fa', t:'2h ago' },
+    { uc:'UC-15', name:'Engineering Copilot',      evt:'BRD-to-diagram prototype — 4 diagrams auto-generated', color:'#2dd4bf', t:'3h ago' },
+  ];
+
+  function makeItem(it) {
+    return `<span class="reel-item">
+      <span class="reel-dot" style="background:${it.color};box-shadow:0 0 5px ${it.color}60;"></span>
+      <span class="reel-uc">${it.uc}</span>
+      <span class="reel-name">${it.name}</span>
+      <span style="color:#334155;font-size:10px;">·</span>
+      <span class="reel-evt">${it.evt}</span>
+      <span class="reel-time">${it.t}</span>
+      <span class="reel-div"></span>
+    </span>`;
+  }
+
+  const inner = document.getElementById('reel-inner');
+  if (!inner) return;
+  // Double the items so the seamless loop works
+  const once = ITEMS.map(makeItem).join('');
+  inner.innerHTML = once + once;
+}
+
 
 </script>
 <!-- ── Detail Drawer ──────────────────────────────────────── -->
