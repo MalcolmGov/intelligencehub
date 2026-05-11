@@ -2751,7 +2751,7 @@ const DEFAULT_DATA = [
     traditionalEst:{devs:6,months:7,aiWeeks:16},
     status:'In progress', pct:65, assignedTo:'Malcolm Govender', demoUrl:'' },
 
-  { id:20, priority:1, owner:'Malcolm Govender', project:'AI POPIA Compliance Scanner', sq:'missing', isNew:true,
+  { id:20, priority:1, owner:'Malcolm Govender', project:'AI POPIA Compliance Scanner', status:'Not started', pct:0, sq:'missing', isNew:true,
     desc:'AI-powered POPIA compliance scanner embedded in the SDLC that detects PII exposure, missing consent flows and unlawful data retention across codebases, APIs, data flows and DB schemas — auto-classifying fields via ML, blocking non-compliant CI/CD merges and producing Article-by-Article compliance reports for the SA Information Regulator.',
     artifacts:[
       {t:'html', l:'Requirements', u:'./requirements/req_20_popia_scanner.html'},
@@ -2769,7 +2769,7 @@ const DEFAULT_DATA = [
     traditionalEst:{devs:3,months:5,aiWeeks:8},
     status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
 
-  { id:21, priority:1, owner:'Malcolm Govender', project:'AI Threat Modelling Agent', sq:'missing', isNew:true,
+  { id:21, priority:1, owner:'Malcolm Govender', project:'AI Threat Modelling Agent', status:'Not started', pct:0, sq:'missing', isNew:true,
     desc:'AI-powered threat modelling agent embedded in the SDLC that auto-generates STRIDE/DREAD/PASTA threat models from architecture diagrams, PRDs and API specs on every PR — producing a living CVSS-scored Threat Register, posting summaries as PR comments in GitHub/Azure DevOps, feeding findings into Jira/Linear and generating executive-ready risk heat maps against the organisation\'s risk appetite.',
     artifacts:[
       {t:'html', l:'Requirements', u:'./requirements/req_21_threat_modelling.html'},
@@ -2787,7 +2787,7 @@ const DEFAULT_DATA = [
     traditionalEst:{devs:3,months:4,aiWeeks:6},
     status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
 
-  { id:22, priority:1, owner:'Malcolm Govender', project:'Regulatory Change Impact Radar', sq:'missing', isNew:true,
+  { id:22, priority:1, owner:'Malcolm Govender', project:'Regulatory Change Impact Radar', status:'Not started', pct:0, sq:'missing', isNew:true,
     desc:'AI-powered regulatory intelligence platform that monitors SARB, FSCA, POPIA Information Regulator, PCI-SSC and FICA amendment feeds in real-time using NLP — auto-mapping regulatory changes to affected system components, APIs and data models, generating impact assessments with effort estimates and compliance deadlines, and producing board-ready regulatory change reports for compliance, engineering and legal teams.',
     artifacts:[
       {t:'html', l:'Requirements', u:'./requirements/req_22_regulatory_radar.html'},
@@ -2805,7 +2805,7 @@ const DEFAULT_DATA = [
     traditionalEst:{devs:3,months:6,aiWeeks:8},
     status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
 
-  { id:23, priority:1, owner:'Malcolm Govender', project:'AI-Powered DevSecOps Security Gate', sq:'missing', isNew:true,
+  { id:23, priority:1, owner:'Malcolm Govender', project:'AI-Powered DevSecOps Security Gate', status:'Not started', pct:0, sq:'missing', isNew:true,
     desc:'AI-powered security gate integrated into CI/CD pipelines (GitHub Actions / Azure DevOps) combining SAST with ML false-positive suppression, dependency CVE scanning with CVSS-based blocking, secret/credential detection, container image scanning, SBOM generation on every release and AI-driven triage — enforcing PCI-DSS Requirement 6 and POPIA security obligations, blocking deploys on policy violations and tracking security posture trends on a live dashboard.',
     artifacts:[
       {t:'html', l:'Requirements', u:'./requirements/req_23_devsecops_gate.html'},
@@ -2822,7 +2822,7 @@ const DEFAULT_DATA = [
     codeMetrics:{srcLoc:1600,testLoc:320,files:8,langs:'Python, YAML',complexity:'High',deps:9,integrations:5,compliance:["PCI-DSS","ISO 27001","POPIA"]},
     traditionalEst:{devs:3,months:3,aiWeeks:6},
     status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
-  { id:24, priority:1, owner:'Malcolm Govender', project:'AI Customer Intelligence Layer', sq:'missing', isNew:true,
+  { id:24, priority:1, owner:'Malcolm Govender', project:'AI Customer Intelligence Layer', status:'Not started', pct:0, sq:'missing', isNew:true,
     desc:'Unified AI-powered customer intelligence platform that stitches fragmented identity across banking, telephony, support, web and transaction systems into a single customer profile — enriched with real-time behavioural signals, AI-driven next-best-action recommendations, POPIA-native consent tracking and bi-directional integration with ARIA (UC18) and PayGuard (UC16) to close the loop between interaction, fraud and engagement data.',
     artifacts:[
       {t:'html', l:'Requirements',         u:'./requirements/req_24_customer_intelligence.html'},
@@ -3796,15 +3796,29 @@ function renderCharts() {
     const el = document.getElementById('chart-owner');
     if (!el) return;
     const ownerMap = {};
-    data.filter(r => r.status !== 'Not started').forEach(r => {
+    // Count active (non-Not-started) UCs and pipeline UCs per owner
+    data.forEach(r => {
       if (!r.owner) return;
-      if (!ownerMap[r.owner]) ownerMap[r.owner] = {total:0, count:0};
-      ownerMap[r.owner].total += r.pct;
-      ownerMap[r.owner].count++;
+      if (!ownerMap[r.owner]) ownerMap[r.owner] = {total:0, active:0, pipeline:0};
+      if (r.status && r.status !== 'Not started') {
+        ownerMap[r.owner].total += (r.pct || 0);
+        ownerMap[r.owner].active++;
+      } else {
+        ownerMap[r.owner].pipeline++;
+      }
+    });
+    // Ensure all OWNER_META entries appear even if only pipeline UCs
+    Object.keys(OWNER_META).forEach(name => {
+      if (!ownerMap[name]) ownerMap[name] = {total:0, active:0, pipeline:0};
     });
     const rows = Object.entries(ownerMap)
-      .map(([name,v]) => ({ name, short: name.split(' ')[0], avg: Math.round(v.total/v.count), count: v.count, color: ownerColor(name) }))
-      .sort((a,b) => b.avg - a.avg);
+      .filter(([name]) => name && OWNER_META[name])
+      .map(([name,v]) => ({
+        name, short: name.split(' ')[0],
+        avg: v.active > 0 ? Math.round(v.total/v.active) : 0,
+        count: v.active, pipeline: v.pipeline, color: ownerColor(name)
+      }))
+      .sort((a,b) => b.avg - a.avg || b.count - a.count);
 
     const barH=18, rowH=30, padL=88, padR=58, padT=8;
     const W = 560, H = padT + rows.length*rowH + 14;
@@ -3847,8 +3861,11 @@ function renderCharts() {
         html += `<rect x="${padL}" y="${y}" width="${bw.toFixed(1)}" height="${barH}" rx="4" fill="url(#og${i})" filter="url(#owner-glow)" opacity=".92"/>`;
       }
       // value + count badge
-      html += `<text x="${padL+barW+8}" y="${y+barH/2+4}" fill="#e8eaff" font-size="12" font-weight="700" font-family="Inter,sans-serif">${row.avg}%</text>`;
-      html += `<text x="${W-2}" y="${y+barH/2+4}" text-anchor="end" fill="#7c8db8" font-size="10" font-family="Inter,sans-serif">${row.count} UC</text>`;
+      const avgLabel = row.count > 0 ? `${row.avg}%` : `—`;
+      const countLabel = row.count > 0 ? `${row.count} UC` : `${row.pipeline} pipeline`;
+      const avgColor = row.count > 0 ? '#e8eaff' : '#555e8a';
+      html += `<text x="${padL+barW+8}" y="${y+barH/2+4}" fill="${avgColor}" font-size="12" font-weight="700" font-family="Inter,sans-serif">${avgLabel}</text>`;
+      html += `<text x="${W-2}" y="${y+barH/2+4}" text-anchor="end" fill="#7c8db8" font-size="10" font-family="Inter,sans-serif">${countLabel}</text>`;
     });
     html += `</svg>`;
     el.innerHTML = html;
