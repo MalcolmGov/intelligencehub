@@ -3892,6 +3892,8 @@ function toggleCharts() {
 /* ── Portfolio Dashboard ─────────────────────────────────────────── */
 let _pfVisible = true;
 let _pfFilter  = 'all';
+let _ucChartFilter = 'all'; // all | done | on-track | at-risk | delayed
+const _ucStatusOvr = {};    // id → 'On Track'|'At Risk'|'In Progress'|'Paused'|'Need Info'
 
 function togglePortfolio() {
   _pfVisible = !_pfVisible;
@@ -3907,6 +3909,45 @@ function pfSetFilter(f, btn) {
   btn.classList.add('pf-active');
   renderPortfolioDashboard();
 }
+function ucChartSetFilter(f) {
+  _ucChartFilter = f;
+  renderCharts();
+}
+
+function ucPickStatus(id, el) {
+  const existing = document.getElementById('uc-status-dd');
+  if (existing) { existing.remove(); if (existing._forId === id) return; }
+  const opts = ['On Track','At Risk','In Progress','Paused','Need Info'];
+  const colors = {'On Track':'#4ade80','At Risk':'#fcd34d','In Progress':'#60a5fa','Paused':'#c4b5fd','Need Info':'#fb7185'};
+  const dd = document.createElement('div');
+  dd.id = 'uc-status-dd';
+  dd._forId = id;
+  dd.style.cssText = 'position:fixed;z-index:9999;background:#131729;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.6);min-width:130px;';
+  opts.forEach(opt => {
+    const item = document.createElement('div');
+    item.textContent = opt;
+    item.style.cssText = 'padding:7px 12px;cursor:pointer;border-radius:5px;font-size:11px;font-weight:700;color:' + colors[opt] + ';transition:background .12s;';
+    item.onmouseenter = () => { item.style.background = 'rgba(255,255,255,.06)'; };
+    item.onmouseleave = () => { item.style.background = ''; };
+    item.onclick = (e) => {
+      e.stopPropagation();
+      _ucStatusOvr[id] = opt;
+      dd.remove();
+      renderCharts();
+    };
+    dd.appendChild(item);
+  });
+  const rect = el.closest('td').getBoundingClientRect();
+  dd.style.top = (rect.bottom + 4) + 'px';
+  dd.style.left = rect.left + 'px';
+  document.body.appendChild(dd);
+  setTimeout(() => {
+    document.addEventListener('click', function closeDD(e) {
+      if (!dd.contains(e.target)) { dd.remove(); document.removeEventListener('click', closeDD); }
+    });
+  }, 0);
+}
+
 
 function renderPortfolioDashboard() {
   if (!_pfVisible) return;
@@ -4240,7 +4281,7 @@ function renderCharts() {
       return {svg,dStr,dColor};
     }
     function ucGrpHdr(label,count,color,icon) {
-      return `<tr><td colspan="8" style="padding:14px 12px 5px;border-bottom:1px solid rgba(255,255,255,.04);">
+      return `<tr><td colspan="7" style="padding:14px 12px 5px;border-bottom:1px solid rgba(255,255,255,.04);">
         <span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${color};">${icon} ${label}</span>
         <span style="font-size:9px;color:#3d4580;margin-left:7px;">${count} use case${count!==1?'s':''}</span>
       </td></tr>`;
@@ -4252,6 +4293,11 @@ function renderCharts() {
       const sp   = ucSparkline(r);
       const rk   = ucRisk(r);
       const upd  = ucUpdated(r);
+      const ovr  = _ucStatusOvr[r.id];
+      const pillLabel = ovr || (pct>=90?'On Track':pct>=50?'At Risk':'Delayed');
+      const pillColors = {'On Track':['rgba(34,197,94,.15)','#4ade80','rgba(34,197,94,.25)'],'At Risk':['rgba(245,158,11,.15)','#fcd34d','rgba(245,158,11,.25)'],'Delayed':['rgba(239,68,68,.15)','#fb923c','rgba(239,68,68,.25)'],'In Progress':['rgba(96,165,250,.15)','#60a5fa','rgba(96,165,250,.25)'],'Paused':['rgba(167,139,250,.15)','#c4b5fd','rgba(167,139,250,.25)'],'Need Info':['rgba(251,113,133,.15)','#fb7185','rgba(251,113,133,.25)']};
+      const pc = pillColors[pillLabel]||pillColors['At Risk'];
+      const pill = `<span onclick="ucPickStatus(${r.id},this)" style="cursor:pointer;display:inline-flex;align-items:center;gap:5px;background:${pc[0]};color:${pc[1]};border:1px solid ${pc[2]};border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;white-space:nowrap;user-select:none;">${pillLabel} <span style="opacity:.6;font-size:9px;">▾</span></span>`;
       const hin  = `this.style.background='rgba(14,220,255,.032)';this.style.boxShadow='inset 0 0 90px rgba(14,220,255,.055),inset 0 1px 0 rgba(14,220,255,.06)'`;
       const hout = `this.style.background='';this.style.boxShadow=''`;
       return `<tr style="border-bottom:1px solid rgba(255,255,255,.03);transition:background .18s,box-shadow .18s;" onmouseover="${hin}" onmouseout="${hout}">
@@ -4272,14 +4318,13 @@ function renderCharts() {
         <td style="padding:9px 10px;white-space:nowrap;">
           <div style="display:flex;align-items:center;gap:6px;">${sp.svg}<span style="font-size:11px;font-weight:700;color:${sp.dColor};">${sp.dStr}</span></div>
         </td>
-        <td style="padding:9px 10px;">${ucStatusPill(pct)}</td>
+        <td style="padding:9px 10px;">${pill}</td>
         <td style="padding:9px 10px;">
           <div style="display:flex;align-items:center;gap:5px;white-space:nowrap;">
             <span style="width:6px;height:6px;border-radius:50%;background:${rk.c};display:inline-block;"></span>
             <span style="font-size:11px;color:${rk.c};">${rk.label}</span>
           </div>
         </td>
-        <td style="padding:9px 8px 9px 4px;font-size:10px;color:#3d4580;white-space:nowrap;">${upd}</td>
       </tr>`;
     }
     function ucPctColor(p) {
@@ -4324,10 +4369,16 @@ function renderCharts() {
     }
 
     // ── group & render ────────────────────────────────────────────
-    const grpDone    = rows.filter(r => r.status === 'Done');
-    const grpOnTrack = rows.filter(r => r.status !== 'Done' && r.pct >= 90);
-    const grpAtRisk  = rows.filter(r => r.status !== 'Done' && r.pct >= 50 && r.pct < 90);
-    const grpDelayed = rows.filter(r => r.status !== 'Done' && r.pct < 50);
+    let grpDone    = rows.filter(r => r.status === 'Done');
+    let grpOnTrack = rows.filter(r => r.status !== 'Done' && r.pct >= 90);
+    let grpAtRisk  = rows.filter(r => r.status !== 'Done' && r.pct >= 50 && r.pct < 90);
+    let grpDelayed = rows.filter(r => r.status !== 'Done' && r.pct < 50);
+    if (_ucChartFilter !== 'all') {
+      if (_ucChartFilter !== 'done')     grpDone    = [];
+      if (_ucChartFilter !== 'on-track') grpOnTrack = [];
+      if (_ucChartFilter !== 'at-risk')  grpAtRisk  = [];
+      if (_ucChartFilter !== 'delayed')  grpDelayed = [];
+    }
 
     const onTrack = grpDone.length + grpOnTrack.length;
     const atRisk  = grpAtRisk.length;
@@ -4339,16 +4390,22 @@ function renderCharts() {
       return ucGrpHdr(label, grp.length, color, icon) + grp.map(r => ucRow(r)).join('');
     }
 
-    const TH = `style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#2e3560;white-space:nowrap;"`;
+    const TH = `style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#606880;white-space:nowrap;"`;
 
     el.style.height = 'auto';
     el.style.overflowX = 'auto';
     el.innerHTML = `
       <div style="position:relative;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse 90% 55% at 50% 0%,rgba(14,220,255,.028) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 10% 100%,rgba(99,102,241,.022) 0%,transparent 60%),#0a0e1e;box-shadow:0 8px 40px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.05),inset 0 1px 0 rgba(255,255,255,.045);">
 
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px 10px;border-bottom:1px solid rgba(255,255,255,.05);">
-          <div style="font-size:11px;font-weight:700;color:#3d4580;letter-spacing:.04em;text-transform:uppercase;">UC Progress \xb7 Active Portfolio</div>
-          <div style="display:flex;align-items:center;gap:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:13px 16px 10px;border-bottom:1px solid rgba(255,255,255,.05);">
+          <div style="font-size:11px;font-weight:700;color:#8892c0;letter-spacing:.04em;text-transform:uppercase;">UC Progress &middot; Active Portfolio</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            ${['all','done','on-track','at-risk','delayed'].map(f=>{
+              const lbl={'all':'All','done':'Done','on-track':'On Track','at-risk':'At Risk','delayed':'Delayed'};
+              const ia=_ucChartFilter===f;
+              return `<button onclick="ucChartSetFilter('${f}')" style="padding:3px 10px;border-radius:99px;border:1px solid ${ia?'rgba(14,220,255,.4)':'rgba(255,255,255,.08)'};background:${ia?'rgba(14,220,255,.1)':'transparent'};color:${ia?'#22d3ee':'#606880'};font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;">${lbl[f]}</button>`;
+            }).join('')}
+            <div style="width:1px;height:14px;background:rgba(255,255,255,.06);margin:0 6px;"></div>
             <div style="display:flex;align-items:center;gap:5px;">
               <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span>
               <span style="font-size:11px;font-weight:700;color:#4ade80;">${onTrack}</span>
@@ -4364,7 +4421,7 @@ function renderCharts() {
               <span style="font-size:11px;font-weight:700;color:#fb923c;">${delayed}</span>
               <span style="font-size:10px;color:#3d4580;">delayed</span>
             </div>
-            <div style="width:1px;height:14px;background:rgba(255,255,255,.06);"></div>
+            <div style="width:1px;height:14px;background:rgba(255,255,255,.06);margin:0 2px;"></div>
             <div style="font-size:11px;font-weight:800;color:#60a5fa;">${avgPct}%<span style="font-size:9px;font-weight:500;color:#3d4580;margin-left:3px;">avg</span></div>
           </div>
         </div>
@@ -4380,7 +4437,6 @@ function renderCharts() {
                 <th ${TH}>Trend</th>
                 <th ${TH}>Status</th>
                 <th ${TH}>Risk</th>
-                <th ${TH}>Updated</th>
               </tr>
             </thead>
             <tbody>
@@ -4395,15 +4451,15 @@ function renderCharts() {
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 16px 16px;">
           <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.14);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:9px;">
             <div style="width:30px;height:30px;border-radius:50%;background:rgba(34,197,94,.18);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#4ade80;">✓</div>
-            <div><div style="font-size:17px;font-weight:800;color:#4ade80;line-height:1;">${onTrack}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">On Track \xb7 90%+</div></div>
+            <div><div style="font-size:17px;font-weight:800;color:#4ade80;line-height:1;">${onTrack}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">On Track &middot; 90%+</div></div>
           </div>
           <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.14);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:9px;">
             <div style="width:30px;height:30px;border-radius:50%;background:rgba(245,158,11,.18);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fcd34d;">⚠</div>
-            <div><div style="font-size:17px;font-weight:800;color:#fcd34d;line-height:1;">${atRisk}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">At Risk \xb7 50–89%</div></div>
+            <div><div style="font-size:17px;font-weight:800;color:#fcd34d;line-height:1;">${atRisk}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">At Risk &middot; 50–89%</div></div>
           </div>
           <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.14);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:9px;">
             <div style="width:30px;height:30px;border-radius:50%;background:rgba(239,68,68,.18);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fb923c;">!</div>
-            <div><div style="font-size:17px;font-weight:800;color:#fb923c;line-height:1;">${delayed}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">Delayed \xb7 Below 50%</div></div>
+            <div><div style="font-size:17px;font-weight:800;color:#fb923c;line-height:1;">${delayed}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">Delayed &middot; Below 50%</div></div>
           </div>
           <div style="background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.14);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:9px;">
             <div style="width:30px;height:30px;border-radius:50%;background:rgba(96,165,250,.18);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#60a5fa;flex-shrink:0;">↗</div>
