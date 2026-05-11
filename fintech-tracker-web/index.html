@@ -3768,12 +3768,10 @@ function renderArtifacts(arts, rowId) {
     }
     const isFile = a.u.startsWith('file://') || a.u.startsWith('computer://');
     if (isFile) {
-      // Convert file:// → computer:// so Cowork desktop can open local files
+      // Convert file:// → computer:// — Cowork's Electron runtime handles this protocol natively
       const computerUrl = a.u.startsWith('file://') ? a.u.replace('file://', 'computer://') : a.u;
-      const safe = computerUrl.replace(/'/g, "\'").replace(/"/g, '&quot;');
-      const lbl  = a.l.replace(/'/g, "\'").replace(/"/g, '&quot;');
       const localPath = a.u.replace('file://', '').replace('computer://', '');
-      return `<a class="art-chip art-${a.t}${hidden}" href="${computerUrl}" onclick="handleLocalArt(event,'${safe}','${lbl}')" title="Open: ${localPath}">${icon}${a.l}</a>`;
+      return `<a class="art-chip art-${a.t}${hidden}" href="${computerUrl}" title="Open: ${localPath}">${icon}${a.l}</a>`;
     }
     return `<a class="art-chip art-${a.t}${hidden}" href="${a.u}" target="_blank" title="${a.l}">${icon}${a.l}</a>`;
   }).join('');
