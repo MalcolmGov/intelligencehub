@@ -4397,27 +4397,28 @@ function renderCharts() {
     const inProg   = active.filter(r=>r.status==='In progress').length;
     const inRev    = active.filter(r=>r.status==='In review').length;
     const total    = active.length;
-    const avg      = total ? Math.round(active.reduce((a,d)=>a+d.pct,0)/total) : 0;
+    const avgRaw   = total ? active.reduce((a,d)=>a+d.pct,0)/total : 0;
+    const avg      = Math.round(avgRaw);
     const segs = [
       { label:'Done',        value:done,   color:'#00c875' },
       { label:'In Progress', value:inProg, color:'#fdab3d' },
       { label:'In Review',   value:inRev,  color:'#a78bfa' },
     ].filter(s=>s.value>0);
 
-    const W=300, H=220, cx=108, cy=106, R=78, ri=50, gap=3;
-    // unique IDs so re-renders don't clash
+    // Layout: donut left, legend right
+    const W=290, H=178, cx=88, cy=86, R=66, ri=42, gap=3;
+    const lx=172; // legend x start
     const uid = 'donut_' + Date.now();
     const valId = uid+'_val', subId = uid+'_sub';
 
-    let html = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;display:block">`;
+    let html = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;display:block;width:100%;max-width:${W}px">`;
 
-    // CSS for hover scale animation scoped to this SVG
     html += `<style>
-      .dseg { cursor:pointer; transition:opacity .18s, transform .18s; transform-box:fill-box; transform-origin:center; }
+      .dseg { cursor:pointer; transition:opacity .18s, transform .18s; transform-box:fill-box; transform-origin:${cx}px ${cy}px; }
       .dseg:hover { opacity:1 !important; transform:scale(1.06); }
     </style>`;
 
-    // arcs with hover handlers
+    // arcs
     let startAngle = -Math.PI/2;
     segs.forEach(seg => {
       const pct = Math.round((seg.value/total)*100);
@@ -4429,22 +4430,46 @@ function renderCharts() {
       const ix2=cx+ri*Math.cos(endAngle),  iy2=cy+ri*Math.sin(endAngle);
       const lg = sweep > Math.PI ? 1 : 0;
       const d  = `M${x1.toFixed(2)} ${y1.toFixed(2)} A${R} ${R} 0 ${lg} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${ix2.toFixed(2)} ${iy2.toFixed(2)} A${ri} ${ri} 0 ${lg} 0 ${ix1.toFixed(2)} ${iy1.toFixed(2)} Z`;
-      html += `<path class="dseg" d="${d}" fill="${seg.color}" opacity=".86"
+      html += `<path class="dseg" d="${d}" fill="${seg.color}" opacity=".88"
         onmouseenter="var v=document.getElementById('${valId}'),s=document.getElementById('${subId}');
           if(v){v.textContent='${pct}%';v.setAttribute('fill','${seg.color}');}
           if(s){s.textContent='${seg.label}';s.setAttribute('fill','${seg.color}');}"
         onmouseleave="var v=document.getElementById('${valId}'),s=document.getElementById('${subId}');
           if(v){v.textContent='${avg}%';v.setAttribute('fill','#e8eaff');}
-          if(s){s.textContent='avg complete';s.setAttribute('fill','#555e8a');}"/>`;
+          if(s){s.textContent='avg complete';s.setAttribute('fill','#6b7280');}"/>`;
       startAngle += sweep + (gap*Math.PI/180);
     });
 
-    // centre text (two lines)
-    html += `<text id="${valId}" x="${cx}" y="${cy+8}" text-anchor="middle" fill="#e8eaff" font-size="24" font-weight="700" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">${avg}%</text>`;
-    html += `<text id="${subId}" x="${cx}" y="${cy+24}" text-anchor="middle" fill="#555e8a" font-size="10" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">avg complete</text>`;
+    // Centre text
+    html += `<text id="${valId}" x="${cx}" y="${cy+7}" text-anchor="middle" fill="#e8eaff" font-size="22" font-weight="700" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">${avg}%</text>`;
+    html += `<text id="${subId}" x="${cx}" y="${cy+21}" text-anchor="middle" fill="#6b7280" font-size="9.5" font-family="Inter,sans-serif" style="pointer-events:none;transition:fill .18s">avg complete</text>`;
 
-    // hint text below donut
-    html += `<text x="${cx}" y="${H-4}" text-anchor="middle" fill="#3d4270" font-size="9" font-family="Inter,sans-serif">hover segments</text>`;
+    // Legend panel (right side)
+    // Summary header
+    html += `<text x="${lx}" y="22" fill="#94a3b8" font-size="10" font-weight="600" font-family="Inter,sans-serif">ACTIVE UCs</text>`;
+    html += `<text x="${lx+84}" y="22" text-anchor="end" fill="#e8eaff" font-size="13" font-weight="700" font-family="Inter,sans-serif">${total}</text>`;
+    html += `<line x1="${lx}" y1="28" x2="${lx+84}" y2="28" stroke="#2e3358" stroke-width="1"/>`;
+
+    // Legend rows
+    const legendSegs = [
+      { label:'Done',        value:done,   color:'#00c875' },
+      { label:'In Progress', value:inProg, color:'#fdab3d' },
+      { label:'In Review',   value:inRev,  color:'#a78bfa' },
+    ];
+    legendSegs.forEach((seg, i) => {
+      const ly = 50 + i * 34;
+      const pct = total ? Math.round((seg.value/total)*100) : 0;
+      // Color dot
+      html += `<circle cx="${lx+5}" cy="${ly}" r="5" fill="${seg.color}" opacity=".9"/>`;
+      // Label
+      html += `<text x="${lx+16}" y="${ly+4}" fill="#94a3b8" font-size="10" font-family="Inter,sans-serif">${seg.label}</text>`;
+      // Count (right-aligned)
+      html += `<text x="${lx+84}" y="${ly-2}" text-anchor="end" fill="#e8eaff" font-size="14" font-weight="700" font-family="Inter,sans-serif">${seg.value}</text>`;
+      html += `<text x="${lx+84}" y="${ly+10}" text-anchor="end" fill="${seg.color}" font-size="9" font-family="Inter,sans-serif">${pct}%</text>`;
+    });
+
+    // Bottom footnote
+    html += `<text x="${lx}" y="${H-4}" fill="#3d4580" font-size="8.5" font-family="Inter,sans-serif">hover to explore</text>`;
 
     html += `</svg>`;
     el.innerHTML = html;
