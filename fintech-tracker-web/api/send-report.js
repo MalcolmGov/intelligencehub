@@ -22,19 +22,25 @@ module.exports = async function handler(req, res) {
     for await (const chunk of req) chunks.push(chunk);
     const body = JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
     const to = String(body.to || '').trim();
-    const subject = String(body.subject || 'Latest Fintech AI Use Case Tracker Report').trim();
-    const report = String(body.report || '').trim();
+    const subject = String(body.subject || 'Fintech AI Use Case Tracker — Programme Report').trim();
+    // Accept pre-built HTML body (preferred) or fall back to plain-text report
+    const htmlBody = String(body.html || '').trim();
+    const plainReport = String(body.report || '').trim();
 
     if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
       return json(res, 400, { error: 'A valid recipient email is required.' });
     }
-    if (!report) return json(res, 400, { error: 'Report content is required.' });
+    if (!htmlBody && !plainReport) return json(res, 400, { error: 'Report content is required.' });
 
-    const html = report
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br>');
+    // Use the pre-built HTML if available, otherwise wrap plain text in basic HTML
+    const emailHtml = htmlBody || (() => {
+      const escaped = plainReport
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+      return `<div style="font-family:Inter,Arial,sans-serif;line-height:1.55;color:#0f172a">${escaped}</div>`;
+    })();
 
     const resendRes = await fetch(RESEND_API_URL, {
       method: 'POST',
@@ -46,8 +52,8 @@ module.exports = async function handler(req, res) {
         from: DEFAULT_FROM,
         to,
         subject,
-        text: report,
-        html: `<div style="font-family:Inter,Arial,sans-serif;line-height:1.55;color:#0f172a">${html}</div>`
+        html: emailHtml,
+        ...(plainReport ? { text: plainReport } : {})
       })
     });
 

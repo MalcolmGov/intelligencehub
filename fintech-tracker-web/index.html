@@ -5811,7 +5811,7 @@ function exportSnapshot() {
   showToast('Snapshot ready — share the downloaded file!');
 }
 
-function exportReport() {
+function generateHTMLReport() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'});
   const sorted = applySortTo(data);
@@ -5963,10 +5963,15 @@ body{font-family:'Inter',-apple-system,sans-serif;background:#f4f3ef;color:#1818
 </body>
 </html>`;
 
+  return { html, filename: 'fintech_ai_report_'+now.toISOString().slice(0,10)+'.html' };
+}
+
+function exportReport() {
+  const { html, filename } = generateHTMLReport();
   const blob = new Blob([html],{type:'text/html;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'fintech_ai_report_'+now.toISOString().slice(0,10)+'.html';
+  a.download = filename;
   a.click();
   showToast('Report exported — open in browser, then print to PDF');
 }
@@ -7064,18 +7069,17 @@ document.addEventListener('DOMContentLoaded', function() {
       ].join('\n');
     }
 
-    function downloadReport(report) {
+    function downloadReport(htmlContent) {
       try {
-        const blob = new Blob([report], { type:'text/plain;charset=utf-8' });
+        const blob = new Blob([htmlContent], { type:'text/html;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'fintech-ai-use-case-latest-report.txt';
+        a.download = 'fintech_ai_report_' + new Date().toISOString().slice(0,10) + '.html';
         document.body.appendChild(a);
         a.click();
         setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1200);
       } catch(e) {}
-      try { navigator.clipboard && navigator.clipboard.writeText(report); } catch(e) {}
     }
 
     function openReportEmailDraft(report) {
@@ -7089,13 +7093,13 @@ document.addEventListener('DOMContentLoaded', function() {
       return `I've generated the latest portfolio report, downloaded a copy, and opened an email draft to **${REPORT_EMAIL_TO}**. Review it and press Send in your mail app.`;
     }
 
-    async function sendReportEmail(report) {
-      const subject = 'Latest Fintech AI Use Case Tracker Report';
+    async function sendReportEmail(htmlContent) {
+      const subject = 'Fintech AI Use Case Tracker — Programme Report';
       if (location.protocol === 'file:') throw new Error('The secure email endpoint is unavailable when opened as a local file.');
       const res = await fetch(REPORT_SEND_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to: REPORT_EMAIL_TO, subject, report })
+        body: JSON.stringify({ to: REPORT_EMAIL_TO, subject, html: htmlContent })
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(payload.error || `Email endpoint returned ${res.status}`);
@@ -7103,15 +7107,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function deliverLatestReport(q) {
-      const report = generateLatestReport();
-      if (!/email|send|mail/i.test(q)) return '**Latest report generated:**\n\n' + report;
+      const { html: reportHtml } = generateHTMLReport();
+      if (!/email|send|mail/i.test(q)) {
+        downloadReport(reportHtml);
+        return `I've generated the latest portfolio report and downloaded it to your device.`;
+      }
       try {
-        await sendReportEmail(report);
-        downloadReport(report);
-        return `I've generated and emailed the latest portfolio report to **${REPORT_EMAIL_TO}**. I also downloaded a local copy for your records.`;
+        await sendReportEmail(reportHtml);
+        downloadReport(reportHtml);
+        return `I've sent the full programme report to **${REPORT_EMAIL_TO}** — it includes the live status table, progress bars, and artifact links. I've also downloaded a local copy.`;
       } catch(e) {
-        openReportEmailDraft(report);
-        return `I generated the latest portfolio report, but secure direct sending is not available here (${e.message}). I downloaded the report and opened a pre-addressed email draft to **${REPORT_EMAIL_TO}** instead.`;
+        downloadReport(reportHtml);
+        return `I generated the professional report and downloaded it locally, but the secure email endpoint couldn't be reached (${e.message}). Please attach the downloaded file and send it manually.`;
       }
     }
 
