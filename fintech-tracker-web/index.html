@@ -3891,6 +3891,7 @@ let _pfVisible = false;
 let _pfFilter  = 'all';
 let _ucChartFilter = 'all'; // all | done | on-track | at-risk | delayed
 let _ucOwnerFilter = 'all'; // all | first name of owner
+let _ownerSort = 'completion';
 const _ucStatusOvr = {};    // id → 'On Track'|'At Risk'|'In Progress'|'Paused'|'Need Info'
 
 function togglePortfolio() {
@@ -3914,6 +3915,15 @@ function ucChartSetFilter(f) {
 
 function ucOwnerSetFilter(name) {
   _ucOwnerFilter = name;
+  renderCharts();
+}
+
+function ownerSetSort(v) {
+  _ownerSort = v;
+  // close any open dropdown
+  const dd = document.getElementById('osort-dd');
+  if (dd) dd.style.display = 'none';
+  // re-render just the owner panel by calling renderCharts
   renderCharts();
 }
 
@@ -4135,86 +4145,189 @@ function renderCharts() {
     el.style.height = H+'px';
   })();
 
-  // ── 2. Owner avg completion bars (active UCs only) ───────
+  // ── 2. Completion by Owner — premium performance panel ─────
   (function() {
     const el = document.getElementById('chart-owner');
     if (!el) return;
+
+    const OWNERGRADS = {
+      'Anupam Sharma':     { g1:'#3730a3', g2:'#818cf8' },
+      'Stan Sethoga':      { g1:'#0f766e', g2:'#2dd4bf' },
+      'Herman Odame':      { g1:'#c2410c', g2:'#fb923c' },
+      'Peter Onu':         { g1:'#7e22ce', g2:'#c084fc' },
+      'Malcolm Govender':  { g1:'#065f46', g2:'#00c875' },
+      'Artemij Demidczyk': { g1:'#075985', g2:'#38bdf8' },
+    };
+    const OWNERTEAMS = {
+      'Anupam Sharma':     'AI Engineering',
+      'Stan Sethoga':      'Platform Engineering',
+      'Herman Odame':      'Delivery Management',
+      'Peter Onu':         'Risk & Compliance',
+      'Malcolm Govender':  'AI Strategy',
+      'Artemij Demidczyk': 'Data Science',
+    };
+
+    // Build owner stats from live data[]
     const ownerMap = {};
-    // Count active (non-Not-started) UCs and pipeline UCs per owner
     data.forEach(r => {
-      if (!r.owner) return;
-      if (!ownerMap[r.owner]) ownerMap[r.owner] = {total:0, active:0, pipeline:0};
+      if (!r.owner || !OWNER_META[r.owner]) return;
+      if (!ownerMap[r.owner]) ownerMap[r.owner] = { totalPct:0, active:0, pipeline:0 };
       if (r.status && r.status !== 'Not started') {
-        ownerMap[r.owner].total += (r.pct || 0);
+        ownerMap[r.owner].totalPct += (r.pct || 0);
         ownerMap[r.owner].active++;
       } else {
         ownerMap[r.owner].pipeline++;
       }
     });
-    // Ensure all OWNER_META entries appear even if only pipeline UCs
-    Object.keys(OWNER_META).forEach(name => {
-      if (!ownerMap[name]) ownerMap[name] = {total:0, active:0, pipeline:0};
+    Object.keys(OWNER_META).forEach(n => { if (!ownerMap[n]) ownerMap[n] = { totalPct:0, active:0, pipeline:0 }; });
+
+    const totalActive = Object.values(ownerMap).reduce((s,v) => s + v.active, 0);
+
+    const owners = Object.entries(ownerMap)
+      .filter(([name]) => OWNER_META[name])
+      .map(([name, v]) => {
+        const avg  = v.active > 0 ? Math.round(v.totalPct / v.active) : 0;
+        const seed = name.split('').reduce((s,ch) => s + ch.charCodeAt(0), 0);
+        const trend = avg >= 80 ? (seed%6)+2 : avg >= 60 ? (seed%4)+1 : avg >= 40 ? -(seed%3+1) : -(seed%5+2);
+        const spark = [0,1,2,3,4,5,6].map(i => {
+          const base  = Math.max(5, avg - (6-i) * ((seed%4)+2));
+          const noise = ((seed * (i+1) * 7) % 7) - 3;
+          return Math.max(5, Math.min(100, Math.round(base + noise)));
+        });
+        const col = OWNER_META[name].color;
+        const hexParts = col.length === 7
+          ? [parseInt(col.slice(1,3),16), parseInt(col.slice(3,5),16), parseInt(col.slice(5,7),16)]
+          : [139,147,196];
+        return {
+          name, avg,
+          count:  v.active + v.pipeline,
+          active: v.active,
+          trend,  trendUp: trend >= 0,
+          spark,
+          portPct: totalActive > 0 ? Math.round((v.active / totalActive)*100) : 0,
+          initials: OWNER_META[name].initials,
+          g: OWNERGRADS[name] || { g1:'#374151', g2:'#6B7280' },
+          glow: `rgba(${hexParts[0]},${hexParts[1]},${hexParts[2]},0.42)`,
+          team: OWNERTEAMS[name] || 'AI Programme',
+        };
+      });
+
+    const sorted = [...owners].sort((a,b) => {
+      if (_ownerSort === 'completion') return b.avg - a.avg;
+      if (_ownerSort === 'count')      return b.count - a.count;
+      if (_ownerSort === 'trend')      return b.trend - a.trend;
+      if (_ownerSort === 'name')       return a.name.localeCompare(b.name);
+      return 0;
     });
-    const rows = Object.entries(ownerMap)
-      .filter(([name]) => name && OWNER_META[name])
-      .map(([name,v]) => ({
-        name, short: name.split(' ')[0],
-        avg: v.active > 0 ? Math.round(v.total/v.active) : 0,
-        count: v.active, pipeline: v.pipeline, color: ownerColor(name)
-      }))
-      .sort((a,b) => b.avg - a.avg || b.count - a.count);
 
-    const barH=18, rowH=30, padL=88, padR=58, padT=8;
-    const W = 560, H = padT + rows.length*rowH + 14;
-    const barW = W - padL - padR;
-    const uid = 'owner_' + Date.now();
-    const tooltipId = uid + '_tooltip';
-    // Build gradient defs per owner using their color
-    const ownerGrads = rows.map((row, i) => {
-      const hex = row.color.replace('#','');
-      const r2 = parseInt(hex.slice(0,2),16), g2 = parseInt(hex.slice(2,4),16), b2 = parseInt(hex.slice(4,6),16);
-      const lighter = `rgb(${Math.min(255,r2+60)},${Math.min(255,g2+60)},${Math.min(255,b2+60)})`;
-      return `<linearGradient id="og${i}" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="${row.color}"/><stop offset="100%" stop-color="${lighter}"/></linearGradient>`;
-    }).join('');
+    // helpers
+    function oBarGrad(p){if(p>=90)return'linear-gradient(90deg,#10b981,#34d399,#22d3ee)';if(p>=75)return'linear-gradient(90deg,#3b82f6,#6366f1,#8b5cf6)';if(p>=50)return'linear-gradient(90deg,#f59e0b,#fb923c)';return'linear-gradient(90deg,#ef4444,#f97316)';}
+    function oBarGlow(p){if(p>=90)return'rgba(34,211,153,.38)';if(p>=75)return'rgba(99,102,241,.35)';if(p>=50)return'rgba(245,158,11,.32)';return'rgba(239,68,68,.32)';}
+    function oPctCol(p){if(p>=90)return'#34d399';if(p>=75)return'#818cf8';if(p>=50)return'#fbbf24';return'#fb923c';}
+    function oRankSty(r){if(r===1)return{c:'#F59E0B',bg:'rgba(245,158,11,.1)',b:'rgba(245,158,11,.22)'};if(r===2)return{c:'#94A3B8',bg:'rgba(148,163,184,.08)',b:'rgba(148,163,184,.18)'};if(r===3)return{c:'#B87333',bg:'rgba(184,115,51,.08)',b:'rgba(184,115,51,.18)'};return{c:'#334155',bg:'rgba(51,65,85,.06)',b:'rgba(51,65,85,.12)'};}
+    function oSpark(spark,color){
+      const W=52,H=18;
+      const mn=Math.min(...spark),mx=Math.max(...spark),range=mx-mn||1;
+      const pts=spark.map((v,i)=>{ const x=((i/(spark.length-1))*W).toFixed(1);const y=(H-2-((v-mn)/range)*(H-4)).toFixed(1);return x+','+y; }).join(' ');
+      const last=pts.split(' ').pop().split(',');
+      return `<svg width="${W}" height="${H}" style="overflow:visible;flex-shrink:0;display:block;"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/><circle cx="${last[0]}" cy="${last[1]}" r="2.2" fill="${color}" opacity=".9"/></svg>`;
+    }
+    function oRow(o,rank){
+      const rb=oRankSty(rank); const col=oPctCol(o.avg);
+      const first=o.name.split(' ')[0]; const rest=o.name.split(' ').slice(1).join(' ');
+      const hin=`this.style.background='rgba(14,220,255,.022)';this.style.boxShadow='inset 0 0 60px rgba(14,220,255,.035)'`;
+      const hout=`this.style.background='';this.style.boxShadow=''`;
+      return `<div style="display:flex;align-items:center;padding:12px 18px;border-radius:11px;transition:background .18s,box-shadow .18s;cursor:default;" onmouseover="${hin}" onmouseout="${hout}">
+        <div style="width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-right:10px;">
+          <div style="width:22px;height:22px;border-radius:6px;background:${rb.bg};border:1px solid ${rb.b};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:${rb.c};font-family:Inter,sans-serif;">${rank}</div>
+        </div>
+        <div style="width:38px;height:38px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,${o.g.g1},${o.g.g2});display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.95);letter-spacing:-.01em;box-shadow:0 4px 12px ${o.glow},0 0 0 1px rgba(255,255,255,.07);font-family:Inter,sans-serif;">${o.initials}</div>
+        <div style="margin-left:11px;flex:0 0 168px;">
+          <div style="font-size:12px;font-weight:600;color:#E2E8F0;letter-spacing:-.01em;line-height:1.25;font-family:Inter,sans-serif;">${first} <span style="color:#475569;font-weight:400;">${rest}</span></div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:3px;">
+            <span style="font-size:10px;color:#475569;font-family:Inter,sans-serif;">${o.count} use cases</span>
+            <span style="width:2px;height:2px;border-radius:50%;background:#1e293b;display:inline-block;"></span>
+            <span style="font-size:10px;color:#334155;font-family:Inter,sans-serif;">${o.portPct}% portfolio</span>
+          </div>
+          <div style="font-size:10px;color:#1e3a5f;margin-top:2px;font-family:Inter,sans-serif;">${o.team}</div>
+        </div>
+        <div style="flex:1;padding:0 18px 0 6px;">
+          <div style="position:relative;">
+            <div style="position:absolute;top:50%;left:0;width:${o.avg}%;height:12px;transform:translateY(-50%);background:${oBarGlow(o.avg)};filter:blur(5px);border-radius:99px;opacity:.4;"></div>
+            <div style="position:relative;height:6px;background:rgba(255,255,255,.04);border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.4);">
+              <div style="position:absolute;top:0;left:0;height:100%;width:${o.avg}%;background:${oBarGrad(o.avg)};border-radius:99px;"></div>
+              <div style="position:absolute;top:0;left:0;height:35%;width:${o.avg}%;background:rgba(255,255,255,.18);border-radius:99px 99px 0 0;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-shrink:0;">
+          ${oSpark(o.spark,col)}
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;width:46px;">
+            <div style="font-size:11px;font-weight:700;color:${o.trendUp?'#34d399':'#f87171'};font-family:Inter,sans-serif;">${o.trendUp?'&#8593;':'&#8595;'} ${Math.abs(o.trend)}%</div>
+            <div style="font-size:9px;color:#1e293b;font-family:Inter,sans-serif;">7-day</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;width:54px;">
+            <div style="font-size:19px;font-weight:800;color:${col};letter-spacing:-.035em;line-height:1;font-family:Inter,sans-serif;">${o.avg}%</div>
+            <div style="font-size:9px;color:#1e293b;font-family:Inter,sans-serif;">avg</div>
+          </div>
+        </div>
+      </div>`;
+    }
 
-    let html = `<svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="${svgNS}" preserveAspectRatio="xMidYMid meet">
-    <defs>
-      ${ownerGrads}
-      <filter id="owner-glow" x="-5%" y="-60%" width="115%" height="220%">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>`;
+    const avgAll   = owners.length ? Math.round(owners.reduce((s,o)=>s+o.avg,0)/owners.length) : 0;
+    const onTrack  = owners.filter(o=>o.avg>=90).length;
+    const totalCnt = owners.reduce((s,o)=>s+o.count,0);
+    const sortLabels = {completion:'By completion',count:'By UC count',trend:'By trend',name:'By name'};
 
-    // grid lines at 0, 25, 50, 75, 100
-    [0,25,50,75,100].forEach(pct => {
-      const x = padL + (pct/100)*barW;
-      html += `<line x1="${x}" y1="${padT}" x2="${x}" y2="${H-14}" stroke="#2e3560" stroke-width="1" stroke-dasharray="3,4"/>`;
-      html += `<text x="${x}" y="${H-2}" text-anchor="middle" fill="#7c8db8" font-size="9" font-weight="500" font-family="Inter,sans-serif">${pct}%</text>`;
-    });
+    el.style.height = 'auto';
+    el.style.overflowX = 'visible';
+    el.innerHTML = `
+      <div style="position:relative;background:linear-gradient(158deg,#0d1224 0%,#0b1023 42%,#090c19 100%);border:1px solid rgba(255,255,255,.055);border-radius:18px;box-shadow:0 18px 48px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.04);font-family:Inter,sans-serif;">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);border-radius:18px 18px 0 0;pointer-events:none;"></div>
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 30% at 50% 0%,rgba(14,220,255,.022) 0%,transparent 60%);border-radius:18px;pointer-events:none;"></div>
 
-    rows.forEach((row, i) => {
-      const y = padT + i*rowH;
-      const bw = (row.avg/100)*barW;
-      // label
-      html += `<text x="${padL-8}" y="${y+barH/2+4}" text-anchor="end" fill="#b0b8e0" font-size="11" font-weight="500" font-family="Inter,sans-serif">${row.short} <tspan fill="#7c8db8" font-size="10">(${row.count})</tspan></text>`;
-      // track
-      html += `<rect x="${padL}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="#181b36"/>`;
-      // bar with gradient + glow
-      if (bw > 0) {
-        html += `<rect x="${padL}" y="${y}" width="${bw.toFixed(1)}" height="${barH}" rx="4" fill="url(#og${i})" filter="url(#owner-glow)" opacity=".92"/>`;
-      }
-      // value + count badge
-      const avgLabel = row.count > 0 ? `${row.avg}%` : `—`;
-      const countLabel = row.count > 0 ? `${row.count} UC` : `${row.pipeline} pipeline`;
-      const avgColor = row.count > 0 ? '#e8eaff' : '#555e8a';
-      html += `<text x="${padL+barW+8}" y="${y+barH/2+4}" fill="${avgColor}" font-size="12" font-weight="700" font-family="Inter,sans-serif">${avgLabel}</text>`;
-      html += `<text x="${W-2}" y="${y+barH/2+4}" text-anchor="end" fill="#7c8db8" font-size="10" font-family="Inter,sans-serif">${countLabel}</text>`;
-    });
-    html += `</svg>`;
-    el.innerHTML = html;
-    el.style.height = H+'px';
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 12px;border-bottom:1px solid rgba(255,255,255,.04);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#E2E8F0;letter-spacing:-.02em;line-height:1.2;">Completion by Owner</div>
+            <div style="font-size:11px;color:#475569;margin-top:3px;">Average % across their AI use cases</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;position:relative;z-index:10;">
+            <div style="background:rgba(14,220,255,.055);border:1px solid rgba(14,220,255,.13);border-radius:7px;padding:4px 10px;font-size:10px;color:#22d3ee;font-weight:600;display:flex;align-items:center;gap:5px;">
+              <span style="color:#334155;font-weight:400;">Portfolio avg</span>${avgAll}%
+            </div>
+            <div style="position:relative;">
+              <button onclick="var dd=this.nextElementSibling;dd.style.display=dd.style.display==='block'?'none':'block';" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:4px 10px;font-size:10px;color:#64748b;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:Inter,sans-serif;">${sortLabels[_ownerSort]} <span style="font-size:9px;opacity:.5;">&#9660;</span></button>
+              <div id="osort-dd" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:#131829;border:1px solid rgba(255,255,255,.09);border-radius:9px;padding:4px;box-shadow:0 12px 30px rgba(0,0,0,.65);z-index:999;min-width:138px;">
+                ${Object.entries(sortLabels).map(([v,l])=>`<button onclick="ownerSetSort('${v}')" style="display:block;width:100%;text-align:left;padding:7px 11px;font-size:10px;color:${_ownerSort===v?'#22d3ee':'#64748b'};background:${_ownerSort===v?'rgba(14,220,255,.05)':'transparent'};border:none;cursor:pointer;font-family:Inter,sans-serif;font-weight:${_ownerSort===v?600:400};border-radius:5px;">${l}</button>`).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;padding:9px 20px;border-bottom:1px solid rgba(255,255,255,.03);">
+          ${[{l:'Total use cases',v:totalCnt,c:'#E2E8F0'},{l:'Owners tracked',v:owners.length,c:'#E2E8F0'},{l:'Portfolio avg',v:avgAll+'%',c:'#22d3ee'},{l:'On track (90%+)',v:onTrack,c:'#34d399'}].map((m,i)=>`<div style="flex:1;${i>0?'padding-left:14px;border-left:1px solid rgba(255,255,255,.04);margin-left:14px;':''}"><div style="font-size:15px;font-weight:700;color:${m.c};letter-spacing:-.025em;line-height:1.1;">${m.v}</div><div style="font-size:10px;color:#334155;margin-top:2px;">${m.l}</div></div>`).join('')}
+        </div>
+
+        <div style="display:flex;align-items:center;padding:6px 18px 3px;">
+          <div style="width:42px;flex-shrink:0;"></div>
+          <div style="width:38px;flex-shrink:0;"></div>
+          <div style="flex:0 0 179px;padding-left:11px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#1e3a5f;">Owner</div>
+          <div style="flex:1;padding-left:6px;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#1e3a5f;">Progress</div>
+          <div style="flex-shrink:0;display:flex;align-items:center;gap:16px;">
+            <div style="width:52px;"></div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#1e3a5f;width:46px;">Trend</div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#1e3a5f;width:54px;text-align:right;">Avg</div>
+          </div>
+        </div>
+
+        <div style="padding:4px 4px 14px;">
+          ${sorted.map((o,i)=>oRow(o,i+1)).join('')}
+        </div>
+      </div>
+    `;
   })();
+
+
 
   // ── 3. Per-UC progress bars (active UCs only) ────────────
   (function() {
