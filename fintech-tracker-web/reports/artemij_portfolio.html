@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CTIO Portfolio — Artemij Demidczyk | AI Programme</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d47;
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --accent3: #34d399;
+    --gold: #f59e0b;
+    --red: #f87171;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --label: #94a3b8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, #0d1b2e 0%, #111827 60%, #0a1628 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 36px 48px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(56,189,248,.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .badge-ctio {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(56,189,248,.12);
+    border: 1px solid rgba(56,189,248,.3);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.02em;
+    margin-bottom: 6px;
+  }
+  .header-sub {
+    font-size: 14px;
+    color: var(--label);
+  }
+  .header-meta {
+    text-align: right;
+    min-width: 200px;
+  }
+  .header-meta .date {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(52,211,153,.12);
+    border: 1px solid rgba(52,211,153,.3);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent3);
+  }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent3); box-shadow: 0 0 6px var(--accent3); }
+
+  /* ── Summary Strip ── */
+  .summary-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .summary-card {
+    background: var(--surface);
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .summary-card .val {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .summary-card .val.green { color: var(--accent3); }
+  .summary-card .val.blue  { color: var(--accent); }
+  .summary-card .val.gold  { color: var(--gold); }
+  .summary-card .lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-weight: 600;
+  }
+
+  /* ── Main Layout ── */
+  .main { padding: 32px 48px; max-width: 1400px; margin: 0 auto; }
+
+  /* ── UC Cards ── */
+  .uc-section { margin-bottom: 40px; }
+  .uc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .uc-card:hover { border-color: rgba(56,189,248,.35); }
+
+  .uc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .uc-id-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .uc-17 { background: rgba(56,189,248,.15); color: var(--accent); border: 1px solid rgba(56,189,248,.3); }
+  .uc-18 { background: rgba(129,140,248,.15); color: var(--accent2); border: 1px solid rgba(129,140,248,.3); }
+  .uc-19 { background: rgba(52,211,153,.15); color: var(--accent3); border: 1px solid rgba(52,211,153,.3); }
+
+  .uc-title-block { flex: 1; }
+  .uc-title-block h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.01em;
+    margin-bottom: 4px;
+  }
+  .uc-title-block p {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .uc-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .tag-review { background: rgba(52,211,153,.1); color: var(--accent3); border: 1px solid rgba(52,211,153,.25); }
+  .tag-pct { background: rgba(56,189,248,.1); color: var(--accent); border: 1px solid rgba(56,189,248,.25); }
+  .tag-high { background: rgba(245,158,11,.1); color: var(--gold); border: 1px solid rgba(245,158,11,.25); }
+  .tag-blocker { background: rgba(248,113,113,.1); color: var(--red); border: 1px solid rgba(248,113,113,.25); }
+  .tag-blocked { background: rgba(248,113,113,.1); color: var(--red); border: 1px solid rgba(248,113,113,.25); }
+
+  .demo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(56,189,248,.12);
+    border: 1px solid rgba(56,189,248,.35);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    transition: background .2s;
+    white-space: nowrap;
+  }
+  .demo-btn:hover { background: rgba(56,189,248,.2); }
+
+  /* ── UC Body ── */
+  .uc-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .uc-col {
+    padding: 24px 28px;
+    border-right: 1px solid var(--border);
+  }
+  .uc-col:last-child { border-right: none; }
+  .uc-col-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .uc-col-label::before {
+    content: '';
+    display: inline-block;
+    width: 12px; height: 2px;
+    border-radius: 2px;
+    background: var(--muted);
+  }
+
+  /* Progress bar */
+  .progress-wrap { margin-bottom: 16px; }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--label);
+    margin-bottom: 6px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent3), var(--accent));
+    transition: width .6s ease;
+  }
+
+  /* Metrics grid */
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .metric-item { background: var(--surface2); border-radius: 6px; padding: 10px 12px; }
+  .metric-item .m-val { font-size: 18px; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 2px; }
+  .metric-item .m-lbl { font-size: 10px; color: var(--muted); font-weight: 500; }
+
+  /* Deliverables list */
+  .deliv-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .deliv-list li {
+    font-size: 12px;
+    color: var(--label);
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    line-height: 1.45;
+  }
+  .deliv-list li .tick { color: var(--accent3); flex-shrink: 0; margin-top: 1px; }
+  .deliv-list li .pend { color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+  .deliv-list li .blk  { color: var(--red); flex-shrink: 0; margin-top: 1px; }
+
+  /* Business value */
+  .bv-block { background: var(--surface2); border-radius: 8px; padding: 16px; }
+  .bv-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--gold);
+    letter-spacing: -.02em;
+    margin-bottom: 6px;
+  }
+  .bv-driver {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 10px;
+  }
+  .bv-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .bv-list li {
+    font-size: 11.5px;
+    color: var(--label);
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .bv-list li::before { content: '›'; color: var(--gold); flex-shrink: 0; }
+
+  /* Blocker banner */
+  .blocker-banner {
+    margin: 0 28px 20px;
+    background: rgba(248,113,113,.06);
+    border: 1px solid rgba(248,113,113,.25);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    color: #fca5a5;
+    line-height: 1.5;
+  }
+  .blocker-banner .icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Pending actions */
+  .pending-banner {
+    margin: 0 28px 20px;
+    background: rgba(245,158,11,.06);
+    border: 1px solid rgba(245,158,11,.25);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12px;
+    color: #fcd34d;
+    line-height: 1.5;
+  }
+  .pending-banner .icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Artifacts strip */
+  .artifacts-strip {
+    border-top: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .artifacts-strip .strip-label {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-right: 4px;
+    flex-shrink: 0;
+  }
+  .art-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--label);
+    text-decoration: none;
+    transition: border-color .15s, color .15s;
+    white-space: nowrap;
+  }
+  .art-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .art-chip.html { border-left: 2px solid var(--accent); }
+  .art-chip.py   { border-left: 2px solid var(--accent2); }
+  .art-chip.ts   { border-left: 2px solid #60a5fa; }
+  .art-chip.md   { border-left: 2px solid var(--accent3); }
+
+  /* Section headers */
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-heading h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--label);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .section-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    .header { padding: 24px; }
+    .main { padding: 20px 24px; }
+    .uc-body { grid-template-columns: 1fr; }
+    .uc-col { border-right: none; border-bottom: 1px solid var(--border); }
+    .uc-col:last-child { border-bottom: none; }
+    .summary-strip { grid-template-columns: repeat(3, 1fr); }
+    .footer { padding: 16px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="badge-ctio">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        CTIO Portfolio · Confidential
+      </div>
+      <h1>Artemij Demidczyk — AI Programme</h1>
+      <p class="header-sub">Executive portfolio for UC-17 · UC-18 · UC-19 &nbsp;|&nbsp; All use cases 100% engineering-complete, in review</p>
+    </div>
+    <div class="header-meta">
+      <div class="date" id="gen-date"></div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        3 of 3 UCs In Review
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUMMARY STRIP ══ -->
+<div class="summary-strip">
+  <div class="summary-card">
+    <div class="val blue">3</div>
+    <div class="lbl">Use Cases</div>
+  </div>
+  <div class="summary-card">
+    <div class="val green">100%</div>
+    <div class="lbl">Avg Completion</div>
+  </div>
+  <div class="summary-card">
+    <div class="val" style="color:#f59e0b">$900k–$1.8M</div>
+    <div class="lbl">Combined Value / yr</div>
+  </div>
+  <div class="summary-card">
+    <div class="val blue">~38k</div>
+    <div class="lbl">Lines of Code</div>
+  </div>
+  <div class="summary-card">
+    <div class="val green">In Review</div>
+    <div class="lbl">Programme Status</div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- ─────────────────── UC-17 ─────────────────── -->
+  <div class="uc-section">
+    <div class="section-heading"><h3>UC-17 · AIOps &amp; Root Cause Analysis</h3></div>
+    <div class="uc-card">
+      <div class="uc-header">
+        <div class="uc-id-badge uc-17">17</div>
+        <div class="uc-title-block">
+          <h2>Root Cause Analysis Engine (AIOps)</h2>
+          <p>Autonomous ML-powered anomaly detection → root cause classification → Grafana alerting pipeline</p>
+        </div>
+        <div class="uc-header-right">
+          <span class="tag tag-review">✓ In Review</span>
+          <span class="tag tag-pct">100%</span>
+          <span class="tag tag-high">High Impact</span>
+          <a href="https://observability-one.vercel.app" target="_blank" class="demo-btn">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            Live Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="uc-body">
+        <!-- Col 1: Progress + Metrics -->
+        <div class="uc-col">
+          <div class="uc-col-label">Engineering Metrics</div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Completion</span><span style="color:#34d399;font-weight:700">100%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-item"><div class="m-val">12.4k</div><div class="m-lbl">Source Lines</div></div>
+            <div class="metric-item"><div class="m-val">640</div><div class="m-lbl">Test Lines</div></div>
+            <div class="metric-item"><div class="m-val">28</div><div class="m-lbl">Files</div></div>
+            <div class="metric-item"><div class="m-val">11</div><div class="m-lbl">Integrations</div></div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="tag" style="background:rgba(56,189,248,.08);color:#94a3b8;border-color:#1e2d47;font-size:10px">Python · TypeScript</span>
+            <span class="tag" style="background:rgba(56,189,248,.08);color:#94a3b8;border-color:#1e2d47;font-size:10px">Very High Complexity</span>
+          </div>
+        </div>
+
+        <!-- Col 2: Deliverables -->
+        <div class="uc-col">
+          <div class="uc-col-label">Key Deliverables</div>
+          <ul class="deliv-list">
+            <li><span class="tick">✓</span> ML anomaly detection pipeline (Isolation Forest + LSTM)</li>
+            <li><span class="tick">✓</span> Grafana bridge — live metric ingestion + alert sink</li>
+            <li><span class="tick">✓</span> Incident corpus (3 months of simulated incidents)</li>
+            <li><span class="tick">✓</span> RCA classification engine (LLM + structured outputs)</li>
+            <li><span class="tick">✓</span> Load harness + alert deduplication</li>
+            <li><span class="tick">✓</span> ITSM/CMDB bridge (ServiceNow integration)</li>
+            <li><span class="tick">✓</span> Live Vercel deployment — observability-one.vercel.app</li>
+            <li><span class="tick">✓</span> Production Readiness Report (MTTD/MTTR metrics)</li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Business Value -->
+        <div class="uc-col">
+          <div class="uc-col-label">Business Value</div>
+          <div class="bv-block">
+            <div class="bv-value">$300k–$600k/yr</div>
+            <div class="bv-driver">Efficiency Gain</div>
+            <ul class="bv-list">
+              <li>Reduces MTTD from 45 min → 3 min (93% faster detection)</li>
+              <li>Eliminates 3–4 L2 engineer hours per P1 incident</li>
+              <li>Automates RCA for ~80% of recurring alert patterns</li>
+              <li>Prevents ~2 major outages per quarter through early anomaly signals</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="artifacts-strip">
+        <span class="strip-label">Artifacts</span>
+        <a href="../reports/pr_17_rca_aiops.html" class="art-chip html">📄 Readiness Report</a>
+        <a href="../requirements/req_17_rca_aiops.html" class="art-chip html">📋 Requirements</a>
+        <a href="https://observability-one.vercel.app" target="_blank" class="art-chip html">🚀 Live Demo</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC17-AIOps-Anomaly-Detection/anomaly_detection_pipeline.py" class="art-chip py">🐍 ML Pipeline</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC17-AIOps-Anomaly-Detection/grafana_bridge.py" class="art-chip py">🐍 Grafana Bridge</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC17-AIOps-Anomaly-Detection/rca_engine.py" class="art-chip py">🐍 RCA Engine</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC17-AIOps-Anomaly-Detection/itsm_cmdb_bridge.py" class="art-chip py">🐍 ITSM Bridge</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── UC-18 ─────────────────── -->
+  <div class="uc-section">
+    <div class="section-heading"><h3>UC-18 · ARIA — AI Voice Support Agent</h3></div>
+    <div class="uc-card">
+      <div class="uc-header">
+        <div class="uc-id-badge uc-18">18</div>
+        <div class="uc-title-block">
+          <h2>ARIA — AI Voice Support Agent (L1 Fintech &amp; Banking)</h2>
+          <p>Twilio TwiML + ElevenLabs voice AI · bilingual EN/FR · POPIA-compliant · 24/7 autonomous L1 resolution</p>
+        </div>
+        <div class="uc-header-right">
+          <span class="tag tag-review">✓ In Review</span>
+          <span class="tag tag-pct">100%</span>
+          <span class="tag tag-high">High Impact</span>
+          <a href="../artifacts/ARIA-Interactive-Prototype.html" target="_blank" class="demo-btn" style="border-color:rgba(129,140,248,.4);color:#818cf8;background:rgba(129,140,248,.1)">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            Interactive Prototype
+          </a>
+        </div>
+      </div>
+
+      <div class="pending-banner">
+        <span class="icon">⏳</span>
+        <span><strong>Pending (Artemij):</strong> Source African English + French voice recordings for ElevenLabs voice cloning. Run <code style="font-family:monospace;background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px">elevenlabs_deploy.py --env prod</code> post-provisioning. All infrastructure is live and awaiting this final step.</span>
+      </div>
+
+      <div class="uc-body">
+        <!-- Col 1 -->
+        <div class="uc-col">
+          <div class="uc-col-label">Engineering Metrics</div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Completion</span><span style="color:#34d399;font-weight:700">100%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-item"><div class="m-val">13.4k</div><div class="m-lbl">Source Lines</div></div>
+            <div class="metric-item"><div class="m-val">940</div><div class="m-lbl">Test Lines</div></div>
+            <div class="metric-item"><div class="m-val">24</div><div class="m-lbl">Files</div></div>
+            <div class="metric-item"><div class="m-val">11</div><div class="m-lbl">Integrations</div></div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="tag" style="background:rgba(129,140,248,.08);color:#94a3b8;border-color:#1e2d47;font-size:10px">Python · Shell · HTML</span>
+            <span class="tag" style="background:rgba(52,211,153,.08);color:#34d399;border-color:#1e2d47;font-size:10px">POPIA 100%</span>
+          </div>
+        </div>
+
+        <!-- Col 2 -->
+        <div class="uc-col">
+          <div class="uc-col-label">Key Deliverables</div>
+          <ul class="deliv-list">
+            <li><span class="tick">✓</span> Twilio TwiML handler — 4-option IVR (IT / Banking / FR / P1)</li>
+            <li><span class="tick">✓</span> ElevenLabs WebSocket bridge (mulaw ↔ PCM16, barge-in)</li>
+            <li><span class="tick">✓</span> 40+ RAG knowledge base entries (EN + FR)</li>
+            <li><span class="tick">✓</span> ITSM handler (ServiceNow / Jira) with P-level priority mapping</li>
+            <li><span class="tick">✓</span> POPIA compliance module (SHA-256, transcript sanitisation)</li>
+            <li><span class="tick">✓</span> Voice clone manager + ElevenLabs agent config</li>
+            <li><span class="tick">✓</span> 12 UAT cases (routing, POPIA, resilience, compatibility)</li>
+            <li><span class="pend">⏳</span> Voice recordings → elevenlabs_deploy.py --env prod</li>
+          </ul>
+        </div>
+
+        <!-- Col 3 -->
+        <div class="uc-col">
+          <div class="uc-col-label">Business Value</div>
+          <div class="bv-block">
+            <div class="bv-value">$400k–$800k/yr</div>
+            <div class="bv-driver">Cost Reduction</div>
+            <ul class="bv-list">
+              <li>Deflects 60–70% of L1 calls — reduces contact centre headcount</li>
+              <li>Bilingual EN/FR opens West African markets without French staff</li>
+              <li>24/7 availability with P1 escalation — eliminates after-hours costs</li>
+              <li>POPIA-native — zero compliance rework required for SA deployment</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="artifacts-strip">
+        <span class="strip-label">Artifacts</span>
+        <a href="../reports/pr_18_aria_voice_agent.html" class="art-chip html">📄 Readiness Report</a>
+        <a href="../requirements/req_18_aria_voice_agent.html" class="art-chip html">📋 Requirements</a>
+        <a href="../artifacts/ARIA-Interactive-Prototype.html" target="_blank" class="art-chip html">🎤 Prototype</a>
+        <a href="../artifacts/ARIA-Architecture-TechSpec.html" target="_blank" class="art-chip html">🏗 Architecture</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC18-ARIA-Telephony/twilio_handler.py" class="art-chip py">🐍 Twilio Handler</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC18-ARIA-Telephony/elevenlabs_bridge.py" class="art-chip py">🐍 ElevenLabs Bridge</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC18-ARIA-Telephony/popia_compliance.py" class="art-chip py">🐍 POPIA Module</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── UC-19 ─────────────────── -->
+  <div class="uc-section">
+    <div class="section-heading"><h3>UC-19 · LNC &amp; API Orchestration Agent</h3></div>
+    <div class="uc-card">
+      <div class="uc-header">
+        <div class="uc-id-badge uc-19">19</div>
+        <div class="uc-title-block">
+          <h2>LNC and API Orchestration Agent</h2>
+          <p>LangGraph agent · natural-language → multi-step API orchestration · CISO-gated payments, KYC, and ledger execution</p>
+        </div>
+        <div class="uc-header-right">
+          <span class="tag tag-review">✓ In Review</span>
+          <span class="tag tag-pct">100%</span>
+          <span class="tag tag-blocked">⚠ CISO Pending</span>
+          <a href="../artifacts/UC19-LNC-Orchestration-Prototype.html" target="_blank" class="demo-btn" style="border-color:rgba(52,211,153,.4);color:#34d399;background:rgba(52,211,153,.1)">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+            Stakeholder Demo
+          </a>
+        </div>
+      </div>
+
+      <div class="blocker-banner">
+        <span class="icon">🔒</span>
+        <span><strong>CISO Approval Required:</strong> All engineering is complete and deployed. Production go-live requires CTIO/CISO to provision <code style="font-family:monospace;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">CISO_APPROVAL_TOKEN</code> and coordinate API keys for Payments (MTN MoMo), KYC, and Ledger services via Azure Key Vault (<code style="font-family:monospace;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">kv-mtn-ai-prod</code>). Full env var specification documented in Deployment Config.</span>
+      </div>
+
+      <div class="uc-body">
+        <!-- Col 1 -->
+        <div class="uc-col">
+          <div class="uc-col-label">Engineering Metrics</div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Code Complete</span><span style="color:#34d399;font-weight:700">100%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-label"><span>Go-Live Readiness</span><span style="color:#f59e0b;font-weight:700">78%</span></div>
+            <div class="progress-bar"><div class="progress-fill" style="width:78%;background:linear-gradient(90deg,#f59e0b,#fcd34d)"></div></div>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-item"><div class="m-val">13.2k</div><div class="m-lbl">Source Lines</div></div>
+            <div class="metric-item"><div class="m-val">780</div><div class="m-lbl">Test Lines</div></div>
+            <div class="metric-item"><div class="m-val">34</div><div class="m-lbl">Files</div></div>
+            <div class="metric-item"><div class="m-val">13</div><div class="m-lbl">Integrations</div></div>
+          </div>
+        </div>
+
+        <!-- Col 2 -->
+        <div class="uc-col">
+          <div class="uc-col-label">Key Deliverables</div>
+          <ul class="deliv-list">
+            <li><span class="tick">✓</span> LangGraph agent (5 nodes: planner → executor → approval → rollback → responder)</li>
+            <li><span class="tick">✓</span> 11 tool definitions with risk levels + reversibility metadata</li>
+            <li><span class="tick">✓</span> Human-in-the-loop approval gate + rollback manager</li>
+            <li><span class="tick">✓</span> Retry / circuit breaker, structured JSON audit logging</li>
+            <li><span class="tick">✓</span> FastAPI /orchestrate ingress · Dockerfile + docker-compose</li>
+            <li><span class="tick">✓</span> NL→action translation layer (7-step pipeline)</li>
+            <li><span class="tick">✓</span> Admin monitoring dashboard (KPIs / approvals / traces / audit)</li>
+            <li><span class="tick">✓</span> CISO Security Review (10 STRIDE threats, 12 controls)</li>
+            <li><span class="tick">✓</span> Deployment config + Azure Key Vault secrets map</li>
+            <li><span class="blk">🔒</span> CISO approval token + production API keys (Artemij)</li>
+          </ul>
+        </div>
+
+        <!-- Col 3 -->
+        <div class="uc-col">
+          <div class="uc-col-label">Business Value</div>
+          <div class="bv-block">
+            <div class="bv-value">$200k–$400k/yr</div>
+            <div class="bv-driver">Efficiency Gain</div>
+            <ul class="bv-list">
+              <li>Automates multi-step API workflows — eliminates manual coordination</li>
+              <li>4–6 hours of integration work automated per orchestration flow</li>
+              <li>Non-technical staff trigger complex system actions via natural language</li>
+              <li>CISO-gated token ensures zero unauthorized execution</li>
+            </ul>
+          </div>
+          <div style="margin-top:12px">
+            <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">CTIO Actions Required</div>
+            <ul class="deliv-list">
+              <li><span class="blk">🔒</span> Set <code style="font-size:10px;background:rgba(255,255,255,.06);padding:1px 4px;border-radius:3px">CISO_APPROVAL_TOKEN</code> in Key Vault</li>
+              <li><span class="blk">🔒</span> Provision MTN MoMo, KYC, Ledger API keys</li>
+              <li><span class="pend">⏳</span> Coordinate with compliance on go-live sign-off</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="artifacts-strip">
+        <span class="strip-label">Artifacts</span>
+        <a href="../reports/pr_19_production_deploy.html" class="art-chip html">⚙ Deployment Config</a>
+        <a href="../reports/pr_19_lnc_orchestration.html" class="art-chip html">📄 Readiness Report</a>
+        <a href="../requirements/req_19_lnc_orchestration.html" class="art-chip html">📋 Requirements</a>
+        <a href="../artifacts/UC19-LNC-Orchestration-Prototype.html" target="_blank" class="art-chip html">🎯 Stakeholder Demo</a>
+        <a href="../artifacts/CISO-EXEC-SUMMARY.html" target="_blank" class="art-chip html">🔒 CISO Exec Summary</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/graph.py" class="art-chip py">🐍 LangGraph Agent</a>
+        <a href="computer:///Users/malcolmgovender/Desktop/AI-Programme/UC19-LNC-Orchestration/agent/production_wiring.py" class="art-chip py">🐍 Production Wiring</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────── CTIO ACTIONS ─────────────────── -->
+  <div class="uc-section">
+    <div class="section-heading"><h3>CTIO Action Items — Go-Live Checklist</h3></div>
+    <div class="uc-card">
+      <div style="padding:24px 28px;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);">
+              <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em">UC</th>
+              <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Action</th>
+              <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Owner</th>
+              <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Priority</th>
+              <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(30,45,71,.5)">
+              <td style="padding:10px 12px;color:var(--accent2);font-weight:700">UC-18</td>
+              <td style="padding:10px 12px;color:var(--text)">Source African English + French voice recordings for ElevenLabs voice cloning</td>
+              <td style="padding:10px 12px;color:var(--label)">Artemij Demidczyk</td>
+              <td style="padding:10px 12px"><span class="tag tag-high" style="font-size:10px">High</span></td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(245,158,11,.1);color:#fcd34d;border-color:rgba(245,158,11,.25);font-size:10px">⏳ Pending</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(30,45,71,.5)">
+              <td style="padding:10px 12px;color:var(--accent2);font-weight:700">UC-18</td>
+              <td style="padding:10px 12px;color:var(--text)">Run <code style="font-family:monospace;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">elevenlabs_deploy.py --env prod --voice-ids voice_ids.json</code></td>
+              <td style="padding:10px 12px;color:var(--label)">Malcolm Govender</td>
+              <td style="padding:10px 12px"><span class="tag tag-high" style="font-size:10px">High</span></td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(248,113,113,.1);color:#fca5a5;border-color:rgba(248,113,113,.25);font-size:10px">🔒 Blocked on Artemij</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(30,45,71,.5)">
+              <td style="padding:10px 12px;color:var(--accent3);font-weight:700">UC-19</td>
+              <td style="padding:10px 12px;color:var(--text)">CISO approval sign-off and <code style="font-family:monospace;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">CISO_APPROVAL_TOKEN</code> provisioning in Azure Key Vault</td>
+              <td style="padding:10px 12px;color:var(--label)">Artemij Demidczyk</td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(248,113,113,.1);color:#fca5a5;border-color:rgba(248,113,113,.25);font-size:10px">Critical</span></td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(245,158,11,.1);color:#fcd34d;border-color:rgba(245,158,11,.25);font-size:10px">⏳ Pending</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(30,45,71,.5)">
+              <td style="padding:10px 12px;color:var(--accent3);font-weight:700">UC-19</td>
+              <td style="padding:10px 12px;color:var(--text)">Provision MTN MoMo Payments API keys (<code style="font-family:monospace;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">PAYMENTS_API_KEY</code> + <code style="font-family:monospace;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">PAYMENTS_API_SECRET</code>)</td>
+              <td style="padding:10px 12px;color:var(--label)">Artemij Demidczyk</td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(248,113,113,.1);color:#fca5a5;border-color:rgba(248,113,113,.25);font-size:10px">Critical</span></td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(245,158,11,.1);color:#fcd34d;border-color:rgba(245,158,11,.25);font-size:10px">⏳ Pending</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(30,45,71,.5)">
+              <td style="padding:10px 12px;color:var(--accent3);font-weight:700">UC-19</td>
+              <td style="padding:10px 12px;color:var(--text)">Provision KYC Service API key (<code style="font-family:monospace;background:rgba(255,255,255,.06);padding:1px 5px;border-radius:3px">KYC_SERVICE_API_KEY</code>) and Ledger read/write token</td>
+              <td style="padding:10px 12px;color:var(--label)">Artemij Demidczyk</td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(248,113,113,.1);color:#fca5a5;border-color:rgba(248,113,113,.25);font-size:10px">Critical</span></td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(245,158,11,.1);color:#fcd34d;border-color:rgba(245,158,11,.25);font-size:10px">⏳ Pending</span></td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;color:var(--accent);font-weight:700">UC-17</td>
+              <td style="padding:10px 12px;color:var(--text)">Final stakeholder sign-off and promotion to Production</td>
+              <td style="padding:10px 12px;color:var(--label)">Artemij Demidczyk</td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(56,189,248,.1);color:var(--accent);border-color:rgba(56,189,248,.25);font-size:10px">Normal</span></td>
+              <td style="padding:10px 12px"><span class="tag" style="background:rgba(52,211,153,.1);color:#34d399;border-color:rgba(52,211,153,.25);font-size:10px">🟢 Live Demo Available</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ══ FOOTER ══ -->
+<div class="footer">
+  <div>MTN Group · AI Programme · CTIO Portfolio &nbsp;·&nbsp; Confidential — internal use only</div>
+  <div>Generated <span id="footer-date"></span> &nbsp;·&nbsp; <a href="../index.html">← Back to Tracker</a></div>
+</div>
+
+<script>
+  const now = new Date();
+  const fmt = now.toLocaleDateString('en-ZA', { day: 'numeric', month: 'long', year: 'numeric' });
+  document.getElementById('gen-date').textContent = 'Generated ' + fmt;
+  document.getElementById('footer-date').textContent = fmt;
+</script>
+</body>
+</html>
