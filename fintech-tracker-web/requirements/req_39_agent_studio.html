@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UC-39 MTN Agent Studio — Requirements & User Stories</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0d1117; color: #e6edf3; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { border-bottom: 2px solid #30363d; padding-bottom: 30px; margin-bottom: 40px; }
+        h1 { font-size: 2.5em; margin-bottom: 15px; color: #a78bfa; }
+        .header-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .meta-item { background: #161b22; padding: 15px; border-left: 3px solid #a78bfa; border-radius: 4px; }
+        .meta-label { font-size: 0.85em; color: #8b949e; text-transform: uppercase; margin-bottom: 5px; }
+        .meta-value { font-size: 1.1em; color: #e6edf3; font-weight: 500; }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; margin-right: 8px; margin-top: 10px; }
+        .badge-p1 { background: #da3633; color: white; }
+        .badge-in-progress { background: #fdab3d; color: #0d1117; }
+        .badge-must { background: #da3633; color: white; }
+        .badge-should { background: #f0883e; color: white; }
+        .badge-nice { background: #3fb950; color: white; }
+        section { margin-bottom: 50px; background: #161b22; padding: 30px; border: 1px solid #30363d; border-radius: 6px; border-left: 4px solid #a78bfa; }
+        h2 { font-size: 1.8em; color: #a78bfa; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #30363d; }
+        h3 { font-size: 1.3em; color: #38bdf8; margin-top: 20px; margin-bottom: 10px; }
+        p { color: #c9d1d9; margin-bottom: 12px; }
+        .card { background: #0d1117; padding: 15px; margin: 15px 0; border: 1px solid #30363d; border-radius: 4px; border-left: 3px solid #a78bfa; }
+        .card-title { font-weight: 600; color: #a78bfa; margin-bottom: 8px; }
+        .card-content { font-size: 0.95em; line-height: 1.5; color: #c9d1d9; }
+        .user-story { background: #0d1117; padding: 15px; margin: 12px 0; border-left: 3px solid #1f6feb; border: 1px solid #30363d; border-radius: 4px; }
+        .story-id { font-weight: 700; color: #a78bfa; font-size: 0.9em; }
+        .story-text { margin: 10px 0; font-style: italic; color: #c9d1d9; }
+        .requirement { padding: 12px 0; border-bottom: 1px solid #30363d; }
+        .requirement:last-child { border-bottom: none; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: #0d1117; border: 1px solid #30363d; }
+        thead { background: #161b22; border-bottom: 2px solid #30363d; }
+        th { padding: 12px; text-align: left; color: #a78bfa; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #30363d; color: #c9d1d9; }
+        tbody tr:hover { background: #161b22; }
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 10px 0; padding-left: 30px; position: relative; color: #c9d1d9; border-bottom: 1px solid #21262d; }
+        .checklist li:last-child { border-bottom: none; }
+        .checklist li:before { content: "✓"; position: absolute; left: 0; color: #3fb950; font-weight: bold; }
+        .dependency-item { padding: 10px; margin: 10px 0; background: #0d1117; border-left: 3px solid #a78bfa; border: 1px solid #30363d; border-radius: 4px; }
+        .dependency-system { font-weight: 600; color: #a78bfa; }
+        .dependency-detail { color: #8b949e; font-size: 0.9em; margin-top: 5px; }
+        .warning-box { background: rgba(248,113,113,0.1); border: 1px solid #f87171; border-left: 4px solid #f87171; border-radius: 4px; padding: 15px; margin: 15px 0; color: #fca5a5; }
+        .info-box { background: rgba(167,139,250,0.08); border: 1px solid #a78bfa; border-left: 4px solid #a78bfa; border-radius: 4px; padding: 15px; margin: 15px 0; color: #c4b5fd; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin: 20px 0; }
+        .kpi-card { background: #0d1117; border: 1px solid #30363d; border-radius: 6px; padding: 18px; text-align: center; }
+        .kpi-value { font-size: 2em; font-weight: 700; color: #a78bfa; }
+        .kpi-label { font-size: 0.85em; color: #8b949e; margin-top: 4px; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #30363d; text-align: center; color: #8b949e; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+<a href="../index.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#a78bfa'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
+
+<div class="container">
+    <header>
+        <h1>MTN Agent Studio</h1>
+        <p style="font-size:1.1em;color:#8b949e;margin-top:8px;">Internal Agentic AI Platform — enabling all MTN divisions to build, deploy and govern AI agents without per-project engineering overhead</p>
+        <div class="header-meta">
+            <div class="meta-item">
+                <div class="meta-label">Use Case ID</div>
+                <div class="meta-value">UC-39</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Owner</div>
+                <div class="meta-value">Malcolm Govender</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Version</div>
+                <div class="meta-value">v1.0</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Document Date</div>
+                <div class="meta-value">May 2026</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Author</div>
+                <div class="meta-value" style="color:#a78bfa;font-weight:700;">Malcolm Govender</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Role</div>
+                <div class="meta-value">Head of AI, MTN Fintech</div>
+            </div>
+        </div>
+        <div style="margin-top:20px;">
+            <span class="badge badge-p1">Priority 1</span>
+            <span class="badge badge-in-progress">In Progress</span>
+            <span class="badge" style="background:#a78bfa;color:#0d1117;">Platform</span>
+            <span class="badge" style="background:#0d1117;border:1px solid #30363d;color:#8b949e;">All 16 Divisions</span>
+        </div>
+    </header>
+
+    <section>
+        <h2>1. Executive Summary</h2>
+        <p>MTN Agent Studio is an internal agentic AI platform that enables every division across MTN's 16+ business units — from Fintech and Network to Legal and HR — to deploy AI agents tailored to their workflows, without requiring deep engineering expertise or initiating individual software projects each time.</p>
+        <p>The platform is adapted from the Swifter AI Platform (an enterprise-grade agentic infrastructure built in TypeScript/Next.js 15) and re-skinned, configured and governed for MTN's internal multi-division, multi-market operating model. It provides a self-service template library, a visual DAG workflow builder, an approval gate system, a full audit trail, and RBAC-governed division isolation — all deployed on MTN's Azure cloud environment with Azure AD SSO.</p>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value">16</div>
+                <div class="kpi-label">MTN Divisions Served</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">42+</div>
+                <div class="kpi-label">Pre-built Agent Templates</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">4</div>
+                <div class="kpi-label">Markets at Launch</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">$1.5M–$3M</div>
+                <div class="kpi-label">Estimated Annual Value</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>Foundation:</strong> UC-39 is built on top of the <a href="https://github.com/MalcolmGov/agentic-ai-platform" style="color:#a78bfa;">Swifter AI Platform</a> — a private commercial platform built by Malcolm Govender. The internal adaptation reuses the orchestration engine, DAG workflow runtime, multi-tenant data model, and agent registry — redirecting them to MTN's internal division structure and compliance requirements.
+        </div>
+    </section>
+
+    <section>
+        <h2>2. Problem Statement</h2>
+
+        <h3>Current State Pain Points</h3>
+        <div class="card">
+            <div class="card-title">🔴 Per-project engineering overhead</div>
+            <div class="card-content">Every AI initiative across MTN's divisions requires a full engineering project: RFP, vendor selection, architecture review, CISO sign-off, budget approval, 6–18 months delivery. Most divisions abandon AI ideas before they reach execution.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">🔴 No reusability across divisions</div>
+            <div class="card-content">When Fintech builds a document processing agent, Network builds one separately, Legal builds one separately. Each pays the full engineering cost with no shared infrastructure, no shared templates, no shared governance framework.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">🔴 Shadow AI proliferating</div>
+            <div class="card-content">Divisions are already deploying unapproved ChatGPT integrations, Zapier workflows and individual API keys — outside governance, outside audit, outside POPIA compliance. This is a CISO risk that compounds monthly.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">🔴 LLM cost fragmentation</div>
+            <div class="card-content">Each division procuring separate LLM API contracts results in MTN paying 3–8x what centralised negotiation would achieve. No visibility into aggregate token spend or cost-per-division attribution.</div>
+        </div>
+
+        <h3>Desired Future State</h3>
+        <p>A self-service internal platform where a Fintech BA, a Network operations analyst, or an HR manager can log in with their Azure AD credentials, browse a library of pre-approved agent templates, customise one for their workflow, submit it through an approval gate, and have it live — governed, audited, cost-attributed — within days rather than months.</p>
+    </section>
+
+    <section>
+        <h2>3. Scope & Functional Requirements</h2>
+
+        <h3>3.1 Agent Template Library</h3>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-01:</strong> The platform MUST provide a pre-built template library of at least 42 agent templates covering all 8 major MTN division categories (Fintech, Network, Legal, HR, Finance, Customer Care, Marketing, IT).
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-02:</strong> Templates MUST be filterable by division, category, complexity tier and compliance tag (POPIA, ISO27001, SOC2).
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-03:</strong> Each template MUST include a pre-wired tool set, retry policy, timeout configuration, and default input/output schema.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-should">SHOULD</span>
+            <strong>FR-04:</strong> Templates SHOULD display estimated LLM token cost per execution and typical latency before deployment.
+        </div>
+
+        <h3>3.2 Visual Workflow Builder (DAG)</h3>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-05:</strong> The platform MUST provide a drag-and-drop DAG workflow builder allowing users to chain multiple agents into multi-step workflows with conditional routing and parallel fan-out.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-06:</strong> The workflow engine MUST perform cycle detection (topological sort) and reject circular dependency configurations before saving.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-07:</strong> Each workflow node MUST support configurable timeout, retry policy (max retries, backoff multiplier) and failure routing (fail-fast vs. skip-and-continue).
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-08:</strong> Workflow execution state MUST be persisted in PostgreSQL — not held in memory — so execution survives pod restarts and horizontal scaling.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-should">SHOULD</span>
+            <strong>FR-09:</strong> The workflow builder SHOULD provide a live simulation mode allowing stakeholders to step through execution with synthetic data before production deployment.
+        </div>
+
+        <h3>3.3 Approval Gates</h3>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-10:</strong> All new agent deployments MUST pass through a configurable approval gate — minimum: division lead approval. High-risk agents (financial actions, PII access) MUST additionally require CISO sign-off.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-11:</strong> Approval gates MUST display: agent name, division, risk tier, tools requested, data access scope, estimated monthly cost, and compliance tags.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-12:</strong> Approved/rejected status MUST be immutably written to the audit trail with approver identity, timestamp and justification notes.
+        </div>
+
+        <h3>3.4 Multi-Division RBAC</h3>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-13:</strong> The platform MUST enforce row-level division isolation — agents, workflows and data created by Fintech are not visible to Network, and vice versa, unless explicitly shared.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-14:</strong> Roles MUST include: Platform Admin (cross-division), Division Owner (own division), Agent Developer (own division, no deploy), Viewer (read-only).
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-15:</strong> Authentication MUST integrate with MTN Azure Active Directory via OAuth 2.0 / OIDC. All user provisioning flows through existing Azure AD groups.
+        </div>
+
+        <h3>3.5 Audit Trail & Observability</h3>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-16:</strong> Every agent execution MUST produce an immutable audit log entry capturing: execution ID, agent ID, division, user/trigger, input hash, output hash, tokens used, cost USD, latency ms, and pass/fail status.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-17:</strong> Audit logs MUST be queryable by division, date range, agent, and status. Export to CSV MUST be available for compliance reporting.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-should">SHOULD</span>
+            <strong>FR-18:</strong> The platform SHOULD integrate with MTN's Pulse observability stack (UC-17) to surface agent execution traces in the existing APM dashboard.
+        </div>
+
+        <h3>3.6 LLM Gateway & Cost Attribution</h3>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-19:</strong> All LLM calls MUST route through a centralised LLM Gateway that enforces rate limits, provides failover between providers (Azure OpenAI primary, Anthropic fallback), and attributes token spend per division.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-20:</strong> Monthly cost attribution per division MUST be visible to Platform Admins and Division Owners, enabling internal showback/chargeback.
+        </div>
+
+        <h3>3.7 Integration Hub</h3>
+        <div class="requirement">
+            <span class="badge badge-must">MUST</span>
+            <strong>FR-21:</strong> Pre-built connectors MUST be available for: MTN MoMo API, Azure AD, Microsoft Teams, ServiceNow, Pulse Observability, SharePoint, SAP HR, Oracle Financials.
+        </div>
+        <div class="requirement">
+            <span class="badge badge-should">SHOULD</span>
+            <strong>FR-22:</strong> A generic REST connector MUST allow any division to wire up custom internal APIs with OAuth 2.0 or API key authentication, without platform code changes.
+        </div>
+    </section>
+
+    <section>
+        <h2>4. Non-Functional Requirements</h2>
+
+        <table>
+            <thead><tr><th>NFR ID</th><th>Category</th><th>Requirement</th><th>Target</th></tr></thead>
+            <tbody>
+                <tr><td>NFR-01</td><td>Performance</td><td>Agent execution API P95 latency (excluding LLM time)</td><td>&lt; 500ms</td></tr>
+                <tr><td>NFR-02</td><td>Availability</td><td>Platform uptime SLA</td><td>99.5% (Azure SLA-backed)</td></tr>
+                <tr><td>NFR-03</td><td>Scalability</td><td>Concurrent agent executions</td><td>500+ (horizontal scale)</td></tr>
+                <tr><td>NFR-04</td><td>Security</td><td>Authentication</td><td>Azure AD SSO, MFA enforced</td></tr>
+                <tr><td>NFR-05</td><td>Security</td><td>Data at rest encryption</td><td>AES-256 (Azure-managed keys)</td></tr>
+                <tr><td>NFR-06</td><td>Security</td><td>Data in transit</td><td>TLS 1.3 minimum</td></tr>
+                <tr><td>NFR-07</td><td>Compliance</td><td>POPIA alignment</td><td>PII fields encrypted, consent tracked, DPO notified on breach</td></tr>
+                <tr><td>NFR-08</td><td>Compliance</td><td>Audit retention</td><td>7 years minimum (FICA requirement)</td></tr>
+                <tr><td>NFR-09</td><td>Compliance</td><td>ISO 27001</td><td>Controls mapped and evidence generated quarterly</td></tr>
+                <tr><td>NFR-10</td><td>Observability</td><td>Structured logging</td><td>OTEL-compatible, JSON, ingested to Pulse stack</td></tr>
+                <tr><td>NFR-11</td><td>Maintainability</td><td>Deployment</td><td>GitOps via Azure DevOps, &lt;15 min deployment pipeline</td></tr>
+                <tr><td>NFR-12</td><td>Usability</td><td>No-code agent config</td><td>Division BA must be able to configure and deploy a template in &lt;30 minutes</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>5. User Stories</h2>
+
+        <h3>Platform Admin</h3>
+        <div class="user-story">
+            <div class="story-id">US-01 · Platform Admin</div>
+            <div class="story-text">"As a Platform Admin, I want to see all agents deployed across all 16 divisions with their status, token spend, and approval state — so I can manage the platform holistically and identify rogue or costly deployments."</div>
+            <div><strong>Acceptance Criteria:</strong> Cross-division agent list with search/filter by division, status, cost tier; sortable by monthly spend; exportable to CSV.</div>
+        </div>
+        <div class="user-story">
+            <div class="story-id">US-02 · Platform Admin</div>
+            <div class="story-text">"As a Platform Admin, I want to configure and publish new agent templates to the shared library — so divisions can self-serve without waiting for engineering."</div>
+            <div><strong>Acceptance Criteria:</strong> Template creation form with schema editor, tool assignment, compliance tag picker, preview before publish; publish triggers division notification.</div>
+        </div>
+
+        <h3>Division Owner</h3>
+        <div class="user-story">
+            <div class="story-id">US-03 · Division Owner (e.g. Fintech)</div>
+            <div class="story-text">"As a Fintech Division Owner, I want to approve or reject agent deployment requests from my team — so I maintain control over what automation runs within my division."</div>
+            <div><strong>Acceptance Criteria:</strong> Approval queue showing agent details, risk tier, tools, data scope, estimated cost; one-click approve/reject with optional notes; decision recorded immutably in audit trail.</div>
+        </div>
+        <div class="user-story">
+            <div class="story-id">US-04 · Division Owner</div>
+            <div class="story-text">"As a Division Owner, I want to see my division's monthly LLM spend broken down by agent — so I can hold teams accountable and manage the AI budget."</div>
+            <div><strong>Acceptance Criteria:</strong> Division cost dashboard with per-agent breakdown, month-to-date and last-3-month trend; projected monthly spend alert at 80% of budget.</div>
+        </div>
+
+        <h3>Agent Developer (BA / Analyst)</h3>
+        <div class="user-story">
+            <div class="story-id">US-05 · Agent Developer</div>
+            <div class="story-text">"As a Fintech BA, I want to browse the template library, find a document processing agent, clone it and configure it for our KYC workflow — without writing any code."</div>
+            <div><strong>Acceptance Criteria:</strong> Template search with division/category filter; clone creates a draft in my division; configuration form pre-populated from template; submit for approval with one click.</div>
+        </div>
+        <div class="user-story">
+            <div class="story-id">US-06 · Agent Developer</div>
+            <div class="story-text">"As a Network Ops analyst, I want to build a multi-agent workflow that detects anomalies, runs a root cause analysis agent, and then posts a summary to Teams — all triggered automatically by a network event."</div>
+            <div><strong>Acceptance Criteria:</strong> Visual DAG builder with 3-node workflow; event trigger configuration; Teams connector with message template; workflow simulation before submit; audit log shows each node's execution.</div>
+        </div>
+        <div class="user-story">
+            <div class="story-id">US-07 · Agent Developer</div>
+            <div class="story-text">"As an HR analyst, I want to see why my onboarding agent failed last Tuesday — so I can debug it without needing to escalate to engineering."</div>
+            <div><strong>Acceptance Criteria:</strong> Execution history for my agents with per-node status, error message, input/output preview, and retry option; accessible to developer role without Platform Admin privileges.</div>
+        </div>
+
+        <h3>Viewer</h3>
+        <div class="user-story">
+            <div class="story-id">US-08 · Viewer (e.g. Finance Controller)</div>
+            <div class="story-text">"As a Finance Controller, I want read-only visibility into AI agent activity in my division — so I can reconcile AI spend in the monthly cost report."</div>
+            <div><strong>Acceptance Criteria:</strong> Read-only dashboard access to division agents, execution count, token cost, approval status; no ability to create, edit or trigger agents.</div>
+        </div>
+
+        <h3>CISO / Compliance</h3>
+        <div class="user-story">
+            <div class="story-id">US-09 · CISO</div>
+            <div class="story-text">"As the MTN CISO, I want to be in the approval chain for any agent that accesses PII, financial transaction data, or makes external API calls — so I can enforce our data governance policy."</div>
+            <div><strong>Acceptance Criteria:</strong> Agents tagged HIGH_RISK or PII_ACCESS automatically route to CISO approval queue; CISO sees agent data access scope, tools, network egress endpoints; approval or rejection with mandatory written justification.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>6. Technical Architecture</h2>
+
+        <h3>Foundation Stack</h3>
+        <table>
+            <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+            <tbody>
+                <tr><td>Frontend</td><td>Next.js 15 + TypeScript + Tailwind</td><td>Admin portal — agent management, workflow builder, analytics, approvals</td></tr>
+                <tr><td>API Layer</td><td>Next.js Route Handlers</td><td>RESTful API with JWT auth, RBAC middleware, rate limiting</td></tr>
+                <tr><td>Agent Orchestrator</td><td>Custom TypeScript (adapted from Swifter)</td><td>DAG-based workflow execution with retry, timeout, conditional routing</td></tr>
+                <tr><td>Agent Memory</td><td>pgvector (PostgreSQL extension)</td><td>Semantic memory storage for agent context — replaces in-memory Map</td></tr>
+                <tr><td>Job Queue</td><td>BullMQ + Azure Redis Cache</td><td>Async agent execution, horizontal worker scale-out</td></tr>
+                <tr><td>Primary Database</td><td>Azure Database for PostgreSQL Flexible</td><td>Multi-tenant data store with row-level division isolation</td></tr>
+                <tr><td>LLM Gateway</td><td>Azure OpenAI + Anthropic (failover)</td><td>Centralised LLM access with cost attribution and rate limiting</td></tr>
+                <tr><td>Auth</td><td>Azure AD (OIDC / OAuth 2.0)</td><td>SSO for all MTN staff — no separate identity store</td></tr>
+                <tr><td>Deployment</td><td>Azure Kubernetes Service (AKS)</td><td>Containerised workers with auto-scaling; Azure DevOps GitOps pipeline</td></tr>
+                <tr><td>Observability</td><td>Pulse (UC-17) + OTEL</td><td>Agent execution traces, LLM latency, cost metrics — surfaced in existing APM</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Key Architectural Changes from Swifter Base</h3>
+        <div class="card">
+            <div class="card-title">🔧 In-memory state → PostgreSQL-persisted workflows</div>
+            <div class="card-content">The Swifter OrchestrationEngine held workflow state in a Map&lt;string, Workflow&gt; singleton — lost on every pod restart. MTN implementation writes workflow state to PostgreSQL on every node transition, enabling true horizontal scale and pod-resilient execution.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">🔧 In-memory AgentMemory → pgvector</div>
+            <div class="card-content">InMemoryAgentMemory replaced with PostgreSQL + pgvector for semantic memory queries. Supports similarity search across agent execution history for context-aware agents.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">🔧 Tenant model → Division model</div>
+            <div class="card-content">Swifter's generic tenantId maps to MTN's 16-division structure. Division metadata (name, market, RBAC group, budget cap) is stored in a divisions table with Azure AD group binding.</div>
+        </div>
+        <div class="card">
+            <div class="card-title">🔧 Generic RBAC → MTN role taxonomy</div>
+            <div class="card-content">Platform Admin, Division Owner, Agent Developer, Viewer roles mapped to Azure AD security groups. CISO role added for high-risk approval gate.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>7. Division Coverage & Templates</h2>
+
+        <table>
+            <thead><tr><th>Division</th><th>Template Count</th><th>Top Use Cases</th></tr></thead>
+            <tbody>
+                <tr><td>Fintech</td><td>8</td><td>Fraud detection pipeline, KYC document processing, MoMo transaction analysis, credit scoring</td></tr>
+                <tr><td>Network</td><td>7</td><td>Anomaly detection, RCA pipeline, capacity forecasting, SLA monitoring, outage triage</td></tr>
+                <tr><td>Customer Care</td><td>6</td><td>Ticket triage, auto-response, escalation flow, CSAT analysis, VOC summarisation</td></tr>
+                <tr><td>HR</td><td>5</td><td>CV screening, onboarding workflow, policy Q&A, performance review summarisation</td></tr>
+                <tr><td>Legal &amp; Compliance</td><td>5</td><td>Contract review, POPIA scanner, regulatory radar, document classification</td></tr>
+                <tr><td>Finance</td><td>4</td><td>Invoice processing, variance analysis, budget alert, financial report generation</td></tr>
+                <tr><td>Marketing</td><td>4</td><td>Campaign performance analysis, content generation, competitive monitoring, churn prediction</td></tr>
+                <tr><td>IT / DevOps</td><td>3</td><td>Incident triage, change risk assessment, security alert enrichment</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>8. Compliance & Security Requirements</h2>
+
+        <h3>POPIA (South Africa)</h3>
+        <ul class="checklist">
+            <li>All PII fields processed by agents MUST be identified, tagged, and encrypted at rest with AES-256</li>
+            <li>Agent execution logs MUST NOT store raw PII — SHA-256 hashed references only</li>
+            <li>Data subject access requests for agent-processed data MUST be fulfillable within 72 hours</li>
+            <li>PII-touching agents MUST appear in the POPIA processing register auto-generated by the platform</li>
+        </ul>
+
+        <h3>ISO 27001</h3>
+        <ul class="checklist">
+            <li>Access control logs (logins, approvals, config changes) MUST be retained for minimum 1 year</li>
+            <li>Platform MUST support quarterly access review export for ISO 27001 Annex A.9 controls</li>
+            <li>Penetration test required before production launch; findings tracked to closure</li>
+        </ul>
+
+        <h3>CISO Approval Gate</h3>
+        <div class="warning-box">
+            Agents with any of the following properties MUST route to the CISO approval queue before activation: tool access to payment APIs, PII field processing, external network egress beyond the approved integration whitelist, execution of financial transactions, or bulk data export capabilities.
+        </div>
+    </section>
+
+    <section>
+        <h2>9. Dependencies</h2>
+
+        <div class="dependency-item">
+            <div class="dependency-system">Azure Active Directory</div>
+            <div class="dependency-detail">SSO and RBAC group sync. Required for authentication at launch.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Azure Database for PostgreSQL Flexible (with pgvector)</div>
+            <div class="dependency-detail">Primary data store + agent memory. Requires pgvector extension enabled.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Azure Redis Cache</div>
+            <div class="dependency-detail">BullMQ job queue for async agent execution and rate limiting.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Azure OpenAI Service</div>
+            <div class="dependency-detail">Primary LLM gateway. Requires GPT-4o deployment approved by MTN procurement.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Pulse Observability (UC-17/UC-19)</div>
+            <div class="dependency-detail">OTEL trace ingestion from agent executions. Optional at launch, required for production SLA monitoring.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">MTN MoMo API</div>
+            <div class="dependency-detail">Pre-built connector for Fintech division agents. Requires MoMo API credentials from MTN Fintech platform team.</div>
+        </div>
+        <div class="dependency-item">
+            <div class="dependency-system">Microsoft Teams</div>
+            <div class="dependency-detail">Notification connector used by multiple division templates. Requires Teams bot registration in MTN tenant.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>10. Delivery Phasing</h2>
+
+        <table>
+            <thead><tr><th>Phase</th><th>Milestone</th><th>Weeks</th><th>Key Deliverables</th></tr></thead>
+            <tbody>
+                <tr><td>Phase 0</td><td>Foundation</td><td>1–4</td><td>Swifter codebase adapted; Azure AD SSO; PostgreSQL + pgvector; BullMQ workers; CI/CD pipeline; CISO review</td></tr>
+                <tr><td>Phase 1</td><td>Alpha (Internal)</td><td>5–10</td><td>Template library (20 templates); approval gates; division RBAC; audit trail; Fintech + Network pilot divisions</td></tr>
+                <tr><td>Phase 2</td><td>Beta (5 Divisions)</td><td>11–18</td><td>Visual DAG workflow builder; 42 templates; 5 division onboarding; MoMo + Teams connectors; cost attribution dashboard</td></tr>
+                <tr><td>Phase 3</td><td>GA (All 16)</td><td>19–32</td><td>All 16 divisions; full integration hub; Pulse OTEL bridge; POPIA processing register; ISO 27001 evidence export</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>11. Success Metrics</h2>
+        <table>
+            <thead><tr><th>Metric</th><th>Baseline</th><th>Target (12 months post-GA)</th></tr></thead>
+            <tbody>
+                <tr><td>AI initiatives per division per year</td><td>0.5 (current avg)</td><td>5+ per division</td></tr>
+                <tr><td>Time from idea to deployed agent</td><td>6–18 months</td><td>&lt;2 weeks</td></tr>
+                <tr><td>LLM cost vs individual contracts</td><td>1.0x baseline</td><td>0.35x (centralised negotiation savings)</td></tr>
+                <tr><td>Shadow AI incidents (ungoverned)</td><td>~12/month estimated</td><td>&lt;2/month</td></tr>
+                <tr><td>Divisions with active agents</td><td>2 (Fintech, Network)</td><td>All 16</td></tr>
+                <tr><td>Agent executions per month</td><td>~500 (manual)</td><td>50,000+</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <p>UC-39 MTN Agent Studio — Requirements v1.0 · May 2026 · Malcolm Govender, Head of AI, MTN Fintech</p>
+        <p style="margin-top:8px;font-size:0.85em;">Built on <a href="https://github.com/MalcolmGov/agentic-ai-platform" style="color:#a78bfa;">Swifter AI Platform</a> · Adapted for MTN Internal Use</p>
+    </footer>
+</div>
+
+<!-- EDITABLE DOCUMENT SYSTEM -->
+<style data-editable-system>
+  body.edm [data-eid]:hover{outline:2px dashed rgba(167,139,250,.35)!important;outline-offset:3px;border-radius:3px;cursor:text}
+  body.edm [data-eid]:focus{outline:2px solid #a78bfa!important;outline-offset:3px;border-radius:3px;background:rgba(167,139,250,.07)!important}
+  body.edm [data-eid]:empty::before{content:"Click to add text";color:rgba(167,139,250,.4);font-style:italic;pointer-events:none}
+  #__etb{position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:6px;align-items:center;background:#111827;border:1px solid #374151;border-radius:12px;padding:9px 14px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
+  #__etb button{padding:5px 11px;border-radius:7px;border:1px solid #374151;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;background:#1f2937;color:#d1d5db}
+  #__etb button:hover{border-color:#a78bfa;color:#e8eaff}
+  #__etb .etb-edit{color:#a78bfa}
+  #__etb .etb-save{color:#34d399}
+  #__etb .etb-reset{color:#f87171}
+  #__etb .etb-export{color:#38bdf8}
+  #__etb .etb-msg{font-size:10.5px;color:#6b7280;min-width:90px;text-align:right}
+  #__etb .etb-sep{width:1px;height:20px;background:#374151;margin:0 2px}
+</style>
+<script data-editable-system>
+(function(){
+  'use strict';
+  var KEY = 'edm:' + (location.pathname || location.href);
+  var SELS = 'p,h1,h2,h3,h4,h5,li,td,th,blockquote,.card-content,.card-title,.meta-value,.hero-meta-value,.summary-card p,.risk-detail,.risk-title,.phase-desc,.gap-value,.kpi-val,.kpi-lbl,.story-text,.card-content p,.dependency-detail,.dependency-system,.checklist li,.warning-box,.info-box,.code-block,.gap-item .gap-value,.status-badge,.badge,.tech-tag,.hero-subtitle,caption,dt,dd,.requirement,.storyid';
+  var mode = false, timer = null, ids = [];
+
+  function elems(){
+    return [].slice.call(document.querySelectorAll(SELS)).filter(function(el){
+      return !el.closest('#__etb') && !el.closest('script') && !el.closest('style') && !el.closest('noscript');
+    });
+  }
+
+  function stamp(){
+    ids = [];
+    elems().forEach(function(el,i){
+      el.setAttribute('data-eid', i);
+      ids.push(i);
+    });
+  }
+
+  function enable(){
+    mode = true;
+    document.body.classList.add('edm');
+    elems().forEach(function(el){
+      el.contentEditable = 'true';
+      el.spellcheck = false;
+    });
+    document.addEventListener('input', onInput);
+    refresh();
+  }
+
+  function disable(){
+    mode = false;
+    document.body.classList.remove('edm');
+    elems().forEach(function(el){
+      el.contentEditable = 'false';
+      el.blur();
+    });
+    document.removeEventListener('input', onInput);
+    refresh();
+  }
+
+  function onInput(){
+    clearTimeout(timer);
+    msg('Unsaved…');
+    timer = setTimeout(persist, 900);
+  }
+
+  function persist(){
+    var store = {};
+    elems().forEach(function(el){
+      var id = el.getAttribute('data-eid');
+      if(id !== null) store[id] = el.innerHTML;
+    });
+    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
+    msg('Saved ✓');
+  }
+
+  function restore(){
+    var raw; try { raw = localStorage.getItem(KEY); } catch(e){}
+    if(!raw) return false;
+    var store; try { store = JSON.parse(raw); } catch(e){ return false; }
+    stamp();
+    elems().forEach(function(el){
+      var id = el.getAttribute('data-eid');
+      if(id !== null && store[id] !== undefined) el.innerHTML = store[id];
+    });
+    return true;
+  }
+
+  function reset(){
+    if(!confirm('Reset all edits to original content? This cannot be undone.')) return;
+    try { localStorage.removeItem(KEY); } catch(e){}
+    location.reload();
+  }
+
+  function exportDoc(){
+    // Temporarily disable editing for clean export
+    var wasMode = mode;
+    if(wasMode) disable();
+    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    // Remove the editable toolbar and injected system from export
+    html = html.replace(/<style[^>]*data-editable-system[^>]*>[\s\S]*?<\/style>/,'');
+    html = html.replace(/<script[^>]*data-editable-system[^>]*>[\s\S]*?<\/script>/,'');
+    html = html.replace(/<div id="__etb"[^>]*>[\s\S]*?<\/div>/,'');
+    html = html.replace(/<!-- EDITABLE DOCUMENT SYSTEM -->/g,'');
+    html = html.replace(/\sdata-eid="\d+"/g,'');
+    html = html.replace(/\scontenteditable="[^"]*"/g,'');
+    var blob = new Blob([html], {type:'text/html'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (location.pathname.split('/').pop() || 'document') + '';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    if(wasMode) enable();
+    msg('Exported ✓');
+  }
+
+  function msg(t){
+    var el = document.getElementById('__etb-msg');
+    if(el){ el.textContent = t; clearTimeout(el._t); if(t==='Saved ✓'||t==='Exported ✓') el._t=setTimeout(function(){el.textContent='';},2500); }
+  }
+
+  function refresh(){
+    var btn = document.getElementById('__etb-btn');
+    var acts = document.getElementById('__etb-acts');
+    if(btn){ btn.textContent = mode ? '🔒 Lock' : '✏️ Edit'; btn.style.background = mode ? '#2d1f5e' : '#1f2937'; btn.style.color = mode ? '#c4b5fd' : '#a78bfa'; }
+    if(acts) acts.style.display = mode ? 'flex' : 'none';
+  }
+
+  function buildToolbar(){
+    var t = document.createElement('div');
+    t.id = '__etb';
+    t.innerHTML =
+      '<span style="font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-right:2px">Document</span>'+
+      '<div class="etb-sep"></div>'+
+      '<button class="etb-edit" id="__etb-btn" onclick="window.__edm.toggle()">✏️ Edit</button>'+
+      '<div class="etb-sep"></div>'+
+      '<button class="etb-share" onclick="window.__edm.share()" title="Copy shareable link">🔗 Share</button>'+
+      '<button class="etb-print" onclick="window.__edm.print()" title="Print / Save as PDF">🖨 Print</button>'+
+      '<div id="__etb-acts" style="display:none;gap:5px;align-items:center">'+
+        '<span class="etb-msg" id="__etb-msg"></span>'+
+        '<button class="etb-save" onclick="window.__edm.save()">💾 Save</button>'+
+        '<button class="etb-reset" onclick="window.__edm.reset()">↺ Reset</button>'+
+        '<button class="etb-export" onclick="window.__edm.export()">⬇ Export</button>'+
+      '</div>';
+    document.body.appendChild(t);
+  }
+
+  function shareDoc(){
+    var base = 'https://fintech-tracker-web.vercel.app';
+    var url = base + location.pathname;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){ msg('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
+    } else { prompt('Copy this link:',url); }
+  }
+  function printDoc(){
+    var wasMode = mode;
+    if(wasMode) disable();
+    window.print();
+    if(wasMode) setTimeout(function(){ enable(); }, 500);
+  }
+  window.__edm = {
+    toggle: function(){ mode ? disable() : enable(); },
+    save:   function(){ persist(); },
+    reset:  function(){ reset(); },
+    export: function(){ exportDoc(); },
+    share:  function(){ shareDoc(); },
+    print:  function(){ printDoc(); }
+  };
+
+  function init(){
+    buildToolbar();
+    stamp();
+    var had = restore();
+    if(had) msg('Edits loaded');
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -2568,7 +2568,7 @@ tbody tr.data-row td a { cursor: auto; }
 </div>
 
 <script>
-const STORE_KEY = 'fintech_projects_v75';
+const STORE_KEY = 'fintech_projects_v88';
 
 const DEFAULT_DATA = [
   { id:1,  priority:1, owner:'Anupam Sharma', project:'AI-Based Test Case Generation',              sq:'built',
@@ -2905,7 +2905,7 @@ const DEFAULT_DATA = [
     bv:{ tier:'High', driver:'Efficiency Gain', impact:['Automates multi-step API workflows — eliminates manual coordination across microservices','Estimated 4–6 hours of manual integration work automated per orchestration flow','Enables non-technical staff to trigger complex system actions via natural language commands'], value:'$200k–$400k/yr' },
     codeMetrics:{srcLoc:9736,testLoc:231,files:19,langs:'Python, YAML, HTML',complexity:'Very High',deps:9,integrations:8,compliance:[]},
     traditionalEst:{devs:6,months:7,aiWeeks:16},
-    status:'In progress', pct:65, assignedTo:'Malcolm Govender', demoUrl:'' },
+    status:'In progress', pct:65, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/UC19-LNC-Orchestration-Prototype.html' },
 
   { id:20, priority:1, owner:'Malcolm Govender', project:'AI POPIA Compliance Scanner', status:'Not started', pct:0, sq:'missing', isNew:true,
     desc:'AI-powered POPIA compliance scanner embedded in the SDLC that detects PII exposure, missing consent flows and unlawful data retention across codebases, APIs, data flows and DB schemas — auto-classifying fields via ML, blocking non-compliant CI/CD merges and producing Article-by-Article compliance reports for the SA Information Regulator.',
@@ -3248,14 +3248,54 @@ const DEFAULT_DATA = [
     codeMetrics:{srcLoc:5600,testLoc:1300,files:27,langs:'Python, TypeScript, Swift, Kotlin',complexity:'High',deps:16,integrations:9,compliance:["POPIA","NDPR","Kenya DPA","FSCA","FICA","ISO30107","FATF"]},
     traditionalEst:{devs:4,months:6,aiWeeks:13},
     status:'Not started', pct:0, assignedTo:'Malcolm Govender' },
+
+  // ── Platform ───────────────────────────────────────────────────────────────
+
+  { id:39, priority:1, owner:'Malcolm Govender', project:'Internal Agentic AI Platform — MTN Agent Studio', sq:'none', isNew:true,
+    desc:'A self-service internal platform enabling all 16 MTN divisions to build, deploy and govern AI agents — without per-project engineering overhead. Built on the Swifter AI Platform (a production-grade agentic infrastructure in TypeScript/Next.js 15), re-configured for MTN\'s multi-division operating model. Provides a 42-template agent library, a visual DAG workflow builder, division-scoped RBAC (Azure AD SSO), approval gates, immutable audit trails, centralised LLM cost attribution, and pre-built connectors for MoMo API, Azure AD, Microsoft Teams, ServiceNow and Oracle. Replaces the current model of per-initiative engineering projects with a platform that reduces time-to-deployed-agent from 6–18 months to under 2 weeks, while eliminating the shadow AI governance risk proliferating across divisions.',
+    artifacts:[
+      {t:'html', l:'Interactive Prototype',    u:'./artifacts/UC39-AgentStudio-Prototype.html'},
+      {t:'html', l:'Requirements',             u:'./requirements/req_39_agent_studio.html'},
+      {t:'html', l:'Readiness Report',         u:'./reports/pr_39_agent_studio.html'},
+      {t:'ts',   l:'Swifter GitHub Repo',      u:'https://github.com/MalcolmGov/agentic-ai-platform'},
+      {t:'ts',   l:'Orchestration Engine',     u:'file:///Users/malcolmgovender/Desktop/agentic-ai-platform/src/lib/orchestration/orchestration-engine.ts'},
+      {t:'ts',   l:'Agent Executor',           u:'file:///Users/malcolmgovender/Desktop/agentic-ai-platform/src/lib/agents/agent-executor.ts'},
+      {t:'ts',   l:'Agent Registry',           u:'file:///Users/malcolmgovender/Desktop/agentic-ai-platform/src/lib/agents/agent-registry.ts'},
+      {t:'ts',   l:'Base Agent',               u:'file:///Users/malcolmgovender/Desktop/agentic-ai-platform/src/lib/agents/base-agent.ts'},
+      {t:'md',   l:'Architecture Docs',        u:'file:///Users/malcolmgovender/Desktop/agentic-ai-platform/docs/architecture.md'},
+    ],
+    nextSteps:'✅ Delivered (Swifter base):\n• DAG orchestration engine — conditional routing, parallel fan-out, retry, cycle detection\n• Agent runtime — BaseAgent abstraction, AgentRegistry, AgentExecutor with timeout\n• Prisma schema — 11 models, multi-tenant row-level isolation\n• Next.js 15 dashboard — all pages scaffolded (Agents, Workflows, Integrations, Logs, Analytics, Settings)\n• 3 built-in workflow templates (Fraud Pipeline, Document Processing, Customer Escalation)\n• Interactive stakeholder prototype — 8-panel demo with animated DAG execution simulation\n\n⏳ Phase 0 (Active — Weeks 1–4):\n• Wire Azure AD OIDC (NextAuth.js) to MTN tenant\n• Replace OrchestrationEngine Map → PostgreSQL workflow state persistence\n• Replace InMemoryAgentMemory → pgvector + Redis\n• Integrate BullMQ worker pool into AgentExecutor\n• CISO threat model + STRIDE analysis submission\n• AKS manifests + Azure DevOps CI/CD pipeline\n\n⏳ Phase 1 (Alpha — Weeks 5–10):\n• Approval gate backend (pending → approved → active lifecycle)\n• Division RBAC bound to Azure AD security groups\n• MoMo API + Teams connectors\n• 20-template library; Fintech + Network pilot',
+    bv:{ tier:'Very High', driver:'Efficiency Gain + Risk Reduction',
+      impact:[
+        'Reduces AI initiative delivery from 6–18 months to under 2 weeks — enabling 5+ AI deployments per division per year vs the current ~0.5, unlocking 80+ new AI initiatives annually across 16 divisions',
+        'Centralised Azure OpenAI procurement vs 16 divisions buying separately — estimated 65% LLM cost reduction ($130k+/yr saving at current scale, scaling proportionally with adoption)',
+        'Eliminates shadow AI governance risk: ungoverned ChatGPT/Zapier usage across divisions represents POPIA enforcement exposure of R5M–R15M per action — governance platform reduces this to near-zero',
+        'Platform multiplier: every future UC can be delivered as an Agent Studio workflow, eliminating per-UC engineering overhead and making the platform MTN\'s primary AI delivery channel',
+      ],
+      metrics:['6–18 months → <2 weeks per initiative', 'LLM spend 0.35x vs distributed procurement', 'Shadow AI incidents from ~12/month to <2', '$1.5M–$3M/yr platform value at scale'],
+      value:'$1.5M–$3M/yr',
+    },
+    codeMetrics:{srcLoc:18500,testLoc:2100,files:95,langs:'TypeScript, SQL, Shell',complexity:'Very High',deps:32,integrations:12,compliance:['POPIA','ISO27001']},
+    traditionalEst:{devs:12,months:18,aiWeeks:32},
+    status:'In progress', pct:72, assignedTo:'Malcolm Govender', demoUrl:'./artifacts/UC39-AgentStudio-Prototype.html' },
 ];
 
-let data, nextId = 39, sortCol = 'priority', sortDir = 1, dragSrcId = null, saveTimer = null;
+let data, nextId = 40, sortCol = 'priority', sortDir = 1, dragSrcId = null, saveTimer = null;
 
 function load() {
   try {
     const saved = localStorage.getItem(STORE_KEY);
-    if (saved) { const p = JSON.parse(saved); data = p.data; nextId = p.nextId; return; }
+    if (saved) {
+      const p = JSON.parse(saved);
+      data = p.data; nextId = p.nextId;
+      // Backfill demoUrl from DEFAULT_DATA whenever cached record has it empty
+      DEFAULT_DATA.forEach(def => {
+        if (!def.demoUrl) return;
+        const live = data.find(r => r.id === def.id);
+        if (live && !live.demoUrl) { live.demoUrl = def.demoUrl; }
+      });
+      return;
+    }
   } catch(e) {}
   data = JSON.parse(JSON.stringify(DEFAULT_DATA));
 }
