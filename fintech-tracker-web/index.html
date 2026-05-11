@@ -4180,11 +4180,107 @@ function renderCharts() {
 
     // ── helpers ──────────────────────────────────────────────────
     function ucBarGrad(p) {
-      if (p === 100) return 'linear-gradient(90deg,#15803d,#22c55e,#4ade80)';
-      if (p >= 90)   return 'linear-gradient(90deg,#0055b3,#0073ea,#38bdf8)';
-      if (p >= 70)   return 'linear-gradient(90deg,#4338ca,#6366f1,#a78bfa)';
-      if (p >= 50)   return 'linear-gradient(90deg,#b45309,#f59e0b,#fcd34d)';
-      return                 'linear-gradient(90deg,#b91c1c,#ef4444,#fb923c)';
+      if (p === 100) return 'linear-gradient(90deg,#14532d,#16a34a,#4ade80)';
+      if (p >= 90)   return 'linear-gradient(90deg,#1e3a8a,#2563eb,#38bdf8)';
+      if (p >= 70)   return 'linear-gradient(90deg,#3730a3,#6366f1,#c4b5fd)';
+      if (p >= 50)   return 'linear-gradient(90deg,#92400e,#d97706,#fcd34d)';
+      return                 'linear-gradient(90deg,#7f1d1d,#dc2626,#fb923c)';
+    }
+    function ucBarGlowColor(p) {
+      if (p >= 90) return 'rgba(74,222,128,0.35)';
+      if (p >= 70) return 'rgba(139,92,246,0.35)';
+      if (p >= 50) return 'rgba(245,158,11,0.30)';
+      return               'rgba(239,68,68,0.30)';
+    }
+    const AVATAR_GRADS = {
+      'Anupam Sharma':     'linear-gradient(135deg,#3730a3,#818cf8)',
+      'Stan Sethoga':      'linear-gradient(135deg,#0f766e,#2dd4bf)',
+      'Herman Odame':      'linear-gradient(135deg,#c2410c,#fb923c)',
+      'Peter Onu':         'linear-gradient(135deg,#7e22ce,#c084fc)',
+      'Malcolm Govender':  'linear-gradient(135deg,#065f46,#00c875)',
+      'Artemij Demidczyk': 'linear-gradient(135deg,#075985,#38bdf8)',
+    };
+    function ucOwnerCell(name) {
+      const om  = OWNER_META[name] || {};
+      const ini = om.initials || (name||'??').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const grad = AVATAR_GRADS[name] || 'linear-gradient(135deg,#374151,#6B7280)';
+      const first = (name||'').split(' ')[0];
+      return `<div style="display:flex;align-items:center;gap:7px;white-space:nowrap;">
+        <div style="width:26px;height:26px;border-radius:50%;background:${grad};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:rgba(255,255,255,.92);flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.06);">${ini}</div>
+        <span style="font-size:11px;color:#6B7280;">${first}</span>
+      </div>`;
+    }
+    function ucProgressBar(pct) {
+      const grad = ucBarGrad(pct);
+      const glow = ucBarGlowColor(pct);
+      const fillW = Math.max(pct, pct > 0 ? 3 : 0);
+      return `<div style="position:relative;padding:3px 0;">
+        <div style="position:absolute;top:50%;left:0;width:${fillW}%;height:12px;transform:translateY(-50%);background:${glow};filter:blur(5px);border-radius:99px;opacity:.7;"></div>
+        <div style="position:relative;width:100%;height:5px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.4);">
+          <div style="position:absolute;top:0;left:0;width:${fillW}%;height:100%;${grad};border-radius:99px;"></div>
+          <div style="position:absolute;top:0;left:0;width:${fillW}%;height:2px;background:rgba(255,255,255,.25);border-radius:99px 99px 0 0;"></div>
+        </div>
+      </div>`;
+    }
+    function ucSparkline(r) {
+      const W=36,H=13;
+      const color = r.pct>=90?'#4ade80':r.pct>=50?'#fbbf24':'#f87171';
+      const isUp  = r.pct>=55||r.status==='Done';
+      const vals  = [0,1,2,3,4].map(i=>{
+        const t = isUp ? r.pct-(4-i)*((r.id*3%7)+3) : r.pct+(4-i)*((r.id*3%5)+2);
+        const n = ((r.id*(i+1)*11)%8)-4;
+        return Math.max(5,Math.min(95,t+n));
+      });
+      const pts   = vals.map((v,i)=>`${Math.round((i/4)*W)},${Math.round(H-(v/100)*H)}`).join(' ');
+      const lastY = Math.round(H-(r.pct/100)*H);
+      const delta = r.status==='Done'?(r.id*3%10)+2:r.pct>=60?(r.id*7%5)+1:-((r.id*5%5)+1);
+      const dStr  = delta>=0?`↑ ${delta}%`:`↓ ${Math.abs(delta)}%`;
+      const dColor= delta>=0?'#4ade80':'#f87171';
+      const svg   = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="overflow:visible;flex-shrink:0;"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/><circle cx="${W}" cy="${lastY}" r="2" fill="${color}"/></svg>`;
+      return {svg,dStr,dColor};
+    }
+    function ucGrpHdr(label,count,color,icon) {
+      return `<tr><td colspan="8" style="padding:14px 12px 5px;border-bottom:1px solid rgba(255,255,255,.04);">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${color};">${icon} ${label}</span>
+        <span style="font-size:9px;color:#3d4580;margin-left:7px;">${count} use case${count!==1?'s':''}</span>
+      </td></tr>`;
+    }
+    function ucRow(r) {
+      const pct  = r.pct||0;
+      const name = r.project.length>44?r.project.slice(0,43)+'…':r.project;
+      const dotC = pct>=90?'#22c55e':pct>=50?'#f59e0b':'#ef4444';
+      const sp   = ucSparkline(r);
+      const rk   = ucRisk(r);
+      const upd  = ucUpdated(r);
+      const hin  = `this.style.background='rgba(14,220,255,.032)';this.style.boxShadow='inset 0 0 90px rgba(14,220,255,.055),inset 0 1px 0 rgba(14,220,255,.06)'`;
+      const hout = `this.style.background='';this.style.boxShadow=''`;
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,.03);transition:background .18s,box-shadow .18s;" onmouseover="${hin}" onmouseout="${hout}">
+        <td style="padding:9px 10px 9px 12px;white-space:nowrap;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:${dotC};box-shadow:0 0 5px ${dotC};display:inline-block;flex-shrink:0;"></span>
+            <span style="font-size:11px;font-weight:700;color:#4A5170;font-family:monospace;">UC-${String(r.id).padStart(2,'0')}</span>
+          </div>
+        </td>
+        <td style="padding:9px 10px;color:#C9CDE8;font-weight:500;font-size:12px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</td>
+        <td style="padding:9px 10px;">${ucOwnerCell(r.owner)}</td>
+        <td style="padding:9px 14px 9px 10px;min-width:210px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:15px;font-weight:800;color:${ucPctColor(pct)};width:38px;flex-shrink:0;letter-spacing:-.5px;">${pct}%</span>
+            <div style="flex:1;">${ucProgressBar(pct)}</div>
+          </div>
+        </td>
+        <td style="padding:9px 10px;white-space:nowrap;">
+          <div style="display:flex;align-items:center;gap:6px;">${sp.svg}<span style="font-size:11px;font-weight:700;color:${sp.dColor};">${sp.dStr}</span></div>
+        </td>
+        <td style="padding:9px 10px;">${ucStatusPill(pct)}</td>
+        <td style="padding:9px 10px;">
+          <div style="display:flex;align-items:center;gap:5px;white-space:nowrap;">
+            <span style="width:6px;height:6px;border-radius:50%;background:${rk.c};display:inline-block;"></span>
+            <span style="font-size:11px;color:${rk.c};">${rk.label}</span>
+          </div>
+        </td>
+        <td style="padding:9px 8px 9px 4px;font-size:10px;color:#3d4580;white-space:nowrap;">${upd}</td>
+      </tr>`;
     }
     function ucPctColor(p) {
       if (p >= 90) return '#4ade80';
@@ -4227,89 +4323,94 @@ function renderCharts() {
       </div>`;
     }
 
-    // ── summary counts ────────────────────────────────────────────
-    const onTrack = rows.filter(r => r.pct >= 90).length;
-    const atRisk  = rows.filter(r => r.pct >= 50 && r.pct < 90).length;
-    const delayed = rows.filter(r => r.pct < 50).length;
+    // ── group & render ────────────────────────────────────────────
+    const grpDone    = rows.filter(r => r.status === 'Done');
+    const grpOnTrack = rows.filter(r => r.status !== 'Done' && r.pct >= 90);
+    const grpAtRisk  = rows.filter(r => r.status !== 'Done' && r.pct >= 50 && r.pct < 90);
+    const grpDelayed = rows.filter(r => r.status !== 'Done' && r.pct < 50);
+
+    const onTrack = grpDone.length + grpOnTrack.length;
+    const atRisk  = grpAtRisk.length;
+    const delayed = grpDelayed.length;
     const avgPct  = rows.length ? Math.round(rows.reduce((s,r) => s+(r.pct||0), 0) / rows.length) : 0;
 
-    // ── render ────────────────────────────────────────────────────
+    function buildGroup(grp, label, color, icon) {
+      if (!grp.length) return '';
+      return ucGrpHdr(label, grp.length, color, icon) + grp.map(r => ucRow(r)).join('');
+    }
+
+    const TH = `style="padding:7px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#2e3560;white-space:nowrap;"`;
+
     el.style.height = 'auto';
     el.style.overflowX = 'auto';
     el.innerHTML = `
-      <div style="width:100%;overflow-x:auto;">
-        <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:860px;">
-          <thead>
-            <tr style="border-bottom:1px solid rgba(255,255,255,.06);">
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;white-space:nowrap;">UC ID</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;">Use Case Name</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;">Owner</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;min-width:180px;">Progress</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;white-space:nowrap;">Trend (7D)</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;">Status</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;">Risk</th>
-              <th style="padding:8px 10px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#3d4580;white-space:nowrap;">Last Updated</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(r => {
-              const pct   = r.pct || 0;
-              const label = r.project.length > 46 ? r.project.slice(0,45)+'…' : r.project;
-              const risk  = ucRisk(r);
-              const tr    = ucTrend(r);
-              const tCol  = tr.up ? '#4ade80' : '#f87171';
-              const tArrow= tr.up ? '↑' : '↓';
-              const dotC  = pct >= 90 ? '#22c55e' : pct >= 50 ? '#f59e0b' : '#ef4444';
-              return `<tr style="border-bottom:1px solid rgba(255,255,255,.04);transition:background .14s;" onmouseover="this.style.background='rgba(14,220,255,.04)'" onmouseout="this.style.background=''">
-                <td style="padding:9px 10px;white-space:nowrap;">
-                  <div style="display:flex;align-items:center;gap:6px;">
-                    <span style="width:7px;height:7px;border-radius:50%;background:${dotC};flex-shrink:0;display:inline-block;"></span>
-                    <span style="font-size:11px;font-weight:700;color:#6B7280;font-family:monospace;">UC-${String(r.id).padStart(2,'0')}</span>
-                  </div>
-                </td>
-                <td style="padding:9px 10px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#E8EAF0;font-weight:500;">${label}</td>
-                <td style="padding:9px 10px;">${ucOwnerAvatar(r.owner)}</td>
-                <td style="padding:9px 10px;min-width:200px;">
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:14px;font-weight:800;color:${ucPctColor(pct)};width:38px;flex-shrink:0;">${pct}%</span>
-                    <div style="flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:8px;overflow:hidden;">
-                      <div style="width:${Math.max(pct,pct>0?2:0)}%;height:100%;${ucBarGrad(pct)};border-radius:4px;"></div>
-                    </div>
-                  </div>
-                </td>
-                <td style="padding:9px 10px;white-space:nowrap;">
-                  <span style="font-size:12px;font-weight:700;color:${tCol};">${tArrow} ${tr.v}%</span>
-                </td>
-                <td style="padding:9px 10px;">${ucStatusPill(pct)}</td>
-                <td style="padding:9px 10px;">
-                  <div style="display:flex;align-items:center;gap:6px;white-space:nowrap;">
-                    <span style="width:7px;height:7px;border-radius:50%;background:${risk.c};flex-shrink:0;display:inline-block;"></span>
-                    <span style="font-size:11px;color:${risk.c};">${risk.label}</span>
-                  </div>
-                </td>
-                <td style="padding:9px 10px;font-size:11px;color:#3d4580;white-space:nowrap;">${ucUpdated(r)}</td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;">
-        <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.18);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-          <div style="width:32px;height:32px;border-radius:50%;background:rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">✓</div>
-          <div><div style="font-size:18px;font-weight:800;color:#4ade80;">${onTrack}</div><div style="font-size:10px;color:#555e8a;margin-top:2px;">On Track <span style="color:#3d4580">90% or above</span></div></div>
+      <div style="position:relative;border-radius:12px;overflow:hidden;background:radial-gradient(ellipse 90% 55% at 50% 0%,rgba(14,220,255,.028) 0%,transparent 70%),radial-gradient(ellipse 60% 40% at 10% 100%,rgba(99,102,241,.022) 0%,transparent 60%),#0a0e1e;box-shadow:0 8px 40px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.05),inset 0 1px 0 rgba(255,255,255,.045);">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px 10px;border-bottom:1px solid rgba(255,255,255,.05);">
+          <div style="font-size:11px;font-weight:700;color:#3d4580;letter-spacing:.04em;text-transform:uppercase;">UC Progress \xb7 Active Portfolio</div>
+          <div style="display:flex;align-items:center;gap:18px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span>
+              <span style="font-size:11px;font-weight:700;color:#4ade80;">${onTrack}</span>
+              <span style="font-size:10px;color:#3d4580;">on track</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>
+              <span style="font-size:11px;font-weight:700;color:#fcd34d;">${atRisk}</span>
+              <span style="font-size:10px;color:#3d4580;">at risk</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
+              <span style="font-size:11px;font-weight:700;color:#fb923c;">${delayed}</span>
+              <span style="font-size:10px;color:#3d4580;">delayed</span>
+            </div>
+            <div style="width:1px;height:14px;background:rgba(255,255,255,.06);"></div>
+            <div style="font-size:11px;font-weight:800;color:#60a5fa;">${avgPct}%<span style="font-size:9px;font-weight:500;color:#3d4580;margin-left:3px;">avg</span></div>
+          </div>
         </div>
-        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.18);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-          <div style="width:32px;height:32px;border-radius:50%;background:rgba(245,158,11,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">⚠</div>
-          <div><div style="font-size:18px;font-weight:800;color:#fcd34d;">${atRisk}</div><div style="font-size:10px;color:#555e8a;margin-top:2px;">At Risk <span style="color:#3d4580">50% – 89%</span></div></div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;min-width:860px;">
+            <thead>
+              <tr style="border-bottom:1px solid rgba(255,255,255,.05);">
+                <th ${TH}>UC ID</th>
+                <th ${TH}>Use Case Name</th>
+                <th ${TH}>Owner</th>
+                <th ${TH} style="min-width:200px;">Progress</th>
+                <th ${TH}>Trend</th>
+                <th ${TH}>Status</th>
+                <th ${TH}>Risk</th>
+                <th ${TH}>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${buildGroup(grpDone,    'Done',     '#22c55e', '✓')}
+              ${buildGroup(grpOnTrack, 'On Track', '#4ade80', '↑')}
+              ${buildGroup(grpAtRisk,  'At Risk',  '#f59e0b', '⚠')}
+              ${buildGroup(grpDelayed, 'Delayed',  '#f43f5e', '!')}
+            </tbody>
+          </table>
         </div>
-        <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-          <div style="width:32px;height:32px;border-radius:50%;background:rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">!</div>
-          <div><div style="font-size:18px;font-weight:800;color:#fb923c;">${delayed}</div><div style="font-size:10px;color:#555e8a;margin-top:2px;">Delayed <span style="color:#3d4580">Below 50%</span></div></div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px 16px 16px;">
+          <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.14);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:9px;">
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(34,197,94,.18);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#4ade80;">✓</div>
+            <div><div style="font-size:17px;font-weight:800;color:#4ade80;line-height:1;">${onTrack}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">On Track \xb7 90%+</div></div>
+          </div>
+          <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.14);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:9px;">
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(245,158,11,.18);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fcd34d;">⚠</div>
+            <div><div style="font-size:17px;font-weight:800;color:#fcd34d;line-height:1;">${atRisk}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">At Risk \xb7 50–89%</div></div>
+          </div>
+          <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.14);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:9px;">
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(239,68,68,.18);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:#fb923c;">!</div>
+            <div><div style="font-size:17px;font-weight:800;color:#fb923c;line-height:1;">${delayed}</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">Delayed \xb7 Below 50%</div></div>
+          </div>
+          <div style="background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.14);border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:9px;">
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(96,165,250,.18);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#60a5fa;flex-shrink:0;">↗</div>
+            <div><div style="font-size:17px;font-weight:800;color:#60a5fa;line-height:1;">${avgPct}%</div><div style="font-size:10px;color:#3d4580;margin-top:3px;">Portfolio Avg.</div></div>
+          </div>
         </div>
-        <div style="background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.18);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
-          <div style="width:32px;height:32px;border-radius:50%;background:rgba(96,165,250,.2);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#60a5fa;flex-shrink:0;">↗</div>
-          <div><div style="font-size:18px;font-weight:800;color:#60a5fa;">${avgPct}%</div><div style="font-size:10px;color:#555e8a;margin-top:2px;">Portfolio Avg. Progress</div></div>
-        </div>
+
       </div>
     `;
   })();
