@@ -1,519 +1,576 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC-20 AI POPIA Compliance Scanner — Requirements & Planning</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
-        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
-        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
-        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
-        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
-        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
-        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
-        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
-        .badge-not-started { background: #1e293b; color: #64748b; border: 1px solid #334155; }
-        .badge-high { background: #7c3aed; color: #fff; }
-        .badge-must { background: #dc2626; color: #fff; }
-        .badge-should { background: #d97706; color: #fff; }
-        .badge-nice { background: #059669; color: #fff; }
-        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
-        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
-        section.teal { border-left-color: #14b8a6; }
-        section.violet { border-left-color: #7c3aed; }
-        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; display: flex; align-items: center; gap: 10px; }
-        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
-        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
-        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
-        .card.teal { border-left-color: #14b8a6; }
-        .card.violet { border-left-color: #7c3aed; }
-        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
-        .card.teal .card-title { color: #2dd4bf; }
-        .card.violet .card-title { color: #a78bfa; }
-        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
-        thead { background: #1e1b4b; }
-        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
-        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
-        tbody tr:hover { background: #1e293b; }
-        .checklist { list-style: none; padding: 0; }
-        .checklist li { padding: 10px 0 10px 32px; position: relative; color: #cbd5e1; border-bottom: 1px solid #1e293b; font-size: 0.94em; }
-        .checklist li:last-child { border-bottom: none; }
-        .checklist li::before { content: "✓"; position: absolute; left: 0; color: #14b8a6; font-weight: 700; font-size: 1.1em; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
-        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
-        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
-        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .artifacts-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
-        .artifact-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; color: #818cf8; font-size: 0.88em; text-decoration: none; font-weight: 600; }
-        .artifact-link:hover { background: rgba(99,102,241,0.2); }
-        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
-        .compare-card.traditional { border-top: 3px solid #dc2626; }
-        .compare-card.ai { border-top: 3px solid #14b8a6; }
-        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
-        .compare-card.traditional .compare-label { color: #f87171; }
-        .compare-card.ai .compare-label { color: #2dd4bf; }
-        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
-        .compare-card.traditional .compare-value { color: #f87171; }
-        .compare-card.ai .compare-value { color: #2dd4bf; }
-        .compare-sub { font-size: 0.85em; color: #64748b; }
-        .step-list { counter-reset: step; list-style: none; padding: 0; }
-        .step-list li { counter-increment: step; padding: 12px 0 12px 48px; position: relative; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.94em; }
-        .step-list li:last-child { border-bottom: none; }
-        .step-list li::before { content: counter(step); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85em; color: #fff; text-align: center; line-height: 28px; }
-        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
-        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
-        .owner-name { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
-        .owner-role { font-size: 0.85em; color: #7c3aed; }
-        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UC-20 AI POPIA Compliance Scanner — Requirements & Planning</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface-alt:#F1F5F9;
+  --border:rgba(226,232,240,0.9);--border-strong:#CBD5E1;
+  --text-primary:#0F172A;--text-secondary:#334155;--text-muted:#64748B;
+  --accent:#7C3AED;--accent-d:#6D28D9;--accent-light:#EDE9FE;--accent-border:rgba(124,58,237,0.2);
+  --blue:#2563EB;--blue-light:#DBEAFE;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --r:16px;--rs:10px;
+  --shadow-sm:0 1px 4px rgba(15,23,42,0.06),0 2px 8px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.08),0 2px 6px rgba(15,23,42,0.04);
+}
+html{scroll-behavior:smooth;font-size:15px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── Sticky Header ── */
+.doc-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:58px;
+}
+.hdr-left{display:flex;align-items:center;gap:16px}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:var(--text-muted);
+  text-decoration:none;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--border);transition:all 0.15s;
+}
+.back-link:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-light)}
+.hdr-breadcrumb{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.hdr-sep{color:var(--border-strong)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:all 0.15s;font-family:inherit;
+}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
+.hdr-btn.violet{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hdr-btn.violet:hover{background:var(--accent-d)}
+
+/* ── Shell ── */
+.doc-shell{max-width:1220px;margin:0 auto;padding:0 40px 100px}
+
+/* ── Hero ── */
+.doc-hero{padding:52px 0 32px;max-width:800px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero-title{
+  font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.2px;
+  background:linear-gradient(140deg,#0F172A 0%,#312E81 50%,#7C3AED 90%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:14px;
+}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:22px;max-width:680px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;letter-spacing:0.04em;
+  padding:4px 12px;border-radius:20px;
+}
+.badge-p1{background:#FEE2E2;color:#B91C1C}
+.badge-p2{background:#FEF3C7;color:#92400E}
+.badge-progress{background:#FEF3C7;color:#92400E}
+.badge-in-progress{background:#FEF3C7;color:#92400E}
+.badge-done,.badge-complete,.badge-built{background:#D1FAE5;color:#065F46}
+.badge-platform{background:var(--accent-light);color:var(--accent)}
+.badge-neutral{background:var(--surface-alt);color:var(--text-muted);border:1px solid var(--border)}
+.badge-must{background:#FEE2E2;color:#B91C1C;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-should{background:#FEF3C7;color:#92400E;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-nice{background:#D1FAE5;color:#065F46;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+
+/* ── Meta Strip ── */
+.meta-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;margin-bottom:36px;
+}
+.meta-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;
+  box-shadow:var(--shadow-sm);transition:all 0.2s;
+}
+.meta-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.meta-value{font-size:13px;font-weight:700;color:var(--text-primary)}
+.meta-value.violet{color:var(--accent)}
+
+/* ── Progress Bar ── */
+.progress-section{margin:0 0 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow-sm)}
+.progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.progress-label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.progress-pct{font-size:14px;font-weight:800;color:var(--accent)}
+.progress-track{height:8px;background:var(--surface-alt);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:8px;transition:width 0.6s ease}
+.progress-note{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+/* ── Doc Layout ── */
+.doc-layout{display:grid;grid-template-columns:210px 1fr;gap:36px;align-items:start}
+@media(max-width:900px){.doc-layout{grid-template-columns:1fr}.doc-toc{display:none}}
+
+/* ── ToC ── */
+.doc-toc{position:sticky;top:76px}
+.toc-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.toc-title{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.toc-link{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;text-decoration:none;color:var(--text-secondary);font-size:12px;font-weight:500;transition:all 0.15s;margin-bottom:2px}
+.toc-link:hover{background:var(--accent-light);color:var(--accent)}
+.toc-num{font-size:10px;font-weight:700;color:var(--text-muted);min-width:20px}
+
+/* ── Sections ── */
+.doc-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.section-num{width:30px;height:30px;border-radius:8px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+h2.section-title{font-size:18px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+h3{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-top:24px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+p{color:var(--text-secondary);margin-bottom:13px;line-height:1.75;font-size:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+ul,ol{color:var(--text-secondary);margin:0 0 14px 20px;line-height:1.75;font-size:14px}
+li{margin-bottom:5px}
+li strong{color:var(--text-primary)}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.kpi-card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;text-align:center;transition:all 0.2s}
+.kpi-card:hover{background:var(--accent-light);border-color:var(--accent-border);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-value{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-0.8px;line-height:1;margin-bottom:6px}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);line-height:1.4}
+
+/* ── Callouts ── */
+.info-box,.accent-box,.callout-blue{
+  background:var(--blue-light);border:1px solid rgba(37,99,235,0.18);
+  border-left:3px solid var(--blue);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#1E40AF;line-height:1.65;
+}
+.info-box a,.accent-box a,.callout-blue a{color:var(--blue);font-weight:600;text-decoration:none}
+.warning-box,.callout-red{
+  background:#FFF5F5;border:1px solid rgba(220,38,38,0.18);
+  border-left:3px solid var(--red);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#7F1D1D;line-height:1.65;
+}
+.warning-box ul,.callout-red ul{color:#7F1D1D}
+.callout-violet{
+  background:var(--accent-light);border:1px solid var(--accent-border);
+  border-left:3px solid var(--accent);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#3B0764;line-height:1.65;
+}
+.callout-green{
+  background:var(--green-light);border:1px solid rgba(22,163,74,0.2);
+  border-left:3px solid var(--green);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#14532D;line-height:1.65;
+}
+.callout-amber{
+  background:var(--amber-light);border:1px solid rgba(217,119,6,0.2);
+  border-left:3px solid var(--amber);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#78350F;line-height:1.65;
+}
+
+/* ── Cards / Items ── */
+.card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;margin-bottom:10px;transition:all 0.15s}
+.card:hover{border-color:var(--accent-border);background:var(--surface)}
+.card-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:7px}
+.card-content{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Requirements ── */
+.requirement{border-left:3px solid var(--border-strong);padding:10px 14px;margin-bottom:8px;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface-alt)}
+.requirement:hover{border-left-color:var(--accent)}
+.req-body{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Tables ── */
+table,.doc-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}
+th{background:var(--surface-alt);border:1px solid var(--border);padding:10px 14px;font-weight:700;color:var(--text-primary);text-align:left;font-size:11px;letter-spacing:0.05em;text-transform:uppercase}
+td{border:1px solid var(--border);padding:10px 14px;color:var(--text-secondary);vertical-align:top;line-height:1.6}
+tr:hover td{background:var(--surface-alt)}
+
+/* ── User Stories ── */
+.story{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;margin-bottom:12px}
+.story-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.story-text{font-size:13.5px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px}
+.story-ac{font-size:12.5px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--surface);border-radius:7px;border:1px solid var(--border)}
+
+/* ── Dependencies ── */
+.dep-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dep-item:last-child{border-bottom:none}
+.dep-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--surface-alt);border:1px solid var(--border)}
+.dep-body{flex:1}
+.dep-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.dep-desc{font-size:12.5px;color:var(--text-muted)}
+
+/* ── Print ── */
+@media print{.doc-header,.doc-toc{display:none!important}.doc-layout{grid-template-columns:1fr}.doc-section{break-inside:avoid}}
+@media(max-width:768px){.doc-shell{padding:0 16px 60px}.doc-hero{padding:32px 0 20px}.doc-section{padding:22px 18px}}
+
+  </style>
 </head>
 <body>
-<a href="../index.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#1e293b;border:1px solid #334155;color:#64748b;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#334155';this.style.color='#e2e8f0'" onmouseout="this.style.background='#1e293b';this.style.color='#64748b'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
 
-<div class="container">
-    <header>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
-            <div>
-                <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Security &amp; Compliance · Use Case 20</div>
-                <h1>AI POPIA Compliance Scanner</h1>
-                <div class="subtitle">Automated POPIA gap detection, PII exposure scanning and regulator-ready evidence generation embedded in the SDLC</div>
-                <div>
-                    <span class="badge badge-new">New — Gap Identified by Malcolm</span>
-                    <span class="badge badge-not-started">Not Started — Planning Phase</span>
-                    <span class="badge badge-high">Complexity: High</span>
-                </div>
-                <div style="margin-top:10px;">
-                    <span class="badge badge-compliance">POPIA</span>
-                    <span class="badge badge-compliance">GDPR-Adjacent</span>
-                    <span class="badge badge-compliance">FSCA</span>
-                    <span class="badge badge-compliance">SARB</span>
-                </div>
-            </div>
-        </div>
-        <div class="header-grid">
-            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-20</div></div>
-            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
-            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
-            <div class="meta-item"><div class="meta-label">Source Lines</div><div class="meta-value">~2,400 LOC</div></div>
-            <div class="meta-item"><div class="meta-label">Test Lines</div><div class="meta-value">~480 LOC</div></div>
-            <div class="meta-item"><div class="meta-label">Files</div><div class="meta-value">11 Files</div></div>
-            <div class="meta-item"><div class="meta-label">Languages</div><div class="meta-value">Python / TypeScript</div></div>
-        </div>
-        <div class="owner-highlight">
-            <div class="owner-avatar">MG</div>
-            <div>
-                <div class="owner-name">Malcolm Govender</div>
-                <div class="owner-role">Head of AI &amp; Engineering · Document Author &amp; Gap Identifier</div>
-            </div>
-        </div>
-    </header>
+<!-- ── Sticky Header ── -->
+<header class="doc-header">
+  <div class="hdr-left">
+    <a href="/index.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+      Back to Tracker
+    </a>
+    <div class="hdr-breadcrumb">
+      <span style="color:var(--text-muted)">UC-20</span>
+      <span class="hdr-sep">/</span>
+      <b>Requirements &amp; User Stories</b>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
 
-    <!-- EXECUTIVE SUMMARY -->
-    <section>
-        <h2>Executive Summary</h2>
-        <p>The AI POPIA Compliance Scanner is an intelligent compliance automation layer embedded directly into the software development lifecycle. It continuously scans APIs, database schemas and microservice codebases for PII exposure risks, missing consent flows and unlawful data retention patterns — automatically generating POPIA gap reports, creating Jira/Linear remediation tickets and maintaining a living, regulator-ready data-flow map.</p>
-        <p>Malcolm Govender identified this as a critical compliance gap during an internal architecture review. With POPIA fines reaching up to R10 million or 10% of annual turnover, and the Information Regulator increasing enforcement activity in 2025–2026, proactive automated compliance scanning is no longer optional for a fintech operating under FSCA and SARB supervision.</p>
-        <div class="comparison-box">
-            <div class="compare-card traditional">
-                <div class="compare-label">Traditional Approach</div>
-                <div class="compare-value">5 Months</div>
-                <div class="compare-sub">3 engineers × 5 months manual build</div>
-            </div>
-            <div class="compare-card ai">
-                <div class="compare-label">AI-Assisted Delivery</div>
-                <div class="compare-value">8 Hours</div>
-                <div class="compare-sub">AI-accelerated implementation target</div>
-            </div>
-        </div>
-    </section>
+<!-- ── Page Shell ── -->
+<div class="doc-shell">
 
-    <!-- PROBLEM STATEMENT -->
-    <section class="violet">
-        <h2>Problem Statement</h2>
-        <div class="card violet">
-            <div class="card-title">Invisible PII Exposure Across Microservices</div>
-            <div class="card-content">Personal information is logged, cached and transmitted across API boundaries without consistent classification or protection controls. Engineers building new services have no automated guardrail that flags PII exposure before code reaches production.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Missing &amp; Incomplete Consent Flows</div>
-            <div class="card-content">POPIA Sections 11–13 require lawful basis and informed consent for data processing. New features are routinely shipped without consent mechanism validation, creating silent compliance breaches detectable only during costly manual audits.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Unlawful Data Retention</div>
-            <div class="card-content">Database schemas retain personal information beyond legally permissible periods. Without automated schema analysis, retention policy violations accumulate silently across dozens of tables and services.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Manual Audit Burden — Regulator Evidence Packs</div>
-            <div class="card-content">Preparing evidence packs for the Information Regulator or FSCA takes compliance teams weeks of manual effort per audit cycle. There is no automated mechanism to generate a living, always-current data-flow map aligned to regulatory requirements.</div>
-        </div>
-    </section>
+  <!-- ── Hero ── -->
+  <div class="doc-hero">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      AI Programme · UC-20
+    </div>
+    <h1 class="hero-title">AI POPIA Compliance Scanner</h1>
+    <p class="hero-subtitle"></p>
+    <div class="hero-badges">
+      <span class="badge badge-neutral">New — Gap Identified by Malcolm</span>
+      <span class="badge badge-neutral">Not Started — Planning Phase</span>
+      <span class="badge badge-neutral">Complexity: High</span>
+      <span class="badge badge-neutral">POPIA</span>
+      <span class="badge badge-neutral">GDPR-Adjacent</span>
+      <span class="badge badge-neutral">FSCA</span>
+      <span class="badge badge-neutral">SARB</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">NICE TO HAVE</span>
+      <span class="badge badge-neutral">SHOULD</span>
+    </div>
+  </div>
 
-    <!-- SOLUTION OVERVIEW -->
-    <section>
-        <h2>Solution Overview</h2>
-        <p>The AI POPIA Compliance Scanner operates as a three-layer system: a <strong>static analysis engine</strong> that scans source code and DB schemas at PR time, a <strong>runtime monitoring layer</strong> that observes API traffic patterns for PII leakage, and a <strong>compliance reporting engine</strong> that generates POPIA-mapped gap reports and regulator-ready evidence packs on demand.</p>
-        <h3>Core Capabilities</h3>
-        <div class="card">
-            <div class="card-title">PR-Time POPIA Gate</div>
-            <div class="card-content">Scans every pull request for PII patterns in API request/response schemas, new DB columns, log statements and error messages. Blocks merge if Critical POPIA violations are detected; posts a structured gap report as a PR comment.</div>
-        </div>
-        <div class="card">
-            <div class="card-title">Living Data-Flow Map</div>
-            <div class="card-content">Maintains an auto-updated map of all personal information flows across the system — which services collect, process, store and transmit what categories of personal information — aligned to POPIA Article mapping (Sections 8–25).</div>
-        </div>
-        <div class="card">
-            <div class="card-title">Automated Remediation Tickets</div>
-            <div class="card-content">Detected violations automatically generate structured remediation tickets in Jira or Linear, pre-populated with POPIA article reference, risk severity, affected service, and suggested remediation steps.</div>
-        </div>
-        <div class="card">
-            <div class="card-title">Regulator Evidence Pack Generation</div>
-            <div class="card-content">On-demand generation of Information Regulator-ready evidence packs, FSCA data governance reports and SARB supervisory expectation compliance summaries — reducing audit preparation from weeks to minutes.</div>
-        </div>
-    </section>
+  <!-- ── Metadata Strip ── -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-label">Use Case ID</div>
+      <div class="meta-value ">UC-20</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Version</div>
+      <div class="meta-value ">v1.0</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Document Date</div>
+      <div class="meta-value ">May 2026</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Source Lines</div>
+      <div class="meta-value">~2,400 LOC</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Test Lines</div>
+      <div class="meta-value">~480 LOC</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Files</div>
+      <div class="meta-value">11 Files</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Languages</div>
+      <div class="meta-value">Python / TypeScript</div>
+    </div>
+  </div>
 
-    <!-- FUNCTIONAL REQUIREMENTS -->
-    <section class="teal">
-        <h2>Functional Requirements</h2>
-        <table>
-            <thead>
-                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>FR-20-01</strong></td><td>Scanner shall detect PII patterns (SA ID numbers, MSISDN, email, financial account numbers, biometric data) in API schemas, source code and DB column definitions at PR time</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-02</strong></td><td>Gap analysis engine shall map detected violations to POPIA sections (8–25) and assign a severity score (Critical / High / Medium / Low)</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-03</strong></td><td>CI/CD gate shall block PR merge when Critical POPIA violations are detected; post structured gap report as PR comment within 5 minutes</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-04</strong></td><td>Living data-flow map shall auto-update on every successful pipeline run, cataloguing all PII flows by service, data category and POPIA section</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-05</strong></td><td>Remediation ticket auto-creation in Jira/Linear: pre-populated with POPIA article, severity, affected service, code location and suggested fix</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-06</strong></td><td>Consent-flow validator shall confirm presence of lawful basis mechanism for every new data processing touchpoint introduced in a PR</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-07</strong></td><td>Retention policy scanner shall flag DB columns/tables retaining personal information beyond configured retention thresholds per data category</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-08</strong></td><td>Evidence pack generator shall produce regulator-ready reports (Information Regulator, FSCA, SARB) on demand in PDF and structured JSON formats</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-09</strong></td><td>Compliance dashboard shall provide real-time POPIA posture score per service and aggregate across the platform</td><td><span class="badge badge-nice" style="margin:0;padding:3px 10px;font-size:0.75em;">NICE TO HAVE</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-20-10</strong></td><td>Information Regulator breach notification templates shall be auto-populated from incident data and flagged for human review within 72 hours of detection</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-            </tbody>
-        </table>
-    </section>
+  
 
-    <!-- NON-FUNCTIONAL REQUIREMENTS -->
-    <section>
-        <h2>Non-Functional Requirements</h2>
-        <table>
-            <thead>
-                <tr><th>Category</th><th>Requirement</th><th>Target</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>Performance</strong></td><td>PR scan completion time (per service)</td><td>&lt; 5 minutes</td></tr>
-                <tr><td><strong>Accuracy</strong></td><td>PII detection false-positive rate</td><td>&lt; 5%</td></tr>
-                <tr><td><strong>Accuracy</strong></td><td>Critical violation false-negative rate</td><td>0% target</td></tr>
-                <tr><td><strong>Data Residency</strong></td><td>All scan processing and storage must remain within South Africa</td><td>Mandatory — POPIA</td></tr>
-                <tr><td><strong>Security</strong></td><td>Scanner must not store or transmit source code or PII externally; analysis in-memory only</td><td>Mandatory</td></tr>
-                <tr><td><strong>Availability</strong></td><td>CI/CD gate uptime (degraded to advisory-only on failure)</td><td>99.9%</td></tr>
-                <tr><td><strong>Audit</strong></td><td>All scan results and remediation actions retained with immutable audit trail</td><td>5 years minimum</td></tr>
-                <tr><td><strong>Scalability</strong></td><td>Concurrent PR scans without queue build-up</td><td>&ge; 30 simultaneous</td></tr>
-            </tbody>
-        </table>
-    </section>
+  <!-- ── Document Layout ── -->
+  <div class="doc-layout">
 
-    <!-- TECHNICAL ARCHITECTURE -->
-    <section class="violet">
-        <h2>Technical Architecture</h2>
-        <h3>Component Overview</h3>
-        <div class="card violet">
-            <div class="card-title">Static Analysis Engine (Python)</div>
-            <div class="card-content">AST-based scanner for Python/TypeScript codebases. Custom detection rules for SA-specific PII patterns (RSA ID, MSISDN formats). Integrates with Semgrep ruleset extended with POPIA-specific patterns. Runs in GitHub Actions / Azure DevOps pipeline step.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Schema Analyser (Python)</div>
-            <div class="card-content">Connects to DB migration files (Flyway/Alembic/Prisma) and OpenAPI specs. Classifies columns by PII category using ML-assisted column-name + type heuristics. Checks retention policy configuration against data category thresholds.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">POPIA Mapping Engine</div>
-            <div class="card-content">Knowledge graph mapping detected PII patterns to POPIA sections 8–25. Produces structured gap report with section references, risk score and remediation guidance. Exposes REST API for dashboard and evidence pack consumption.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Evidence Pack Generator (TypeScript)</div>
-            <div class="card-content">Templated report generator producing PDF and JSON evidence packs aligned to Information Regulator, FSCA and SARB reporting formats. Updates living data-flow map on each pipeline run.</div>
-        </div>
-        <h3>Integration Points</h3>
-        <div class="card">
-            <div class="card-title">CI/CD — GitHub Actions / Azure DevOps</div>
-            <div class="card-content">Pipeline step added to all service repos. Scan runs on every PR. Results posted as PR check status and comment. Critical violations block merge.</div>
-        </div>
-        <div class="card">
-            <div class="card-title">Jira / Linear — Ticket Auto-Creation</div>
-            <div class="card-content">Webhook from POPIA Mapping Engine triggers ticket creation in configured project board. De-duplication logic prevents duplicate tickets for recurring violations.</div>
-        </div>
-    </section>
+    <!-- ToC -->
+    <aside class="doc-toc">
+      <div class="toc-inner">
+        <div class="toc-title">Contents</div>
+        <a href="#s1" class="toc-link"><span class="toc-num">01</span>Executive Summary</a>
+        <a href="#s2" class="toc-link"><span class="toc-num">02</span>Problem Statement</a>
+        <a href="#s3" class="toc-link"><span class="toc-num">03</span>Solution Overview</a>
+        <a href="#s4" class="toc-link"><span class="toc-num">04</span>Functional Requirements</a>
+        <a href="#s5" class="toc-link"><span class="toc-num">05</span>Non-Functional Requirements</a>
+        <a href="#s6" class="toc-link"><span class="toc-num">06</span>Technical Architecture</a>
+        <a href="#s7" class="toc-link"><span class="toc-num">07</span>Compliance & Regulatory Alignment</a>
+        <a href="#s8" class="toc-link"><span class="toc-num">08</span>Success Metrics</a>
+        <a href="#s9" class="toc-link"><span class="toc-num">09</span>Next Steps</a>
+        <a href="#s10" class="toc-link"><span class="toc-num">10</span>Related Artefacts</a>
+      </div>
+    </aside>
 
-    <!-- COMPLIANCE & REGULATORY -->
-    <section class="teal">
-        <h2>Compliance &amp; Regulatory Alignment</h2>
-        <table>
-            <thead>
-                <tr><th>Regulatory Body</th><th>Requirement</th><th>How Scanner Addresses It</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>POPIA Information Regulator</strong></td><td>Sections 8–25: lawful processing, consent, purpose limitation, retention, security safeguards</td><td>Direct section mapping in gap reports; consent flow validation; retention scanning</td></tr>
-                <tr><td><strong>FSCA</strong></td><td>Data governance standards for financial service providers; conduct of business obligations</td><td>FSCA-formatted evidence pack; data-flow map aligned to FSP data governance obligations</td></tr>
-                <tr><td><strong>SARB</strong></td><td>Supervisory expectations on data management and privacy in payment systems</td><td>SARB supervisory report template; API-level PII flow cataloguing</td></tr>
-                <tr><td><strong>GDPR-Adjacent</strong></td><td>Cross-border data transfer controls for international partners</td><td>Cross-border transfer detection in API schemas; adequacy decision mapping</td></tr>
-                <tr><td><strong>PCI-DSS</strong></td><td>Cardholder data protection; log sanitisation</td><td>PAN/CVV detection in logs and API responses; masking enforcement checks</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- SUCCESS METRICS -->
-    <section>
-        <h2>Success Metrics</h2>
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">80%</div>
-                <div class="metric-label">Reduction in manual compliance audit time</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">R10M</div>
-                <div class="metric-label">Max POPIA fine exposure mitigated</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">&lt;5 min</div>
-                <div class="metric-label">PR scan turnaround time</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">0</div>
-                <div class="metric-label">Critical violations reaching production (target)</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">&lt;5%</div>
-                <div class="metric-label">False-positive rate on PII detection</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">72h</div>
-                <div class="metric-label">Breach notification template generation</div>
-            </div>
+    <!-- Main Content -->
+    <main class="doc-content">
+      <section class="doc-section" id="s1">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2 class="section-title">Executive Summary</h2>
         </div>
-    </section>
+        
 
-    <!-- NEXT STEPS -->
-    <section class="violet">
-        <h2>Next Steps</h2>
-        <ol class="step-list">
-            <li>Catalogue all PII touchpoints across APIs, DB schemas and services — produce initial PII inventory baseline</li>
-            <li>Define POPIA Article mapping document covering Sections 8–25 with detection rule specifications per section</li>
-            <li>Integrate scanner with existing CI/CD pipeline (GitHub Actions / Azure DevOps) in advisory-only mode initially</li>
-            <li>Configure Information Regulator breach notification templates aligned to Section 22 notification requirements</li>
-            <li>Run pilot scan across 3 highest-risk services; review false-positive rate and tune detection rules</li>
-            <li>Enable blocking mode for Critical violations on all services after pilot sign-off</li>
-            <li>Schedule quarterly evidence pack generation and board compliance review cadence</li>
-        </ol>
-    </section>
-
-    <!-- ARTIFACTS -->
-    <section>
-        <h2>Related Artefacts</h2>
-        <div class="artifacts-row">
-            <a class="artifact-link" href="#">Requirements (this document)</a>
-            <a class="artifact-link" href="#">Architecture Specification</a>
-            <a class="artifact-link" href="#">Threat Model</a>
-            <a class="artifact-link" href="#">POPIA Compliance Mapping</a>
-        </div>
-    </section>
-
-    <footer>
-        <p>UC-20 AI POPIA Compliance Scanner — Requirements &amp; Planning Document v1.0</p>
-        <p style="margin-top:6px;">Gap Identified &amp; Authored by: <strong style="color:#818cf8;">Malcolm Govender</strong>, Head of AI &amp; Engineering &nbsp;·&nbsp; May 2026</p>
-        <p style="margin-top:6px;">South African Fintech AI Transformation Programme</p>
-    </footer>
+<p>The AI POPIA Compliance Scanner is an intelligent compliance automation layer embedded directly into the software development lifecycle. It continuously scans APIs, database schemas and microservice codebases for PII exposure risks, missing consent flows and unlawful data retention patterns — automatically generating POPIA gap reports, creating Jira/Linear remediation tickets and maintaining a living, regulator-ready data-flow map.</p>
+<p>Malcolm Govender identified this as a critical compliance gap during an internal architecture review. With POPIA fines reaching up to R10 million or 10% of annual turnover, and the Information Regulator increasing enforcement activity in 2025–2026, proactive automated compliance scanning is no longer optional for a fintech operating under FSCA and SARB supervision.</p>
+<div class="comparison-box">
+<div class="compare-card traditional">
+<div class="compare-label">Traditional Approach</div>
+<div class="compare-value">5 Months</div>
+<div class="compare-sub">3 engineers × 5 months manual build</div>
+</div>
+<div class="compare-card ai">
+<div class="compare-label">AI-Assisted Delivery</div>
+<div class="compare-value">8 Hours</div>
+<div class="compare-sub">AI-accelerated implementation target</div>
+</div>
 </div>
 
-<!-- EDITABLE DOCUMENT SYSTEM -->
-<style data-editable-system>
-  body.edm [data-eid]:hover{outline:2px dashed rgba(167,139,250,.35)!important;outline-offset:3px;border-radius:3px;cursor:text}
-  body.edm [data-eid]:focus{outline:2px solid #a78bfa!important;outline-offset:3px;border-radius:3px;background:rgba(167,139,250,.07)!important}
-  body.edm [data-eid]:empty::before{content:"Click to add text";color:rgba(167,139,250,.4);font-style:italic;pointer-events:none}
-  #__etb{position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:6px;align-items:center;background:#111827;border:1px solid #374151;border-radius:12px;padding:9px 14px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
-  #__etb button{padding:5px 11px;border-radius:7px;border:1px solid #374151;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;background:#1f2937;color:#d1d5db}
-  #__etb button:hover{border-color:#a78bfa;color:#e8eaff}
-  #__etb .etb-edit{color:#a78bfa}
-  #__etb .etb-save{color:#34d399}
-  #__etb .etb-reset{color:#f87171}
-  #__etb .etb-export{color:#38bdf8}
-  #__etb .etb-msg{font-size:10.5px;color:#6b7280;min-width:90px;text-align:right}
-  #__etb .etb-sep{width:1px;height:20px;background:#374151;margin:0 2px}
-</style>
-<script data-editable-system>
-(function(){
-  'use strict';
-  var KEY = 'edm:' + (location.pathname || location.href);
-  var SELS = 'p,h1,h2,h3,h4,h5,li,td,th,blockquote,.card-content,.card-title,.meta-value,.hero-meta-value,.summary-card p,.risk-detail,.risk-title,.phase-desc,.gap-value,.kpi-val,.kpi-lbl,.story-text,.card-content p,.dependency-detail,.dependency-system,.checklist li,.warning-box,.info-box,.code-block,.gap-item .gap-value,.status-badge,.badge,.tech-tag,.hero-subtitle,caption,dt,dd,.requirement,.storyid';
-  var mode = false, timer = null, ids = [];
+      </section>
+      <section class="doc-section" id="s2">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <h2 class="section-title">Problem Statement</h2>
+        </div>
+        
 
-  function elems(){
-    return [].slice.call(document.querySelectorAll(SELS)).filter(function(el){
-      return !el.closest('#__etb') && !el.closest('script') && !el.closest('style') && !el.closest('noscript');
-    });
-  }
+<div class="card violet">
+<div class="card-title">Invisible PII Exposure Across Microservices</div>
+<div class="card-content">Personal information is logged, cached and transmitted across API boundaries without consistent classification or protection controls. Engineers building new services have no automated guardrail that flags PII exposure before code reaches production.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Missing &amp; Incomplete Consent Flows</div>
+<div class="card-content">POPIA Sections 11–13 require lawful basis and informed consent for data processing. New features are routinely shipped without consent mechanism validation, creating silent compliance breaches detectable only during costly manual audits.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Unlawful Data Retention</div>
+<div class="card-content">Database schemas retain personal information beyond legally permissible periods. Without automated schema analysis, retention policy violations accumulate silently across dozens of tables and services.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Manual Audit Burden — Regulator Evidence Packs</div>
+<div class="card-content">Preparing evidence packs for the Information Regulator or FSCA takes compliance teams weeks of manual effort per audit cycle. There is no automated mechanism to generate a living, always-current data-flow map aligned to regulatory requirements.</div>
+</div>
 
-  function stamp(){
-    ids = [];
-    elems().forEach(function(el,i){
-      el.setAttribute('data-eid', i);
-      ids.push(i);
-    });
-  }
+      </section>
+      <section class="doc-section" id="s3">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <h2 class="section-title">Solution Overview</h2>
+        </div>
+        
 
-  function enable(){
-    mode = true;
-    document.body.classList.add('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'true';
-      el.spellcheck = false;
-    });
-    document.addEventListener('input', onInput);
-    refresh();
-  }
+<p>The AI POPIA Compliance Scanner operates as a three-layer system: a <strong>static analysis engine</strong> that scans source code and DB schemas at PR time, a <strong>runtime monitoring layer</strong> that observes API traffic patterns for PII leakage, and a <strong>compliance reporting engine</strong> that generates POPIA-mapped gap reports and regulator-ready evidence packs on demand.</p>
+<h3>Core Capabilities</h3>
+<div class="card">
+<div class="card-title">PR-Time POPIA Gate</div>
+<div class="card-content">Scans every pull request for PII patterns in API request/response schemas, new DB columns, log statements and error messages. Blocks merge if Critical POPIA violations are detected; posts a structured gap report as a PR comment.</div>
+</div>
+<div class="card">
+<div class="card-title">Living Data-Flow Map</div>
+<div class="card-content">Maintains an auto-updated map of all personal information flows across the system — which services collect, process, store and transmit what categories of personal information — aligned to POPIA Article mapping (Sections 8–25).</div>
+</div>
+<div class="card">
+<div class="card-title">Automated Remediation Tickets</div>
+<div class="card-content">Detected violations automatically generate structured remediation tickets in Jira or Linear, pre-populated with POPIA article reference, risk severity, affected service, and suggested remediation steps.</div>
+</div>
+<div class="card">
+<div class="card-title">Regulator Evidence Pack Generation</div>
+<div class="card-content">On-demand generation of Information Regulator-ready evidence packs, FSCA data governance reports and SARB supervisory expectation compliance summaries — reducing audit preparation from weeks to minutes.</div>
+</div>
 
-  function disable(){
-    mode = false;
-    document.body.classList.remove('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'false';
-      el.blur();
-    });
-    document.removeEventListener('input', onInput);
-    refresh();
-  }
+      </section>
+      <section class="doc-section" id="s4">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <h2 class="section-title">Functional Requirements</h2>
+        </div>
+        
 
-  function onInput(){
-    clearTimeout(timer);
-    msg('Unsaved…');
-    timer = setTimeout(persist, 900);
-  }
+<table>
+<thead>
+<tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FR-20-01</strong></td><td>Scanner shall detect PII patterns (SA ID numbers, MSISDN, email, financial account numbers, biometric data) in API schemas, source code and DB column definitions at PR time</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-02</strong></td><td>Gap analysis engine shall map detected violations to POPIA sections (8–25) and assign a severity score (Critical / High / Medium / Low)</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-03</strong></td><td>CI/CD gate shall block PR merge when Critical POPIA violations are detected; post structured gap report as PR comment within 5 minutes</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-04</strong></td><td>Living data-flow map shall auto-update on every successful pipeline run, cataloguing all PII flows by service, data category and POPIA section</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-05</strong></td><td>Remediation ticket auto-creation in Jira/Linear: pre-populated with POPIA article, severity, affected service, code location and suggested fix</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-06</strong></td><td>Consent-flow validator shall confirm presence of lawful basis mechanism for every new data processing touchpoint introduced in a PR</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-07</strong></td><td>Retention policy scanner shall flag DB columns/tables retaining personal information beyond configured retention thresholds per data category</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-08</strong></td><td>Evidence pack generator shall produce regulator-ready reports (Information Regulator, FSCA, SARB) on demand in PDF and structured JSON formats</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-09</strong></td><td>Compliance dashboard shall provide real-time POPIA posture score per service and aggregate across the platform</td><td><span class="badge badge-nice" style="margin:0;padding:3px 10px;font-size:0.75em;">NICE TO HAVE</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-20-10</strong></td><td>Information Regulator breach notification templates shall be auto-populated from incident data and flagged for human review within 72 hours of detection</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+</tbody>
+</table>
 
-  function persist(){
-    var store = {};
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null) store[id] = el.innerHTML;
-    });
-    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
-    msg('Saved ✓');
-  }
+      </section>
+      <section class="doc-section" id="s5">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <h2 class="section-title">Non-Functional Requirements</h2>
+        </div>
+        
 
-  function restore(){
-    var raw; try { raw = localStorage.getItem(KEY); } catch(e){}
-    if(!raw) return false;
-    var store; try { store = JSON.parse(raw); } catch(e){ return false; }
-    stamp();
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null && store[id] !== undefined) el.innerHTML = store[id];
-    });
-    return true;
-  }
+<table>
+<thead>
+<tr><th>Category</th><th>Requirement</th><th>Target</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Performance</strong></td><td>PR scan completion time (per service)</td><td>&lt; 5 minutes</td></tr>
+<tr><td><strong>Accuracy</strong></td><td>PII detection false-positive rate</td><td>&lt; 5%</td></tr>
+<tr><td><strong>Accuracy</strong></td><td>Critical violation false-negative rate</td><td>0% target</td></tr>
+<tr><td><strong>Data Residency</strong></td><td>All scan processing and storage must remain within South Africa</td><td>Mandatory — POPIA</td></tr>
+<tr><td><strong>Security</strong></td><td>Scanner must not store or transmit source code or PII externally; analysis in-memory only</td><td>Mandatory</td></tr>
+<tr><td><strong>Availability</strong></td><td>CI/CD gate uptime (degraded to advisory-only on failure)</td><td>99.9%</td></tr>
+<tr><td><strong>Audit</strong></td><td>All scan results and remediation actions retained with immutable audit trail</td><td>5 years minimum</td></tr>
+<tr><td><strong>Scalability</strong></td><td>Concurrent PR scans without queue build-up</td><td>≥ 30 simultaneous</td></tr>
+</tbody>
+</table>
 
-  function reset(){
-    if(!confirm('Reset all edits to original content? This cannot be undone.')) return;
-    try { localStorage.removeItem(KEY); } catch(e){}
-    location.reload();
-  }
+      </section>
+      <section class="doc-section" id="s6">
+        <div class="section-header">
+          <div class="section-num">6</div>
+          <h2 class="section-title">Technical Architecture</h2>
+        </div>
+        
 
-  function exportDoc(){
-    // Temporarily disable editing for clean export
-    var wasMode = mode;
-    if(wasMode) disable();
-    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    // Remove the editable toolbar and injected system from export
-    html = html.replace(/<style[^>]*data-editable-system[^>]*>[\s\S]*?<\/style>/,'');
-    html = html.replace(/<script[^>]*data-editable-system[^>]*>[\s\S]*?<\/script>/,'');
-    html = html.replace(/<div id="__etb"[^>]*>[\s\S]*?<\/div>/,'');
-    html = html.replace(/<!-- EDITABLE DOCUMENT SYSTEM -->/g,'');
-    html = html.replace(/\sdata-eid="\d+"/g,'');
-    html = html.replace(/\scontenteditable="[^"]*"/g,'');
-    var blob = new Blob([html], {type:'text/html'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = (location.pathname.split('/').pop() || 'document') + '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    if(wasMode) enable();
-    msg('Exported ✓');
-  }
+<h3>Component Overview</h3>
+<div class="card violet">
+<div class="card-title">Static Analysis Engine (Python)</div>
+<div class="card-content">AST-based scanner for Python/TypeScript codebases. Custom detection rules for SA-specific PII patterns (RSA ID, MSISDN formats). Integrates with Semgrep ruleset extended with POPIA-specific patterns. Runs in GitHub Actions / Azure DevOps pipeline step.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Schema Analyser (Python)</div>
+<div class="card-content">Connects to DB migration files (Flyway/Alembic/Prisma) and OpenAPI specs. Classifies columns by PII category using ML-assisted column-name + type heuristics. Checks retention policy configuration against data category thresholds.</div>
+</div>
+<div class="card violet">
+<div class="card-title">POPIA Mapping Engine</div>
+<div class="card-content">Knowledge graph mapping detected PII patterns to POPIA sections 8–25. Produces structured gap report with section references, risk score and remediation guidance. Exposes REST API for dashboard and evidence pack consumption.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Evidence Pack Generator (TypeScript)</div>
+<div class="card-content">Templated report generator producing PDF and JSON evidence packs aligned to Information Regulator, FSCA and SARB reporting formats. Updates living data-flow map on each pipeline run.</div>
+</div>
+<h3>Integration Points</h3>
+<div class="card">
+<div class="card-title">CI/CD — GitHub Actions / Azure DevOps</div>
+<div class="card-content">Pipeline step added to all service repos. Scan runs on every PR. Results posted as PR check status and comment. Critical violations block merge.</div>
+</div>
+<div class="card">
+<div class="card-title">Jira / Linear — Ticket Auto-Creation</div>
+<div class="card-content">Webhook from POPIA Mapping Engine triggers ticket creation in configured project board. De-duplication logic prevents duplicate tickets for recurring violations.</div>
+</div>
 
-  function msg(t){
-    var el = document.getElementById('__etb-msg');
-    if(el){ el.textContent = t; clearTimeout(el._t); if(t==='Saved ✓'||t==='Exported ✓') el._t=setTimeout(function(){el.textContent='';},2500); }
-  }
+      </section>
+      <section class="doc-section" id="s7">
+        <div class="section-header">
+          <div class="section-num">7</div>
+          <h2 class="section-title">Compliance & Regulatory Alignment</h2>
+        </div>
+        
 
-  function refresh(){
-    var btn = document.getElementById('__etb-btn');
-    var acts = document.getElementById('__etb-acts');
-    if(btn){ btn.textContent = mode ? '🔒 Lock' : '✏️ Edit'; btn.style.background = mode ? '#2d1f5e' : '#1f2937'; btn.style.color = mode ? '#c4b5fd' : '#a78bfa'; }
-    if(acts) acts.style.display = mode ? 'flex' : 'none';
-  }
+<table>
+<thead>
+<tr><th>Regulatory Body</th><th>Requirement</th><th>How Scanner Addresses It</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>POPIA Information Regulator</strong></td><td>Sections 8–25: lawful processing, consent, purpose limitation, retention, security safeguards</td><td>Direct section mapping in gap reports; consent flow validation; retention scanning</td></tr>
+<tr><td><strong>FSCA</strong></td><td>Data governance standards for financial service providers; conduct of business obligations</td><td>FSCA-formatted evidence pack; data-flow map aligned to FSP data governance obligations</td></tr>
+<tr><td><strong>SARB</strong></td><td>Supervisory expectations on data management and privacy in payment systems</td><td>SARB supervisory report template; API-level PII flow cataloguing</td></tr>
+<tr><td><strong>GDPR-Adjacent</strong></td><td>Cross-border data transfer controls for international partners</td><td>Cross-border transfer detection in API schemas; adequacy decision mapping</td></tr>
+<tr><td><strong>PCI-DSS</strong></td><td>Cardholder data protection; log sanitisation</td><td>PAN/CVV detection in logs and API responses; masking enforcement checks</td></tr>
+</tbody>
+</table>
 
-  function buildToolbar(){
-    var t = document.createElement('div');
-    t.id = '__etb';
-    t.innerHTML =
-      '<span style="font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-right:2px">Document</span>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-edit" id="__etb-btn" onclick="window.__edm.toggle()">✏️ Edit</button>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-share" onclick="window.__edm.share()" title="Copy shareable link">🔗 Share</button>'+
-      '<button class="etb-print" onclick="window.__edm.print()" title="Print / Save as PDF">🖨 Print</button>'+
-      '<div id="__etb-acts" style="display:none;gap:5px;align-items:center">'+
-        '<span class="etb-msg" id="__etb-msg"></span>'+
-        '<button class="etb-save" onclick="window.__edm.save()">💾 Save</button>'+
-        '<button class="etb-reset" onclick="window.__edm.reset()">↺ Reset</button>'+
-        '<button class="etb-export" onclick="window.__edm.export()">⬇ Export</button>'+
-      '</div>';
-    document.body.appendChild(t);
-  }
+      </section>
+      <section class="doc-section" id="s8">
+        <div class="section-header">
+          <div class="section-num">8</div>
+          <h2 class="section-title">Success Metrics</h2>
+        </div>
+        
 
-  function shareDoc(){
-    var base = 'https://fintech-tracker-web.vercel.app';
-    var url = base + location.pathname;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ msg('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
-    } else { prompt('Copy this link:',url); }
-  }
-  function printDoc(){
-    var wasMode = mode;
-    if(wasMode) disable();
-    window.print();
-    if(wasMode) setTimeout(function(){ enable(); }, 500);
-  }
-  window.__edm = {
-    toggle: function(){ mode ? disable() : enable(); },
-    save:   function(){ persist(); },
-    reset:  function(){ reset(); },
-    export: function(){ exportDoc(); },
-    share:  function(){ shareDoc(); },
-    print:  function(){ printDoc(); }
-  };
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-value">80%</div>
+<div class="metric-label">Reduction in manual compliance audit time</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">R10M</div>
+<div class="metric-label">Max POPIA fine exposure mitigated</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">&lt;5 min</div>
+<div class="metric-label">PR scan turnaround time</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">0</div>
+<div class="metric-label">Critical violations reaching production (target)</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">&lt;5%</div>
+<div class="metric-label">False-positive rate on PII detection</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">72h</div>
+<div class="metric-label">Breach notification template generation</div>
+</div>
+</div>
 
-  function init(){
-    buildToolbar();
-    stamp();
-    var had = restore();
-    if(had) msg('Edits loaded');
-  }
+      </section>
+      <section class="doc-section" id="s9">
+        <div class="section-header">
+          <div class="section-num">9</div>
+          <h2 class="section-title">Next Steps</h2>
+        </div>
+        
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+<ol class="step-list">
+<li>Catalogue all PII touchpoints across APIs, DB schemas and services — produce initial PII inventory baseline</li>
+<li>Define POPIA Article mapping document covering Sections 8–25 with detection rule specifications per section</li>
+<li>Integrate scanner with existing CI/CD pipeline (GitHub Actions / Azure DevOps) in advisory-only mode initially</li>
+<li>Configure Information Regulator breach notification templates aligned to Section 22 notification requirements</li>
+<li>Run pilot scan across 3 highest-risk services; review false-positive rate and tune detection rules</li>
+<li>Enable blocking mode for Critical violations on all services after pilot sign-off</li>
+<li>Schedule quarterly evidence pack generation and board compliance review cadence</li>
+</ol>
+
+      </section>
+      <section class="doc-section" id="s10">
+        <div class="section-header">
+          <div class="section-num">10</div>
+          <h2 class="section-title">Related Artefacts</h2>
+        </div>
+        
+
+<div class="artifacts-row">
+<a class="artifact-link" href="#">Requirements (this document)</a>
+<a class="artifact-link" href="#">Architecture Specification</a>
+<a class="artifact-link" href="#">Threat Model</a>
+<a class="artifact-link" href="#">POPIA Compliance Mapping</a>
+</div>
+
+      </section>
+    </main>
+
+  </div><!-- /doc-layout -->
+
+</div><!-- /doc-shell -->
 
 </body>
 </html>

@@ -1,910 +1,909 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC-35 Predictive Wealth Builder — Requirements &amp; Planning</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
-        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
-        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
-        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
-        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
-        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
-        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
-        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
-        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
-        .badge-high { background: #7c3aed; color: #fff; }
-        .badge-p2 { background: rgba(99,102,241,0.2); color: #818cf8; border: 1px solid #4f46e5; }
-        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
-        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
-        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
-        section.teal { border-left-color: #14b8a6; }
-        section.violet { border-left-color: #7c3aed; }
-        section.amber { border-left-color: #f59e0b; }
-        section.red { border-left-color: #dc2626; }
-        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
-        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
-        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
-        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
-        ul li { margin-bottom: 5px; }
-        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
-        .card.teal { border-left-color: #14b8a6; }
-        .card.violet { border-left-color: #7c3aed; }
-        .card.amber { border-left-color: #f59e0b; }
-        .card.red { border-left-color: #dc2626; }
-        .card.green { border-left-color: #34d399; }
-        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
-        .card.teal .card-title { color: #2dd4bf; }
-        .card.violet .card-title { color: #a78bfa; }
-        .card.amber .card-title { color: #f59e0b; }
-        .card.red .card-title { color: #f87171; }
-        .card.green .card-title { color: #34d399; }
-        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
-        thead { background: #1e1b4b; }
-        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
-        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
-        tbody tr:hover { background: #1e293b; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
-        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
-        .metric-card.indigo { border-top-color: #6366f1; }
-        .metric-card.violet { border-top-color: #7c3aed; }
-        .metric-card.amber { border-top-color: #f59e0b; }
-        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
-        .metric-card.indigo .metric-value { color: #818cf8; }
-        .metric-card.violet .metric-value { color: #a78bfa; }
-        .metric-card.amber .metric-value { color: #f59e0b; }
-        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
-        .compare-card.traditional { border-top: 3px solid #dc2626; }
-        .compare-card.ai { border-top: 3px solid #14b8a6; }
-        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
-        .compare-card.traditional .compare-label { color: #f87171; }
-        .compare-card.ai .compare-label { color: #2dd4bf; }
-        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
-        .compare-card.traditional .compare-value { color: #f87171; }
-        .compare-card.ai .compare-value { color: #2dd4bf; }
-        .compare-sub { font-size: 0.85em; color: #64748b; }
-        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
-        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
-        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
-        .owner-role { font-size: 0.85em; color: #7c3aed; }
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
-        .four-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
-        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
-        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
-        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
-        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
-        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
-        .us-ac li { margin-bottom: 3px; }
-        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
-        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
-        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
-        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
-        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
-        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
-        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
-        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 140px; }
-        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
-        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
-        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
-        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
-        .arch-layer:last-child .arch-layer-label { color: #64748b; }
-        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
-        .sprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px; }
-        .sprint-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
-        .sprint-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-        .sprint-1 .sprint-label { color: #6366f1; }
-        .sprint-2 .sprint-label { color: #14b8a6; }
-        .sprint-3 .sprint-label { color: #f59e0b; }
-        .sprint-title { font-size: 1.05em; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
-        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
-        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
-        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
-        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
-        .priority-high { color: #f87171; font-weight: 700; }
-        .priority-med { color: #fbbf24; font-weight: 700; }
-        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
-        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
-        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UC-35 Predictive Wealth Builder — Requirements & Planning</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface-alt:#F1F5F9;
+  --border:rgba(226,232,240,0.9);--border-strong:#CBD5E1;
+  --text-primary:#0F172A;--text-secondary:#334155;--text-muted:#64748B;
+  --accent:#7C3AED;--accent-d:#6D28D9;--accent-light:#EDE9FE;--accent-border:rgba(124,58,237,0.2);
+  --blue:#2563EB;--blue-light:#DBEAFE;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --r:16px;--rs:10px;
+  --shadow-sm:0 1px 4px rgba(15,23,42,0.06),0 2px 8px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.08),0 2px 6px rgba(15,23,42,0.04);
+}
+html{scroll-behavior:smooth;font-size:15px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── Sticky Header ── */
+.doc-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:58px;
+}
+.hdr-left{display:flex;align-items:center;gap:16px}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:var(--text-muted);
+  text-decoration:none;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--border);transition:all 0.15s;
+}
+.back-link:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-light)}
+.hdr-breadcrumb{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.hdr-sep{color:var(--border-strong)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:all 0.15s;font-family:inherit;
+}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
+.hdr-btn.violet{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hdr-btn.violet:hover{background:var(--accent-d)}
+
+/* ── Shell ── */
+.doc-shell{max-width:1220px;margin:0 auto;padding:0 40px 100px}
+
+/* ── Hero ── */
+.doc-hero{padding:52px 0 32px;max-width:800px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero-title{
+  font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.2px;
+  background:linear-gradient(140deg,#0F172A 0%,#312E81 50%,#7C3AED 90%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:14px;
+}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:22px;max-width:680px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;letter-spacing:0.04em;
+  padding:4px 12px;border-radius:20px;
+}
+.badge-p1{background:#FEE2E2;color:#B91C1C}
+.badge-p2{background:#FEF3C7;color:#92400E}
+.badge-progress{background:#FEF3C7;color:#92400E}
+.badge-in-progress{background:#FEF3C7;color:#92400E}
+.badge-done,.badge-complete,.badge-built{background:#D1FAE5;color:#065F46}
+.badge-platform{background:var(--accent-light);color:var(--accent)}
+.badge-neutral{background:var(--surface-alt);color:var(--text-muted);border:1px solid var(--border)}
+.badge-must{background:#FEE2E2;color:#B91C1C;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-should{background:#FEF3C7;color:#92400E;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-nice{background:#D1FAE5;color:#065F46;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+
+/* ── Meta Strip ── */
+.meta-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;margin-bottom:36px;
+}
+.meta-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;
+  box-shadow:var(--shadow-sm);transition:all 0.2s;
+}
+.meta-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.meta-value{font-size:13px;font-weight:700;color:var(--text-primary)}
+.meta-value.violet{color:var(--accent)}
+
+/* ── Progress Bar ── */
+.progress-section{margin:0 0 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow-sm)}
+.progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.progress-label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.progress-pct{font-size:14px;font-weight:800;color:var(--accent)}
+.progress-track{height:8px;background:var(--surface-alt);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:8px;transition:width 0.6s ease}
+.progress-note{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+/* ── Doc Layout ── */
+.doc-layout{display:grid;grid-template-columns:210px 1fr;gap:36px;align-items:start}
+@media(max-width:900px){.doc-layout{grid-template-columns:1fr}.doc-toc{display:none}}
+
+/* ── ToC ── */
+.doc-toc{position:sticky;top:76px}
+.toc-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.toc-title{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.toc-link{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;text-decoration:none;color:var(--text-secondary);font-size:12px;font-weight:500;transition:all 0.15s;margin-bottom:2px}
+.toc-link:hover{background:var(--accent-light);color:var(--accent)}
+.toc-num{font-size:10px;font-weight:700;color:var(--text-muted);min-width:20px}
+
+/* ── Sections ── */
+.doc-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.section-num{width:30px;height:30px;border-radius:8px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+h2.section-title{font-size:18px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+h3{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-top:24px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+p{color:var(--text-secondary);margin-bottom:13px;line-height:1.75;font-size:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+ul,ol{color:var(--text-secondary);margin:0 0 14px 20px;line-height:1.75;font-size:14px}
+li{margin-bottom:5px}
+li strong{color:var(--text-primary)}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.kpi-card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;text-align:center;transition:all 0.2s}
+.kpi-card:hover{background:var(--accent-light);border-color:var(--accent-border);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-value{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-0.8px;line-height:1;margin-bottom:6px}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);line-height:1.4}
+
+/* ── Callouts ── */
+.info-box,.accent-box,.callout-blue{
+  background:var(--blue-light);border:1px solid rgba(37,99,235,0.18);
+  border-left:3px solid var(--blue);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#1E40AF;line-height:1.65;
+}
+.info-box a,.accent-box a,.callout-blue a{color:var(--blue);font-weight:600;text-decoration:none}
+.warning-box,.callout-red{
+  background:#FFF5F5;border:1px solid rgba(220,38,38,0.18);
+  border-left:3px solid var(--red);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#7F1D1D;line-height:1.65;
+}
+.warning-box ul,.callout-red ul{color:#7F1D1D}
+.callout-violet{
+  background:var(--accent-light);border:1px solid var(--accent-border);
+  border-left:3px solid var(--accent);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#3B0764;line-height:1.65;
+}
+.callout-green{
+  background:var(--green-light);border:1px solid rgba(22,163,74,0.2);
+  border-left:3px solid var(--green);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#14532D;line-height:1.65;
+}
+.callout-amber{
+  background:var(--amber-light);border:1px solid rgba(217,119,6,0.2);
+  border-left:3px solid var(--amber);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#78350F;line-height:1.65;
+}
+
+/* ── Cards / Items ── */
+.card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;margin-bottom:10px;transition:all 0.15s}
+.card:hover{border-color:var(--accent-border);background:var(--surface)}
+.card-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:7px}
+.card-content{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Requirements ── */
+.requirement{border-left:3px solid var(--border-strong);padding:10px 14px;margin-bottom:8px;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface-alt)}
+.requirement:hover{border-left-color:var(--accent)}
+.req-body{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Tables ── */
+table,.doc-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}
+th{background:var(--surface-alt);border:1px solid var(--border);padding:10px 14px;font-weight:700;color:var(--text-primary);text-align:left;font-size:11px;letter-spacing:0.05em;text-transform:uppercase}
+td{border:1px solid var(--border);padding:10px 14px;color:var(--text-secondary);vertical-align:top;line-height:1.6}
+tr:hover td{background:var(--surface-alt)}
+
+/* ── User Stories ── */
+.story{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;margin-bottom:12px}
+.story-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.story-text{font-size:13.5px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px}
+.story-ac{font-size:12.5px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--surface);border-radius:7px;border:1px solid var(--border)}
+
+/* ── Dependencies ── */
+.dep-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dep-item:last-child{border-bottom:none}
+.dep-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--surface-alt);border:1px solid var(--border)}
+.dep-body{flex:1}
+.dep-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.dep-desc{font-size:12.5px;color:var(--text-muted)}
+
+/* ── Print ── */
+@media print{.doc-header,.doc-toc{display:none!important}.doc-layout{grid-template-columns:1fr}.doc-section{break-inside:avoid}}
+@media(max-width:768px){.doc-shell{padding:0 16px 60px}.doc-hero{padding:32px 0 20px}.doc-section{padding:22px 18px}}
+
+  </style>
 </head>
 <body>
-<a href="../index.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
 
-<div class="container">
+<!-- ── Sticky Header ── -->
+<header class="doc-header">
+  <div class="hdr-left">
+    <a href="/index.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+      Back to Tracker
+    </a>
+    <div class="hdr-breadcrumb">
+      <span style="color:var(--text-muted)">UC-35</span>
+      <span class="hdr-sep">/</span>
+      <b>Requirements &amp; User Stories</b>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
 
-    <!-- HEADER -->
-    <header>
-        <div>
-            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 35</div>
-            <h1>Predictive Wealth Builder</h1>
-            <div class="subtitle">AI-powered micro-investment automation embedded directly in the MoMo consumer app &mdash; with no minimum investment amount. Round-up investing, goal-based savings, and in-app access to government bonds and ETFs for 65 million+ MoMo subscribers across Africa.</div>
-            <div>
-                <span class="badge badge-new">New &mdash; Revenue Growth Opportunity</span>
-                <span class="badge badge-not-started">Not Started &mdash; 0% Complete</span>
-                <span class="badge badge-p2">Priority: P2</span>
-                <span class="badge badge-high">Tier: High</span>
-            </div>
-            <div style="margin-top:10px;">
-                <span class="badge badge-compliance">FSCA</span>
-                <span class="badge badge-compliance">FAIS Act</span>
-                <span class="badge badge-compliance">POPIA</span>
-                <span class="badge badge-compliance">JSE/NSE</span>
-                <span class="badge badge-teal">Investment Products</span>
-                <span class="badge badge-teal">13 Markets</span>
-            </div>
+<!-- ── Page Shell ── -->
+<div class="doc-shell">
+
+  <!-- ── Hero ── -->
+  <div class="doc-hero">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      AI Programme · UC-35
+    </div>
+    <h1 class="hero-title">Predictive Wealth Builder</h1>
+    <p class="hero-subtitle"></p>
+    <div class="hero-badges">
+      <span class="badge badge-neutral">New — Revenue Growth Opportunity</span>
+      <span class="badge badge-in-progress">Not Started — 0% Complete</span>
+      <span class="badge badge-p2">Priority: P2</span>
+      <span class="badge badge-neutral">Tier: High</span>
+      <span class="badge badge-neutral">FSCA</span>
+      <span class="badge badge-neutral">FAIS Act</span>
+      <span class="badge badge-neutral">POPIA</span>
+      <span class="badge badge-neutral">JSE/NSE</span>
+      <span class="badge badge-neutral">Investment Products</span>
+      <span class="badge badge-neutral">13 Markets</span>
+    </div>
+  </div>
+
+  <!-- ── Metadata Strip ── -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-label">Use Case ID</div>
+      <div class="meta-value ">UC-35</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Version</div>
+      <div class="meta-value ">v1.0</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Document Date</div>
+      <div class="meta-value ">May 2026</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Status</div>
+      <div class="meta-value ">Not Started</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Priority</div>
+      <div class="meta-value">P2</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Min. Investment</div>
+      <div class="meta-value">R1 / N1 / KES1</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Driver</div>
+      <div class="meta-value">Revenue Growth & CLV</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Business Value</div>
+      <div class="meta-value">New Investment Fee Income</div>
+    </div>
+  </div>
+
+    <div class="progress-section">
+    <div class="progress-header">
+      <span class="progress-label">Build Progress</span>
+      <span class="progress-pct">0% Complete</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:0%"></div>
+    </div>
+    
+  </div>
+
+  <!-- ── Document Layout ── -->
+  <div class="doc-layout">
+
+    <!-- ToC -->
+    <aside class="doc-toc">
+      <div class="toc-inner">
+        <div class="toc-title">Contents</div>
+        <a href="#s1" class="toc-link"><span class="toc-num">01</span>Executive Summary & Business Case</a>
+        <a href="#s2" class="toc-link"><span class="toc-num">02</span>Problem Statement</a>
+        <a href="#s3" class="toc-link"><span class="toc-num">03</span>Objectives & Success Metrics</a>
+        <a href="#s4" class="toc-link"><span class="toc-num">04</span>User Stories</a>
+        <a href="#s5" class="toc-link"><span class="toc-num">05</span>Functional Requirements</a>
+        <a href="#s6" class="toc-link"><span class="toc-num">06</span>Technical Architecture</a>
+        <a href="#s7" class="toc-link"><span class="toc-num">07</span>Data & AI Model Requirements</a>
+        <a href="#s8" class="toc-link"><span class="toc-num">08</span>Compliance & Regulatory Requirements</a>
+        <a href="#s9" class="toc-link"><span class="toc-num">09</span>Sprint Plan & Roadmap</a>
+        <a href="#s10" class="toc-link"><span class="toc-num">10</span>Risk Register</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="doc-content">
+      <section class="doc-section" id="s1">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2 class="section-title">Executive Summary & Business Case</h2>
         </div>
-        <div class="header-grid">
-            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-35</div></div>
-            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
-            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
-            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P2</div></div>
-            <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">Not Started</div></div>
-            <div class="meta-item"><div class="meta-label">Min. Investment</div><div class="meta-value">R1 / N1 / KES1</div></div>
-            <div class="meta-item"><div class="meta-label">Driver</div><div class="meta-value">Revenue Growth &amp; CLV</div></div>
-            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">New Investment Fee Income</div></div>
-        </div>
-        <div class="owner-highlight">
-            <div class="owner-avatar">MG</div>
-            <div>
-                <div class="owner-name-text">Malcolm Govender</div>
-                <div class="owner-role">Head of AI &amp; Engineering &middot; Document Author &amp; Use Case Owner</div>
-            </div>
-        </div>
-    </header>
+        
 
-    <!-- 1. EXECUTIVE SUMMARY -->
-    <section>
-        <h2>1. Executive Summary &amp; Business Case</h2>
-        <p>MTN Group Fintech serves over 65 million active MoMo subscribers across 13 African markets, yet none of these customers currently have access to investment products through MoMo. The traditional wealth management and investment industry in Africa has minimum investment thresholds that exclude the vast majority of the continent's working population &mdash; often requiring R10,000&ndash;R50,000 to open a retail investment account. UC-35 eliminates this barrier entirely.</p>
-        <p>The Predictive Wealth Builder embeds AI-powered micro-investment automation directly into the MoMo consumer app, enabling any subscriber to invest from as little as R1 (or local currency equivalent). The product uses behavioural AI to analyse transaction patterns, identify discretionary spending capacity, and automatically route micro-amounts into government bonds, ETFs, and tax-free savings accounts &mdash; without the customer needing to actively think about it.</p>
-        <p>The core mechanic is <strong style="color:#818cf8;">round-up investing</strong>: every MoMo purchase is rounded up to the nearest rand/naira/shilling, with the difference automatically invested according to the customer's chosen goal and risk profile. Supplementary features include goal-based savings pots (school fees, emergency fund, home deposit), AI portfolio rebalancing, and tax-free savings account (TFSA) integration where regulatory frameworks permit.</p>
-        <p>The business case is anchored on new fee income streams: an annual management fee of 0.5&ndash;1.5% AUM, transaction fees on ETF purchases, and premium tier subscription fees for advanced AI features. At 5 million investors averaging R500 AUM, fee income reaches R37.5M annually at 1.5% AMF. Crucially, this product increases customer lifetime value, reduces churn, and positions MoMo as a full-spectrum financial services provider rather than a payments utility.</p>
-
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">R1</div>
-                <div class="metric-label">Minimum Investment Amount</div>
-            </div>
-            <div class="metric-card indigo">
-                <div class="metric-value">65M+</div>
-                <div class="metric-label">Addressable MoMo Subscribers</div>
-            </div>
-            <div class="metric-card violet">
-                <div class="metric-value">R37.5M</div>
-                <div class="metric-label">Projected Annual Fee Income (5M investors)</div>
-            </div>
-            <div class="metric-card amber">
-                <div class="metric-value">0%</div>
-                <div class="metric-label">Current MoMo Subscribers with Investment Access</div>
-            </div>
-        </div>
-
-        <div class="comparison-box" style="margin-top:20px;">
-            <div class="compare-card traditional">
-                <div class="compare-label">Traditional Investment Access</div>
-                <div class="compare-value">R10,000+</div>
-                <div class="compare-sub">Minimum account opening, long KYC process, separate app or branch visit, advisor relationship required, excludes 80%+ of African working population</div>
-            </div>
-            <div class="compare-card ai">
-                <div class="compare-label">Predictive Wealth Builder (UC-35)</div>
-                <div class="compare-value">R1 Minimum</div>
-                <div class="compare-sub">In-app setup in under 3 minutes, automated round-ups, AI portfolio management, goal-based savings, no advisor needed, available to all 65M+ MoMo users</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 2. PROBLEM STATEMENT -->
-    <section class="violet">
-        <h2>2. Problem Statement</h2>
-        <p>Africa has one of the youngest and fastest-growing populations on earth, with a burgeoning middle class that has demonstrated strong financial discipline through consistent mobile money usage. Yet structural barriers in the traditional investment industry systematically exclude these customers from wealth creation. Three compounding problems define the gap:</p>
-
-        <div class="card violet">
-            <div class="card-title">Problem 1 &mdash; Minimum Thresholds Exclude the Majority</div>
-            <div class="card-content">Regulated investment products in South Africa, Nigeria, Kenya and other MTN markets require minimum initial investments that are out of reach for the majority of MoMo's subscriber base. A market trader who saves R50 per week and uses MoMo daily has no viable path to compound wealth accumulation. The result is a structural wealth gap that mobile money payments have not addressed. UC-35 solves this with a R1 minimum investment, the lowest in any regulated African investment product.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Problem 2 &mdash; MoMo Is Untapped as a Wealth Platform</div>
-            <div class="card-content">MoMo captures daily transaction data for 65 million subscribers &mdash; spending patterns, income cadence, discretionary capacity, seasonal fluctuations. This is precisely the data a robo-advisor uses to build an investment profile. Yet MTN currently monetises this data only through payments fees. UC-35 converts transactional data into an investment intelligence engine, generating fee income while delivering genuine financial uplift to subscribers. Competitors (M-Pesa, OPay, Airtel Money) are moving into investment products; MTN must act in 2026 or cede this market.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Problem 3 &mdash; Manual Investing Requires Financial Literacy Most Customers Lack</div>
-            <div class="card-content">Traditional investment products require customers to actively select funds, understand risk ratings, rebalance portfolios, and manage tax implications. The majority of MTN's subscriber base lacks the financial literacy to navigate these decisions confidently. UC-35's AI removes this burden entirely &mdash; the system makes portfolio decisions, executes round-ups automatically, rebalances monthly, and surfaces only the information the customer needs to stay engaged with their goals. The product is designed for financial inclusion by design, not as an afterthought.</div>
-        </div>
-    </section>
-
-    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
-    <section class="teal">
-        <h2>3. Objectives &amp; Success Metrics</h2>
-        <div class="two-col">
-            <div>
-                <h3>Primary Objectives</h3>
-                <div class="card teal">
-                    <div class="card-title">OBJ-01 &mdash; Launch In-App Micro-Investment Product</div>
-                    <div class="card-content">Deploy a fully regulated, FSCA-compliant investment product embedded in the MoMo app with a R1 minimum investment, accessible to all existing MoMo KYC-verified subscribers.</div>
-                </div>
-                <div class="card teal">
-                    <div class="card-title">OBJ-02 &mdash; Automate Wealth Accumulation via Round-Ups</div>
-                    <div class="card-content">Enable round-up investing on every MoMo payment, automatically investing the difference between the transaction amount and the nearest whole rand/naira/shilling.</div>
-                </div>
-                <div class="card teal">
-                    <div class="card-title">OBJ-03 &mdash; AI Portfolio Management</div>
-                    <div class="card-content">Deliver AI-driven portfolio allocation and monthly rebalancing across government bonds, ETFs, and money market instruments, calibrated to the customer's stated goal and risk tolerance.</div>
-                </div>
-                <div class="card teal">
-                    <div class="card-title">OBJ-04 &mdash; Generate Investment Fee Income</div>
-                    <div class="card-content">Establish a new revenue stream through annual management fees (0.5&ndash;1.5% AUM), ETF transaction fees, and premium subscription tiers for advanced AI features.</div>
-                </div>
-            </div>
-            <div>
-                <h3>Success Metrics</h3>
-                <div class="metrics-grid" style="grid-template-columns: 1fr 1fr;">
-                    <div class="metric-card">
-                        <div class="metric-value">1M</div>
-                        <div class="metric-label">Investors by Month 12</div>
-                    </div>
-                    <div class="metric-card indigo">
-                        <div class="metric-value">R500</div>
-                        <div class="metric-label">Avg AUM per Investor M12</div>
-                    </div>
-                    <div class="metric-card violet">
-                        <div class="metric-value">65%</div>
-                        <div class="metric-label">Round-Up Activation Rate</div>
-                    </div>
-                    <div class="metric-card amber">
-                        <div class="metric-value">&lt;3 min</div>
-                        <div class="metric-label">Investment Onboarding Time</div>
-                    </div>
-                </div>
-
-                <table style="margin-top:16px;">
-                    <thead><tr><th>KPI</th><th>M6 Target</th><th>M12 Target</th></tr></thead>
-                    <tbody>
-                        <tr><td>Active Investors</td><td>250,000</td><td>1,000,000</td></tr>
-                        <tr><td>Total AUM</td><td>R50M</td><td>R500M</td></tr>
-                        <tr><td>Monthly Fee Income</td><td>R62,500</td><td>R625,000</td></tr>
-                        <tr><td>Round-Up Activation</td><td>50%</td><td>65%</td></tr>
-                        <tr><td>Goal Achievement Rate</td><td>&mdash;</td><td>&gt;40%</td></tr>
-                        <tr><td>30-Day Investor Retention</td><td>&gt;70%</td><td>&gt;80%</td></tr>
-                        <tr><td>App Session Frequency Lift</td><td>+15%</td><td>+25%</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. USER STORIES -->
-    <section>
-        <h2>4. User Stories</h2>
-        <div class="two-col">
-            <div>
-                <div class="us-card">
-                    <div class="us-id">US-01 &middot; Round-Up Investing</div>
-                    <div class="us-title">Automatic Round-Up on Every Purchase</div>
-                    <div class="us-story">"As a MoMo user, I want every purchase I make to automatically round up to the nearest rand and invest the difference, so I can build savings without thinking about it."</div>
-                    <div class="us-ac-label">Acceptance Criteria</div>
-                    <ul class="us-ac">
-                        <li>Round-up calculated on every MoMo debit transaction (minimum R0.01)</li>
-                        <li>Round-up amounts batched daily and invested by 23:00</li>
-                        <li>Customer can pause/resume round-ups from app at any time</li>
-                        <li>Round-up multiplier (1x, 2x, 3x) configurable by customer</li>
-                        <li>Daily round-up summary notification sent via push/SMS</li>
-                    </ul>
-                </div>
-                <div class="us-card">
-                    <div class="us-id">US-02 &middot; Goal-Based Savings Pots</div>
-                    <div class="us-title">Create and Track Named Investment Goals</div>
-                    <div class="us-story">"As a parent, I want to create a savings pot called 'School Fees 2027' with a target amount and date, and have the AI tell me if I'm on track."</div>
-                    <div class="us-ac-label">Acceptance Criteria</div>
-                    <ul class="us-ac">
-                        <li>Customer can create up to 5 named goals with target amount and target date</li>
-                        <li>AI calculates required monthly contribution to reach goal on time</li>
-                        <li>Progress bar and days-remaining displayed per goal</li>
-                        <li>AI sends proactive alerts if customer is falling behind target</li>
-                        <li>Goal funds ring-fenced in separate allocation within portfolio</li>
-                    </ul>
-                </div>
-                <div class="us-card">
-                    <div class="us-id">US-03 &middot; ETF &amp; Bond Access</div>
-                    <div class="us-title">Invest in Exchange-Traded Funds and Government Bonds</div>
-                    <div class="us-story">"As a first-time investor, I want to invest in ETFs and government bonds directly from MoMo without needing a stockbroker account."</div>
-                    <div class="us-ac-label">Acceptance Criteria</div>
-                    <ul class="us-ac">
-                        <li>Minimum 3 ETF options (equity, balanced, fixed income) available in-app</li>
-                        <li>Government retail bonds available where JSE/NSE infrastructure supports</li>
-                        <li>Plain-language fund descriptions with risk rating (1-5)</li>
-                        <li>Historical performance chart displayed (1M, 3M, 1Y, 3Y)</li>
-                        <li>Purchase executes via licensed asset manager partner within T+2</li>
-                    </ul>
-                </div>
-                <div class="us-card">
-                    <div class="us-id">US-04 &middot; AI Portfolio Rebalancing</div>
-                    <div class="us-title">Automatic Monthly Portfolio Optimisation</div>
-                    <div class="us-story">"As an investor, I want my portfolio to be automatically rebalanced every month so I don't have to manually adjust my allocations as markets move."</div>
-                    <div class="us-ac-label">Acceptance Criteria</div>
-                    <ul class="us-ac">
-                        <li>AI rebalances portfolio to target allocation on the 1st of each month</li>
-                        <li>Rebalancing triggered if any asset class drifts &gt;5% from target</li>
-                        <li>Customer receives rebalancing summary notification post-execution</li>
-                        <li>Customer can opt out of auto-rebalancing and manage manually</li>
-                        <li>Tax-aware rebalancing (avoid unnecessary capital gains events)</li>
-                    </ul>
-                </div>
-            </div>
-            <div>
-                <div class="us-card">
-                    <div class="us-id">US-05 &middot; Risk Profiling</div>
-                    <div class="us-title">AI-Assisted Risk Assessment at Onboarding</div>
-                    <div class="us-story">"As a new investor, I want to complete a short questionnaire and have the AI recommend a portfolio that suits my financial situation and risk appetite."</div>
-                    <div class="us-ac-label">Acceptance Criteria</div>
-                    <ul class="us-ac">
-                        <li>5-question onboarding flow completed in under 2 minutes</li>
-                        <li>AI assigns risk profile (Conservative / Moderate / Growth / Aggressive)</li>
-                        <li>Recommended portfolio allocation displayed with rationale</li>
-                        <li>Customer can override AI recommendation before confirming</li>
-                        <li>Risk profile stored and used for all subsequent investment decisions</li>
-                    </ul>
-                </div>
-                <div class="us-card">
-                    <div class="us-id">US-06 &middot; Tax-Free Savings Account</div>
-                    <div class="us-title">TFSA Wrapper for SA Investors</div>
-                    <div class="us-story">"As a South African MoMo user, I want my investments to be held in a Tax-Free Savings Account wrapper to maximise tax efficiency."</div>
-                    <div class="us-ac-label">Acceptance Criteria</div>
-                    <ul class="us-ac">
-                        <li>TFSA product available to SA-market customers (SARS registered)</li>
-                        <li>Annual contribution limit (R36,000) tracked and enforced in-app</li>
-                        <li>Lifetime limit (R500,000) displayed on TFSA dashboard</li>
-                        <li>System prevents contributions exceeding SARS annual limit</li>
-                        <li>Annual tax certificate generated and downloadable in-app</li>
-                    </ul>
-                </div>
-                <div class="us-card">
-                    <div class="us-id">US-07 &middot; Spending Intelligence</div>
-                    <div class="us-title">AI Identifies Discretionary Capacity for Investing</div>
-                    <div class="us-story">"As a MoMo user, I want the AI to analyse my spending and tell me how much I can safely invest each month without affecting my essential expenses."</div>
-                    <div class="us-ac-label">Acceptance Criteria</div>
-                    <ul class="us-ac">
-                        <li>AI analyses 90-day MoMo transaction history to identify income and expense patterns</li>
-                        <li>Discretionary capacity calculated as income minus essential spend minus buffer (20%)</li>
-                        <li>Monthly investment recommendation surfaced in-app with explanation</li>
-                        <li>Customer can accept, adjust, or reject AI recommendation</li>
-                        <li>Recommendation updates monthly based on latest 90-day transaction data</li>
-                    </ul>
-                </div>
-                <div class="us-card">
-                    <div class="us-id">US-08 &middot; Withdrawal</div>
-                    <div class="us-title">Partial and Full Portfolio Withdrawal</div>
-                    <div class="us-story">"As an investor, I want to withdraw part of my investment back to my MoMo wallet in an emergency without losing my entire portfolio."</div>
-                    <div class="us-ac-label">Acceptance Criteria</div>
-                    <ul class="us-ac">
-                        <li>Partial withdrawal available for liquid assets (money market, ETFs) within T+3</li>
-                        <li>Minimum withdrawal amount R10 (or local currency equivalent)</li>
-                        <li>Tax implications displayed before withdrawal confirmation</li>
-                        <li>Withdrawn funds credited to MoMo wallet within 3 business days</li>
-                        <li>Goal impact warning shown if withdrawal affects goal achievement</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. FUNCTIONAL REQUIREMENTS -->
-    <section>
-        <h2>5. Functional Requirements</h2>
-
-        <h3>5.1 Investment Onboarding &amp; KYC</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-01</code></td><td>The system SHALL leverage existing MoMo KYC data to pre-populate investor profile fields. Customers with FICA-compliant KYC on file SHALL not be required to re-submit identity documents for the investment product.</td><td><span class="tag tag-must">MUST</span></td><td>Requires FSCA confirmation that MoMo FICA KYC is sufficient for investment product access</td></tr>
-                <tr><td><code>FR-02</code></td><td>The system SHALL present a FAIS-compliant risk disclosure and Terms &amp; Conditions document to all customers prior to first investment. Acceptance SHALL be recorded with timestamp and device fingerprint.</td><td><span class="tag tag-must">MUST</span></td><td>FAIS Act requirement for FSP regulated products</td></tr>
-                <tr><td><code>FR-03</code></td><td>The onboarding flow SHALL be completable within 3 minutes including risk profiling questionnaire, portfolio selection, and first investment setup. Flow SHALL be resumable if interrupted.</td><td><span class="tag tag-must">MUST</span></td><td>Key conversion metric</td></tr>
-                <tr><td><code>FR-04</code></td><td>The system SHALL collect and store investor risk profile (5-question questionnaire) and assign one of four risk bands: Conservative, Moderate, Growth, Aggressive. Risk profile SHALL expire and require renewal every 24 months per FAIS requirements.</td><td><span class="tag tag-must">MUST</span></td><td>FAIS section 8(1)(a) suitability requirement</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.2 Round-Up Engine</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-05</code></td><td>The round-up engine SHALL intercept all MoMo debit transactions in real-time, calculate the round-up amount (ceiling(amount) - amount), and accumulate in a daily investment queue.</td><td><span class="tag tag-must">MUST</span></td><td>Integration with MoMo transaction event stream required</td></tr>
-                <tr><td><code>FR-06</code></td><td>Daily accumulated round-ups SHALL be executed as a single investment instruction at 23:00 local time, provided the accumulated amount is &ge; R1.00 (or local currency minimum).</td><td><span class="tag tag-must">MUST</span></td><td>Batch execution reduces transaction fees</td></tr>
-                <tr><td><code>FR-07</code></td><td>The system SHALL support round-up multipliers of 1x, 2x, and 3x, configured per customer. A 2x multiplier doubles the calculated round-up amount before adding to the investment queue.</td><td><span class="tag tag-should">SHOULD</span></td><td>Increases AUM growth rate</td></tr>
-                <tr><td><code>FR-08</code></td><td>The system SHALL enforce a daily round-up cap per customer (default R50, configurable up to R200) to prevent unexpected large deductions on high-value transaction days.</td><td><span class="tag tag-must">MUST</span></td><td>Customer protection requirement</td></tr>
-                <tr><td><code>FR-09</code></td><td>Round-ups SHALL only be deducted if the customer's MoMo wallet balance after deduction remains above R20 (or local equivalent emergency buffer). If balance would fall below buffer, round-up SHALL be skipped for that day.</td><td><span class="tag tag-must">MUST</span></td><td>Prevents accidental over-deduction</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.3 Portfolio &amp; Product Management</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-10</code></td><td>The system SHALL offer a minimum of 3 pre-configured portfolio options: (1) Capital Preservation (bonds + money market), (2) Balanced Growth (ETFs + bonds), (3) High Growth (equity ETFs). Each SHALL have a defined target asset allocation.</td><td><span class="tag tag-must">MUST</span></td><td>Curated options reduce decision paralysis</td></tr>
-                <tr><td><code>FR-11</code></td><td>The system SHALL integrate with a JSE-connected licensed asset manager (Satrix, 10X, or equivalent) to execute ETF purchases. All trades SHALL be executed via the partner's regulated platform; UC-35 acts as a UI layer and distributor.</td><td><span class="tag tag-must">MUST</span></td><td>Requires FSP licence or Section 13B distribution agreement</td></tr>
-                <tr><td><code>FR-12</code></td><td>The system SHALL display real-time (15-minute delayed) NAV for all ETF holdings. Total portfolio value SHALL be calculated using latest available NAV and updated at minimum daily.</td><td><span class="tag tag-must">MUST</span></td><td>JSE data feed licence required</td></tr>
-                <tr><td><code>FR-13</code></td><td>The AI rebalancing engine SHALL automatically adjust portfolio allocations to within 5% of target weights on the 1st of each month. Rebalancing SHALL be tax-aware, avoiding unnecessary CGT events.</td><td><span class="tag tag-must">MUST</span></td><td>Robo-advisor core feature</td></tr>
-                <tr><td><code>FR-14</code></td><td>The system SHALL support Tax-Free Savings Account (TFSA) product in the South African market, enforcing the SARS annual contribution limit of R36,000 and lifetime limit of R500,000. Annual tax certificate SHALL be generated and available for download.</td><td><span class="tag tag-must">MUST</span></td><td>SA market only; SARS registration required</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.4 AI Investment Intelligence</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-15</code></td><td>The AI engine SHALL analyse the customer's 90-day MoMo transaction history to identify income patterns, essential expense categories, and discretionary spending capacity. Output SHALL be a monthly investable surplus estimate with 80%+ confidence interval.</td><td><span class="tag tag-must">MUST</span></td><td>Core AI capability; uses MoMo transaction data</td></tr>
-                <tr><td><code>FR-16</code></td><td>The AI engine SHALL generate a monthly investment recommendation (amount and instrument) personalised to the customer's goal, risk profile, market conditions, and identified spending capacity. Recommendation SHALL include plain-English rationale.</td><td><span class="tag tag-must">MUST</span></td><td>FAIS suitability obligation requires recommendation rationale</td></tr>
-                <tr><td><code>FR-17</code></td><td>The system SHALL send proactive goal-tracking alerts when: (a) customer is on track &mdash; celebrate milestone, (b) customer is 10%+ behind target &mdash; suggest top-up amount, (c) goal date is within 30 days &mdash; final push notification.</td><td><span class="tag tag-should">SHOULD</span></td><td>Engagement and retention driver</td></tr>
-                <tr><td><code>FR-18</code></td><td>The AI engine SHALL NOT execute any investment action without explicit customer authorisation (either one-time permission for automated round-ups, or per-transaction confirmation for manual investments).</td><td><span class="tag tag-must">MUST</span></td><td>Regulatory and customer protection requirement</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.5 Withdrawals &amp; Reporting</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-19</code></td><td>The system SHALL support partial and full withdrawal of liquid holdings (money market: T+1; ETFs: T+3). Withdrawn funds SHALL be credited to the customer's MoMo wallet within the applicable settlement period.</td><td><span class="tag tag-must">MUST</span></td><td>Settlement timelines governed by asset manager partner</td></tr>
-                <tr><td><code>FR-20</code></td><td>The system SHALL generate and make available a monthly investment statement in PDF format, showing: opening balance, transactions, returns, fees deducted, closing balance, and goal progress.</td><td><span class="tag tag-must">MUST</span></td><td>FAIS / FSP regulatory reporting requirement</td></tr>
-                <tr><td><code>FR-21</code></td><td>The system SHALL display an annualised return rate (XIRR) for each customer's portfolio and for each individual holding, updated daily.</td><td><span class="tag tag-should">SHOULD</span></td><td>Customer transparency</td></tr>
-                <tr><td><code>FR-22</code></td><td>The fee structure SHALL be transparent and displayed in-app: annual management fee percentage, estimated rand value, and ETF-specific total expense ratios (TER). Fees SHALL be deducted from portfolio monthly.</td><td><span class="tag tag-must">MUST</span></td><td>FSCA conduct standard requirement</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 6. TECHNICAL ARCHITECTURE -->
-    <section class="violet">
-        <h2>6. Technical Architecture</h2>
-
-        <h3>System Architecture &mdash; Predictive Wealth Builder Stack</h3>
-        <div class="arch-layers">
-            <div class="arch-layer">
-                <div class="arch-layer-label">Presentation Layer</div>
-                <div class="arch-layer-content">MoMo Consumer App (iOS + Android) &rarr; Investment Module (React Native) &rarr; Goal Dashboard &rarr; Portfolio View &rarr; Round-Up Settings &rarr; Statement Download</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">AI Intelligence Layer</div>
-                <div class="arch-layer-content">Spending Analysis Engine &rarr; Discretionary Capacity Model &rarr; Portfolio Recommendation Engine &rarr; Goal Projection Engine &rarr; Rebalancing Optimiser &rarr; Alert &amp; Notification Engine</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Investment Execution Layer</div>
-                <div class="arch-layer-content">Round-Up Engine &rarr; Daily Batch Investment Processor &rarr; Asset Manager API Integration (Satrix / 10X) &rarr; JSE/NSE Trade Execution &rarr; Settlement Reconciliation &rarr; Portfolio Ledger</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Data &amp; Compliance Layer</div>
-                <div class="arch-layer-content">MoMo Transaction Event Stream (Kafka) &rarr; Customer Profile Store (PostgreSQL) &rarr; TFSA Contribution Tracker &rarr; SARS Reporting &rarr; Audit Log (immutable) &rarr; FSCA Regulatory Reporting</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Infrastructure &amp; Integration</div>
-                <div class="arch-layer-content">JSE Market Data Feed &rarr; NSE Market Data Feed &rarr; MoMo API (wallet, KYC, transactions) &rarr; Push Notification Service &rarr; PDF Generation Service &rarr; MLOps Pipeline (model retraining)</div>
-            </div>
-        </div>
-
-        <h3>Key Integration Dependencies</h3>
-        <table>
-            <thead><tr><th>Integration</th><th>Purpose</th><th>Protocol</th><th>SLA</th><th>Fallback</th></tr></thead>
-            <tbody>
-                <tr><td>MoMo Transaction Stream</td><td>Real-time round-up trigger</td><td>Kafka consumer</td><td>&lt;500ms event lag</td><td>Daily batch reconciliation</td></tr>
-                <tr><td>Asset Manager API (Satrix/10X)</td><td>ETF/bond trade execution</td><td>REST/mTLS</td><td>T+2 settlement</td><td>Queue &amp; retry; alert if &gt;4h delay</td></tr>
-                <tr><td>JSE Market Data Feed</td><td>Real-time ETF NAV pricing</td><td>FTP/REST (JSE)</td><td>15-min delayed quotes</td><td>Cache last known price; display staleness warning</td></tr>
-                <tr><td>MoMo KYC/Profile API</td><td>Investor identity &amp; KYC data</td><td>REST/JSON (internal)</td><td>&lt;200ms P95</td><td>Cache; reject onboarding if unavailable</td></tr>
-                <tr><td>MoMo Wallet API</td><td>Round-up deduction &amp; withdrawal credit</td><td>REST/JSON (internal)</td><td>&lt;300ms P95</td><td>Retry up to 3x; skip round-up if fails</td></tr>
-                <tr><td>Push Notification Service</td><td>Goal alerts, rebalancing notices</td><td>FCM/APNs</td><td>Best effort</td><td>SMS fallback for critical alerts</td></tr>
-                <tr><td>SARS Integration (SA only)</td><td>TFSA reporting &amp; limit validation</td><td>SARS API or manual upload</td><td>Annual reporting</td><td>Manual file submission</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 7. DATA & AI MODEL REQUIREMENTS -->
-    <section>
-        <h2>7. Data &amp; AI Model Requirements</h2>
-
-        <h3>7.1 Input Data Sources</h3>
-        <div class="two-col">
-            <div>
-                <div class="card">
-                    <div class="card-title">MoMo Transaction History</div>
-                    <div class="card-content">90-day rolling window of all debit/credit transactions per customer. Used for spending pattern analysis, income identification, discretionary capacity calculation, and round-up triggering. Minimum 30-day history required for AI recommendation activation.</div>
-                </div>
-                <div class="card teal">
-                    <div class="card-title">Customer Risk Profile Data</div>
-                    <div class="card-content">5-question onboarding questionnaire responses: investment goal, time horizon, risk tolerance, income stability, emergency fund status. Used to assign risk band and generate initial portfolio recommendation. Refreshed every 24 months.</div>
-                </div>
-                <div class="card violet">
-                    <div class="card-title">Market Price Data</div>
-                    <div class="card-content">15-minute delayed ETF NAV from JSE/NSE data feeds. Government bond yields from central bank APIs. Money market rates from asset manager partners. Used for portfolio valuation, rebalancing calculations, and return reporting.</div>
-                </div>
-            </div>
-            <div>
-                <div class="card amber">
-                    <div class="card-title">Goal Configuration Data</div>
-                    <div class="card-content">Customer-defined goal name, target amount, target date, priority ranking. Used by goal projection engine to calculate required monthly contribution, assess on-track status, and generate proactive alerts.</div>
-                </div>
-                <div class="card green">
-                    <div class="card-title">Portfolio Ledger Data</div>
-                    <div class="card-content">Real-time portfolio holdings: instrument code, units held, average purchase price, current value, unrealised P&amp;L, asset class allocation. Used for rebalancing decisions, withdrawal calculations, and statement generation.</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Macro Economic Signals (Phase 2)</div>
-                    <div class="card-content">CPI data, prime rate, JSE ALSI trend. Used by advanced rebalancing model to adjust equity/bond split in response to macro environment. Phase 2 feature requiring additional data licences.</div>
-                </div>
-            </div>
-        </div>
-
-        <h3>7.2 AI Model Specifications</h3>
-        <table>
-            <thead><tr><th>Model</th><th>Type</th><th>Input Features</th><th>Output</th><th>Accuracy Target</th></tr></thead>
-            <tbody>
-                <tr><td>Spending Analyser</td><td>Unsupervised clustering + time-series</td><td>Transaction amounts, merchant categories, timing, frequency</td><td>Monthly discretionary capacity estimate + income pattern</td><td>MAPE &lt;15% vs actual surplus</td></tr>
-                <tr><td>Portfolio Recommender</td><td>Rule-based + ML scoring</td><td>Risk profile band, goal horizon, current AUM, market conditions</td><td>Asset allocation recommendation (% per instrument)</td><td>Suitability score &gt;90% on test set</td></tr>
-                <tr><td>Goal Projection Engine</td><td>Deterministic + Monte Carlo</td><td>Target amount, target date, current balance, monthly contribution, historical returns</td><td>Probability of goal achievement + required top-up</td><td>Projection accuracy &lt;10% MAPE at 12M horizon</td></tr>
-                <tr><td>Rebalancing Optimiser</td><td>Constrained optimisation (Markowitz-inspired)</td><td>Current allocation, target allocation, current NAV, tax lots, transaction costs</td><td>Rebalancing trade instructions (buy/sell per instrument)</td><td>Drift &lt;5% post-rebalance; CGT minimised</td></tr>
-                <tr><td>Churn Predictor (Phase 2)</td><td>Gradient boosting classifier</td><td>Days since last round-up, goal progress, app engagement, portfolio performance</td><td>30-day churn probability + retention intervention trigger</td><td>AUC &gt;0.80</td></tr>
-            </tbody>
-        </table>
-
-        <h3>7.3 Data Privacy &amp; Governance</h3>
-        <ul>
-            <li>All transaction data used for AI analysis is processed within the customer's home market data boundary (POPIA &mdash; SA; NDPR &mdash; Nigeria; Kenya DPA &mdash; Kenya)</li>
-            <li>AI processing of financial transaction data for investment recommendations constitutes "further processing" under POPIA &mdash; explicit consent obtained at investment onboarding</li>
-            <li>No raw transaction data shared with asset manager partners &mdash; only aggregated portfolio instructions transmitted</li>
-            <li>Customer has right to data access, correction, and deletion per POPIA Section 23 &mdash; deletion request triggers investment account closure workflow</li>
-            <li>Model training data must be anonymised &mdash; MSISDN replaced with pseudonymous customer ID before any model training pipeline ingestion</li>
-        </ul>
-    </section>
-
-    <!-- 8. COMPLIANCE & REGULATORY -->
-    <section class="violet">
-        <h2>8. Compliance &amp; Regulatory Requirements</h2>
-        <table>
-            <thead><tr><th>Framework</th><th>Market(s)</th><th>Key Obligation</th><th>UC-35 Control</th><th>Owner</th></tr></thead>
-            <tbody>
-                <tr><td><strong style="color:#2dd4bf;">FSCA / FAIS Act</strong></td><td>South Africa</td><td>FSP licence required to render financial advice; suitability assessment (Section 8A); disclosure of fees and conflicts</td><td>FR-02 T&amp;Cs disclosure; FR-04 risk profiling; FR-22 fee transparency; FR-16 recommendation rationale; partner distribution agreement</td><td>Group Compliance + MTN SA Legal</td></tr>
-                <tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Consent for AI processing of transaction data; data minimisation; right to erasure; data subject rights</td><td>FR-02 explicit investment consent; data processing limited to investment purpose; deletion workflow; POPIA impact assessment</td><td>Group Compliance</td></tr>
-                <tr><td><strong style="color:#2dd4bf;">FICA</strong></td><td>South Africa</td><td>AML/CFT &mdash; beneficial owner identification; suspicious activity reporting; transaction monitoring</td><td>MoMo KYC leveraged for FICA compliance; investment transaction monitoring via PayGuard (UC-16); SAR workflow</td><td>MTN SA FinCrime</td></tr>
-                <tr><td><strong style="color:#2dd4bf;">SARS Regulations</strong></td><td>South Africa</td><td>TFSA contribution limits (R36k annual / R500k lifetime); tax certificate issuance; IT3(c) reporting</td><td>FR-14 TFSA limit enforcement; annual IT3(c) generation; SARS submission pipeline</td><td>MTN SA Tax &amp; Finance</td></tr>
-                <tr><td><strong style="color:#2dd4bf;">SEC / NSE Rules</strong></td><td>Nigeria</td><td>Securities dealing licence; investor protection rules; investment product registration</td><td>Partner with SEC-licensed Nigerian asset manager; product registration via partner; UC-35 acts as distributor</td><td>MTN Nigeria OpCo + Legal</td></tr>
-                <tr><td><strong style="color:#2dd4bf;">CMA Act</strong></td><td>Kenya</td><td>Capital Markets Authority licence for collective investment schemes; investor suitability</td><td>Partner with CMA-licensed Kenyan fund manager; suitability assessment per FR-04; local product registration</td><td>MTN Kenya OpCo + Legal</td></tr>
-                <tr><td><strong style="color:#2dd4bf;">NDPR</strong></td><td>Nigeria</td><td>Data localisation; consent for financial data processing; breach notification within 72 hours</td><td>Nigeria transaction data processed in-country; explicit investment consent; breach detection and notification workflow</td><td>MTN Nigeria OpCo + Group Compliance</td></tr>
-            </tbody>
-        </table>
-
-        <div class="card violet" style="margin-top:16px;">
-            <div class="card-title">FSP Licence / Distribution Partner Strategy</div>
-            <div class="card-content">MTN Group Fintech does not currently hold a Financial Services Provider (FSP) licence under FAIS. UC-35 Phase 1 will be delivered via a Section 13B distribution agreement with a licensed asset manager partner (preferred: Satrix, 10X Investments, or similar). This agreement allows MTN to distribute the partner's CIS products through the MoMo app without holding its own FSP licence. Phase 2 will evaluate the business case for MTN obtaining its own FSP licence as AUM grows. The distribution partner model must be reflected in all T&amp;Cs, key information documents (KID), and regulatory filings.</div>
-        </div>
-
-        <div class="card violet">
-            <div class="card-title">Next Steps: Regulatory &amp; Partnership</div>
-            <div class="card-content">1. Obtain FSCA confirmation that MoMo FICA KYC is sufficient for investment product distribution. 2. Execute Section 13B distribution agreement with preferred asset manager partner. 3. Register investment products with relevant regulators in pilot markets (SA, Nigeria, Kenya). 4. Engage JSE and NSE for market data feed licence agreements. 5. SARS registration for TFSA product (SA market). 6. Obtain NDPR data processing consent framework sign-off for Nigeria.</div>
-        </div>
-    </section>
-
-    <!-- 9. SPRINT PLAN / ROADMAP -->
-    <section class="teal">
-        <h2>9. Sprint Plan &amp; Roadmap</h2>
-        <div class="sprint-grid">
-            <div class="sprint-card sprint-1">
-                <div class="sprint-label">Sprint 1 &mdash; Weeks 1&ndash;4 &mdash; Foundation</div>
-                <div class="sprint-title">Infrastructure, Partnerships &amp; Data Pipeline</div>
-                <ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
-                    <li>Execute asset manager distribution agreement (Satrix / 10X)</li>
-                    <li>Establish JSE/NSE market data feed licence and integration</li>
-                    <li>Build MoMo transaction event stream consumer (Kafka)</li>
-                    <li>Design and build portfolio ledger data model (PostgreSQL)</li>
-                    <li>Implement round-up calculation engine (unit tested)</li>
-                    <li>Build customer risk profiling questionnaire (React Native)</li>
-                    <li>POPIA/FAIS compliance review &mdash; investment consent flow design</li>
-                    <li>Regulatory engagement: FSCA, SARS, SEC Nigeria</li>
-                </ul>
-            </div>
-            <div class="sprint-card sprint-2">
-                <div class="sprint-label">Sprint 2 &mdash; Weeks 5&ndash;8 &mdash; Core Product</div>
-                <div class="sprint-title">AI Engine, Investment Execution &amp; App Module</div>
-                <ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
-                    <li>Build spending analysis AI model (transaction categorisation + surplus estimation)</li>
-                    <li>Build portfolio recommendation engine (rule-based + ML scoring)</li>
-                    <li>Implement daily round-up batch processor and asset manager API integration</li>
-                    <li>Build goal-based savings pot UI and projection engine</li>
-                    <li>Implement real-time portfolio valuation (NAV + ledger)</li>
-                    <li>Build rebalancing optimiser (monthly trigger + tax-aware logic)</li>
-                    <li>Develop MoMo app investment module (dashboard, goal view, settings)</li>
-                    <li>TFSA contribution tracking and SARS limit enforcement (SA)</li>
-                </ul>
-            </div>
-            <div class="sprint-card sprint-3">
-                <div class="sprint-label">Sprint 3 &mdash; Weeks 9&ndash;12 &mdash; Launch Ready</div>
-                <div class="sprint-title">Testing, Compliance &amp; Pilot Launch</div>
-                <ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
-                    <li>End-to-end integration testing (round-up &rarr; batch &rarr; trade &rarr; settle &rarr; ledger)</li>
-                    <li>FSCA / FAIS compliance audit and sign-off</li>
-                    <li>POPIA impact assessment completion and DPO sign-off</li>
-                    <li>Load testing: 10,000 concurrent round-up events</li>
-                    <li>UAT with 500 internal beta users (MTN SA)</li>
-                    <li>Monthly statement PDF generation and download testing</li>
-                    <li>Pilot launch: MTN South Africa (500 early access customers)</li>
-                    <li>MLOps pipeline: model monitoring and drift detection</li>
-                </ul>
-            </div>
-        </div>
-
-        <h3 style="margin-top:24px;">Phase 2 Roadmap (Months 4&ndash;12)</h3>
-        <table>
-            <thead><tr><th>Milestone</th><th>Target</th><th>Description</th></tr></thead>
-            <tbody>
-                <tr><td>Nigeria Launch</td><td>Month 5</td><td>SEC-compliant investment product via licensed Nigerian asset manager partner</td></tr>
-                <tr><td>Kenya Launch</td><td>Month 6</td><td>CMA-licensed product via Kenyan fund manager; Mpesa-familiar UX patterns</td></tr>
-                <tr><td>Churn Prediction Model</td><td>Month 7</td><td>ML model to identify at-risk investors and trigger retention interventions</td></tr>
-                <tr><td>Macro-Aware Rebalancing</td><td>Month 9</td><td>CPI, prime rate, and market trend signals integrated into rebalancing model</td></tr>
-                <tr><td>FSP Licence Evaluation</td><td>Month 10</td><td>Business case review for MTN Group Fintech obtaining own FAIS FSP licence</td></tr>
-                <tr><td>1M Investor Milestone</td><td>Month 12</td><td>Target: 1 million active investors, R500M AUM across SA, Nigeria, Kenya</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 10. RISK REGISTER -->
-    <section class="red">
-        <h2>10. Risk Register</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
-            <tbody>
-                <tr>
-                    <td><code>R-01</code></td>
-                    <td>FSCA / FAIS regulatory approval delays product launch</td>
-                    <td class="priority-high">High</td>
-                    <td class="priority-high">High</td>
-                    <td>Engage FSCA early in design phase. Use distribution agreement model to avoid own-licence requirement. Appoint dedicated regulatory counsel for financial services product registration.</td>
-                </tr>
-                <tr>
-                    <td><code>R-02</code></td>
-                    <td>Asset manager partnership negotiations fail or take &gt;6 months</td>
-                    <td class="priority-med">Medium</td>
-                    <td class="priority-high">High</td>
-                    <td>Run parallel negotiations with 3 asset manager candidates (Satrix, 10X, Allan Gray). Define minimum acceptable commercial terms before negotiations begin. Contingency: white-label robo-advisor platform (EasyEquities API).</td>
-                </tr>
-                <tr>
-                    <td><code>R-03</code></td>
-                    <td>Round-up over-deduction causes customer dissatisfaction or NCA complaint</td>
-                    <td class="priority-med">Medium</td>
-                    <td class="priority-high">High</td>
-                    <td>FR-08 daily cap; FR-09 wallet buffer protection. Pre-launch stress testing with extreme transaction scenarios. Clear in-app explanation of round-up mechanics. One-tap pause functionality.</td>
-                </tr>
-                <tr>
-                    <td><code>R-04</code></td>
-                    <td>AI portfolio recommendation deemed unsuitable for customer risk profile (FAIS liability)</td>
-                    <td class="priority-med">Medium</td>
-                    <td class="priority-high">Very High</td>
-                    <td>FR-04 risk profile questionnaire per FAIS Section 8A. FR-16 recommendation rationale documented. Legal review of AI recommendation disclosure language. D&amp;O insurance review. External FAIS compliance consultant engaged.</td>
-                </tr>
-                <tr>
-                    <td><code>R-05</code></td>
-                    <td>Market downturn causes customer portfolio losses &mdash; reputational and complaint risk</td>
-                    <td class="priority-high">High (market-dependent)</td>
-                    <td class="priority-high">High</td>
-                    <td>Clear investment risk disclosure at onboarding. "Past performance" disclaimers on all return displays. Proactive communication during market downturns. Capital preservation portfolio option for risk-averse customers. No guarantee of returns implied anywhere in-app.</td>
-                </tr>
-                <tr>
-                    <td><code>R-06</code></td>
-                    <td>JSE/NSE market data feed licence cost makes business case unviable</td>
-                    <td class="priority-med">Medium</td>
-                    <td class="priority-med">Medium</td>
-                    <td>Negotiate market data fees as part of asset manager distribution agreement &mdash; most partners include data in the platform. Fallback: 15-minute delayed free tier data via alternative provider.</td>
-                </tr>
-                <tr>
-                    <td><code>R-07</code></td>
-                    <td>Low investor activation rate (&lt;2% of MoMo users) makes investment fee income immaterial</td>
-                    <td class="priority-med">Medium</td>
-                    <td class="priority-med">Medium</td>
-                    <td>Onboarding A/B testing to optimise conversion. In-app gamification of goal achievement. Round-up activation as default opt-in (with clear consent). Referral programme. 3-month free AMF offer for early adopters.</td>
-                </tr>
-                <tr>
-                    <td><code>R-08</code></td>
-                    <td>SARS TFSA limit breach causes customer tax liability and compliance exposure</td>
-                    <td class="priority-med">Low</td>
-                    <td class="priority-high">High</td>
-                    <td>FR-14 hard limit enforcement in code. Annual limit counter validated at each contribution. SARS IT3(c) submission pipeline automated. Tax counsel review of TFSA product before launch.</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <footer>
-        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-35 Predictive Wealth Builder &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
-        <div>Document Author: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
-        <div style="margin-top:8px;font-size:0.82em;">Driver: Revenue Growth &amp; Customer Lifetime Value &nbsp;&middot;&nbsp; Value: New Investment Fee Income Stream &nbsp;&middot;&nbsp; Compliance: FSCA &middot; FAIS Act &middot; POPIA &middot; FICA &middot; SARS &middot; NSE &middot; CMA Kenya &nbsp;&middot;&nbsp; Next Steps: Obtain FSP licence or partner with licensed asset manager; integrate with JSE/NSE securities infrastructure</div>
-    </footer>
-
+<p>MTN Group Fintech serves over 65 million active MoMo subscribers across 13 African markets, yet none of these customers currently have access to investment products through MoMo. The traditional wealth management and investment industry in Africa has minimum investment thresholds that exclude the vast majority of the continent's working population — often requiring R10,000–R50,000 to open a retail investment account. UC-35 eliminates this barrier entirely.</p>
+<p>The Predictive Wealth Builder embeds AI-powered micro-investment automation directly into the MoMo consumer app, enabling any subscriber to invest from as little as R1 (or local currency equivalent). The product uses behavioural AI to analyse transaction patterns, identify discretionary spending capacity, and automatically route micro-amounts into government bonds, ETFs, and tax-free savings accounts — without the customer needing to actively think about it.</p>
+<p>The core mechanic is <strong style="color:#818cf8;">round-up investing</strong>: every MoMo purchase is rounded up to the nearest rand/naira/shilling, with the difference automatically invested according to the customer's chosen goal and risk profile. Supplementary features include goal-based savings pots (school fees, emergency fund, home deposit), AI portfolio rebalancing, and tax-free savings account (TFSA) integration where regulatory frameworks permit.</p>
+<p>The business case is anchored on new fee income streams: an annual management fee of 0.5–1.5% AUM, transaction fees on ETF purchases, and premium tier subscription fees for advanced AI features. At 5 million investors averaging R500 AUM, fee income reaches R37.5M annually at 1.5% AMF. Crucially, this product increases customer lifetime value, reduces churn, and positions MoMo as a full-spectrum financial services provider rather than a payments utility.</p>
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-value">R1</div>
+<div class="metric-label">Minimum Investment Amount</div>
+</div>
+<div class="metric-card indigo">
+<div class="metric-value">65M+</div>
+<div class="metric-label">Addressable MoMo Subscribers</div>
+</div>
+<div class="metric-card violet">
+<div class="metric-value">R37.5M</div>
+<div class="metric-label">Projected Annual Fee Income (5M investors)</div>
+</div>
+<div class="metric-card amber">
+<div class="metric-value">0%</div>
+<div class="metric-label">Current MoMo Subscribers with Investment Access</div>
+</div>
+</div>
+<div class="comparison-box" style="margin-top:20px;">
+<div class="compare-card traditional">
+<div class="compare-label">Traditional Investment Access</div>
+<div class="compare-value">R10,000+</div>
+<div class="compare-sub">Minimum account opening, long KYC process, separate app or branch visit, advisor relationship required, excludes 80%+ of African working population</div>
+</div>
+<div class="compare-card ai">
+<div class="compare-label">Predictive Wealth Builder (UC-35)</div>
+<div class="compare-value">R1 Minimum</div>
+<div class="compare-sub">In-app setup in under 3 minutes, automated round-ups, AI portfolio management, goal-based savings, no advisor needed, available to all 65M+ MoMo users</div>
+</div>
 </div>
 
-<!-- EDITABLE DOCUMENT SYSTEM -->
-<style data-editable-system>
-  body.edm [data-eid]:hover{outline:2px dashed rgba(167,139,250,.35)!important;outline-offset:3px;border-radius:3px;cursor:text}
-  body.edm [data-eid]:focus{outline:2px solid #a78bfa!important;outline-offset:3px;border-radius:3px;background:rgba(167,139,250,.07)!important}
-  body.edm [data-eid]:empty::before{content:"Click to add text";color:rgba(167,139,250,.4);font-style:italic;pointer-events:none}
-  #__etb{position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:6px;align-items:center;background:#111827;border:1px solid #374151;border-radius:12px;padding:9px 14px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
-  #__etb button{padding:5px 11px;border-radius:7px;border:1px solid #374151;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;background:#1f2937;color:#d1d5db}
-  #__etb button:hover{border-color:#a78bfa;color:#e8eaff}
-  #__etb .etb-edit{color:#a78bfa}
-  #__etb .etb-save{color:#34d399}
-  #__etb .etb-reset{color:#f87171}
-  #__etb .etb-export{color:#38bdf8}
-  #__etb .etb-msg{font-size:10.5px;color:#6b7280;min-width:90px;text-align:right}
-  #__etb .etb-sep{width:1px;height:20px;background:#374151;margin:0 2px}
-</style>
-<script data-editable-system>
-(function(){
-  'use strict';
-  var KEY = 'edm:' + (location.pathname || location.href);
-  var SELS = 'p,h1,h2,h3,h4,h5,li,td,th,blockquote,.card-content,.card-title,.meta-value,.hero-meta-value,.summary-card p,.risk-detail,.risk-title,.phase-desc,.gap-value,.kpi-val,.kpi-lbl,.story-text,.card-content p,.dependency-detail,.dependency-system,.checklist li,.warning-box,.info-box,.code-block,.gap-item .gap-value,.status-badge,.badge,.tech-tag,.hero-subtitle,caption,dt,dd,.requirement,.storyid';
-  var mode = false, timer = null, ids = [];
+      </section>
+      <section class="doc-section" id="s2">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <h2 class="section-title">Problem Statement</h2>
+        </div>
+        
 
-  function elems(){
-    return [].slice.call(document.querySelectorAll(SELS)).filter(function(el){
-      return !el.closest('#__etb') && !el.closest('script') && !el.closest('style') && !el.closest('noscript');
-    });
-  }
+<p>Africa has one of the youngest and fastest-growing populations on earth, with a burgeoning middle class that has demonstrated strong financial discipline through consistent mobile money usage. Yet structural barriers in the traditional investment industry systematically exclude these customers from wealth creation. Three compounding problems define the gap:</p>
+<div class="card violet">
+<div class="card-title">Problem 1 — Minimum Thresholds Exclude the Majority</div>
+<div class="card-content">Regulated investment products in South Africa, Nigeria, Kenya and other MTN markets require minimum initial investments that are out of reach for the majority of MoMo's subscriber base. A market trader who saves R50 per week and uses MoMo daily has no viable path to compound wealth accumulation. The result is a structural wealth gap that mobile money payments have not addressed. UC-35 solves this with a R1 minimum investment, the lowest in any regulated African investment product.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Problem 2 — MoMo Is Untapped as a Wealth Platform</div>
+<div class="card-content">MoMo captures daily transaction data for 65 million subscribers — spending patterns, income cadence, discretionary capacity, seasonal fluctuations. This is precisely the data a robo-advisor uses to build an investment profile. Yet MTN currently monetises this data only through payments fees. UC-35 converts transactional data into an investment intelligence engine, generating fee income while delivering genuine financial uplift to subscribers. Competitors (M-Pesa, OPay, Airtel Money) are moving into investment products; MTN must act in 2026 or cede this market.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Problem 3 — Manual Investing Requires Financial Literacy Most Customers Lack</div>
+<div class="card-content">Traditional investment products require customers to actively select funds, understand risk ratings, rebalance portfolios, and manage tax implications. The majority of MTN's subscriber base lacks the financial literacy to navigate these decisions confidently. UC-35's AI removes this burden entirely — the system makes portfolio decisions, executes round-ups automatically, rebalances monthly, and surfaces only the information the customer needs to stay engaged with their goals. The product is designed for financial inclusion by design, not as an afterthought.</div>
+</div>
 
-  function stamp(){
-    ids = [];
-    elems().forEach(function(el,i){
-      el.setAttribute('data-eid', i);
-      ids.push(i);
-    });
-  }
+      </section>
+      <section class="doc-section" id="s3">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <h2 class="section-title">Objectives & Success Metrics</h2>
+        </div>
+        
 
-  function enable(){
-    mode = true;
-    document.body.classList.add('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'true';
-      el.spellcheck = false;
-    });
-    document.addEventListener('input', onInput);
-    refresh();
-  }
+<div class="two-col">
+<div>
+<h3>Primary Objectives</h3>
+<div class="card teal">
+<div class="card-title">OBJ-01 — Launch In-App Micro-Investment Product</div>
+<div class="card-content">Deploy a fully regulated, FSCA-compliant investment product embedded in the MoMo app with a R1 minimum investment, accessible to all existing MoMo KYC-verified subscribers.</div>
+</div>
+<div class="card teal">
+<div class="card-title">OBJ-02 — Automate Wealth Accumulation via Round-Ups</div>
+<div class="card-content">Enable round-up investing on every MoMo payment, automatically investing the difference between the transaction amount and the nearest whole rand/naira/shilling.</div>
+</div>
+<div class="card teal">
+<div class="card-title">OBJ-03 — AI Portfolio Management</div>
+<div class="card-content">Deliver AI-driven portfolio allocation and monthly rebalancing across government bonds, ETFs, and money market instruments, calibrated to the customer's stated goal and risk tolerance.</div>
+</div>
+<div class="card teal">
+<div class="card-title">OBJ-04 — Generate Investment Fee Income</div>
+<div class="card-content">Establish a new revenue stream through annual management fees (0.5–1.5% AUM), ETF transaction fees, and premium subscription tiers for advanced AI features.</div>
+</div>
+</div>
+<div>
+<h3>Success Metrics</h3>
+<div class="metrics-grid" style="grid-template-columns: 1fr 1fr;">
+<div class="metric-card">
+<div class="metric-value">1M</div>
+<div class="metric-label">Investors by Month 12</div>
+</div>
+<div class="metric-card indigo">
+<div class="metric-value">R500</div>
+<div class="metric-label">Avg AUM per Investor M12</div>
+</div>
+<div class="metric-card violet">
+<div class="metric-value">65%</div>
+<div class="metric-label">Round-Up Activation Rate</div>
+</div>
+<div class="metric-card amber">
+<div class="metric-value">&lt;3 min</div>
+<div class="metric-label">Investment Onboarding Time</div>
+</div>
+</div>
+<table style="margin-top:16px;">
+<thead><tr><th>KPI</th><th>M6 Target</th><th>M12 Target</th></tr></thead>
+<tbody>
+<tr><td>Active Investors</td><td>250,000</td><td>1,000,000</td></tr>
+<tr><td>Total AUM</td><td>R50M</td><td>R500M</td></tr>
+<tr><td>Monthly Fee Income</td><td>R62,500</td><td>R625,000</td></tr>
+<tr><td>Round-Up Activation</td><td>50%</td><td>65%</td></tr>
+<tr><td>Goal Achievement Rate</td><td>—</td><td>&gt;40%</td></tr>
+<tr><td>30-Day Investor Retention</td><td>&gt;70%</td><td>&gt;80%</td></tr>
+<tr><td>App Session Frequency Lift</td><td>+15%</td><td>+25%</td></tr>
+</tbody>
+</table>
+</div>
+</div>
 
-  function disable(){
-    mode = false;
-    document.body.classList.remove('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'false';
-      el.blur();
-    });
-    document.removeEventListener('input', onInput);
-    refresh();
-  }
+      </section>
+      <section class="doc-section" id="s4">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <h2 class="section-title">User Stories</h2>
+        </div>
+        
 
-  function onInput(){
-    clearTimeout(timer);
-    msg('Unsaved…');
-    timer = setTimeout(persist, 900);
-  }
+<div class="two-col">
+<div>
+<div class="us-card">
+<div class="us-id">US-01 · Round-Up Investing</div>
+<div class="us-title">Automatic Round-Up on Every Purchase</div>
+<div class="us-story">"As a MoMo user, I want every purchase I make to automatically round up to the nearest rand and invest the difference, so I can build savings without thinking about it."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Round-up calculated on every MoMo debit transaction (minimum R0.01)</li>
+<li>Round-up amounts batched daily and invested by 23:00</li>
+<li>Customer can pause/resume round-ups from app at any time</li>
+<li>Round-up multiplier (1x, 2x, 3x) configurable by customer</li>
+<li>Daily round-up summary notification sent via push/SMS</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-02 · Goal-Based Savings Pots</div>
+<div class="us-title">Create and Track Named Investment Goals</div>
+<div class="us-story">"As a parent, I want to create a savings pot called 'School Fees 2027' with a target amount and date, and have the AI tell me if I'm on track."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Customer can create up to 5 named goals with target amount and target date</li>
+<li>AI calculates required monthly contribution to reach goal on time</li>
+<li>Progress bar and days-remaining displayed per goal</li>
+<li>AI sends proactive alerts if customer is falling behind target</li>
+<li>Goal funds ring-fenced in separate allocation within portfolio</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-03 · ETF &amp; Bond Access</div>
+<div class="us-title">Invest in Exchange-Traded Funds and Government Bonds</div>
+<div class="us-story">"As a first-time investor, I want to invest in ETFs and government bonds directly from MoMo without needing a stockbroker account."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Minimum 3 ETF options (equity, balanced, fixed income) available in-app</li>
+<li>Government retail bonds available where JSE/NSE infrastructure supports</li>
+<li>Plain-language fund descriptions with risk rating (1-5)</li>
+<li>Historical performance chart displayed (1M, 3M, 1Y, 3Y)</li>
+<li>Purchase executes via licensed asset manager partner within T+2</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-04 · AI Portfolio Rebalancing</div>
+<div class="us-title">Automatic Monthly Portfolio Optimisation</div>
+<div class="us-story">"As an investor, I want my portfolio to be automatically rebalanced every month so I don't have to manually adjust my allocations as markets move."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>AI rebalances portfolio to target allocation on the 1st of each month</li>
+<li>Rebalancing triggered if any asset class drifts &gt;5% from target</li>
+<li>Customer receives rebalancing summary notification post-execution</li>
+<li>Customer can opt out of auto-rebalancing and manage manually</li>
+<li>Tax-aware rebalancing (avoid unnecessary capital gains events)</li>
+</ul>
+</div>
+</div>
+<div>
+<div class="us-card">
+<div class="us-id">US-05 · Risk Profiling</div>
+<div class="us-title">AI-Assisted Risk Assessment at Onboarding</div>
+<div class="us-story">"As a new investor, I want to complete a short questionnaire and have the AI recommend a portfolio that suits my financial situation and risk appetite."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>5-question onboarding flow completed in under 2 minutes</li>
+<li>AI assigns risk profile (Conservative / Moderate / Growth / Aggressive)</li>
+<li>Recommended portfolio allocation displayed with rationale</li>
+<li>Customer can override AI recommendation before confirming</li>
+<li>Risk profile stored and used for all subsequent investment decisions</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-06 · Tax-Free Savings Account</div>
+<div class="us-title">TFSA Wrapper for SA Investors</div>
+<div class="us-story">"As a South African MoMo user, I want my investments to be held in a Tax-Free Savings Account wrapper to maximise tax efficiency."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>TFSA product available to SA-market customers (SARS registered)</li>
+<li>Annual contribution limit (R36,000) tracked and enforced in-app</li>
+<li>Lifetime limit (R500,000) displayed on TFSA dashboard</li>
+<li>System prevents contributions exceeding SARS annual limit</li>
+<li>Annual tax certificate generated and downloadable in-app</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-07 · Spending Intelligence</div>
+<div class="us-title">AI Identifies Discretionary Capacity for Investing</div>
+<div class="us-story">"As a MoMo user, I want the AI to analyse my spending and tell me how much I can safely invest each month without affecting my essential expenses."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>AI analyses 90-day MoMo transaction history to identify income and expense patterns</li>
+<li>Discretionary capacity calculated as income minus essential spend minus buffer (20%)</li>
+<li>Monthly investment recommendation surfaced in-app with explanation</li>
+<li>Customer can accept, adjust, or reject AI recommendation</li>
+<li>Recommendation updates monthly based on latest 90-day transaction data</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-08 · Withdrawal</div>
+<div class="us-title">Partial and Full Portfolio Withdrawal</div>
+<div class="us-story">"As an investor, I want to withdraw part of my investment back to my MoMo wallet in an emergency without losing my entire portfolio."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Partial withdrawal available for liquid assets (money market, ETFs) within T+3</li>
+<li>Minimum withdrawal amount R10 (or local currency equivalent)</li>
+<li>Tax implications displayed before withdrawal confirmation</li>
+<li>Withdrawn funds credited to MoMo wallet within 3 business days</li>
+<li>Goal impact warning shown if withdrawal affects goal achievement</li>
+</ul>
+</div>
+</div>
+</div>
 
-  function persist(){
-    var store = {};
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null) store[id] = el.innerHTML;
-    });
-    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
-    msg('Saved ✓');
-  }
+      </section>
+      <section class="doc-section" id="s5">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <h2 class="section-title">Functional Requirements</h2>
+        </div>
+        
 
-  function restore(){
-    var raw; try { raw = localStorage.getItem(KEY); } catch(e){}
-    if(!raw) return false;
-    var store; try { store = JSON.parse(raw); } catch(e){ return false; }
-    stamp();
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null && store[id] !== undefined) el.innerHTML = store[id];
-    });
-    return true;
-  }
+<h3>5.1 Investment Onboarding &amp; KYC</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-01</code></td><td>The system SHALL leverage existing MoMo KYC data to pre-populate investor profile fields. Customers with FICA-compliant KYC on file SHALL not be required to re-submit identity documents for the investment product.</td><td><span class="tag tag-must">MUST</span></td><td>Requires FSCA confirmation that MoMo FICA KYC is sufficient for investment product access</td></tr>
+<tr><td><code>FR-02</code></td><td>The system SHALL present a FAIS-compliant risk disclosure and Terms &amp; Conditions document to all customers prior to first investment. Acceptance SHALL be recorded with timestamp and device fingerprint.</td><td><span class="tag tag-must">MUST</span></td><td>FAIS Act requirement for FSP regulated products</td></tr>
+<tr><td><code>FR-03</code></td><td>The onboarding flow SHALL be completable within 3 minutes including risk profiling questionnaire, portfolio selection, and first investment setup. Flow SHALL be resumable if interrupted.</td><td><span class="tag tag-must">MUST</span></td><td>Key conversion metric</td></tr>
+<tr><td><code>FR-04</code></td><td>The system SHALL collect and store investor risk profile (5-question questionnaire) and assign one of four risk bands: Conservative, Moderate, Growth, Aggressive. Risk profile SHALL expire and require renewal every 24 months per FAIS requirements.</td><td><span class="tag tag-must">MUST</span></td><td>FAIS section 8(1)(a) suitability requirement</td></tr>
+</tbody>
+</table>
+<h3>5.2 Round-Up Engine</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-05</code></td><td>The round-up engine SHALL intercept all MoMo debit transactions in real-time, calculate the round-up amount (ceiling(amount) - amount), and accumulate in a daily investment queue.</td><td><span class="tag tag-must">MUST</span></td><td>Integration with MoMo transaction event stream required</td></tr>
+<tr><td><code>FR-06</code></td><td>Daily accumulated round-ups SHALL be executed as a single investment instruction at 23:00 local time, provided the accumulated amount is ≥ R1.00 (or local currency minimum).</td><td><span class="tag tag-must">MUST</span></td><td>Batch execution reduces transaction fees</td></tr>
+<tr><td><code>FR-07</code></td><td>The system SHALL support round-up multipliers of 1x, 2x, and 3x, configured per customer. A 2x multiplier doubles the calculated round-up amount before adding to the investment queue.</td><td><span class="tag tag-should">SHOULD</span></td><td>Increases AUM growth rate</td></tr>
+<tr><td><code>FR-08</code></td><td>The system SHALL enforce a daily round-up cap per customer (default R50, configurable up to R200) to prevent unexpected large deductions on high-value transaction days.</td><td><span class="tag tag-must">MUST</span></td><td>Customer protection requirement</td></tr>
+<tr><td><code>FR-09</code></td><td>Round-ups SHALL only be deducted if the customer's MoMo wallet balance after deduction remains above R20 (or local equivalent emergency buffer). If balance would fall below buffer, round-up SHALL be skipped for that day.</td><td><span class="tag tag-must">MUST</span></td><td>Prevents accidental over-deduction</td></tr>
+</tbody>
+</table>
+<h3>5.3 Portfolio &amp; Product Management</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-10</code></td><td>The system SHALL offer a minimum of 3 pre-configured portfolio options: (1) Capital Preservation (bonds + money market), (2) Balanced Growth (ETFs + bonds), (3) High Growth (equity ETFs). Each SHALL have a defined target asset allocation.</td><td><span class="tag tag-must">MUST</span></td><td>Curated options reduce decision paralysis</td></tr>
+<tr><td><code>FR-11</code></td><td>The system SHALL integrate with a JSE-connected licensed asset manager (Satrix, 10X, or equivalent) to execute ETF purchases. All trades SHALL be executed via the partner's regulated platform; UC-35 acts as a UI layer and distributor.</td><td><span class="tag tag-must">MUST</span></td><td>Requires FSP licence or Section 13B distribution agreement</td></tr>
+<tr><td><code>FR-12</code></td><td>The system SHALL display real-time (15-minute delayed) NAV for all ETF holdings. Total portfolio value SHALL be calculated using latest available NAV and updated at minimum daily.</td><td><span class="tag tag-must">MUST</span></td><td>JSE data feed licence required</td></tr>
+<tr><td><code>FR-13</code></td><td>The AI rebalancing engine SHALL automatically adjust portfolio allocations to within 5% of target weights on the 1st of each month. Rebalancing SHALL be tax-aware, avoiding unnecessary CGT events.</td><td><span class="tag tag-must">MUST</span></td><td>Robo-advisor core feature</td></tr>
+<tr><td><code>FR-14</code></td><td>The system SHALL support Tax-Free Savings Account (TFSA) product in the South African market, enforcing the SARS annual contribution limit of R36,000 and lifetime limit of R500,000. Annual tax certificate SHALL be generated and available for download.</td><td><span class="tag tag-must">MUST</span></td><td>SA market only; SARS registration required</td></tr>
+</tbody>
+</table>
+<h3>5.4 AI Investment Intelligence</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-15</code></td><td>The AI engine SHALL analyse the customer's 90-day MoMo transaction history to identify income patterns, essential expense categories, and discretionary spending capacity. Output SHALL be a monthly investable surplus estimate with 80%+ confidence interval.</td><td><span class="tag tag-must">MUST</span></td><td>Core AI capability; uses MoMo transaction data</td></tr>
+<tr><td><code>FR-16</code></td><td>The AI engine SHALL generate a monthly investment recommendation (amount and instrument) personalised to the customer's goal, risk profile, market conditions, and identified spending capacity. Recommendation SHALL include plain-English rationale.</td><td><span class="tag tag-must">MUST</span></td><td>FAIS suitability obligation requires recommendation rationale</td></tr>
+<tr><td><code>FR-17</code></td><td>The system SHALL send proactive goal-tracking alerts when: (a) customer is on track — celebrate milestone, (b) customer is 10%+ behind target — suggest top-up amount, (c) goal date is within 30 days — final push notification.</td><td><span class="tag tag-should">SHOULD</span></td><td>Engagement and retention driver</td></tr>
+<tr><td><code>FR-18</code></td><td>The AI engine SHALL NOT execute any investment action without explicit customer authorisation (either one-time permission for automated round-ups, or per-transaction confirmation for manual investments).</td><td><span class="tag tag-must">MUST</span></td><td>Regulatory and customer protection requirement</td></tr>
+</tbody>
+</table>
+<h3>5.5 Withdrawals &amp; Reporting</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-19</code></td><td>The system SHALL support partial and full withdrawal of liquid holdings (money market: T+1; ETFs: T+3). Withdrawn funds SHALL be credited to the customer's MoMo wallet within the applicable settlement period.</td><td><span class="tag tag-must">MUST</span></td><td>Settlement timelines governed by asset manager partner</td></tr>
+<tr><td><code>FR-20</code></td><td>The system SHALL generate and make available a monthly investment statement in PDF format, showing: opening balance, transactions, returns, fees deducted, closing balance, and goal progress.</td><td><span class="tag tag-must">MUST</span></td><td>FAIS / FSP regulatory reporting requirement</td></tr>
+<tr><td><code>FR-21</code></td><td>The system SHALL display an annualised return rate (XIRR) for each customer's portfolio and for each individual holding, updated daily.</td><td><span class="tag tag-should">SHOULD</span></td><td>Customer transparency</td></tr>
+<tr><td><code>FR-22</code></td><td>The fee structure SHALL be transparent and displayed in-app: annual management fee percentage, estimated rand value, and ETF-specific total expense ratios (TER). Fees SHALL be deducted from portfolio monthly.</td><td><span class="tag tag-must">MUST</span></td><td>FSCA conduct standard requirement</td></tr>
+</tbody>
+</table>
 
-  function reset(){
-    if(!confirm('Reset all edits to original content? This cannot be undone.')) return;
-    try { localStorage.removeItem(KEY); } catch(e){}
-    location.reload();
-  }
+      </section>
+      <section class="doc-section" id="s6">
+        <div class="section-header">
+          <div class="section-num">6</div>
+          <h2 class="section-title">Technical Architecture</h2>
+        </div>
+        
 
-  function exportDoc(){
-    // Temporarily disable editing for clean export
-    var wasMode = mode;
-    if(wasMode) disable();
-    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    // Remove the editable toolbar and injected system from export
-    html = html.replace(/<style[^>]*data-editable-system[^>]*>[\s\S]*?<\/style>/,'');
-    html = html.replace(/<script[^>]*data-editable-system[^>]*>[\s\S]*?<\/script>/,'');
-    html = html.replace(/<div id="__etb"[^>]*>[\s\S]*?<\/div>/,'');
-    html = html.replace(/<!-- EDITABLE DOCUMENT SYSTEM -->/g,'');
-    html = html.replace(/\sdata-eid="\d+"/g,'');
-    html = html.replace(/\scontenteditable="[^"]*"/g,'');
-    var blob = new Blob([html], {type:'text/html'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = (location.pathname.split('/').pop() || 'document') + '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    if(wasMode) enable();
-    msg('Exported ✓');
-  }
+<h3>System Architecture — Predictive Wealth Builder Stack</h3>
+<div class="arch-layers">
+<div class="arch-layer">
+<div class="arch-layer-label">Presentation Layer</div>
+<div class="arch-layer-content">MoMo Consumer App (iOS + Android) → Investment Module (React Native) → Goal Dashboard → Portfolio View → Round-Up Settings → Statement Download</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">AI Intelligence Layer</div>
+<div class="arch-layer-content">Spending Analysis Engine → Discretionary Capacity Model → Portfolio Recommendation Engine → Goal Projection Engine → Rebalancing Optimiser → Alert &amp; Notification Engine</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Investment Execution Layer</div>
+<div class="arch-layer-content">Round-Up Engine → Daily Batch Investment Processor → Asset Manager API Integration (Satrix / 10X) → JSE/NSE Trade Execution → Settlement Reconciliation → Portfolio Ledger</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Data &amp; Compliance Layer</div>
+<div class="arch-layer-content">MoMo Transaction Event Stream (Kafka) → Customer Profile Store (PostgreSQL) → TFSA Contribution Tracker → SARS Reporting → Audit Log (immutable) → FSCA Regulatory Reporting</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Infrastructure &amp; Integration</div>
+<div class="arch-layer-content">JSE Market Data Feed → NSE Market Data Feed → MoMo API (wallet, KYC, transactions) → Push Notification Service → PDF Generation Service → MLOps Pipeline (model retraining)</div>
+</div>
+</div>
+<h3>Key Integration Dependencies</h3>
+<table>
+<thead><tr><th>Integration</th><th>Purpose</th><th>Protocol</th><th>SLA</th><th>Fallback</th></tr></thead>
+<tbody>
+<tr><td>MoMo Transaction Stream</td><td>Real-time round-up trigger</td><td>Kafka consumer</td><td>&lt;500ms event lag</td><td>Daily batch reconciliation</td></tr>
+<tr><td>Asset Manager API (Satrix/10X)</td><td>ETF/bond trade execution</td><td>REST/mTLS</td><td>T+2 settlement</td><td>Queue &amp; retry; alert if &gt;4h delay</td></tr>
+<tr><td>JSE Market Data Feed</td><td>Real-time ETF NAV pricing</td><td>FTP/REST (JSE)</td><td>15-min delayed quotes</td><td>Cache last known price; display staleness warning</td></tr>
+<tr><td>MoMo KYC/Profile API</td><td>Investor identity &amp; KYC data</td><td>REST/JSON (internal)</td><td>&lt;200ms P95</td><td>Cache; reject onboarding if unavailable</td></tr>
+<tr><td>MoMo Wallet API</td><td>Round-up deduction &amp; withdrawal credit</td><td>REST/JSON (internal)</td><td>&lt;300ms P95</td><td>Retry up to 3x; skip round-up if fails</td></tr>
+<tr><td>Push Notification Service</td><td>Goal alerts, rebalancing notices</td><td>FCM/APNs</td><td>Best effort</td><td>SMS fallback for critical alerts</td></tr>
+<tr><td>SARS Integration (SA only)</td><td>TFSA reporting &amp; limit validation</td><td>SARS API or manual upload</td><td>Annual reporting</td><td>Manual file submission</td></tr>
+</tbody>
+</table>
 
-  function msg(t){
-    var el = document.getElementById('__etb-msg');
-    if(el){ el.textContent = t; clearTimeout(el._t); if(t==='Saved ✓'||t==='Exported ✓') el._t=setTimeout(function(){el.textContent='';},2500); }
-  }
+      </section>
+      <section class="doc-section" id="s7">
+        <div class="section-header">
+          <div class="section-num">7</div>
+          <h2 class="section-title">Data & AI Model Requirements</h2>
+        </div>
+        
 
-  function refresh(){
-    var btn = document.getElementById('__etb-btn');
-    var acts = document.getElementById('__etb-acts');
-    if(btn){ btn.textContent = mode ? '🔒 Lock' : '✏️ Edit'; btn.style.background = mode ? '#2d1f5e' : '#1f2937'; btn.style.color = mode ? '#c4b5fd' : '#a78bfa'; }
-    if(acts) acts.style.display = mode ? 'flex' : 'none';
-  }
+<h3>7.1 Input Data Sources</h3>
+<div class="two-col">
+<div>
+<div class="card">
+<div class="card-title">MoMo Transaction History</div>
+<div class="card-content">90-day rolling window of all debit/credit transactions per customer. Used for spending pattern analysis, income identification, discretionary capacity calculation, and round-up triggering. Minimum 30-day history required for AI recommendation activation.</div>
+</div>
+<div class="card teal">
+<div class="card-title">Customer Risk Profile Data</div>
+<div class="card-content">5-question onboarding questionnaire responses: investment goal, time horizon, risk tolerance, income stability, emergency fund status. Used to assign risk band and generate initial portfolio recommendation. Refreshed every 24 months.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Market Price Data</div>
+<div class="card-content">15-minute delayed ETF NAV from JSE/NSE data feeds. Government bond yields from central bank APIs. Money market rates from asset manager partners. Used for portfolio valuation, rebalancing calculations, and return reporting.</div>
+</div>
+</div>
+<div>
+<div class="card amber">
+<div class="card-title">Goal Configuration Data</div>
+<div class="card-content">Customer-defined goal name, target amount, target date, priority ranking. Used by goal projection engine to calculate required monthly contribution, assess on-track status, and generate proactive alerts.</div>
+</div>
+<div class="card green">
+<div class="card-title">Portfolio Ledger Data</div>
+<div class="card-content">Real-time portfolio holdings: instrument code, units held, average purchase price, current value, unrealised P&amp;L, asset class allocation. Used for rebalancing decisions, withdrawal calculations, and statement generation.</div>
+</div>
+<div class="card">
+<div class="card-title">Macro Economic Signals (Phase 2)</div>
+<div class="card-content">CPI data, prime rate, JSE ALSI trend. Used by advanced rebalancing model to adjust equity/bond split in response to macro environment. Phase 2 feature requiring additional data licences.</div>
+</div>
+</div>
+</div>
+<h3>7.2 AI Model Specifications</h3>
+<table>
+<thead><tr><th>Model</th><th>Type</th><th>Input Features</th><th>Output</th><th>Accuracy Target</th></tr></thead>
+<tbody>
+<tr><td>Spending Analyser</td><td>Unsupervised clustering + time-series</td><td>Transaction amounts, merchant categories, timing, frequency</td><td>Monthly discretionary capacity estimate + income pattern</td><td>MAPE &lt;15% vs actual surplus</td></tr>
+<tr><td>Portfolio Recommender</td><td>Rule-based + ML scoring</td><td>Risk profile band, goal horizon, current AUM, market conditions</td><td>Asset allocation recommendation (% per instrument)</td><td>Suitability score &gt;90% on test set</td></tr>
+<tr><td>Goal Projection Engine</td><td>Deterministic + Monte Carlo</td><td>Target amount, target date, current balance, monthly contribution, historical returns</td><td>Probability of goal achievement + required top-up</td><td>Projection accuracy &lt;10% MAPE at 12M horizon</td></tr>
+<tr><td>Rebalancing Optimiser</td><td>Constrained optimisation (Markowitz-inspired)</td><td>Current allocation, target allocation, current NAV, tax lots, transaction costs</td><td>Rebalancing trade instructions (buy/sell per instrument)</td><td>Drift &lt;5% post-rebalance; CGT minimised</td></tr>
+<tr><td>Churn Predictor (Phase 2)</td><td>Gradient boosting classifier</td><td>Days since last round-up, goal progress, app engagement, portfolio performance</td><td>30-day churn probability + retention intervention trigger</td><td>AUC &gt;0.80</td></tr>
+</tbody>
+</table>
+<h3>7.3 Data Privacy &amp; Governance</h3>
+<ul>
+<li>All transaction data used for AI analysis is processed within the customer's home market data boundary (POPIA — SA; NDPR — Nigeria; Kenya DPA — Kenya)</li>
+<li>AI processing of financial transaction data for investment recommendations constitutes "further processing" under POPIA — explicit consent obtained at investment onboarding</li>
+<li>No raw transaction data shared with asset manager partners — only aggregated portfolio instructions transmitted</li>
+<li>Customer has right to data access, correction, and deletion per POPIA Section 23 — deletion request triggers investment account closure workflow</li>
+<li>Model training data must be anonymised — MSISDN replaced with pseudonymous customer ID before any model training pipeline ingestion</li>
+</ul>
 
-  function buildToolbar(){
-    var t = document.createElement('div');
-    t.id = '__etb';
-    t.innerHTML =
-      '<span style="font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-right:2px">Document</span>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-edit" id="__etb-btn" onclick="window.__edm.toggle()">✏️ Edit</button>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-share" onclick="window.__edm.share()" title="Copy shareable link">🔗 Share</button>'+
-      '<button class="etb-print" onclick="window.__edm.print()" title="Print / Save as PDF">🖨 Print</button>'+
-      '<div id="__etb-acts" style="display:none;gap:5px;align-items:center">'+
-        '<span class="etb-msg" id="__etb-msg"></span>'+
-        '<button class="etb-save" onclick="window.__edm.save()">💾 Save</button>'+
-        '<button class="etb-reset" onclick="window.__edm.reset()">↺ Reset</button>'+
-        '<button class="etb-export" onclick="window.__edm.export()">⬇ Export</button>'+
-      '</div>';
-    document.body.appendChild(t);
-  }
+      </section>
+      <section class="doc-section" id="s8">
+        <div class="section-header">
+          <div class="section-num">8</div>
+          <h2 class="section-title">Compliance & Regulatory Requirements</h2>
+        </div>
+        
 
-  function shareDoc(){
-    var base = 'https://fintech-tracker-web.vercel.app';
-    var url = base + location.pathname;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ msg('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
-    } else { prompt('Copy this link:',url); }
-  }
-  function printDoc(){
-    var wasMode = mode;
-    if(wasMode) disable();
-    window.print();
-    if(wasMode) setTimeout(function(){ enable(); }, 500);
-  }
-  window.__edm = {
-    toggle: function(){ mode ? disable() : enable(); },
-    save:   function(){ persist(); },
-    reset:  function(){ reset(); },
-    export: function(){ exportDoc(); },
-    share:  function(){ shareDoc(); },
-    print:  function(){ printDoc(); }
-  };
+<table>
+<thead><tr><th>Framework</th><th>Market(s)</th><th>Key Obligation</th><th>UC-35 Control</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td><strong style="color:#2dd4bf;">FSCA / FAIS Act</strong></td><td>South Africa</td><td>FSP licence required to render financial advice; suitability assessment (Section 8A); disclosure of fees and conflicts</td><td>FR-02 T&amp;Cs disclosure; FR-04 risk profiling; FR-22 fee transparency; FR-16 recommendation rationale; partner distribution agreement</td><td>Group Compliance + MTN SA Legal</td></tr>
+<tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Consent for AI processing of transaction data; data minimisation; right to erasure; data subject rights</td><td>FR-02 explicit investment consent; data processing limited to investment purpose; deletion workflow; POPIA impact assessment</td><td>Group Compliance</td></tr>
+<tr><td><strong style="color:#2dd4bf;">FICA</strong></td><td>South Africa</td><td>AML/CFT — beneficial owner identification; suspicious activity reporting; transaction monitoring</td><td>MoMo KYC leveraged for FICA compliance; investment transaction monitoring via PayGuard (UC-16); SAR workflow</td><td>MTN SA FinCrime</td></tr>
+<tr><td><strong style="color:#2dd4bf;">SARS Regulations</strong></td><td>South Africa</td><td>TFSA contribution limits (R36k annual / R500k lifetime); tax certificate issuance; IT3(c) reporting</td><td>FR-14 TFSA limit enforcement; annual IT3(c) generation; SARS submission pipeline</td><td>MTN SA Tax &amp; Finance</td></tr>
+<tr><td><strong style="color:#2dd4bf;">SEC / NSE Rules</strong></td><td>Nigeria</td><td>Securities dealing licence; investor protection rules; investment product registration</td><td>Partner with SEC-licensed Nigerian asset manager; product registration via partner; UC-35 acts as distributor</td><td>MTN Nigeria OpCo + Legal</td></tr>
+<tr><td><strong style="color:#2dd4bf;">CMA Act</strong></td><td>Kenya</td><td>Capital Markets Authority licence for collective investment schemes; investor suitability</td><td>Partner with CMA-licensed Kenyan fund manager; suitability assessment per FR-04; local product registration</td><td>MTN Kenya OpCo + Legal</td></tr>
+<tr><td><strong style="color:#2dd4bf;">NDPR</strong></td><td>Nigeria</td><td>Data localisation; consent for financial data processing; breach notification within 72 hours</td><td>Nigeria transaction data processed in-country; explicit investment consent; breach detection and notification workflow</td><td>MTN Nigeria OpCo + Group Compliance</td></tr>
+</tbody>
+</table>
+<div class="card violet" style="margin-top:16px;">
+<div class="card-title">FSP Licence / Distribution Partner Strategy</div>
+<div class="card-content">MTN Group Fintech does not currently hold a Financial Services Provider (FSP) licence under FAIS. UC-35 Phase 1 will be delivered via a Section 13B distribution agreement with a licensed asset manager partner (preferred: Satrix, 10X Investments, or similar). This agreement allows MTN to distribute the partner's CIS products through the MoMo app without holding its own FSP licence. Phase 2 will evaluate the business case for MTN obtaining its own FSP licence as AUM grows. The distribution partner model must be reflected in all T&amp;Cs, key information documents (KID), and regulatory filings.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Next Steps: Regulatory &amp; Partnership</div>
+<div class="card-content">1. Obtain FSCA confirmation that MoMo FICA KYC is sufficient for investment product distribution. 2. Execute Section 13B distribution agreement with preferred asset manager partner. 3. Register investment products with relevant regulators in pilot markets (SA, Nigeria, Kenya). 4. Engage JSE and NSE for market data feed licence agreements. 5. SARS registration for TFSA product (SA market). 6. Obtain NDPR data processing consent framework sign-off for Nigeria.</div>
+</div>
 
-  function init(){
-    buildToolbar();
-    stamp();
-    var had = restore();
-    if(had) msg('Edits loaded');
-  }
+      </section>
+      <section class="doc-section" id="s9">
+        <div class="section-header">
+          <div class="section-num">9</div>
+          <h2 class="section-title">Sprint Plan & Roadmap</h2>
+        </div>
+        
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+<div class="sprint-grid">
+<div class="sprint-card sprint-1">
+<div class="sprint-label">Sprint 1 — Weeks 1–4 — Foundation</div>
+<div class="sprint-title">Infrastructure, Partnerships &amp; Data Pipeline</div>
+<ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
+<li>Execute asset manager distribution agreement (Satrix / 10X)</li>
+<li>Establish JSE/NSE market data feed licence and integration</li>
+<li>Build MoMo transaction event stream consumer (Kafka)</li>
+<li>Design and build portfolio ledger data model (PostgreSQL)</li>
+<li>Implement round-up calculation engine (unit tested)</li>
+<li>Build customer risk profiling questionnaire (React Native)</li>
+<li>POPIA/FAIS compliance review — investment consent flow design</li>
+<li>Regulatory engagement: FSCA, SARS, SEC Nigeria</li>
+</ul>
+</div>
+<div class="sprint-card sprint-2">
+<div class="sprint-label">Sprint 2 — Weeks 5–8 — Core Product</div>
+<div class="sprint-title">AI Engine, Investment Execution &amp; App Module</div>
+<ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
+<li>Build spending analysis AI model (transaction categorisation + surplus estimation)</li>
+<li>Build portfolio recommendation engine (rule-based + ML scoring)</li>
+<li>Implement daily round-up batch processor and asset manager API integration</li>
+<li>Build goal-based savings pot UI and projection engine</li>
+<li>Implement real-time portfolio valuation (NAV + ledger)</li>
+<li>Build rebalancing optimiser (monthly trigger + tax-aware logic)</li>
+<li>Develop MoMo app investment module (dashboard, goal view, settings)</li>
+<li>TFSA contribution tracking and SARS limit enforcement (SA)</li>
+</ul>
+</div>
+<div class="sprint-card sprint-3">
+<div class="sprint-label">Sprint 3 — Weeks 9–12 — Launch Ready</div>
+<div class="sprint-title">Testing, Compliance &amp; Pilot Launch</div>
+<ul style="color:#94a3b8;font-size:0.9em;padding-left:18px;margin-top:8px;">
+<li>End-to-end integration testing (round-up → batch → trade → settle → ledger)</li>
+<li>FSCA / FAIS compliance audit and sign-off</li>
+<li>POPIA impact assessment completion and DPO sign-off</li>
+<li>Load testing: 10,000 concurrent round-up events</li>
+<li>UAT with 500 internal beta users (MTN SA)</li>
+<li>Monthly statement PDF generation and download testing</li>
+<li>Pilot launch: MTN South Africa (500 early access customers)</li>
+<li>MLOps pipeline: model monitoring and drift detection</li>
+</ul>
+</div>
+</div>
+<h3 style="margin-top:24px;">Phase 2 Roadmap (Months 4–12)</h3>
+<table>
+<thead><tr><th>Milestone</th><th>Target</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Nigeria Launch</td><td>Month 5</td><td>SEC-compliant investment product via licensed Nigerian asset manager partner</td></tr>
+<tr><td>Kenya Launch</td><td>Month 6</td><td>CMA-licensed product via Kenyan fund manager; Mpesa-familiar UX patterns</td></tr>
+<tr><td>Churn Prediction Model</td><td>Month 7</td><td>ML model to identify at-risk investors and trigger retention interventions</td></tr>
+<tr><td>Macro-Aware Rebalancing</td><td>Month 9</td><td>CPI, prime rate, and market trend signals integrated into rebalancing model</td></tr>
+<tr><td>FSP Licence Evaluation</td><td>Month 10</td><td>Business case review for MTN Group Fintech obtaining own FAIS FSP licence</td></tr>
+<tr><td>1M Investor Milestone</td><td>Month 12</td><td>Target: 1 million active investors, R500M AUM across SA, Nigeria, Kenya</td></tr>
+</tbody>
+</table>
+
+      </section>
+      <section class="doc-section" id="s10">
+        <div class="section-header">
+          <div class="section-num">10</div>
+          <h2 class="section-title">Risk Register</h2>
+        </div>
+        
+
+<table>
+<thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+<td><code>R-01</code></td>
+<td>FSCA / FAIS regulatory approval delays product launch</td>
+<td class="priority-high">High</td>
+<td class="priority-high">High</td>
+<td>Engage FSCA early in design phase. Use distribution agreement model to avoid own-licence requirement. Appoint dedicated regulatory counsel for financial services product registration.</td>
+</tr>
+<tr>
+<td><code>R-02</code></td>
+<td>Asset manager partnership negotiations fail or take &gt;6 months</td>
+<td class="priority-med">Medium</td>
+<td class="priority-high">High</td>
+<td>Run parallel negotiations with 3 asset manager candidates (Satrix, 10X, Allan Gray). Define minimum acceptable commercial terms before negotiations begin. Contingency: white-label robo-advisor platform (EasyEquities API).</td>
+</tr>
+<tr>
+<td><code>R-03</code></td>
+<td>Round-up over-deduction causes customer dissatisfaction or NCA complaint</td>
+<td class="priority-med">Medium</td>
+<td class="priority-high">High</td>
+<td>FR-08 daily cap; FR-09 wallet buffer protection. Pre-launch stress testing with extreme transaction scenarios. Clear in-app explanation of round-up mechanics. One-tap pause functionality.</td>
+</tr>
+<tr>
+<td><code>R-04</code></td>
+<td>AI portfolio recommendation deemed unsuitable for customer risk profile (FAIS liability)</td>
+<td class="priority-med">Medium</td>
+<td class="priority-high">Very High</td>
+<td>FR-04 risk profile questionnaire per FAIS Section 8A. FR-16 recommendation rationale documented. Legal review of AI recommendation disclosure language. D&amp;O insurance review. External FAIS compliance consultant engaged.</td>
+</tr>
+<tr>
+<td><code>R-05</code></td>
+<td>Market downturn causes customer portfolio losses — reputational and complaint risk</td>
+<td class="priority-high">High (market-dependent)</td>
+<td class="priority-high">High</td>
+<td>Clear investment risk disclosure at onboarding. "Past performance" disclaimers on all return displays. Proactive communication during market downturns. Capital preservation portfolio option for risk-averse customers. No guarantee of returns implied anywhere in-app.</td>
+</tr>
+<tr>
+<td><code>R-06</code></td>
+<td>JSE/NSE market data feed licence cost makes business case unviable</td>
+<td class="priority-med">Medium</td>
+<td class="priority-med">Medium</td>
+<td>Negotiate market data fees as part of asset manager distribution agreement — most partners include data in the platform. Fallback: 15-minute delayed free tier data via alternative provider.</td>
+</tr>
+<tr>
+<td><code>R-07</code></td>
+<td>Low investor activation rate (&lt;2% of MoMo users) makes investment fee income immaterial</td>
+<td class="priority-med">Medium</td>
+<td class="priority-med">Medium</td>
+<td>Onboarding A/B testing to optimise conversion. In-app gamification of goal achievement. Round-up activation as default opt-in (with clear consent). Referral programme. 3-month free AMF offer for early adopters.</td>
+</tr>
+<tr>
+<td><code>R-08</code></td>
+<td>SARS TFSA limit breach causes customer tax liability and compliance exposure</td>
+<td class="priority-med">Low</td>
+<td class="priority-high">High</td>
+<td>FR-14 hard limit enforcement in code. Annual limit counter validated at each contribution. SARS IT3(c) submission pipeline automated. Tax counsel review of TFSA product before launch.</td>
+</tr>
+</tbody>
+</table>
+
+      </section>
+    </main>
+
+  </div><!-- /doc-layout -->
+
+</div><!-- /doc-shell -->
 
 </body>
 </html>

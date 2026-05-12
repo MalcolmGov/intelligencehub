@@ -1,879 +1,856 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC-30 USSD Voice-to-Action Bridge — Requirements &amp; Planning</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
-        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
-        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
-        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
-        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
-        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
-        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
-        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
-        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
-        .badge-high { background: #7c3aed; color: #fff; }
-        .badge-p1 { background: linear-gradient(135deg, #dc2626, #b91c1c); color: #fff; }
-        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
-        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
-        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
-        section.teal { border-left-color: #14b8a6; }
-        section.violet { border-left-color: #7c3aed; }
-        section.amber { border-left-color: #f59e0b; }
-        section.red { border-left-color: #dc2626; }
-        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
-        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
-        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
-        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
-        ul li { margin-bottom: 5px; }
-        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
-        .card.teal { border-left-color: #14b8a6; }
-        .card.violet { border-left-color: #7c3aed; }
-        .card.amber { border-left-color: #f59e0b; }
-        .card.red { border-left-color: #dc2626; }
-        .card.green { border-left-color: #34d399; }
-        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
-        .card.teal .card-title { color: #2dd4bf; }
-        .card.violet .card-title { color: #a78bfa; }
-        .card.amber .card-title { color: #f59e0b; }
-        .card.red .card-title { color: #f87171; }
-        .card.green .card-title { color: #34d399; }
-        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
-        thead { background: #1e1b4b; }
-        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
-        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
-        tbody tr:hover { background: #1e293b; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
-        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
-        .metric-card.indigo { border-top-color: #6366f1; }
-        .metric-card.violet { border-top-color: #7c3aed; }
-        .metric-card.amber { border-top-color: #f59e0b; }
-        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
-        .metric-card.indigo .metric-value { color: #818cf8; }
-        .metric-card.violet .metric-value { color: #a78bfa; }
-        .metric-card.amber .metric-value { color: #f59e0b; }
-        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
-        .compare-card.traditional { border-top: 3px solid #dc2626; }
-        .compare-card.ai { border-top: 3px solid #14b8a6; }
-        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
-        .compare-card.traditional .compare-label { color: #f87171; }
-        .compare-card.ai .compare-label { color: #2dd4bf; }
-        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
-        .compare-card.traditional .compare-value { color: #f87171; }
-        .compare-card.ai .compare-value { color: #2dd4bf; }
-        .compare-sub { font-size: 0.85em; color: #64748b; }
-        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
-        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
-        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
-        .owner-role { font-size: 0.85em; color: #7c3aed; }
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
-        .four-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
-        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
-        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
-        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
-        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
-        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
-        .us-ac li { margin-bottom: 3px; }
-        .flow-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; margin-top: 14px; }
-        .flow-title { font-size: 0.9em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
-        .flow-step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
-        .flow-num { width: 26px; height: 26px; min-width: 26px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: 700; color: #fff; line-height: 26px; text-align: center; }
-        .flow-text { font-size: 0.88em; color: #cbd5e1; line-height: 1.5; }
-        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
-        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
-        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
-        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
-        .priority-high { color: #f87171; font-weight: 700; }
-        .priority-med { color: #fbbf24; font-weight: 700; }
-        .lang-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
-        .lang-card { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 12px; text-align: center; }
-        .lang-flag { font-size: 1.6em; margin-bottom: 4px; }
-        .lang-name { font-size: 0.82em; font-weight: 700; color: #818cf8; }
-        .lang-market { font-size: 0.72em; color: #64748b; margin-top: 2px; }
-        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
-        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
-        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
-        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
-        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
-        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
-        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
-        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 140px; }
-        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
-        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
-        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
-        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
-        .arch-layer:last-child .arch-layer-label { color: #64748b; }
-        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
-        .market-pill { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; padding: 8px 10px; text-align: center; font-size: 0.8em; color: #a5b4fc; font-weight: 600; }
-        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
-        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
-        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UC-30 USSD Voice-to-Action Bridge — Requirements & Planning</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface-alt:#F1F5F9;
+  --border:rgba(226,232,240,0.9);--border-strong:#CBD5E1;
+  --text-primary:#0F172A;--text-secondary:#334155;--text-muted:#64748B;
+  --accent:#7C3AED;--accent-d:#6D28D9;--accent-light:#EDE9FE;--accent-border:rgba(124,58,237,0.2);
+  --blue:#2563EB;--blue-light:#DBEAFE;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --r:16px;--rs:10px;
+  --shadow-sm:0 1px 4px rgba(15,23,42,0.06),0 2px 8px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.08),0 2px 6px rgba(15,23,42,0.04);
+}
+html{scroll-behavior:smooth;font-size:15px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── Sticky Header ── */
+.doc-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:58px;
+}
+.hdr-left{display:flex;align-items:center;gap:16px}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:var(--text-muted);
+  text-decoration:none;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--border);transition:all 0.15s;
+}
+.back-link:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-light)}
+.hdr-breadcrumb{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.hdr-sep{color:var(--border-strong)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:all 0.15s;font-family:inherit;
+}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
+.hdr-btn.violet{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hdr-btn.violet:hover{background:var(--accent-d)}
+
+/* ── Shell ── */
+.doc-shell{max-width:1220px;margin:0 auto;padding:0 40px 100px}
+
+/* ── Hero ── */
+.doc-hero{padding:52px 0 32px;max-width:800px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero-title{
+  font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.2px;
+  background:linear-gradient(140deg,#0F172A 0%,#312E81 50%,#7C3AED 90%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:14px;
+}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:22px;max-width:680px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;letter-spacing:0.04em;
+  padding:4px 12px;border-radius:20px;
+}
+.badge-p1{background:#FEE2E2;color:#B91C1C}
+.badge-p2{background:#FEF3C7;color:#92400E}
+.badge-progress{background:#FEF3C7;color:#92400E}
+.badge-in-progress{background:#FEF3C7;color:#92400E}
+.badge-done,.badge-complete,.badge-built{background:#D1FAE5;color:#065F46}
+.badge-platform{background:var(--accent-light);color:var(--accent)}
+.badge-neutral{background:var(--surface-alt);color:var(--text-muted);border:1px solid var(--border)}
+.badge-must{background:#FEE2E2;color:#B91C1C;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-should{background:#FEF3C7;color:#92400E;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-nice{background:#D1FAE5;color:#065F46;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+
+/* ── Meta Strip ── */
+.meta-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;margin-bottom:36px;
+}
+.meta-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;
+  box-shadow:var(--shadow-sm);transition:all 0.2s;
+}
+.meta-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.meta-value{font-size:13px;font-weight:700;color:var(--text-primary)}
+.meta-value.violet{color:var(--accent)}
+
+/* ── Progress Bar ── */
+.progress-section{margin:0 0 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow-sm)}
+.progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.progress-label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.progress-pct{font-size:14px;font-weight:800;color:var(--accent)}
+.progress-track{height:8px;background:var(--surface-alt);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:8px;transition:width 0.6s ease}
+.progress-note{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+/* ── Doc Layout ── */
+.doc-layout{display:grid;grid-template-columns:210px 1fr;gap:36px;align-items:start}
+@media(max-width:900px){.doc-layout{grid-template-columns:1fr}.doc-toc{display:none}}
+
+/* ── ToC ── */
+.doc-toc{position:sticky;top:76px}
+.toc-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.toc-title{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.toc-link{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;text-decoration:none;color:var(--text-secondary);font-size:12px;font-weight:500;transition:all 0.15s;margin-bottom:2px}
+.toc-link:hover{background:var(--accent-light);color:var(--accent)}
+.toc-num{font-size:10px;font-weight:700;color:var(--text-muted);min-width:20px}
+
+/* ── Sections ── */
+.doc-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.section-num{width:30px;height:30px;border-radius:8px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+h2.section-title{font-size:18px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+h3{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-top:24px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+p{color:var(--text-secondary);margin-bottom:13px;line-height:1.75;font-size:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+ul,ol{color:var(--text-secondary);margin:0 0 14px 20px;line-height:1.75;font-size:14px}
+li{margin-bottom:5px}
+li strong{color:var(--text-primary)}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.kpi-card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;text-align:center;transition:all 0.2s}
+.kpi-card:hover{background:var(--accent-light);border-color:var(--accent-border);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-value{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-0.8px;line-height:1;margin-bottom:6px}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);line-height:1.4}
+
+/* ── Callouts ── */
+.info-box,.accent-box,.callout-blue{
+  background:var(--blue-light);border:1px solid rgba(37,99,235,0.18);
+  border-left:3px solid var(--blue);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#1E40AF;line-height:1.65;
+}
+.info-box a,.accent-box a,.callout-blue a{color:var(--blue);font-weight:600;text-decoration:none}
+.warning-box,.callout-red{
+  background:#FFF5F5;border:1px solid rgba(220,38,38,0.18);
+  border-left:3px solid var(--red);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#7F1D1D;line-height:1.65;
+}
+.warning-box ul,.callout-red ul{color:#7F1D1D}
+.callout-violet{
+  background:var(--accent-light);border:1px solid var(--accent-border);
+  border-left:3px solid var(--accent);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#3B0764;line-height:1.65;
+}
+.callout-green{
+  background:var(--green-light);border:1px solid rgba(22,163,74,0.2);
+  border-left:3px solid var(--green);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#14532D;line-height:1.65;
+}
+.callout-amber{
+  background:var(--amber-light);border:1px solid rgba(217,119,6,0.2);
+  border-left:3px solid var(--amber);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#78350F;line-height:1.65;
+}
+
+/* ── Cards / Items ── */
+.card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;margin-bottom:10px;transition:all 0.15s}
+.card:hover{border-color:var(--accent-border);background:var(--surface)}
+.card-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:7px}
+.card-content{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Requirements ── */
+.requirement{border-left:3px solid var(--border-strong);padding:10px 14px;margin-bottom:8px;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface-alt)}
+.requirement:hover{border-left-color:var(--accent)}
+.req-body{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Tables ── */
+table,.doc-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}
+th{background:var(--surface-alt);border:1px solid var(--border);padding:10px 14px;font-weight:700;color:var(--text-primary);text-align:left;font-size:11px;letter-spacing:0.05em;text-transform:uppercase}
+td{border:1px solid var(--border);padding:10px 14px;color:var(--text-secondary);vertical-align:top;line-height:1.6}
+tr:hover td{background:var(--surface-alt)}
+
+/* ── User Stories ── */
+.story{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;margin-bottom:12px}
+.story-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.story-text{font-size:13.5px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px}
+.story-ac{font-size:12.5px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--surface);border-radius:7px;border:1px solid var(--border)}
+
+/* ── Dependencies ── */
+.dep-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dep-item:last-child{border-bottom:none}
+.dep-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--surface-alt);border:1px solid var(--border)}
+.dep-body{flex:1}
+.dep-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.dep-desc{font-size:12.5px;color:var(--text-muted)}
+
+/* ── Print ── */
+@media print{.doc-header,.doc-toc{display:none!important}.doc-layout{grid-template-columns:1fr}.doc-section{break-inside:avoid}}
+@media(max-width:768px){.doc-shell{padding:0 16px 60px}.doc-hero{padding:32px 0 20px}.doc-section{padding:22px 18px}}
+
+  </style>
 </head>
 <body>
-<a href="../index.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
 
-<div class="container">
+<!-- ── Sticky Header ── -->
+<header class="doc-header">
+  <div class="hdr-left">
+    <a href="/index.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+      Back to Tracker
+    </a>
+    <div class="hdr-breadcrumb">
+      <span style="color:var(--text-muted)">UC-30</span>
+      <span class="hdr-sep">/</span>
+      <b>Requirements &amp; User Stories</b>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
 
-    <!-- HEADER -->
-    <header>
-        <div>
-            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 30</div>
-            <h1>USSD Voice-to-Action Bridge</h1>
-            <div class="subtitle">Bridges the literacy gap entirely &mdash; customers who cannot type or read call a short code, speak their intent in any of 15 supported African languages, and the AI executes the USSD action on their behalf, reaching 250M+ functionally illiterate adults across the continent</div>
-            <div>
-                <span class="badge badge-new">New &mdash; Gap Identified by Malcolm</span>
-                <span class="badge badge-not-started">Not Started &mdash; 0%</span>
-                <span class="badge badge-p1">Priority: P1</span>
-                <span class="badge badge-high">Complexity: High</span>
-            </div>
-            <div style="margin-top:10px;">
-                <span class="badge badge-compliance">POPIA</span>
-                <span class="badge badge-compliance">NDPR</span>
-                <span class="badge badge-compliance">Kenya DPA</span>
-                <span class="badge badge-compliance">FSCA</span>
-                <span class="badge badge-teal">15 Languages</span>
-                <span class="badge badge-teal">Financial Inclusion</span>
-                <span class="badge badge-teal">Voice Biometric</span>
-            </div>
+<!-- ── Page Shell ── -->
+<div class="doc-shell">
+
+  <!-- ── Hero ── -->
+  <div class="doc-hero">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      AI Programme · UC-30
+    </div>
+    <h1 class="hero-title">USSD Voice-to-Action Bridge</h1>
+    <p class="hero-subtitle"></p>
+    <div class="hero-badges">
+      <span class="badge badge-neutral">New — Gap Identified by Malcolm</span>
+      <span class="badge badge-in-progress">Not Started — 0%</span>
+      <span class="badge badge-p1">Priority: P1</span>
+      <span class="badge badge-neutral">Complexity: High</span>
+      <span class="badge badge-neutral">POPIA</span>
+      <span class="badge badge-neutral">NDPR</span>
+      <span class="badge badge-neutral">Kenya DPA</span>
+      <span class="badge badge-neutral">FSCA</span>
+      <span class="badge badge-neutral">15 Languages</span>
+      <span class="badge badge-neutral">Financial Inclusion</span>
+      <span class="badge badge-neutral">Voice Biometric</span>
+    </div>
+  </div>
+
+  <!-- ── Metadata Strip ── -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-label">Use Case ID</div>
+      <div class="meta-value ">UC-30</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Version</div>
+      <div class="meta-value ">v1.0</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Document Date</div>
+      <div class="meta-value ">May 2026</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Priority</div>
+      <div class="meta-value">P1</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">STT Latency Target</div>
+      <div class="meta-value"><2s speech-to-intent</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Languages</div>
+      <div class="meta-value">15 African Languages</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Strategic Driver</div>
+      <div class="meta-value">Financial Inclusion</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Business Value</div>
+      <div class="meta-value">250M+ Adults Reached</div>
+    </div>
+  </div>
+
+  
+
+  <!-- ── Document Layout ── -->
+  <div class="doc-layout">
+
+    <!-- ToC -->
+    <aside class="doc-toc">
+      <div class="toc-inner">
+        <div class="toc-title">Contents</div>
+        <a href="#s1" class="toc-link"><span class="toc-num">01</span>Executive Summary & Business Case</a>
+        <a href="#s2" class="toc-link"><span class="toc-num">02</span>Problem Statement</a>
+        <a href="#s3" class="toc-link"><span class="toc-num">03</span>Objectives & Success Metrics</a>
+        <a href="#s4" class="toc-link"><span class="toc-num">04</span>User Stories & Acceptance Criteria</a>
+        <a href="#s5" class="toc-link"><span class="toc-num">05</span>Functional Requirements</a>
+        <a href="#s6" class="toc-link"><span class="toc-num">06</span>Technical Architecture</a>
+        <a href="#s7" class="toc-link"><span class="toc-num">07</span>Data & AI Model Requirements</a>
+        <a href="#s8" class="toc-link"><span class="toc-num">08</span>Compliance & Regulatory</a>
+        <a href="#s9" class="toc-link"><span class="toc-num">09</span>Sprint Plan & Roadmap</a>
+        <a href="#s10" class="toc-link"><span class="toc-num">10</span>Risk Register</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="doc-content">
+      <section class="doc-section" id="s1">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2 class="section-title">Executive Summary & Business Case</h2>
         </div>
-        <div class="header-grid">
-            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-30</div></div>
-            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
-            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
-            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P1</div></div>
-            <div class="meta-item"><div class="meta-label">STT Latency Target</div><div class="meta-value">&lt;2s speech-to-intent</div></div>
-            <div class="meta-item"><div class="meta-label">Languages</div><div class="meta-value">15 African Languages</div></div>
-            <div class="meta-item"><div class="meta-label">Strategic Driver</div><div class="meta-value">Financial Inclusion</div></div>
-            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">250M+ Adults Reached</div></div>
-        </div>
-        <div class="owner-highlight">
-            <div class="owner-avatar">MG</div>
-            <div>
-                <div class="owner-name-text">Malcolm Govender</div>
-                <div class="owner-role">Head of AI &amp; Engineering &middot; Document Author &amp; Use Case Owner</div>
-            </div>
-        </div>
-    </header>
+        
 
-    <!-- 1. EXECUTIVE SUMMARY -->
-    <section>
-        <h2>1. Executive Summary &amp; Business Case</h2>
-        <p>Sub-Saharan Africa is home to an estimated 250 million functionally illiterate adults &mdash; individuals who cannot reliably read or type text, yet who are active economic participants with mobile phones. These customers are systematically excluded from Mobile Money services that require text-based interaction, whether through USSD menu navigation or the AI natural language layer introduced in UC-25. Even with simplified menus and intent classification, the irreducible requirement to type text creates an insurmountable barrier for this population.</p>
-        <p>UC-30 eliminates this barrier entirely. By bridging the voice channel to the USSD action layer, a customer dials a short code, speaks their intent in their mother tongue &mdash; one of 15 supported African languages &mdash; and the AI executes the Mobile Money action on their behalf without any typing required. The solution extends MTN's ARIA voice engine (UC-18) with 15-language speech-to-text capability and connects to the UC-25 USSD AI intent layer as its execution backbone.</p>
-        <p>The business case is compelling from both a financial inclusion mandate and a commercial growth perspective. MTN's licence obligations across multiple markets include commitments to financial inclusion that UC-30 directly fulfils. Commercially, reaching the 250M+ adults who are currently excluded represents an untapped subscriber base that competitors who rely on text-only interfaces cannot serve. Voice biometric caller verification built into the flow eliminates the need for PIN entry, providing a superior authentication experience for users who may also struggle with numeric PIN recall.</p>
-        <p>UC-30 builds on rather than replaces existing infrastructure: UC-18 ARIA provides the voice engine foundation, UC-25 provides the intent execution layer, and the MoMo API provides the transactional backbone. This approach minimises net-new development while maximising reuse across the AI portfolio.</p>
-
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">250M+</div>
-                <div class="metric-label">Functionally Illiterate Adults in MTN Markets</div>
-            </div>
-            <div class="metric-card indigo">
-                <div class="metric-value">15</div>
-                <div class="metric-label">African Languages Supported (STT)</div>
-            </div>
-            <div class="metric-card violet">
-                <div class="metric-value">&lt;2s</div>
-                <div class="metric-label">Speech-to-Intent Target Latency</div>
-            </div>
-            <div class="metric-card amber">
-                <div class="metric-value">P1</div>
-                <div class="metric-label">Priority — Financial Inclusion Driver</div>
-            </div>
-        </div>
-
-        <div class="comparison-box" style="margin-top:20px;">
-            <div class="compare-card traditional">
-                <div class="compare-label">Text-Only USSD (UC-25)</div>
-                <div class="compare-value">~750M Reachable</div>
-                <div class="compare-sub">Requires basic literacy; excludes 250M+ functionally illiterate adults; PIN entry required; menu navigation or typing needed</div>
-            </div>
-            <div class="compare-card ai">
-                <div class="compare-label">Voice-to-Action Bridge (UC-30)</div>
-                <div class="compare-value">1B+ Reachable</div>
-                <div class="compare-sub">Zero literacy required; 15 mother-tongue languages; voice biometric auth; IVR fallback; offline-capable edge model</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 2. PROBLEM STATEMENT -->
-    <section class="violet">
-        <h2>2. Problem Statement</h2>
-        <p>Despite significant AI investment in the MoMo channel, MTN's digital financial services remain inaccessible to a substantial portion of the population it is mandated to serve. Three interconnected problems drive this gap:</p>
-
-        <div class="card violet">
-            <div class="card-title">Problem 1 &mdash; The Literacy Wall Excludes 250M+ Adults</div>
-            <div class="card-content">An estimated 250 million adults across MTN's operating markets are functionally illiterate &mdash; they cannot reliably read menu options, type amounts, or respond to text-based prompts. Even UC-25's natural language USSD layer requires the ability to type a sentence. Voice is these customers' only viable digital interaction modality. Current IVR systems are either unavailable in local languages or provide rigid branching trees that mirror the same structural exclusion as text USSD menus.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Problem 2 &mdash; Language Fragmentation Creates Service Deserts</div>
-            <div class="card-content">Africa's linguistic diversity is extraordinary &mdash; with over 2,000 languages across the continent. While MTN's text systems support 6 primary languages (UC-25), voice interaction demands support for far more granular local languages to achieve genuine inclusion. A customer in rural Cameroon speaking Fulfulde, or a trader in northern Ghana speaking Dagbani, has no viable voice interface despite both owning GSM handsets. The voice bridge must reach 15 languages at minimum to close the service desert.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Problem 3 &mdash; PIN Authentication Excludes Low-Numeracy Users</div>
-            <div class="card-content">Even when customers can initiate a voice interaction, the requirement to key in a 4-digit PIN creates a final exclusion hurdle for users with cognitive barriers to PIN recall, particularly elderly customers and those with low numeracy. Voice biometric verification &mdash; passphrase or speaker recognition &mdash; provides an authentication mechanism that is both more inclusive and, when implemented correctly, more secure than PIN-based auth for voice channels.</div>
-        </div>
-
-        <h3>Affected Markets &amp; Languages</h3>
-        <div class="market-grid">
-            <div class="market-pill">South Africa</div>
-            <div class="market-pill">Nigeria</div>
-            <div class="market-pill">Ghana</div>
-            <div class="market-pill">Uganda</div>
-            <div class="market-pill">Kenya</div>
-            <div class="market-pill">Cameroon</div>
-            <div class="market-pill">Ivory Coast</div>
-            <div class="market-pill">Rwanda</div>
-            <div class="market-pill">Zambia</div>
-            <div class="market-pill">Ethiopia</div>
-            <div class="market-pill">Benin</div>
-            <div class="market-pill">Guinea</div>
-        </div>
-    </section>
-
-    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
-    <section class="teal">
-        <h2>3. Objectives &amp; Success Metrics</h2>
-        <div class="two-col">
-            <div>
-                <h3>Primary Objectives</h3>
-                <div class="card teal">
-                    <div class="card-title">OBJ-01 Zero-Literacy MoMo Access</div>
-                    <div class="card-content">Enable any MTN MoMo subscriber to complete a send money, balance check, or airtime purchase transaction using only voice &mdash; no typing, no reading, no PIN entry required.</div>
-                </div>
-                <div class="card teal">
-                    <div class="card-title">OBJ-02 15-Language Speech Recognition</div>
-                    <div class="card-content">Deploy STT capability across 15 African languages with &gt;90% word-error-rate accuracy per language, including low-resource languages such as Fulfulde, Dagbani, Kinyarwanda and Tigrinya.</div>
-                </div>
-                <div class="card teal">
-                    <div class="card-title">OBJ-03 Sub-2-Second Speech-to-Intent</div>
-                    <div class="card-content">Achieve end-to-end latency from end of speech utterance to confirmed intent classification of under 2 seconds at P95, enabling natural conversational pacing over standard GSM voice calls.</div>
-                </div>
-                <div class="card teal">
-                    <div class="card-title">OBJ-04 Voice Biometric Authentication</div>
-                    <div class="card-content">Implement speaker verification as a PIN replacement for voice channel transactions, achieving &lt;1% false acceptance rate and &lt;3% false rejection rate across enrolled users.</div>
-                </div>
-            </div>
-            <div>
-                <h3>Success Metrics</h3>
-                <div class="metrics-grid" style="grid-template-columns:1fr 1fr;">
-                    <div class="metric-card">
-                        <div class="metric-value">&gt;90%</div>
-                        <div class="metric-label">STT Word Error Rate Accuracy</div>
-                    </div>
-                    <div class="metric-card indigo">
-                        <div class="metric-value">&lt;2s</div>
-                        <div class="metric-label">Speech-to-Intent P95</div>
-                    </div>
-                    <div class="metric-card violet">
-                        <div class="metric-value">&lt;1%</div>
-                        <div class="metric-label">Voice Biometric FAR</div>
-                    </div>
-                    <div class="metric-card amber">
-                        <div class="metric-value">15</div>
-                        <div class="metric-label">Languages at Launch</div>
-                    </div>
-                </div>
-                <div class="card green" style="margin-top:14px;">
-                    <div class="card-title">12-Month Financial Inclusion Target</div>
-                    <div class="card-content">Onboard 5 million previously unserved (literacy-excluded) MoMo subscribers via the voice bridge within 12 months of full market rollout. Measured via new account activations where first transaction was voice-initiated.</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. USER STORIES -->
-    <section>
-        <h2>4. User Stories &amp; Acceptance Criteria</h2>
-
-        <div class="us-card">
-            <div class="us-id">US-30-01</div>
-            <div class="us-title">Voice-Initiated Money Transfer — Illiterate User</div>
-            <div class="us-story">"As Fatou, a market trader in Conakry who cannot read or type, I want to call a number, say 'send 10,000 francs to my sister Mariama' in Pular, and have the money sent, so that I can participate in Mobile Money without needing to read anything."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>System recognises Pular speech input and extracts amount (10,000 CFA) and recipient name (Mariama)</li>
-                <li>System resolves 'Mariama' to a registered contact or prompts selection if multiple matches</li>
-                <li>Voice biometric verification confirms caller identity before transaction execution</li>
-                <li>Transaction confirmation is spoken back to caller in Pular before execution</li>
-                <li>Confirmation SMS sent to Fatou's number in Pular (latin script)</li>
-                <li>End-to-end latency from end of utterance to spoken confirmation &lt;4 seconds</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-30-02</div>
-            <div class="us-title">Voice Balance Check — First-Time User</div>
-            <div class="us-story">"As a first-time voice bridge user, I want to hear my balance in my own language when I call and say 'what is my balance', so that I can manage my money without needing a smartphone or literacy."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>System auto-detects spoken language within first 2 seconds of speech</li>
-                <li>Balance is retrieved from MoMo API and spoken back in the detected language</li>
-                <li>First-time callers are guided through a 30-second voice biometric enrolment before balance disclosure</li>
-                <li>Response includes available balance and any pending transactions in natural language</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-30-03</div>
-            <div class="us-title">Voice Biometric Enrolment</div>
-            <div class="us-story">"As a new UC-30 user, I want to set up my voice as my password in under 2 minutes, so that future calls are secure without needing to remember a PIN."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Enrolment flow prompted on first voice bridge call, completable in under 2 minutes</li>
-                <li>System collects 3 passphrase repetitions and constructs speaker model</li>
-                <li>Model stored on-device (where supported) or encrypted server-side per market data laws</li>
-                <li>Enrolment quality score &gt;0.80 required before model is activated</li>
-                <li>Fallback to numeric PIN available if enrolment quality below threshold</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-30-04</div>
-            <div class="us-title">Offline Edge Model — Low-Connectivity Area</div>
-            <div class="us-story">"As a user in a rural area with intermittent data coverage but good voice signal, I want the voice bridge to still process my request even when the data network is degraded, so that I'm not excluded by infrastructure limitations."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Edge STT model deployed at telecom base station or MVNO gateway processes speech locally</li>
-                <li>Intent classification for core transactions (send, balance, airtime) available offline at edge</li>
-                <li>MoMo API call queued and executed when connectivity restored, with caller notified by callback</li>
-                <li>Edge model operates within 200ms additional latency vs cloud model</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-30-05</div>
-            <div class="us-title">IVR Fallback — Speech Recognition Failure</div>
-            <div class="us-story">"As a user whose speech input was not understood, I want to be gracefully guided to a simple button-press IVR menu, so that I can still complete my transaction without being disconnected."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>After 2 failed STT attempts, system transitions to IVR menu automatically</li>
-                <li>IVR menu covers top 5 transactions: send money, balance, airtime, last transaction, help</li>
-                <li>Transition is seamless &mdash; no call drop, no re-authentication required</li>
-                <li>IVR prompts available in top 3 languages for that market</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-30-06</div>
-            <div class="us-title">Language Auto-Detection</div>
-            <div class="us-story">"As a customer speaking Kinyarwanda, I want the system to detect my language automatically without me having to select it from a menu, so that I experience a natural, frictionless interaction."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Language detection model identifies language from first utterance with &gt;92% accuracy across 15 supported languages</li>
-                <li>All subsequent prompts and responses delivered in detected language</li>
-                <li>Customer can override by saying "English please" or local equivalent at any point</li>
-                <li>Language preference stored against MSISDN for future sessions</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-30-07</div>
-            <div class="us-title">OpCo Product Manager — Language Pack Configuration</div>
-            <div class="us-story">"As an OpCo product manager, I want to configure which languages are active in my market and upload custom voice prompts in local dialects, so that the experience is culturally appropriate for my customers."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Admin portal allows per-market language activation/deactivation without code deployment</li>
-                <li>Custom audio prompt upload (WAV/MP3) for each transaction step per language</li>
-                <li>Configuration changes take effect within 60 seconds via hot-reload</li>
-                <li>A/B testing capability for prompt variants with conversion tracking</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- 5. FUNCTIONAL REQUIREMENTS -->
-    <section>
-        <h2>5. Functional Requirements</h2>
-
-        <h3>5.1 Speech-to-Text Engine</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-01</code></td><td>The STT engine SHALL support a minimum of 15 African languages with word error rate &lt;10% per language on the MTN MoMo domain vocabulary.</td><td><span class="tag tag-must">MUST</span></td><td>Extends UC-18 ARIA STT engine</td></tr>
-                <tr><td><code>FR-02</code></td><td>The system SHALL auto-detect the spoken language from the first utterance (&gt;92% accuracy) and route to the appropriate language model without requiring caller selection.</td><td><span class="tag tag-must">MUST</span></td><td>Language ID model separate from STT</td></tr>
-                <tr><td><code>FR-03</code></td><td>Speech input SHALL be processed within 2 seconds end-to-end from end-of-utterance signal to classified intent at P95 under normal network conditions.</td><td><span class="tag tag-must">MUST</span></td><td>Includes STT + intent classification</td></tr>
-                <tr><td><code>FR-04</code></td><td>The STT engine SHALL support code-switching (e.g., Swahili with English financial terms) without triggering a language mismatch error.</td><td><span class="tag tag-should">SHOULD</span></td><td>Common in East/West African markets</td></tr>
-                <tr><td><code>FR-05</code></td><td>An offline-capable edge STT model SHALL be deployable at base station or MVNO gateway level to serve areas with degraded data connectivity.</td><td><span class="tag tag-must">MUST</span></td><td>Quantised model &lt;500MB footprint</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.2 Voice Biometric Authentication</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-06</code></td><td>The system SHALL implement speaker verification for enrolled users achieving FAR &lt;1% and FRR &lt;3% on a representative voice sample set.</td><td><span class="tag tag-must">MUST</span></td><td>FSB/FSCA biometric auth standards</td></tr>
-                <tr><td><code>FR-07</code></td><td>Voice biometric enrolment SHALL be completable in under 2 minutes via a guided spoken prompt sequence requiring 3 passphrase repetitions.</td><td><span class="tag tag-must">MUST</span></td><td>Enrolment quality score &gt;0.80 required</td></tr>
-                <tr><td><code>FR-08</code></td><td>For unenrolled users or failed biometric verification, the system SHALL fall back to numeric PIN entry via DTMF keypad.</td><td><span class="tag tag-must">MUST</span></td><td>Security baseline maintained</td></tr>
-                <tr><td><code>FR-09</code></td><td>Biometric voice templates SHALL be stored encrypted (AES-256) and localised per market data residency requirements. Templates SHALL never be transmitted in raw form.</td><td><span class="tag tag-must">MUST</span></td><td>POPIA / NDPR biometric data rules</td></tr>
-                <tr><td><code>FR-10</code></td><td>Voice biometric verification SHALL complete within 1.5 seconds of utterance end at P95.</td><td><span class="tag tag-must">MUST</span></td><td>Within 2s total speech-to-intent budget</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.3 Intent Routing &amp; USSD Action Execution</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-11</code></td><td>Classified voice intents SHALL be routed to the UC-25 USSD AI intent layer via a standardised internal API, reusing all entity extraction, contact resolution, and MoMo API execution logic.</td><td><span class="tag tag-must">MUST</span></td><td>No duplication of business logic</td></tr>
-                <tr><td><code>FR-12</code></td><td>Voice confirmations SHALL be synthesised using text-to-speech (TTS) in the detected language and played to the caller before any financial transaction is executed.</td><td><span class="tag tag-must">MUST</span></td><td>Explicit confirmation required</td></tr>
-                <tr><td><code>FR-13</code></td><td>After 2 consecutive STT failures, the system SHALL automatically transition the call to a DTMF IVR menu covering the top 5 transaction types without dropping the call.</td><td><span class="tag tag-must">MUST</span></td><td>Graceful degradation</td></tr>
-                <tr><td><code>FR-14</code></td><td>The voice bridge SHALL support an offline queue for MoMo API calls when connectivity is degraded, with callback to the caller's MSISDN when the transaction completes.</td><td><span class="tag tag-should">SHOULD</span></td><td>Edge deployment mode</td></tr>
-                <tr><td><code>FR-15</code></td><td>All voice interaction transcripts SHALL be processed ephemerally &mdash; audio is not retained post-STT, and transcripts are purged within 24 hours unless flagged for fraud investigation.</td><td><span class="tag tag-must">MUST</span></td><td>POPIA consent &amp; data minimisation</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.4 Language Coverage</h3>
-        <div class="lang-grid">
-            <div class="lang-card"><div class="lang-flag">&#127988;</div><div class="lang-name">English</div><div class="lang-market">All markets</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127467;&#127479;</div><div class="lang-name">French</div><div class="lang-market">Cameroon, CI, Benin</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127472;&#127466;</div><div class="lang-name">Swahili</div><div class="lang-market">Kenya, Uganda, Rwanda</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127475;&#127468;</div><div class="lang-name">Hausa</div><div class="lang-market">Nigeria, Niger</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127487;&#127462;</div><div class="lang-name">Zulu</div><div class="lang-market">South Africa</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127466;&#127481;</div><div class="lang-name">Amharic</div><div class="lang-market">Ethiopia</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127479;&#127484;</div><div class="lang-name">Kinyarwanda</div><div class="lang-market">Rwanda</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127468;&#127469;</div><div class="lang-name">Twi / Akan</div><div class="lang-market">Ghana</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127475;&#127468;</div><div class="lang-name">Yoruba</div><div class="lang-market">Nigeria</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127475;&#127468;</div><div class="lang-name">Igbo</div><div class="lang-market">Nigeria</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127482;&#127468;</div><div class="lang-name">Luganda</div><div class="lang-market">Uganda</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127467;&#127479;</div><div class="lang-name">Fulfulde</div><div class="lang-market">Cameroon, Guinea</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127487;&#127462;</div><div class="lang-name">Xhosa</div><div class="lang-market">South Africa</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127487;&#127474;</div><div class="lang-name">Chichewa</div><div class="lang-market">Zambia</div></div>
-            <div class="lang-card"><div class="lang-flag">&#127468;&#127469;</div><div class="lang-name">Dagbani</div><div class="lang-market">Ghana (North)</div></div>
-        </div>
-    </section>
-
-    <!-- 6. TECHNICAL ARCHITECTURE -->
-    <section class="violet">
-        <h2>6. Technical Architecture</h2>
-
-        <div class="arch-layers">
-            <div class="arch-layer">
-                <div class="arch-layer-label">Caller Interface</div>
-                <div class="arch-layer-content">GSM Voice Call (short code) &rarr; MTN IVR/SBC Gateway &rarr; Voice Bridge Ingress — SIP/RTP stream ingested per market OpCo gateway</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Voice AI Layer</div>
-                <div class="arch-layer-content">Language Identification Model &rarr; STT Engine (15-language, per-market model) &rarr; Voice Biometric Verifier &rarr; Noise Cancellation Pre-processor</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Intent &amp; Action Layer</div>
-                <div class="arch-layer-content">UC-25 Intent API (shared) &rarr; Entity Extraction &rarr; Contact Resolution &rarr; Confirmation TTS Synthesis &rarr; MoMo API Execution</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Edge / Offline Layer</div>
-                <div class="arch-layer-content">Quantised Edge STT Model (&lt;500MB) deployed at base station / MVNO gateway &rarr; Offline transaction queue &rarr; Async callback handler</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Data &amp; Compliance</div>
-                <div class="arch-layer-content">Ephemeral audio processing (no retention) &rarr; Transcript 24h TTL &rarr; Encrypted biometric template store (per-market) &rarr; Audit log (POPIA/NDPR)</div>
-            </div>
-        </div>
-
-        <h3>Integration Map</h3>
-        <table>
-            <thead><tr><th>System</th><th>Integration Type</th><th>Purpose</th><th>Dependency</th></tr></thead>
-            <tbody>
-                <tr><td>UC-18 ARIA Voice Engine</td><td>Extension / SDK</td><td>Base STT &amp; TTS capability, 6 languages already trained</td><td>Critical path</td></tr>
-                <tr><td>UC-25 USSD AI Intent Layer</td><td>Internal REST API</td><td>Intent routing, entity extraction, MoMo API execution</td><td>Critical path</td></tr>
-                <tr><td>MoMo API v3</td><td>REST API</td><td>Balance, transfer, airtime, transaction history</td><td>Available</td></tr>
-                <tr><td>MTN IVR / SBC Gateway (per OpCo)</td><td>SIP/RTP</td><td>Voice call ingress and DTMF fallback IVR</td><td>Per-market integration</td></tr>
-                <tr><td>UC-16 PayGuard</td><td>REST API</td><td>Fraud pre-screen on voice-initiated transactions</td><td>Available</td></tr>
-                <tr><td>Biometric Template Store</td><td>Encrypted DB</td><td>Speaker verification model storage</td><td>New build required</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 7. DATA & AI MODEL REQUIREMENTS -->
-    <section>
-        <h2>7. Data &amp; AI Model Requirements</h2>
-
-        <h3>7.1 Training Data Requirements</h3>
-        <table>
-            <thead><tr><th>Language</th><th>Hours Required</th><th>Domain</th><th>Source</th><th>Status</th></tr></thead>
-            <tbody>
-                <tr><td>Hausa, Yoruba, Igbo</td><td>500h each</td><td>Financial / conversational</td><td>Mozilla Common Voice + MTN data labelling</td><td>Partial (Common Voice)</td></tr>
-                <tr><td>Swahili, Kinyarwanda, Luganda</td><td>300h each</td><td>Financial / conversational</td><td>Mozilla Common Voice + OpenSLR</td><td>Available (fine-tuning needed)</td></tr>
-                <tr><td>Fulfulde, Dagbani</td><td>200h each (target)</td><td>Financial / conversational</td><td>Bespoke collection via MTN agents</td><td>Not started — procurement needed</td></tr>
-                <tr><td>Zulu, Xhosa</td><td>400h each</td><td>Financial / conversational</td><td>NCHLT corpus + MTN SA voice data</td><td>Available</td></tr>
-                <tr><td>Amharic, Tigrinya</td><td>300h each</td><td>Financial / conversational</td><td>Fleurs dataset + MTN ET labelling</td><td>Partial</td></tr>
-                <tr><td>Twi / Akan, Chichewa</td><td>200h each</td><td>Financial / conversational</td><td>CMU Wilderness + bespoke collection</td><td>Not started</td></tr>
-            </tbody>
-        </table>
-
-        <h3>7.2 Model Architecture</h3>
-        <div class="card">
-            <div class="card-title">Cloud STT Model</div>
-            <div class="card-content">Fine-tuned Whisper Large v3 with per-language LoRA adapters. MoMo financial vocabulary injection (amounts, currency names, transaction types, common recipient names). Real-time streaming inference via WebSocket. Hosted per-market on MTN cloud infrastructure to meet data localisation requirements.</div>
-        </div>
-        <div class="card teal">
-            <div class="card-title">Edge STT Model</div>
-            <div class="card-content">Quantised Whisper Medium (INT8) with top-5 language support per market. &lt;500MB footprint for base station deployment. 15-50ms additional latency vs cloud. Covers send money, balance, airtime, last transaction, and help intents in offline mode.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Voice Biometric Model</div>
-            <div class="card-content">Speaker embedding model (ECAPA-TDNN or equivalent) producing 192-dimensional voice print. Cosine similarity scoring with market-tuned threshold. Liveness detection to prevent replay attacks. Per-user model updated incrementally with confirmed successful authentications.</div>
-        </div>
-        <div class="card amber">
-            <div class="card-title">Language Identification Model</div>
-            <div class="card-content">Lightweight VoxLingua107-derived model fine-tuned on 15 African languages. &lt;10MB footprint, &lt;50ms inference. Runs as pre-processor before STT routing. Confidence threshold: &gt;0.85 for auto-route, below threshold prompts explicit language selection.</div>
-        </div>
-    </section>
-
-    <!-- 8. COMPLIANCE & REGULATORY -->
-    <section class="amber">
-        <h2>8. Compliance &amp; Regulatory</h2>
-
-        <h3>8.1 Biometric Data Handling</h3>
-        <div class="card amber">
-            <div class="card-title">POPIA — South Africa (Biometric Information)</div>
-            <div class="card-content">Voice biometric templates constitute "special personal information" under POPIA Section 26. Explicit informed consent required before enrolment. Consent must be recordable, withdrawable, and stored for the duration of the customer relationship. Biometric data must not be transferred outside SA without explicit consent and appropriate safeguards. Data subject access requests must include the right to delete biometric templates.</div>
-        </div>
-        <div class="card amber">
-            <div class="card-title">NDPR — Nigeria</div>
-            <div class="card-content">Biometric voice data falls under "sensitive personal data" per NDPR Article 2.1. Specific consent required for biometric processing. Data localisation: voice templates must reside on Nigerian infrastructure. The NITDA must be notified of any biometric processing system before deployment. Annual audit of biometric data processing is required.</div>
-        </div>
-        <div class="card amber">
-            <div class="card-title">Kenya DPA 2019</div>
-            <div class="card-content">Biometric data processing requires a Data Protection Impact Assessment (DPIA) filed with the Office of the Data Protection Commissioner (ODPC) before deployment. Voice enrolment consent must be explicit, documented, and linked to the customer's MoMo account record. Right to erasure must delete the biometric template from all systems within 30 days of request.</div>
-        </div>
-
-        <h3>8.2 Voice Authentication Regulatory Requirements</h3>
-        <table>
-            <thead><tr><th>Market</th><th>Regulator</th><th>Voice Auth Status</th><th>Action Required</th></tr></thead>
-            <tbody>
-                <tr><td>South Africa</td><td>FSCA / SARB</td><td>Permitted with POPIA consent</td><td>POPIA compliance documentation</td></tr>
-                <tr><td>Nigeria</td><td>CBN / NDPC</td><td>Permitted for low-value transactions</td><td>CBN biometric framework alignment</td></tr>
-                <tr><td>Kenya</td><td>CBK / ODPC</td><td>DPIA required before deployment</td><td>File DPIA 90 days before launch</td></tr>
-                <tr><td>Ghana</td><td>BoG / DPC</td><td>Under review — BoG guidance pending</td><td>Engage BoG proactively in discovery</td></tr>
-                <tr><td>Uganda / Rwanda / Zambia</td><td>Local CBs</td><td>No specific prohibition; consultation advised</td><td>Regulatory engagement per OpCo</td></tr>
-            </tbody>
-        </table>
-
-        <h3>8.3 Audio Data Minimisation</h3>
-        <ul>
-            <li>Raw audio SHALL be processed ephemerally &mdash; audio is destroyed immediately after STT conversion</li>
-            <li>STT transcripts retained for maximum 24 hours for QA sampling; purged automatically via TTL</li>
-            <li>No audio recordings used for marketing, profiling or any secondary purpose without explicit consent</li>
-            <li>Transcripts classified as personal data &mdash; subject to all applicable data subject rights</li>
-        </ul>
-    </section>
-
-    <!-- 9. SPRINT PLAN -->
-    <section class="teal">
-        <h2>9. Sprint Plan &amp; Roadmap</h2>
-
-        <h3>Sprint 1 (Weeks 1&ndash;3): Foundation &amp; STT Core</h3>
-        <div class="card teal">
-            <div class="card-title">Sprint 1 Deliverables</div>
-            <div class="card-content">
-                <ul>
-                    <li>Extend UC-18 ARIA STT to support 9 languages (English, French, Swahili, Hausa, Zulu, Amharic, Kinyarwanda, Yoruba, Luganda) with fine-tuned Whisper Large v3</li>
-                    <li>Language identification model integration (VoxLingua107 fine-tune, 15 languages)</li>
-                    <li>Voice bridge ingress layer: SIP/RTP handler, end-of-utterance detection, audio pre-processing (noise cancellation)</li>
-                    <li>UC-25 Intent API adapter — route classified voice intent to existing UC-25 execution pipeline</li>
-                    <li>IVR DTMF fallback scaffold for 5 core transaction types</li>
-                    <li>Per-market audio processing deployment on MTN cloud (SA, Nigeria, Ghana as pilots)</li>
-                    <li>Ephemeral audio processing pipeline with 24h transcript TTL</li>
-                </ul>
-            </div>
-        </div>
-
-        <h3>Sprint 2 (Weeks 4&ndash;6): Biometrics, Edge &amp; Remaining Languages</h3>
-        <div class="card teal">
-            <div class="card-title">Sprint 2 Deliverables</div>
-            <div class="card-content">
-                <ul>
-                    <li>Voice biometric enrolment flow: guided prompt sequence, 3-repetition model construction, quality scoring</li>
-                    <li>Speaker verification service: ECAPA-TDNN embedding, cosine similarity, liveness detection</li>
-                    <li>Encrypted biometric template store with per-market data residency enforcement</li>
-                    <li>Edge STT model: quantised Whisper Medium (INT8) for 5-language offline mode</li>
-                    <li>Offline transaction queue with async MoMo API execution and caller callback</li>
-                    <li>Remaining 6 languages: Twi/Akan, Igbo, Fulfulde, Xhosa, Dagbani, Chichewa (training data procurement concurrent)</li>
-                    <li>TTS integration for spoken confirmations per language</li>
-                    <li>POPIA / NDPR consent capture flow for biometric enrolment</li>
-                </ul>
-            </div>
-        </div>
-
-        <h3>Sprint 3 (Weeks 7&ndash;9): Pilot, Compliance &amp; Hardening</h3>
-        <div class="card teal">
-            <div class="card-title">Sprint 3 Deliverables</div>
-            <div class="card-content">
-                <ul>
-                    <li>Pilot deployment: MTN South Africa, Nigeria, Ghana with real caller traffic (5,000 user cohort per market)</li>
-                    <li>STT accuracy benchmarking per language on production audio samples</li>
-                    <li>Voice biometric FAR/FRR measurement on enrolled pilot population</li>
-                    <li>Regulatory filing: DPIA for Kenya; POPIA compliance documentation for SA; CBN alignment for Nigeria</li>
-                    <li>OpCo admin portal: language pack management, prompt upload, A/B testing configuration</li>
-                    <li>Load testing: 50,000 concurrent voice calls sustained 30 minutes</li>
-                    <li>Security red team: replay attack testing, voice spoofing resistance, adversarial STT input</li>
-                    <li>Full rollout plan for remaining 9 markets with per-market timeline</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- 10. RISK REGISTER -->
-    <section class="red">
-        <h2>10. Risk Register</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
-            <tbody>
-                <tr>
-                    <td><code>R-01</code></td>
-                    <td>Insufficient training data for low-resource languages (Fulfulde, Dagbani, Chichewa) results in WER &gt;20%</td>
-                    <td class="priority-high">High</td>
-                    <td class="priority-high">High</td>
-                    <td>Begin data collection procurement in Sprint 1. Deploy IVR-only mode for underserved languages until STT quality meets threshold. Commission MTN agent network for data labelling as secondary source.</td>
-                </tr>
-                <tr>
-                    <td><code>R-02</code></td>
-                    <td>Voice biometric FAR exceeds 1% — fraudulent transactions via voice spoofing</td>
-                    <td class="priority-med">Medium</td>
-                    <td class="priority-high">Very High</td>
-                    <td>Liveness detection mandatory. Dual-channel verification for transactions above market-specific threshold (e.g., ZAR 500). Limit voice-auth to &lt;10 transactions per day per MSISDN. Real-time anomaly monitoring via PayGuard.</td>
-                </tr>
-                <tr>
-                    <td><code>R-03</code></td>
-                    <td>Regulatory approval for biometric voice authentication blocked in key markets (Kenya, Ghana)</td>
-                    <td class="priority-med">Medium</td>
-                    <td class="priority-high">High</td>
-                    <td>Launch with DTMF PIN fallback as primary auth in markets pending approval. Biometric enrolment offered as optional enhancement. Engage regulators 6 months before planned launch date.</td>
-                </tr>
-                <tr>
-                    <td><code>R-04</code></td>
-                    <td>Edge STT model latency at base station exceeds 2s target under high concurrent call load</td>
-                    <td class="priority-med">Medium</td>
-                    <td class="priority-med">Medium</td>
-                    <td>Benchmark edge model under realistic concurrency before deployment. Fall back to cloud STT if edge latency budget blown. Scale edge hardware per-market based on call volume projections.</td>
-                </tr>
-                <tr>
-                    <td><code>R-05</code></td>
-                    <td>SIP/RTP integration complexity per OpCo IVR gateway causes significant integration delays</td>
-                    <td class="priority-high">High</td>
-                    <td class="priority-med">Medium</td>
-                    <td>Conduct gateway capability assessment in discovery week. Standardise on Twilio or Vonage media bridge where native SIP integration not feasible. Prototype with 3 pilot OpCos before full rollout.</td>
-                </tr>
-                <tr>
-                    <td><code>R-06</code></td>
-                    <td>Background noise in rural call environments degrades STT accuracy below acceptable threshold</td>
-                    <td class="priority-high">High</td>
-                    <td class="priority-med">Medium</td>
-                    <td>Implement RNNoise or spectral subtraction pre-processing on audio before STT. Collect noisy environment audio samples for model fine-tuning. Prompt callers to move to quieter location if SNR below threshold.</td>
-                </tr>
-                <tr>
-                    <td><code>R-07</code></td>
-                    <td>Customer distrust of voice biometric data collection limits enrolment rates</td>
-                    <td class="priority-high">High</td>
-                    <td class="priority-med">Medium</td>
-                    <td>Make biometric enrolment entirely optional &mdash; PIN fallback always available. Invest in clear, culturally appropriate consent communication per market. Agent channel used to explain and demonstrate voice bridge in high-traffic markets.</td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-
-    <footer>
-        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-30 USSD Voice-to-Action Bridge &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
-        <div>Document Author: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
-        <div style="margin-top:8px;font-size:0.82em;">Integrations: UC-18 ARIA &nbsp;&middot;&nbsp; UC-25 USSD AI &nbsp;&middot;&nbsp; UC-16 PayGuard &nbsp;&middot;&nbsp; MoMo API &nbsp;&middot;&nbsp; Compliance: POPIA &middot; NDPR &middot; Kenya DPA &middot; FSCA &middot; CBN</div>
-    </footer>
-
+<p>Sub-Saharan Africa is home to an estimated 250 million functionally illiterate adults — individuals who cannot reliably read or type text, yet who are active economic participants with mobile phones. These customers are systematically excluded from Mobile Money services that require text-based interaction, whether through USSD menu navigation or the AI natural language layer introduced in UC-25. Even with simplified menus and intent classification, the irreducible requirement to type text creates an insurmountable barrier for this population.</p>
+<p>UC-30 eliminates this barrier entirely. By bridging the voice channel to the USSD action layer, a customer dials a short code, speaks their intent in their mother tongue — one of 15 supported African languages — and the AI executes the Mobile Money action on their behalf without any typing required. The solution extends MTN's ARIA voice engine (UC-18) with 15-language speech-to-text capability and connects to the UC-25 USSD AI intent layer as its execution backbone.</p>
+<p>The business case is compelling from both a financial inclusion mandate and a commercial growth perspective. MTN's licence obligations across multiple markets include commitments to financial inclusion that UC-30 directly fulfils. Commercially, reaching the 250M+ adults who are currently excluded represents an untapped subscriber base that competitors who rely on text-only interfaces cannot serve. Voice biometric caller verification built into the flow eliminates the need for PIN entry, providing a superior authentication experience for users who may also struggle with numeric PIN recall.</p>
+<p>UC-30 builds on rather than replaces existing infrastructure: UC-18 ARIA provides the voice engine foundation, UC-25 provides the intent execution layer, and the MoMo API provides the transactional backbone. This approach minimises net-new development while maximising reuse across the AI portfolio.</p>
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-value">250M+</div>
+<div class="metric-label">Functionally Illiterate Adults in MTN Markets</div>
+</div>
+<div class="metric-card indigo">
+<div class="metric-value">15</div>
+<div class="metric-label">African Languages Supported (STT)</div>
+</div>
+<div class="metric-card violet">
+<div class="metric-value">&lt;2s</div>
+<div class="metric-label">Speech-to-Intent Target Latency</div>
+</div>
+<div class="metric-card amber">
+<div class="metric-value">P1</div>
+<div class="metric-label">Priority — Financial Inclusion Driver</div>
+</div>
+</div>
+<div class="comparison-box" style="margin-top:20px;">
+<div class="compare-card traditional">
+<div class="compare-label">Text-Only USSD (UC-25)</div>
+<div class="compare-value">~750M Reachable</div>
+<div class="compare-sub">Requires basic literacy; excludes 250M+ functionally illiterate adults; PIN entry required; menu navigation or typing needed</div>
+</div>
+<div class="compare-card ai">
+<div class="compare-label">Voice-to-Action Bridge (UC-30)</div>
+<div class="compare-value">1B+ Reachable</div>
+<div class="compare-sub">Zero literacy required; 15 mother-tongue languages; voice biometric auth; IVR fallback; offline-capable edge model</div>
+</div>
 </div>
 
-<!-- EDITABLE DOCUMENT SYSTEM -->
-<style data-editable-system>
-  body.edm [data-eid]:hover{outline:2px dashed rgba(167,139,250,.35)!important;outline-offset:3px;border-radius:3px;cursor:text}
-  body.edm [data-eid]:focus{outline:2px solid #a78bfa!important;outline-offset:3px;border-radius:3px;background:rgba(167,139,250,.07)!important}
-  body.edm [data-eid]:empty::before{content:"Click to add text";color:rgba(167,139,250,.4);font-style:italic;pointer-events:none}
-  #__etb{position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:6px;align-items:center;background:#111827;border:1px solid #374151;border-radius:12px;padding:9px 14px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
-  #__etb button{padding:5px 11px;border-radius:7px;border:1px solid #374151;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;background:#1f2937;color:#d1d5db}
-  #__etb button:hover{border-color:#a78bfa;color:#e8eaff}
-  #__etb .etb-edit{color:#a78bfa}
-  #__etb .etb-save{color:#34d399}
-  #__etb .etb-reset{color:#f87171}
-  #__etb .etb-export{color:#38bdf8}
-  #__etb .etb-msg{font-size:10.5px;color:#6b7280;min-width:90px;text-align:right}
-  #__etb .etb-sep{width:1px;height:20px;background:#374151;margin:0 2px}
-</style>
-<script data-editable-system>
-(function(){
-  'use strict';
-  var KEY = 'edm:' + (location.pathname || location.href);
-  var SELS = 'p,h1,h2,h3,h4,h5,li,td,th,blockquote,.card-content,.card-title,.meta-value,.hero-meta-value,.summary-card p,.risk-detail,.risk-title,.phase-desc,.gap-value,.kpi-val,.kpi-lbl,.story-text,.card-content p,.dependency-detail,.dependency-system,.checklist li,.warning-box,.info-box,.code-block,.gap-item .gap-value,.status-badge,.badge,.tech-tag,.hero-subtitle,caption,dt,dd,.requirement,.storyid';
-  var mode = false, timer = null, ids = [];
+      </section>
+      <section class="doc-section" id="s2">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <h2 class="section-title">Problem Statement</h2>
+        </div>
+        
 
-  function elems(){
-    return [].slice.call(document.querySelectorAll(SELS)).filter(function(el){
-      return !el.closest('#__etb') && !el.closest('script') && !el.closest('style') && !el.closest('noscript');
-    });
-  }
+<p>Despite significant AI investment in the MoMo channel, MTN's digital financial services remain inaccessible to a substantial portion of the population it is mandated to serve. Three interconnected problems drive this gap:</p>
+<div class="card violet">
+<div class="card-title">Problem 1 — The Literacy Wall Excludes 250M+ Adults</div>
+<div class="card-content">An estimated 250 million adults across MTN's operating markets are functionally illiterate — they cannot reliably read menu options, type amounts, or respond to text-based prompts. Even UC-25's natural language USSD layer requires the ability to type a sentence. Voice is these customers' only viable digital interaction modality. Current IVR systems are either unavailable in local languages or provide rigid branching trees that mirror the same structural exclusion as text USSD menus.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Problem 2 — Language Fragmentation Creates Service Deserts</div>
+<div class="card-content">Africa's linguistic diversity is extraordinary — with over 2,000 languages across the continent. While MTN's text systems support 6 primary languages (UC-25), voice interaction demands support for far more granular local languages to achieve genuine inclusion. A customer in rural Cameroon speaking Fulfulde, or a trader in northern Ghana speaking Dagbani, has no viable voice interface despite both owning GSM handsets. The voice bridge must reach 15 languages at minimum to close the service desert.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Problem 3 — PIN Authentication Excludes Low-Numeracy Users</div>
+<div class="card-content">Even when customers can initiate a voice interaction, the requirement to key in a 4-digit PIN creates a final exclusion hurdle for users with cognitive barriers to PIN recall, particularly elderly customers and those with low numeracy. Voice biometric verification — passphrase or speaker recognition — provides an authentication mechanism that is both more inclusive and, when implemented correctly, more secure than PIN-based auth for voice channels.</div>
+</div>
+<h3>Affected Markets &amp; Languages</h3>
+<div class="market-grid">
+<div class="market-pill">South Africa</div>
+<div class="market-pill">Nigeria</div>
+<div class="market-pill">Ghana</div>
+<div class="market-pill">Uganda</div>
+<div class="market-pill">Kenya</div>
+<div class="market-pill">Cameroon</div>
+<div class="market-pill">Ivory Coast</div>
+<div class="market-pill">Rwanda</div>
+<div class="market-pill">Zambia</div>
+<div class="market-pill">Ethiopia</div>
+<div class="market-pill">Benin</div>
+<div class="market-pill">Guinea</div>
+</div>
 
-  function stamp(){
-    ids = [];
-    elems().forEach(function(el,i){
-      el.setAttribute('data-eid', i);
-      ids.push(i);
-    });
-  }
+      </section>
+      <section class="doc-section" id="s3">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <h2 class="section-title">Objectives & Success Metrics</h2>
+        </div>
+        
 
-  function enable(){
-    mode = true;
-    document.body.classList.add('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'true';
-      el.spellcheck = false;
-    });
-    document.addEventListener('input', onInput);
-    refresh();
-  }
+<div class="two-col">
+<div>
+<h3>Primary Objectives</h3>
+<div class="card teal">
+<div class="card-title">OBJ-01 Zero-Literacy MoMo Access</div>
+<div class="card-content">Enable any MTN MoMo subscriber to complete a send money, balance check, or airtime purchase transaction using only voice — no typing, no reading, no PIN entry required.</div>
+</div>
+<div class="card teal">
+<div class="card-title">OBJ-02 15-Language Speech Recognition</div>
+<div class="card-content">Deploy STT capability across 15 African languages with &gt;90% word-error-rate accuracy per language, including low-resource languages such as Fulfulde, Dagbani, Kinyarwanda and Tigrinya.</div>
+</div>
+<div class="card teal">
+<div class="card-title">OBJ-03 Sub-2-Second Speech-to-Intent</div>
+<div class="card-content">Achieve end-to-end latency from end of speech utterance to confirmed intent classification of under 2 seconds at P95, enabling natural conversational pacing over standard GSM voice calls.</div>
+</div>
+<div class="card teal">
+<div class="card-title">OBJ-04 Voice Biometric Authentication</div>
+<div class="card-content">Implement speaker verification as a PIN replacement for voice channel transactions, achieving &lt;1% false acceptance rate and &lt;3% false rejection rate across enrolled users.</div>
+</div>
+</div>
+<div>
+<h3>Success Metrics</h3>
+<div class="metrics-grid" style="grid-template-columns:1fr 1fr;">
+<div class="metric-card">
+<div class="metric-value">&gt;90%</div>
+<div class="metric-label">STT Word Error Rate Accuracy</div>
+</div>
+<div class="metric-card indigo">
+<div class="metric-value">&lt;2s</div>
+<div class="metric-label">Speech-to-Intent P95</div>
+</div>
+<div class="metric-card violet">
+<div class="metric-value">&lt;1%</div>
+<div class="metric-label">Voice Biometric FAR</div>
+</div>
+<div class="metric-card amber">
+<div class="metric-value">15</div>
+<div class="metric-label">Languages at Launch</div>
+</div>
+</div>
+<div class="card green" style="margin-top:14px;">
+<div class="card-title">12-Month Financial Inclusion Target</div>
+<div class="card-content">Onboard 5 million previously unserved (literacy-excluded) MoMo subscribers via the voice bridge within 12 months of full market rollout. Measured via new account activations where first transaction was voice-initiated.</div>
+</div>
+</div>
+</div>
 
-  function disable(){
-    mode = false;
-    document.body.classList.remove('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'false';
-      el.blur();
-    });
-    document.removeEventListener('input', onInput);
-    refresh();
-  }
+      </section>
+      <section class="doc-section" id="s4">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <h2 class="section-title">User Stories & Acceptance Criteria</h2>
+        </div>
+        
 
-  function onInput(){
-    clearTimeout(timer);
-    msg('Unsaved…');
-    timer = setTimeout(persist, 900);
-  }
+<div class="us-card">
+<div class="us-id">US-30-01</div>
+<div class="us-title">Voice-Initiated Money Transfer — Illiterate User</div>
+<div class="us-story">"As Fatou, a market trader in Conakry who cannot read or type, I want to call a number, say 'send 10,000 francs to my sister Mariama' in Pular, and have the money sent, so that I can participate in Mobile Money without needing to read anything."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>System recognises Pular speech input and extracts amount (10,000 CFA) and recipient name (Mariama)</li>
+<li>System resolves 'Mariama' to a registered contact or prompts selection if multiple matches</li>
+<li>Voice biometric verification confirms caller identity before transaction execution</li>
+<li>Transaction confirmation is spoken back to caller in Pular before execution</li>
+<li>Confirmation SMS sent to Fatou's number in Pular (latin script)</li>
+<li>End-to-end latency from end of utterance to spoken confirmation &lt;4 seconds</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-30-02</div>
+<div class="us-title">Voice Balance Check — First-Time User</div>
+<div class="us-story">"As a first-time voice bridge user, I want to hear my balance in my own language when I call and say 'what is my balance', so that I can manage my money without needing a smartphone or literacy."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>System auto-detects spoken language within first 2 seconds of speech</li>
+<li>Balance is retrieved from MoMo API and spoken back in the detected language</li>
+<li>First-time callers are guided through a 30-second voice biometric enrolment before balance disclosure</li>
+<li>Response includes available balance and any pending transactions in natural language</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-30-03</div>
+<div class="us-title">Voice Biometric Enrolment</div>
+<div class="us-story">"As a new UC-30 user, I want to set up my voice as my password in under 2 minutes, so that future calls are secure without needing to remember a PIN."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Enrolment flow prompted on first voice bridge call, completable in under 2 minutes</li>
+<li>System collects 3 passphrase repetitions and constructs speaker model</li>
+<li>Model stored on-device (where supported) or encrypted server-side per market data laws</li>
+<li>Enrolment quality score &gt;0.80 required before model is activated</li>
+<li>Fallback to numeric PIN available if enrolment quality below threshold</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-30-04</div>
+<div class="us-title">Offline Edge Model — Low-Connectivity Area</div>
+<div class="us-story">"As a user in a rural area with intermittent data coverage but good voice signal, I want the voice bridge to still process my request even when the data network is degraded, so that I'm not excluded by infrastructure limitations."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Edge STT model deployed at telecom base station or MVNO gateway processes speech locally</li>
+<li>Intent classification for core transactions (send, balance, airtime) available offline at edge</li>
+<li>MoMo API call queued and executed when connectivity restored, with caller notified by callback</li>
+<li>Edge model operates within 200ms additional latency vs cloud model</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-30-05</div>
+<div class="us-title">IVR Fallback — Speech Recognition Failure</div>
+<div class="us-story">"As a user whose speech input was not understood, I want to be gracefully guided to a simple button-press IVR menu, so that I can still complete my transaction without being disconnected."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>After 2 failed STT attempts, system transitions to IVR menu automatically</li>
+<li>IVR menu covers top 5 transactions: send money, balance, airtime, last transaction, help</li>
+<li>Transition is seamless — no call drop, no re-authentication required</li>
+<li>IVR prompts available in top 3 languages for that market</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-30-06</div>
+<div class="us-title">Language Auto-Detection</div>
+<div class="us-story">"As a customer speaking Kinyarwanda, I want the system to detect my language automatically without me having to select it from a menu, so that I experience a natural, frictionless interaction."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Language detection model identifies language from first utterance with &gt;92% accuracy across 15 supported languages</li>
+<li>All subsequent prompts and responses delivered in detected language</li>
+<li>Customer can override by saying "English please" or local equivalent at any point</li>
+<li>Language preference stored against MSISDN for future sessions</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-30-07</div>
+<div class="us-title">OpCo Product Manager — Language Pack Configuration</div>
+<div class="us-story">"As an OpCo product manager, I want to configure which languages are active in my market and upload custom voice prompts in local dialects, so that the experience is culturally appropriate for my customers."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Admin portal allows per-market language activation/deactivation without code deployment</li>
+<li>Custom audio prompt upload (WAV/MP3) for each transaction step per language</li>
+<li>Configuration changes take effect within 60 seconds via hot-reload</li>
+<li>A/B testing capability for prompt variants with conversion tracking</li>
+</ul>
+</div>
 
-  function persist(){
-    var store = {};
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null) store[id] = el.innerHTML;
-    });
-    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
-    msg('Saved ✓');
-  }
+      </section>
+      <section class="doc-section" id="s5">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <h2 class="section-title">Functional Requirements</h2>
+        </div>
+        
 
-  function restore(){
-    var raw; try { raw = localStorage.getItem(KEY); } catch(e){}
-    if(!raw) return false;
-    var store; try { store = JSON.parse(raw); } catch(e){ return false; }
-    stamp();
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null && store[id] !== undefined) el.innerHTML = store[id];
-    });
-    return true;
-  }
+<h3>5.1 Speech-to-Text Engine</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-01</code></td><td>The STT engine SHALL support a minimum of 15 African languages with word error rate &lt;10% per language on the MTN MoMo domain vocabulary.</td><td><span class="tag tag-must">MUST</span></td><td>Extends UC-18 ARIA STT engine</td></tr>
+<tr><td><code>FR-02</code></td><td>The system SHALL auto-detect the spoken language from the first utterance (&gt;92% accuracy) and route to the appropriate language model without requiring caller selection.</td><td><span class="tag tag-must">MUST</span></td><td>Language ID model separate from STT</td></tr>
+<tr><td><code>FR-03</code></td><td>Speech input SHALL be processed within 2 seconds end-to-end from end-of-utterance signal to classified intent at P95 under normal network conditions.</td><td><span class="tag tag-must">MUST</span></td><td>Includes STT + intent classification</td></tr>
+<tr><td><code>FR-04</code></td><td>The STT engine SHALL support code-switching (e.g., Swahili with English financial terms) without triggering a language mismatch error.</td><td><span class="tag tag-should">SHOULD</span></td><td>Common in East/West African markets</td></tr>
+<tr><td><code>FR-05</code></td><td>An offline-capable edge STT model SHALL be deployable at base station or MVNO gateway level to serve areas with degraded data connectivity.</td><td><span class="tag tag-must">MUST</span></td><td>Quantised model &lt;500MB footprint</td></tr>
+</tbody>
+</table>
+<h3>5.2 Voice Biometric Authentication</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-06</code></td><td>The system SHALL implement speaker verification for enrolled users achieving FAR &lt;1% and FRR &lt;3% on a representative voice sample set.</td><td><span class="tag tag-must">MUST</span></td><td>FSB/FSCA biometric auth standards</td></tr>
+<tr><td><code>FR-07</code></td><td>Voice biometric enrolment SHALL be completable in under 2 minutes via a guided spoken prompt sequence requiring 3 passphrase repetitions.</td><td><span class="tag tag-must">MUST</span></td><td>Enrolment quality score &gt;0.80 required</td></tr>
+<tr><td><code>FR-08</code></td><td>For unenrolled users or failed biometric verification, the system SHALL fall back to numeric PIN entry via DTMF keypad.</td><td><span class="tag tag-must">MUST</span></td><td>Security baseline maintained</td></tr>
+<tr><td><code>FR-09</code></td><td>Biometric voice templates SHALL be stored encrypted (AES-256) and localised per market data residency requirements. Templates SHALL never be transmitted in raw form.</td><td><span class="tag tag-must">MUST</span></td><td>POPIA / NDPR biometric data rules</td></tr>
+<tr><td><code>FR-10</code></td><td>Voice biometric verification SHALL complete within 1.5 seconds of utterance end at P95.</td><td><span class="tag tag-must">MUST</span></td><td>Within 2s total speech-to-intent budget</td></tr>
+</tbody>
+</table>
+<h3>5.3 Intent Routing &amp; USSD Action Execution</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-11</code></td><td>Classified voice intents SHALL be routed to the UC-25 USSD AI intent layer via a standardised internal API, reusing all entity extraction, contact resolution, and MoMo API execution logic.</td><td><span class="tag tag-must">MUST</span></td><td>No duplication of business logic</td></tr>
+<tr><td><code>FR-12</code></td><td>Voice confirmations SHALL be synthesised using text-to-speech (TTS) in the detected language and played to the caller before any financial transaction is executed.</td><td><span class="tag tag-must">MUST</span></td><td>Explicit confirmation required</td></tr>
+<tr><td><code>FR-13</code></td><td>After 2 consecutive STT failures, the system SHALL automatically transition the call to a DTMF IVR menu covering the top 5 transaction types without dropping the call.</td><td><span class="tag tag-must">MUST</span></td><td>Graceful degradation</td></tr>
+<tr><td><code>FR-14</code></td><td>The voice bridge SHALL support an offline queue for MoMo API calls when connectivity is degraded, with callback to the caller's MSISDN when the transaction completes.</td><td><span class="tag tag-should">SHOULD</span></td><td>Edge deployment mode</td></tr>
+<tr><td><code>FR-15</code></td><td>All voice interaction transcripts SHALL be processed ephemerally — audio is not retained post-STT, and transcripts are purged within 24 hours unless flagged for fraud investigation.</td><td><span class="tag tag-must">MUST</span></td><td>POPIA consent &amp; data minimisation</td></tr>
+</tbody>
+</table>
+<h3>5.4 Language Coverage</h3>
+<div class="lang-grid">
+<div class="lang-card"><div class="lang-flag">🏴</div><div class="lang-name">English</div><div class="lang-market">All markets</div></div>
+<div class="lang-card"><div class="lang-flag">🇫🇷</div><div class="lang-name">French</div><div class="lang-market">Cameroon, CI, Benin</div></div>
+<div class="lang-card"><div class="lang-flag">🇰🇪</div><div class="lang-name">Swahili</div><div class="lang-market">Kenya, Uganda, Rwanda</div></div>
+<div class="lang-card"><div class="lang-flag">🇳🇬</div><div class="lang-name">Hausa</div><div class="lang-market">Nigeria, Niger</div></div>
+<div class="lang-card"><div class="lang-flag">🇿🇦</div><div class="lang-name">Zulu</div><div class="lang-market">South Africa</div></div>
+<div class="lang-card"><div class="lang-flag">🇪🇹</div><div class="lang-name">Amharic</div><div class="lang-market">Ethiopia</div></div>
+<div class="lang-card"><div class="lang-flag">🇷🇼</div><div class="lang-name">Kinyarwanda</div><div class="lang-market">Rwanda</div></div>
+<div class="lang-card"><div class="lang-flag">🇬🇭</div><div class="lang-name">Twi / Akan</div><div class="lang-market">Ghana</div></div>
+<div class="lang-card"><div class="lang-flag">🇳🇬</div><div class="lang-name">Yoruba</div><div class="lang-market">Nigeria</div></div>
+<div class="lang-card"><div class="lang-flag">🇳🇬</div><div class="lang-name">Igbo</div><div class="lang-market">Nigeria</div></div>
+<div class="lang-card"><div class="lang-flag">🇺🇬</div><div class="lang-name">Luganda</div><div class="lang-market">Uganda</div></div>
+<div class="lang-card"><div class="lang-flag">🇫🇷</div><div class="lang-name">Fulfulde</div><div class="lang-market">Cameroon, Guinea</div></div>
+<div class="lang-card"><div class="lang-flag">🇿🇦</div><div class="lang-name">Xhosa</div><div class="lang-market">South Africa</div></div>
+<div class="lang-card"><div class="lang-flag">🇿🇲</div><div class="lang-name">Chichewa</div><div class="lang-market">Zambia</div></div>
+<div class="lang-card"><div class="lang-flag">🇬🇭</div><div class="lang-name">Dagbani</div><div class="lang-market">Ghana (North)</div></div>
+</div>
 
-  function reset(){
-    if(!confirm('Reset all edits to original content? This cannot be undone.')) return;
-    try { localStorage.removeItem(KEY); } catch(e){}
-    location.reload();
-  }
+      </section>
+      <section class="doc-section" id="s6">
+        <div class="section-header">
+          <div class="section-num">6</div>
+          <h2 class="section-title">Technical Architecture</h2>
+        </div>
+        
 
-  function exportDoc(){
-    // Temporarily disable editing for clean export
-    var wasMode = mode;
-    if(wasMode) disable();
-    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    // Remove the editable toolbar and injected system from export
-    html = html.replace(/<style[^>]*data-editable-system[^>]*>[\s\S]*?<\/style>/,'');
-    html = html.replace(/<script[^>]*data-editable-system[^>]*>[\s\S]*?<\/script>/,'');
-    html = html.replace(/<div id="__etb"[^>]*>[\s\S]*?<\/div>/,'');
-    html = html.replace(/<!-- EDITABLE DOCUMENT SYSTEM -->/g,'');
-    html = html.replace(/\sdata-eid="\d+"/g,'');
-    html = html.replace(/\scontenteditable="[^"]*"/g,'');
-    var blob = new Blob([html], {type:'text/html'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = (location.pathname.split('/').pop() || 'document') + '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    if(wasMode) enable();
-    msg('Exported ✓');
-  }
+<div class="arch-layers">
+<div class="arch-layer">
+<div class="arch-layer-label">Caller Interface</div>
+<div class="arch-layer-content">GSM Voice Call (short code) → MTN IVR/SBC Gateway → Voice Bridge Ingress — SIP/RTP stream ingested per market OpCo gateway</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Voice AI Layer</div>
+<div class="arch-layer-content">Language Identification Model → STT Engine (15-language, per-market model) → Voice Biometric Verifier → Noise Cancellation Pre-processor</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Intent &amp; Action Layer</div>
+<div class="arch-layer-content">UC-25 Intent API (shared) → Entity Extraction → Contact Resolution → Confirmation TTS Synthesis → MoMo API Execution</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Edge / Offline Layer</div>
+<div class="arch-layer-content">Quantised Edge STT Model (&lt;500MB) deployed at base station / MVNO gateway → Offline transaction queue → Async callback handler</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Data &amp; Compliance</div>
+<div class="arch-layer-content">Ephemeral audio processing (no retention) → Transcript 24h TTL → Encrypted biometric template store (per-market) → Audit log (POPIA/NDPR)</div>
+</div>
+</div>
+<h3>Integration Map</h3>
+<table>
+<thead><tr><th>System</th><th>Integration Type</th><th>Purpose</th><th>Dependency</th></tr></thead>
+<tbody>
+<tr><td>UC-18 ARIA Voice Engine</td><td>Extension / SDK</td><td>Base STT &amp; TTS capability, 6 languages already trained</td><td>Critical path</td></tr>
+<tr><td>UC-25 USSD AI Intent Layer</td><td>Internal REST API</td><td>Intent routing, entity extraction, MoMo API execution</td><td>Critical path</td></tr>
+<tr><td>MoMo API v3</td><td>REST API</td><td>Balance, transfer, airtime, transaction history</td><td>Available</td></tr>
+<tr><td>MTN IVR / SBC Gateway (per OpCo)</td><td>SIP/RTP</td><td>Voice call ingress and DTMF fallback IVR</td><td>Per-market integration</td></tr>
+<tr><td>UC-16 PayGuard</td><td>REST API</td><td>Fraud pre-screen on voice-initiated transactions</td><td>Available</td></tr>
+<tr><td>Biometric Template Store</td><td>Encrypted DB</td><td>Speaker verification model storage</td><td>New build required</td></tr>
+</tbody>
+</table>
 
-  function msg(t){
-    var el = document.getElementById('__etb-msg');
-    if(el){ el.textContent = t; clearTimeout(el._t); if(t==='Saved ✓'||t==='Exported ✓') el._t=setTimeout(function(){el.textContent='';},2500); }
-  }
+      </section>
+      <section class="doc-section" id="s7">
+        <div class="section-header">
+          <div class="section-num">7</div>
+          <h2 class="section-title">Data & AI Model Requirements</h2>
+        </div>
+        
 
-  function refresh(){
-    var btn = document.getElementById('__etb-btn');
-    var acts = document.getElementById('__etb-acts');
-    if(btn){ btn.textContent = mode ? '🔒 Lock' : '✏️ Edit'; btn.style.background = mode ? '#2d1f5e' : '#1f2937'; btn.style.color = mode ? '#c4b5fd' : '#a78bfa'; }
-    if(acts) acts.style.display = mode ? 'flex' : 'none';
-  }
+<h3>7.1 Training Data Requirements</h3>
+<table>
+<thead><tr><th>Language</th><th>Hours Required</th><th>Domain</th><th>Source</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>Hausa, Yoruba, Igbo</td><td>500h each</td><td>Financial / conversational</td><td>Mozilla Common Voice + MTN data labelling</td><td>Partial (Common Voice)</td></tr>
+<tr><td>Swahili, Kinyarwanda, Luganda</td><td>300h each</td><td>Financial / conversational</td><td>Mozilla Common Voice + OpenSLR</td><td>Available (fine-tuning needed)</td></tr>
+<tr><td>Fulfulde, Dagbani</td><td>200h each (target)</td><td>Financial / conversational</td><td>Bespoke collection via MTN agents</td><td>Not started — procurement needed</td></tr>
+<tr><td>Zulu, Xhosa</td><td>400h each</td><td>Financial / conversational</td><td>NCHLT corpus + MTN SA voice data</td><td>Available</td></tr>
+<tr><td>Amharic, Tigrinya</td><td>300h each</td><td>Financial / conversational</td><td>Fleurs dataset + MTN ET labelling</td><td>Partial</td></tr>
+<tr><td>Twi / Akan, Chichewa</td><td>200h each</td><td>Financial / conversational</td><td>CMU Wilderness + bespoke collection</td><td>Not started</td></tr>
+</tbody>
+</table>
+<h3>7.2 Model Architecture</h3>
+<div class="card">
+<div class="card-title">Cloud STT Model</div>
+<div class="card-content">Fine-tuned Whisper Large v3 with per-language LoRA adapters. MoMo financial vocabulary injection (amounts, currency names, transaction types, common recipient names). Real-time streaming inference via WebSocket. Hosted per-market on MTN cloud infrastructure to meet data localisation requirements.</div>
+</div>
+<div class="card teal">
+<div class="card-title">Edge STT Model</div>
+<div class="card-content">Quantised Whisper Medium (INT8) with top-5 language support per market. &lt;500MB footprint for base station deployment. 15-50ms additional latency vs cloud. Covers send money, balance, airtime, last transaction, and help intents in offline mode.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Voice Biometric Model</div>
+<div class="card-content">Speaker embedding model (ECAPA-TDNN or equivalent) producing 192-dimensional voice print. Cosine similarity scoring with market-tuned threshold. Liveness detection to prevent replay attacks. Per-user model updated incrementally with confirmed successful authentications.</div>
+</div>
+<div class="card amber">
+<div class="card-title">Language Identification Model</div>
+<div class="card-content">Lightweight VoxLingua107-derived model fine-tuned on 15 African languages. &lt;10MB footprint, &lt;50ms inference. Runs as pre-processor before STT routing. Confidence threshold: &gt;0.85 for auto-route, below threshold prompts explicit language selection.</div>
+</div>
 
-  function buildToolbar(){
-    var t = document.createElement('div');
-    t.id = '__etb';
-    t.innerHTML =
-      '<span style="font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-right:2px">Document</span>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-edit" id="__etb-btn" onclick="window.__edm.toggle()">✏️ Edit</button>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-share" onclick="window.__edm.share()" title="Copy shareable link">🔗 Share</button>'+
-      '<button class="etb-print" onclick="window.__edm.print()" title="Print / Save as PDF">🖨 Print</button>'+
-      '<div id="__etb-acts" style="display:none;gap:5px;align-items:center">'+
-        '<span class="etb-msg" id="__etb-msg"></span>'+
-        '<button class="etb-save" onclick="window.__edm.save()">💾 Save</button>'+
-        '<button class="etb-reset" onclick="window.__edm.reset()">↺ Reset</button>'+
-        '<button class="etb-export" onclick="window.__edm.export()">⬇ Export</button>'+
-      '</div>';
-    document.body.appendChild(t);
-  }
+      </section>
+      <section class="doc-section" id="s8">
+        <div class="section-header">
+          <div class="section-num">8</div>
+          <h2 class="section-title">Compliance & Regulatory</h2>
+        </div>
+        
 
-  function shareDoc(){
-    var base = 'https://fintech-tracker-web.vercel.app';
-    var url = base + location.pathname;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ msg('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
-    } else { prompt('Copy this link:',url); }
-  }
-  function printDoc(){
-    var wasMode = mode;
-    if(wasMode) disable();
-    window.print();
-    if(wasMode) setTimeout(function(){ enable(); }, 500);
-  }
-  window.__edm = {
-    toggle: function(){ mode ? disable() : enable(); },
-    save:   function(){ persist(); },
-    reset:  function(){ reset(); },
-    export: function(){ exportDoc(); },
-    share:  function(){ shareDoc(); },
-    print:  function(){ printDoc(); }
-  };
+<h3>8.1 Biometric Data Handling</h3>
+<div class="card amber">
+<div class="card-title">POPIA — South Africa (Biometric Information)</div>
+<div class="card-content">Voice biometric templates constitute "special personal information" under POPIA Section 26. Explicit informed consent required before enrolment. Consent must be recordable, withdrawable, and stored for the duration of the customer relationship. Biometric data must not be transferred outside SA without explicit consent and appropriate safeguards. Data subject access requests must include the right to delete biometric templates.</div>
+</div>
+<div class="card amber">
+<div class="card-title">NDPR — Nigeria</div>
+<div class="card-content">Biometric voice data falls under "sensitive personal data" per NDPR Article 2.1. Specific consent required for biometric processing. Data localisation: voice templates must reside on Nigerian infrastructure. The NITDA must be notified of any biometric processing system before deployment. Annual audit of biometric data processing is required.</div>
+</div>
+<div class="card amber">
+<div class="card-title">Kenya DPA 2019</div>
+<div class="card-content">Biometric data processing requires a Data Protection Impact Assessment (DPIA) filed with the Office of the Data Protection Commissioner (ODPC) before deployment. Voice enrolment consent must be explicit, documented, and linked to the customer's MoMo account record. Right to erasure must delete the biometric template from all systems within 30 days of request.</div>
+</div>
+<h3>8.2 Voice Authentication Regulatory Requirements</h3>
+<table>
+<thead><tr><th>Market</th><th>Regulator</th><th>Voice Auth Status</th><th>Action Required</th></tr></thead>
+<tbody>
+<tr><td>South Africa</td><td>FSCA / SARB</td><td>Permitted with POPIA consent</td><td>POPIA compliance documentation</td></tr>
+<tr><td>Nigeria</td><td>CBN / NDPC</td><td>Permitted for low-value transactions</td><td>CBN biometric framework alignment</td></tr>
+<tr><td>Kenya</td><td>CBK / ODPC</td><td>DPIA required before deployment</td><td>File DPIA 90 days before launch</td></tr>
+<tr><td>Ghana</td><td>BoG / DPC</td><td>Under review — BoG guidance pending</td><td>Engage BoG proactively in discovery</td></tr>
+<tr><td>Uganda / Rwanda / Zambia</td><td>Local CBs</td><td>No specific prohibition; consultation advised</td><td>Regulatory engagement per OpCo</td></tr>
+</tbody>
+</table>
+<h3>8.3 Audio Data Minimisation</h3>
+<ul>
+<li>Raw audio SHALL be processed ephemerally — audio is destroyed immediately after STT conversion</li>
+<li>STT transcripts retained for maximum 24 hours for QA sampling; purged automatically via TTL</li>
+<li>No audio recordings used for marketing, profiling or any secondary purpose without explicit consent</li>
+<li>Transcripts classified as personal data — subject to all applicable data subject rights</li>
+</ul>
 
-  function init(){
-    buildToolbar();
-    stamp();
-    var had = restore();
-    if(had) msg('Edits loaded');
-  }
+      </section>
+      <section class="doc-section" id="s9">
+        <div class="section-header">
+          <div class="section-num">9</div>
+          <h2 class="section-title">Sprint Plan & Roadmap</h2>
+        </div>
+        
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+<h3>Sprint 1 (Weeks 1–3): Foundation &amp; STT Core</h3>
+<div class="card teal">
+<div class="card-title">Sprint 1 Deliverables</div>
+<div class="card-content">
+<ul>
+<li>Extend UC-18 ARIA STT to support 9 languages (English, French, Swahili, Hausa, Zulu, Amharic, Kinyarwanda, Yoruba, Luganda) with fine-tuned Whisper Large v3</li>
+<li>Language identification model integration (VoxLingua107 fine-tune, 15 languages)</li>
+<li>Voice bridge ingress layer: SIP/RTP handler, end-of-utterance detection, audio pre-processing (noise cancellation)</li>
+<li>UC-25 Intent API adapter — route classified voice intent to existing UC-25 execution pipeline</li>
+<li>IVR DTMF fallback scaffold for 5 core transaction types</li>
+<li>Per-market audio processing deployment on MTN cloud (SA, Nigeria, Ghana as pilots)</li>
+<li>Ephemeral audio processing pipeline with 24h transcript TTL</li>
+</ul>
+</div>
+</div>
+<h3>Sprint 2 (Weeks 4–6): Biometrics, Edge &amp; Remaining Languages</h3>
+<div class="card teal">
+<div class="card-title">Sprint 2 Deliverables</div>
+<div class="card-content">
+<ul>
+<li>Voice biometric enrolment flow: guided prompt sequence, 3-repetition model construction, quality scoring</li>
+<li>Speaker verification service: ECAPA-TDNN embedding, cosine similarity, liveness detection</li>
+<li>Encrypted biometric template store with per-market data residency enforcement</li>
+<li>Edge STT model: quantised Whisper Medium (INT8) for 5-language offline mode</li>
+<li>Offline transaction queue with async MoMo API execution and caller callback</li>
+<li>Remaining 6 languages: Twi/Akan, Igbo, Fulfulde, Xhosa, Dagbani, Chichewa (training data procurement concurrent)</li>
+<li>TTS integration for spoken confirmations per language</li>
+<li>POPIA / NDPR consent capture flow for biometric enrolment</li>
+</ul>
+</div>
+</div>
+<h3>Sprint 3 (Weeks 7–9): Pilot, Compliance &amp; Hardening</h3>
+<div class="card teal">
+<div class="card-title">Sprint 3 Deliverables</div>
+<div class="card-content">
+<ul>
+<li>Pilot deployment: MTN South Africa, Nigeria, Ghana with real caller traffic (5,000 user cohort per market)</li>
+<li>STT accuracy benchmarking per language on production audio samples</li>
+<li>Voice biometric FAR/FRR measurement on enrolled pilot population</li>
+<li>Regulatory filing: DPIA for Kenya; POPIA compliance documentation for SA; CBN alignment for Nigeria</li>
+<li>OpCo admin portal: language pack management, prompt upload, A/B testing configuration</li>
+<li>Load testing: 50,000 concurrent voice calls sustained 30 minutes</li>
+<li>Security red team: replay attack testing, voice spoofing resistance, adversarial STT input</li>
+<li>Full rollout plan for remaining 9 markets with per-market timeline</li>
+</ul>
+</div>
+</div>
+
+      </section>
+      <section class="doc-section" id="s10">
+        <div class="section-header">
+          <div class="section-num">10</div>
+          <h2 class="section-title">Risk Register</h2>
+        </div>
+        
+
+<table>
+<thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr>
+<td><code>R-01</code></td>
+<td>Insufficient training data for low-resource languages (Fulfulde, Dagbani, Chichewa) results in WER &gt;20%</td>
+<td class="priority-high">High</td>
+<td class="priority-high">High</td>
+<td>Begin data collection procurement in Sprint 1. Deploy IVR-only mode for underserved languages until STT quality meets threshold. Commission MTN agent network for data labelling as secondary source.</td>
+</tr>
+<tr>
+<td><code>R-02</code></td>
+<td>Voice biometric FAR exceeds 1% — fraudulent transactions via voice spoofing</td>
+<td class="priority-med">Medium</td>
+<td class="priority-high">Very High</td>
+<td>Liveness detection mandatory. Dual-channel verification for transactions above market-specific threshold (e.g., ZAR 500). Limit voice-auth to &lt;10 transactions per day per MSISDN. Real-time anomaly monitoring via PayGuard.</td>
+</tr>
+<tr>
+<td><code>R-03</code></td>
+<td>Regulatory approval for biometric voice authentication blocked in key markets (Kenya, Ghana)</td>
+<td class="priority-med">Medium</td>
+<td class="priority-high">High</td>
+<td>Launch with DTMF PIN fallback as primary auth in markets pending approval. Biometric enrolment offered as optional enhancement. Engage regulators 6 months before planned launch date.</td>
+</tr>
+<tr>
+<td><code>R-04</code></td>
+<td>Edge STT model latency at base station exceeds 2s target under high concurrent call load</td>
+<td class="priority-med">Medium</td>
+<td class="priority-med">Medium</td>
+<td>Benchmark edge model under realistic concurrency before deployment. Fall back to cloud STT if edge latency budget blown. Scale edge hardware per-market based on call volume projections.</td>
+</tr>
+<tr>
+<td><code>R-05</code></td>
+<td>SIP/RTP integration complexity per OpCo IVR gateway causes significant integration delays</td>
+<td class="priority-high">High</td>
+<td class="priority-med">Medium</td>
+<td>Conduct gateway capability assessment in discovery week. Standardise on Twilio or Vonage media bridge where native SIP integration not feasible. Prototype with 3 pilot OpCos before full rollout.</td>
+</tr>
+<tr>
+<td><code>R-06</code></td>
+<td>Background noise in rural call environments degrades STT accuracy below acceptable threshold</td>
+<td class="priority-high">High</td>
+<td class="priority-med">Medium</td>
+<td>Implement RNNoise or spectral subtraction pre-processing on audio before STT. Collect noisy environment audio samples for model fine-tuning. Prompt callers to move to quieter location if SNR below threshold.</td>
+</tr>
+<tr>
+<td><code>R-07</code></td>
+<td>Customer distrust of voice biometric data collection limits enrolment rates</td>
+<td class="priority-high">High</td>
+<td class="priority-med">Medium</td>
+<td>Make biometric enrolment entirely optional — PIN fallback always available. Invest in clear, culturally appropriate consent communication per market. Agent channel used to explain and demonstrate voice bridge in high-traffic markets.</td>
+</tr>
+</tbody>
+</table>
+
+      </section>
+    </main>
+
+  </div><!-- /doc-layout -->
+
+</div><!-- /doc-shell -->
 
 </body>
 </html>

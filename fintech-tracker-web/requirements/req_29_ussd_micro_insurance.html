@@ -1,357 +1,529 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC-29 USSD AI Micro-Insurance &mdash; Requirements &amp; Planning</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
-        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
-        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
-        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
-        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
-        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
-        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
-        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
-        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
-        .badge-high { background: #7c3aed; color: #fff; }
-        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
-        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
-        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
-        section.teal { border-left-color: #14b8a6; }
-        section.violet { border-left-color: #7c3aed; }
-        section.amber { border-left-color: #f59e0b; }
-        section.red { border-left-color: #dc2626; }
-        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
-        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
-        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
-        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
-        ul li { margin-bottom: 5px; }
-        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
-        .card.teal { border-left-color: #14b8a6; }
-        .card.violet { border-left-color: #7c3aed; }
-        .card.amber { border-left-color: #f59e0b; }
-        .card.red { border-left-color: #dc2626; }
-        .card.green { border-left-color: #34d399; }
-        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
-        .card.teal .card-title { color: #2dd4bf; }
-        .card.violet .card-title { color: #a78bfa; }
-        .card.amber .card-title { color: #f59e0b; }
-        .card.red .card-title { color: #f87171; }
-        .card.green .card-title { color: #34d399; }
-        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
-        thead { background: #1e1b4b; }
-        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
-        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
-        tbody tr:hover { background: #1e293b; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
-        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
-        .metric-card.indigo { border-top-color: #6366f1; }
-        .metric-card.violet { border-top-color: #7c3aed; }
-        .metric-card.amber { border-top-color: #f59e0b; }
-        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
-        .metric-card.indigo .metric-value { color: #818cf8; }
-        .metric-card.violet .metric-value { color: #a78bfa; }
-        .metric-card.amber .metric-value { color: #f59e0b; }
-        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
-        .compare-card.traditional { border-top: 3px solid #dc2626; }
-        .compare-card.ai { border-top: 3px solid #14b8a6; }
-        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
-        .compare-card.traditional .compare-label { color: #f87171; }
-        .compare-card.ai .compare-label { color: #2dd4bf; }
-        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
-        .compare-card.traditional .compare-value { color: #f87171; }
-        .compare-card.ai .compare-value { color: #2dd4bf; }
-        .compare-sub { font-size: 0.85em; color: #64748b; }
-        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
-        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
-        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
-        .owner-role { font-size: 0.85em; color: #7c3aed; }
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
-        .four-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 12px; }
-        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
-        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
-        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
-        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
-        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
-        .us-ac li { margin-bottom: 3px; }
-        .flow-box { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; margin-top: 14px; }
-        .flow-title { font-size: 0.9em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
-        .flow-step { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
-        .flow-num { width: 26px; height: 26px; min-width: 26px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75em; font-weight: 700; color: #fff; line-height: 26px; text-align: center; }
-        .flow-text { font-size: 0.88em; color: #cbd5e1; line-height: 1.5; }
-        .ussd-mock { background: #020617; border: 2px solid #334155; border-radius: 8px; padding: 16px; font-family: 'Courier New', monospace; font-size: 0.88em; color: #34d399; margin: 12px 0; white-space: pre-wrap; line-height: 1.7; }
-        .ussd-mock .prompt { color: #818cf8; }
-        .ussd-mock .system { color: #64748b; }
-        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
-        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
-        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
-        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
-        .priority-high { color: #f87171; font-weight: 700; }
-        .priority-med { color: #fbbf24; font-weight: 700; }
-        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
-        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
-        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
-        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
-        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
-        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
-        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
-        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 120px; }
-        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
-        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
-        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
-        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
-        .arch-layer:last-child .arch-layer-label { color: #64748b; }
-        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin: 12px 0; }
-        .market-pill { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; padding: 8px 10px; text-align: center; font-size: 0.8em; color: #a5b4fc; font-weight: 600; }
-        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
-        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
-        .sprint-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
-        .sprint-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
-        .sprint-label { font-size: 0.78em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #6366f1; margin-bottom: 6px; }
-        .sprint-title { font-size: 1.05em; font-weight: 700; color: #e2e8f0; margin-bottom: 12px; }
-        .sprint-item { font-size: 0.88em; color: #94a3b8; padding: 4px 0; border-bottom: 1px solid #1e293b; }
-        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
-    
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UC-29 USSD AI Micro-Insurance — Requirements & Planning</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface-alt:#F1F5F9;
+  --border:rgba(226,232,240,0.9);--border-strong:#CBD5E1;
+  --text-primary:#0F172A;--text-secondary:#334155;--text-muted:#64748B;
+  --accent:#7C3AED;--accent-d:#6D28D9;--accent-light:#EDE9FE;--accent-border:rgba(124,58,237,0.2);
+  --blue:#2563EB;--blue-light:#DBEAFE;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --r:16px;--rs:10px;
+  --shadow-sm:0 1px 4px rgba(15,23,42,0.06),0 2px 8px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.08),0 2px 6px rgba(15,23,42,0.04);
+}
+html{scroll-behavior:smooth;font-size:15px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── Sticky Header ── */
+.doc-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:58px;
+}
+.hdr-left{display:flex;align-items:center;gap:16px}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:var(--text-muted);
+  text-decoration:none;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--border);transition:all 0.15s;
+}
+.back-link:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-light)}
+.hdr-breadcrumb{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.hdr-sep{color:var(--border-strong)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:all 0.15s;font-family:inherit;
+}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
+.hdr-btn.violet{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hdr-btn.violet:hover{background:var(--accent-d)}
+
+/* ── Shell ── */
+.doc-shell{max-width:1220px;margin:0 auto;padding:0 40px 100px}
+
+/* ── Hero ── */
+.doc-hero{padding:52px 0 32px;max-width:800px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero-title{
+  font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.2px;
+  background:linear-gradient(140deg,#0F172A 0%,#312E81 50%,#7C3AED 90%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:14px;
+}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:22px;max-width:680px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;letter-spacing:0.04em;
+  padding:4px 12px;border-radius:20px;
+}
+.badge-p1{background:#FEE2E2;color:#B91C1C}
+.badge-p2{background:#FEF3C7;color:#92400E}
+.badge-progress{background:#FEF3C7;color:#92400E}
+.badge-in-progress{background:#FEF3C7;color:#92400E}
+.badge-done,.badge-complete,.badge-built{background:#D1FAE5;color:#065F46}
+.badge-platform{background:var(--accent-light);color:var(--accent)}
+.badge-neutral{background:var(--surface-alt);color:var(--text-muted);border:1px solid var(--border)}
+.badge-must{background:#FEE2E2;color:#B91C1C;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-should{background:#FEF3C7;color:#92400E;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-nice{background:#D1FAE5;color:#065F46;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+
+/* ── Meta Strip ── */
+.meta-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;margin-bottom:36px;
+}
+.meta-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;
+  box-shadow:var(--shadow-sm);transition:all 0.2s;
+}
+.meta-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.meta-value{font-size:13px;font-weight:700;color:var(--text-primary)}
+.meta-value.violet{color:var(--accent)}
+
+/* ── Progress Bar ── */
+.progress-section{margin:0 0 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow-sm)}
+.progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.progress-label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.progress-pct{font-size:14px;font-weight:800;color:var(--accent)}
+.progress-track{height:8px;background:var(--surface-alt);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:8px;transition:width 0.6s ease}
+.progress-note{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+/* ── Doc Layout ── */
+.doc-layout{display:grid;grid-template-columns:210px 1fr;gap:36px;align-items:start}
+@media(max-width:900px){.doc-layout{grid-template-columns:1fr}.doc-toc{display:none}}
+
+/* ── ToC ── */
+.doc-toc{position:sticky;top:76px}
+.toc-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.toc-title{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.toc-link{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;text-decoration:none;color:var(--text-secondary);font-size:12px;font-weight:500;transition:all 0.15s;margin-bottom:2px}
+.toc-link:hover{background:var(--accent-light);color:var(--accent)}
+.toc-num{font-size:10px;font-weight:700;color:var(--text-muted);min-width:20px}
+
+/* ── Sections ── */
+.doc-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.section-num{width:30px;height:30px;border-radius:8px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+h2.section-title{font-size:18px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+h3{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-top:24px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+p{color:var(--text-secondary);margin-bottom:13px;line-height:1.75;font-size:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+ul,ol{color:var(--text-secondary);margin:0 0 14px 20px;line-height:1.75;font-size:14px}
+li{margin-bottom:5px}
+li strong{color:var(--text-primary)}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.kpi-card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;text-align:center;transition:all 0.2s}
+.kpi-card:hover{background:var(--accent-light);border-color:var(--accent-border);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-value{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-0.8px;line-height:1;margin-bottom:6px}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);line-height:1.4}
+
+/* ── Callouts ── */
+.info-box,.accent-box,.callout-blue{
+  background:var(--blue-light);border:1px solid rgba(37,99,235,0.18);
+  border-left:3px solid var(--blue);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#1E40AF;line-height:1.65;
+}
+.info-box a,.accent-box a,.callout-blue a{color:var(--blue);font-weight:600;text-decoration:none}
+.warning-box,.callout-red{
+  background:#FFF5F5;border:1px solid rgba(220,38,38,0.18);
+  border-left:3px solid var(--red);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#7F1D1D;line-height:1.65;
+}
+.warning-box ul,.callout-red ul{color:#7F1D1D}
+.callout-violet{
+  background:var(--accent-light);border:1px solid var(--accent-border);
+  border-left:3px solid var(--accent);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#3B0764;line-height:1.65;
+}
+.callout-green{
+  background:var(--green-light);border:1px solid rgba(22,163,74,0.2);
+  border-left:3px solid var(--green);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#14532D;line-height:1.65;
+}
+.callout-amber{
+  background:var(--amber-light);border:1px solid rgba(217,119,6,0.2);
+  border-left:3px solid var(--amber);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#78350F;line-height:1.65;
+}
+
+/* ── Cards / Items ── */
+.card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;margin-bottom:10px;transition:all 0.15s}
+.card:hover{border-color:var(--accent-border);background:var(--surface)}
+.card-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:7px}
+.card-content{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Requirements ── */
+.requirement{border-left:3px solid var(--border-strong);padding:10px 14px;margin-bottom:8px;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface-alt)}
+.requirement:hover{border-left-color:var(--accent)}
+.req-body{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Tables ── */
+table,.doc-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}
+th{background:var(--surface-alt);border:1px solid var(--border);padding:10px 14px;font-weight:700;color:var(--text-primary);text-align:left;font-size:11px;letter-spacing:0.05em;text-transform:uppercase}
+td{border:1px solid var(--border);padding:10px 14px;color:var(--text-secondary);vertical-align:top;line-height:1.6}
+tr:hover td{background:var(--surface-alt)}
+
+/* ── User Stories ── */
+.story{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;margin-bottom:12px}
+.story-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.story-text{font-size:13.5px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px}
+.story-ac{font-size:12.5px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--surface);border-radius:7px;border:1px solid var(--border)}
+
+/* ── Dependencies ── */
+.dep-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dep-item:last-child{border-bottom:none}
+.dep-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--surface-alt);border:1px solid var(--border)}
+.dep-body{flex:1}
+.dep-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.dep-desc{font-size:12.5px;color:var(--text-muted)}
+
+/* ── Print ── */
+@media print{.doc-header,.doc-toc{display:none!important}.doc-layout{grid-template-columns:1fr}.doc-section{break-inside:avoid}}
+@media(max-width:768px){.doc-shell{padding:0 16px 60px}.doc-hero{padding:32px 0 20px}.doc-section{padding:22px 18px}}
+
+  </style>
 </head>
 <body>
-<a href="../index.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
-<div class="container">
-<header>
-    <div>
-        <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 29</div>
-        <h1>USSD AI Micro-Insurance</h1>
-        <div class="subtitle">Parametric and behavioural micro-insurance enrolled, managed, and claimed entirely over USSD &mdash; policies from as little as R5/month covering crop loss, hospitalisation, device damage, and funeral cover &mdash; instant claim payment via MoMo wallet, no paperwork, FSCA regulated, targeting 200M+ uninsured across 13 African markets</div>
-        <div>
-            <span class="badge badge-not-started">Not Started &mdash; 0%</span>
-            <span class="badge badge-high">Priority: P2</span>
-            <span class="badge badge-high">Tier: High</span>
-            <span class="badge badge-new">Driver: Revenue Growth &amp; Financial Inclusion</span>
-        </div>
-        <div style="margin-top:10px;">
-            <span class="badge badge-compliance">POPIA</span>
-            <span class="badge badge-compliance">FSCA</span>
-            <span class="badge badge-compliance">IAIS</span>
-            <span class="badge badge-teal">200M+ Addressable Market</span>
-            <span class="badge badge-teal">R5/month Min Premium</span>
-            <span class="badge badge-teal">Instant MoMo Payout</span>
-            <span class="badge badge-teal">4 Product Types</span>
-        </div>
+
+<!-- ── Sticky Header ── -->
+<header class="doc-header">
+  <div class="hdr-left">
+    <a href="/index.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+      Back to Tracker
+    </a>
+    <div class="hdr-breadcrumb">
+      <span style="color:var(--text-muted)">UC-29</span>
+      <span class="hdr-sep">/</span>
+      <b>Requirements &amp; User Stories</b>
     </div>
-    <div class="header-grid">
-        <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-29</div></div>
-        <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
-        <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
-        <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">Not Started</div></div>
-        <div class="meta-item"><div class="meta-label">Owner</div><div class="meta-value">Malcolm Govender</div></div>
-        <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P2</div></div>
-        <div class="meta-item"><div class="meta-label">Min Premium</div><div class="meta-value">R5/month</div></div>
-        <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">200M+ Addressable</div></div>
-    </div>
-    <div class="owner-highlight">
-        <div class="owner-avatar">MG</div>
-        <div>
-            <div class="owner-name-text">Malcolm Govender</div>
-            <div class="owner-role">Head of AI &amp; Engineering &middot; Product Owner &amp; Document Author</div>
-        </div>
-    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="window.print()">🖨 Print</button>
+  </div>
 </header>
 
-<section>
-    <h2>1. Executive Summary &amp; Business Case</h2>
-    <p>Africa has the world&apos;s lowest insurance penetration rate: less than 3% of the population holds any form of formal insurance cover, compared to 50&ndash;80% in developed markets. The reasons are systemic: traditional insurance products require face-to-face sales agents, complex paper forms, bank accounts for premium payments, and lengthy claims processes. For the 200+ million MTN customers across 13 markets who live below the middle-income threshold, these barriers are insurmountable. Yet these are precisely the people most exposed to financial shocks from illness, crop failure, device loss, and death in the family.</p>
-    <p>UC-29 delivers parametric and behavioural micro-insurance that can be enrolled, managed, and claimed entirely over USSD on any feature phone, with premiums as low as R5 per month collected via MoMo wallet and claims paid instantly to the MoMo wallet when a parametric trigger fires or a covered event is verified. No paperwork. No branch visit. No medical examination. No bank account required. Four product types cover the highest-impact risks: <strong style="color:#818cf8;">Crop Insurance</strong> (parametric weather triggers), <strong style="color:#818cf8;">Hospitalisation Cover</strong> (daily cash benefit), <strong style="color:#818cf8;">Device Insurance</strong> (phone theft/damage), and <strong style="color:#818cf8;">Funeral Cover</strong> (lump-sum payout).</p>
-    <p>The commercial model is a partnership with licensed insurance underwriters per market, with MTN acting as the distribution and administration platform earning 15&ndash;20% commission on premiums. At 5 million policyholders paying an average R25/month, the gross premium volume reaches R1.5 billion per year, generating <strong style="color:#818cf8;">R225&ndash;R300 million annual commission</strong> for MTN with near-zero marginal cost of adding new policyholders.</p>
-    <div class="metrics-grid">
-        <div class="metric-card"><div class="metric-value">200M+</div><div class="metric-label">Uninsured Addressable Market</div></div>
-        <div class="metric-card indigo"><div class="metric-value">R5</div><div class="metric-label">Minimum Monthly Premium</div></div>
-        <div class="metric-card violet"><div class="metric-value">4</div><div class="metric-label">Product Types Phase 1</div></div>
-        <div class="metric-card amber"><div class="metric-value">R300M</div><div class="metric-label">Target Annual Commission Revenue</div></div>
+<!-- ── Page Shell ── -->
+<div class="doc-shell">
+
+  <!-- ── Hero ── -->
+  <div class="doc-hero">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      AI Programme · UC-29
     </div>
-    <div class="comparison-box" style="margin-top:20px;">
-        <div class="compare-card traditional">
-            <div class="compare-label">Traditional Insurance</div>
-            <div class="compare-value">R200+/mo</div>
-            <div class="compare-sub">Agent required, paper forms, bank account needed, medical exam for life cover, weeks to pay claim, 97% of MTN customers effectively excluded from access</div>
+    <h1 class="hero-title">USSD AI Micro-Insurance</h1>
+    <p class="hero-subtitle"></p>
+    <div class="hero-badges">
+      <span class="badge badge-in-progress">Not Started — 0%</span>
+      <span class="badge badge-p2">Priority: P2</span>
+      <span class="badge badge-neutral">Tier: High</span>
+      <span class="badge badge-neutral">Driver: Revenue Growth & Financial Inclusion</span>
+      <span class="badge badge-neutral">POPIA</span>
+      <span class="badge badge-neutral">FSCA</span>
+      <span class="badge badge-neutral">IAIS</span>
+      <span class="badge badge-neutral">200M+ Addressable Market</span>
+      <span class="badge badge-neutral">R5/month Min Premium</span>
+      <span class="badge badge-neutral">Instant MoMo Payout</span>
+      <span class="badge badge-neutral">4 Product Types</span>
+    </div>
+  </div>
+
+  <!-- ── Metadata Strip ── -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-label">Use Case ID</div>
+      <div class="meta-value ">UC-29</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Owner</div>
+      <div class="meta-value ">Malcolm Govender</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Version</div>
+      <div class="meta-value ">v1.0</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Document Date</div>
+      <div class="meta-value ">May 2026</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Status</div>
+      <div class="meta-value ">Not Started</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Priority</div>
+      <div class="meta-value">P2</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Min Premium</div>
+      <div class="meta-value">R5/month</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Business Value</div>
+      <div class="meta-value">200M+ Addressable</div>
+    </div>
+  </div>
+
+  
+
+  <!-- ── Document Layout ── -->
+  <div class="doc-layout">
+
+    <!-- ToC -->
+    <aside class="doc-toc">
+      <div class="toc-inner">
+        <div class="toc-title">Contents</div>
+        <a href="#s1" class="toc-link"><span class="toc-num">01</span>Executive Summary & Business Case</a>
+        <a href="#s2" class="toc-link"><span class="toc-num">02</span>Problem Statement</a>
+        <a href="#s3" class="toc-link"><span class="toc-num">03</span>Objectives & Success Metrics</a>
+        <a href="#s4" class="toc-link"><span class="toc-num">04</span>User Stories</a>
+        <a href="#s5" class="toc-link"><span class="toc-num">05</span>Functional Requirements</a>
+        <a href="#s6" class="toc-link"><span class="toc-num">06</span>Technical Architecture</a>
+        <a href="#s7" class="toc-link"><span class="toc-num">07</span>Data & AI Model Requirements</a>
+        <a href="#s8" class="toc-link"><span class="toc-num">08</span>Compliance & Regulatory</a>
+        <a href="#s9" class="toc-link"><span class="toc-num">09</span>Sprint Plan & Roadmap</a>
+        <a href="#s10" class="toc-link"><span class="toc-num">10</span>Risk Register</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="doc-content">
+      <section class="doc-section" id="s1">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2 class="section-title">Executive Summary & Business Case</h2>
         </div>
-        <div class="compare-card ai">
-            <div class="compare-label">USSD AI Micro-Insurance (UC-29)</div>
-            <div class="compare-value">R5/mo</div>
-            <div class="compare-sub">USSD enrolment in 3 minutes, MoMo premium auto-deduction, parametric instant claim, no paperwork, no agent needed, payout to MoMo wallet within 24 hours, 200M+ eligible customers</div>
+        
+
+<p>Africa has the world's lowest insurance penetration rate: less than 3% of the population holds any form of formal insurance cover, compared to 50–80% in developed markets. The reasons are systemic: traditional insurance products require face-to-face sales agents, complex paper forms, bank accounts for premium payments, and lengthy claims processes. For the 200+ million MTN customers across 13 markets who live below the middle-income threshold, these barriers are insurmountable. Yet these are precisely the people most exposed to financial shocks from illness, crop failure, device loss, and death in the family.</p>
+<p>UC-29 delivers parametric and behavioural micro-insurance that can be enrolled, managed, and claimed entirely over USSD on any feature phone, with premiums as low as R5 per month collected via MoMo wallet and claims paid instantly to the MoMo wallet when a parametric trigger fires or a covered event is verified. No paperwork. No branch visit. No medical examination. No bank account required. Four product types cover the highest-impact risks: <strong style="color:#818cf8;">Crop Insurance</strong> (parametric weather triggers), <strong style="color:#818cf8;">Hospitalisation Cover</strong> (daily cash benefit), <strong style="color:#818cf8;">Device Insurance</strong> (phone theft/damage), and <strong style="color:#818cf8;">Funeral Cover</strong> (lump-sum payout).</p>
+<p>The commercial model is a partnership with licensed insurance underwriters per market, with MTN acting as the distribution and administration platform earning 15–20% commission on premiums. At 5 million policyholders paying an average R25/month, the gross premium volume reaches R1.5 billion per year, generating <strong style="color:#818cf8;">R225–R300 million annual commission</strong> for MTN with near-zero marginal cost of adding new policyholders.</p>
+<div class="metrics-grid">
+<div class="metric-card"><div class="metric-value">200M+</div><div class="metric-label">Uninsured Addressable Market</div></div>
+<div class="metric-card indigo"><div class="metric-value">R5</div><div class="metric-label">Minimum Monthly Premium</div></div>
+<div class="metric-card violet"><div class="metric-value">4</div><div class="metric-label">Product Types Phase 1</div></div>
+<div class="metric-card amber"><div class="metric-value">R300M</div><div class="metric-label">Target Annual Commission Revenue</div></div>
+</div>
+<div class="comparison-box" style="margin-top:20px;">
+<div class="compare-card traditional">
+<div class="compare-label">Traditional Insurance</div>
+<div class="compare-value">R200+/mo</div>
+<div class="compare-sub">Agent required, paper forms, bank account needed, medical exam for life cover, weeks to pay claim, 97% of MTN customers effectively excluded from access</div>
+</div>
+<div class="compare-card ai">
+<div class="compare-label">USSD AI Micro-Insurance (UC-29)</div>
+<div class="compare-value">R5/mo</div>
+<div class="compare-sub">USSD enrolment in 3 minutes, MoMo premium auto-deduction, parametric instant claim, no paperwork, no agent needed, payout to MoMo wallet within 24 hours, 200M+ eligible customers</div>
+</div>
+</div>
+
+      </section>
+      <section class="doc-section" id="s2">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <h2 class="section-title">Problem Statement</h2>
         </div>
-    </div>
-</section>
+        
 
-<section class="violet">
-    <h2>2. Problem Statement</h2>
-    <div class="card violet">
-        <div class="card-title">Problem 1 &mdash; Financial Shocks Wipe Out Years of Savings in a Single Event</div>
-        <div class="card-content">Across MTN&apos;s markets, the most common cause of households falling into poverty is a single uninsured shock: a death in the family requiring funeral costs of R3,000&ndash;R15,000, a hospitalisation costing R1,500&ndash;R10,000 out-of-pocket, or a crop failure destroying an entire season&apos;s income. Without insurance, families sell assets, borrow at predatory rates, or rely on community fundraising. Micro-insurance at R5&ndash;R50/month can break this cycle completely for any individual risk category.</div>
-    </div>
-    <div class="card violet">
-        <div class="card-title">Problem 2 &mdash; Traditional Insurance Distribution Is Structurally Inaccessible</div>
-        <div class="card-content">Insurance companies in Africa distribute through tied agents earning commission, requiring minimum policy sizes to make economics viable. A R5/month crop insurance policy cannot support a commission-earning agent visit. The result is a market failure: customers most in need of insurance cannot access it. MTN&apos;s USSD network eliminates distribution cost entirely &mdash; USSD enrolment costs cents per policy vs hundreds of rands per agent-sold policy, making micro-premiums commercially viable.</div>
-    </div>
-    <div class="card violet">
-        <div class="card-title">Problem 3 &mdash; Claims Processes Are Opaque and Slow, Destroying Customer Trust</div>
-        <div class="card-content">Even when lower-income Africans obtain insurance, claims processes are frequently so opaque, slow, and document-intensive that many valid claims are never paid. Claims repudiation rates in South African micro-insurance products have been reported at 30&ndash;40% &mdash; disproportionately affecting lower-income claimants lacking documentation. Parametric insurance eliminates this entirely: when the trigger fires (rainfall below threshold, confirmed hospitalisation), the claim pays automatically without the customer filing anything.</div>
-    </div>
-</section>
+<div class="card violet">
+<div class="card-title">Problem 1 — Financial Shocks Wipe Out Years of Savings in a Single Event</div>
+<div class="card-content">Across MTN's markets, the most common cause of households falling into poverty is a single uninsured shock: a death in the family requiring funeral costs of R3,000–R15,000, a hospitalisation costing R1,500–R10,000 out-of-pocket, or a crop failure destroying an entire season's income. Without insurance, families sell assets, borrow at predatory rates, or rely on community fundraising. Micro-insurance at R5–R50/month can break this cycle completely for any individual risk category.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Problem 2 — Traditional Insurance Distribution Is Structurally Inaccessible</div>
+<div class="card-content">Insurance companies in Africa distribute through tied agents earning commission, requiring minimum policy sizes to make economics viable. A R5/month crop insurance policy cannot support a commission-earning agent visit. The result is a market failure: customers most in need of insurance cannot access it. MTN's USSD network eliminates distribution cost entirely — USSD enrolment costs cents per policy vs hundreds of rands per agent-sold policy, making micro-premiums commercially viable.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Problem 3 — Claims Processes Are Opaque and Slow, Destroying Customer Trust</div>
+<div class="card-content">Even when lower-income Africans obtain insurance, claims processes are frequently so opaque, slow, and document-intensive that many valid claims are never paid. Claims repudiation rates in South African micro-insurance products have been reported at 30–40% — disproportionately affecting lower-income claimants lacking documentation. Parametric insurance eliminates this entirely: when the trigger fires (rainfall below threshold, confirmed hospitalisation), the claim pays automatically without the customer filing anything.</div>
+</div>
 
-<section class="teal">
-    <h2>3. Objectives &amp; Success Metrics</h2>
-    <div class="metrics-grid">
-        <div class="metric-card"><div class="metric-value">1M</div><div class="metric-label">Target Policyholders Year 1</div></div>
-        <div class="metric-card indigo"><div class="metric-value">&lt;24h</div><div class="metric-label">Target Claim Payment Time</div></div>
-        <div class="metric-card violet"><div class="metric-value">97%</div><div class="metric-label">Premium Collection Rate Target</div></div>
-        <div class="metric-card amber"><div class="metric-value">5</div><div class="metric-label">Markets Live by Month 12</div></div>
-    </div>
-    <table style="margin-top:20px;">
-        <thead><tr><th>KPI</th><th>Target (6 Mo)</th><th>Target (12 Mo)</th><th>Measurement</th></tr></thead>
-        <tbody>
-            <tr><td>Active Policyholders</td><td class="priority-med">100,000</td><td class="priority-high">1,000,000</td><td>Insurance policy management system</td></tr>
-            <tr><td>Enrolment Completion Rate</td><td class="priority-high">&ge;80%</td><td class="priority-high">&ge;85%</td><td>USSD session completion logs</td></tr>
-            <tr><td>Premium Collection Rate (MoMo)</td><td class="priority-high">&ge;97%</td><td class="priority-high">&ge;99%</td><td>MoMo payment logs</td></tr>
-            <tr><td>Parametric Claim Payment Time</td><td class="priority-high">&lt;24h</td><td class="priority-high">&lt;4h</td><td>Claim event to MoMo credit timestamp</td></tr>
-            <tr><td>Claims Repudiation Rate</td><td class="priority-high">&lt;5%</td><td class="priority-high">&lt;3%</td><td>Claims management system</td></tr>
-            <tr><td>Policy Lapse Rate (annual)</td><td class="priority-med">&lt;20%</td><td class="priority-high">&lt;15%</td><td>Policy management system</td></tr>
-            <tr><td>Gross Premium Volume (monthly)</td><td class="priority-med">R2.5M</td><td class="priority-high">R25M</td><td>Financial reporting</td></tr>
-            <tr><td>Markets Live</td><td class="priority-med">2 (SA, Ghana)</td><td class="priority-high">5</td><td>Deployment tracker</td></tr>
-        </tbody>
-    </table>
-</section>
-
-<section>
-    <h2>4. User Stories</h2>
-    <div class="two-col">
-        <div>
-            <div class="us-card">
-                <div class="us-id">US-01 &middot; Funeral Cover Enrolment</div>
-                <div class="us-title">Customer Enrolls in R5/Month Funeral Cover via USSD</div>
-                <div class="us-story">&ldquo;As a low-income MoMo customer, I want to get funeral cover for my family for R5 per month via USSD with no paperwork or agent visit required.&rdquo;</div>
-                <div class="us-ac-label">Acceptance Criteria</div>
-                <ul class="us-ac">
-                    <li>Enrolment completes in &le;5 USSD interactions from dial to policy issued</li>
-                    <li>Customer selects cover amount and enters beneficiary MSISDN</li>
-                    <li>First premium deducted from MoMo wallet at enrolment</li>
-                    <li>Policy number and cover summary sent via SMS within 60 seconds</li>
-                </ul>
-            </div>
-            <div class="us-card">
-                <div class="us-id">US-02 &middot; Parametric Crop Insurance Claim</div>
-                <div class="us-title">Automatic Payout on Rainfall Trigger</div>
-                <div class="us-story">&ldquo;As a farmer with crop insurance, I want my claim to be paid automatically when rainfall falls below the insured threshold, without filing any paperwork.&rdquo;</div>
-                <div class="us-ac-label">Acceptance Criteria</div>
-                <ul class="us-ac">
-                    <li>Rainfall data checked daily from weather API for insured district</li>
-                    <li>When trigger fires: claim created automatically, no customer action needed</li>
-                    <li>MoMo payout credited within 24 hours of trigger date</li>
-                    <li>SMS: &ldquo;Your crop insurance paid R[amount] to your MoMo. Ref: CLM-12345.&rdquo;</li>
-                </ul>
-            </div>
-            <div class="us-card">
-                <div class="us-id">US-03 &middot; Hospitalisation Cash Benefit</div>
-                <div class="us-title">Daily Cash Benefit Triggered on Hospital Admission</div>
-                <div class="us-story">&ldquo;As a hospitalised MoMo customer, I want to claim a daily cash benefit by simply reporting my admission via USSD from any phone.&rdquo;</div>
-                <div class="us-ac-label">Acceptance Criteria</div>
-                <ul class="us-ac">
-                    <li>Customer dials USSD, selects &ldquo;Report hospitalisation&rdquo;</li>
-                    <li>Enters hospital name and admission date</li>
-                    <li>Claim sent to underwriter for verification within 2 hours</li>
-                    <li>Daily benefit paid to MoMo from day 2 of admission, up to 30 days</li>
-                </ul>
-            </div>
-            <div class="us-card">
-                <div class="us-id">US-04 &middot; Policy Management</div>
-                <div class="us-title">Customer Views and Manages All Active Policies</div>
-                <div class="us-story">&ldquo;As a policyholder with multiple cover types, I want to see all my active policies and premiums in one USSD screen.&rdquo;</div>
-                <div class="us-ac-label">Acceptance Criteria</div>
-                <ul class="us-ac">
-                    <li>All active policies listed: type, cover amount, premium, renewal date</li>
-                    <li>Option to cancel any policy from the USSD menu</li>
-                    <li>Cancellation takes effect end of current month</li>
-                    <li>Beneficiary update available via USSD for funeral cover</li>
-                </ul>
-            </div>
+      </section>
+      <section class="doc-section" id="s3">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <h2 class="section-title">Objectives & Success Metrics</h2>
         </div>
-        <div>
-            <div class="us-card">
-                <div class="us-id">US-05 &middot; Device Insurance Claim</div>
-                <div class="us-title">Report Phone Theft or Damage from Borrowed Phone</div>
-                <div class="us-story">&ldquo;As a device insurance policyholder whose phone was stolen, I want to report the claim from a borrowed phone using my MSISDN and PIN.&rdquo;</div>
-                <div class="us-ac-label">Acceptance Criteria</div>
-                <ul class="us-ac">
-                    <li>Claim reported via USSD from any phone using MSISDN + PIN authentication</li>
-                    <li>Police case number entered for theft claims (within 10 days)</li>
-                    <li>Claim assessed by underwriter within 48 hours</li>
-                    <li>Approved: device replacement voucher or MoMo equivalent within 72 hours</li>
-                </ul>
-            </div>
-            <div class="us-card">
-                <div class="us-id">US-06 &middot; Premium Lapse Warning</div>
-                <div class="us-title">Customer Warned Before Policy Lapses</div>
-                <div class="us-story">&ldquo;As a policyholder with a low MoMo balance, I want an SMS warning 3 days before my premium deduction so I can top up in time.&rdquo;</div>
-                <div class="us-ac-label">Acceptance Criteria</div>
-                <ul class="us-ac">
-                    <li>Balance checked 3 days before each premium due date</li>
-                    <li>SMS warning sent if balance insufficient for premium</li>
-                    <li>5-day grace period before policy lapses</li>
-                    <li>4 retry attempts for premium deduction over the grace period</li>
-                </ul>
-            </div>
-            <div class="us-card">
-                <div class="us-id">US-07 &middot; FSCA Disclosure at Enrolment</div>
-                <div class="us-title">Mandatory Product Disclosure Before First Premium</div>
-                <div class="us-story">&ldquo;As a regulator, I want every new policyholder to see the key policy terms and exclusions before their first premium is deducted.&rdquo;</div>
-                <div class="us-ac-label">Acceptance Criteria</div>
-                <ul class="us-ac">
-                    <li>Key terms screen: cover amount, exclusions, premium, claim process</li>
-                    <li>Customer presses 1 to accept or 2 to decline &mdash; no policy issued without acceptance</li>
-                    <li>Acceptance decision and timestamp stored immutably</li>
-                    <li>Full policy wording sent via SMS URL within 60 seconds of acceptance</li>
-                </ul>
-            </div>
-            <div class="us-card">
-                <div class="us-id">US-08 &middot; Underwriter Partnership View</div>
-                <div class="us-title">Insurance Partner Monitors Portfolio via Dashboard</div>
-                <div class="us-story">&ldquo;As an insurance underwriter partner, I want a real-time dashboard showing active policies, claims triggered, and loss ratio per product type.&rdquo;</div>
-                <div class="us-ac-label">Acceptance Criteria</div>
-                <ul class="us-ac">
-                    <li>Underwriter dashboard shows: active policies, premium volume, claims triggered, loss ratio</li>
-                    <li>Segmented by product type, market, and time period</li>
-                    <li>Data refreshed at minimum hourly</li>
-                    <li>Claim approval / rejection workflow integrated into dashboard</li>
-                </ul>
-            </div>
+        
+
+<div class="metrics-grid">
+<div class="metric-card"><div class="metric-value">1M</div><div class="metric-label">Target Policyholders Year 1</div></div>
+<div class="metric-card indigo"><div class="metric-value">&lt;24h</div><div class="metric-label">Target Claim Payment Time</div></div>
+<div class="metric-card violet"><div class="metric-value">97%</div><div class="metric-label">Premium Collection Rate Target</div></div>
+<div class="metric-card amber"><div class="metric-value">5</div><div class="metric-label">Markets Live by Month 12</div></div>
+</div>
+<table style="margin-top:20px;">
+<thead><tr><th>KPI</th><th>Target (6 Mo)</th><th>Target (12 Mo)</th><th>Measurement</th></tr></thead>
+<tbody>
+<tr><td>Active Policyholders</td><td class="priority-med">100,000</td><td class="priority-high">1,000,000</td><td>Insurance policy management system</td></tr>
+<tr><td>Enrolment Completion Rate</td><td class="priority-high">≥80%</td><td class="priority-high">≥85%</td><td>USSD session completion logs</td></tr>
+<tr><td>Premium Collection Rate (MoMo)</td><td class="priority-high">≥97%</td><td class="priority-high">≥99%</td><td>MoMo payment logs</td></tr>
+<tr><td>Parametric Claim Payment Time</td><td class="priority-high">&lt;24h</td><td class="priority-high">&lt;4h</td><td>Claim event to MoMo credit timestamp</td></tr>
+<tr><td>Claims Repudiation Rate</td><td class="priority-high">&lt;5%</td><td class="priority-high">&lt;3%</td><td>Claims management system</td></tr>
+<tr><td>Policy Lapse Rate (annual)</td><td class="priority-med">&lt;20%</td><td class="priority-high">&lt;15%</td><td>Policy management system</td></tr>
+<tr><td>Gross Premium Volume (monthly)</td><td class="priority-med">R2.5M</td><td class="priority-high">R25M</td><td>Financial reporting</td></tr>
+<tr><td>Markets Live</td><td class="priority-med">2 (SA, Ghana)</td><td class="priority-high">5</td><td>Deployment tracker</td></tr>
+</tbody>
+</table>
+
+      </section>
+      <section class="doc-section" id="s4">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <h2 class="section-title">User Stories</h2>
         </div>
-    </div>
-</section>
+        
 
-<section>
-    <h2>5. Functional Requirements</h2>
-    <h3>5.1 Product Catalogue &amp; Parametric Triggers</h3>
-    <table>
-        <thead><tr><th>Product</th><th>Cover</th><th>Premium Range</th><th>Trigger / Claim Mechanism</th><th>Payout SLA</th></tr></thead>
-        <tbody>
-            <tr><td><strong style="color:#2dd4bf;">Crop Insurance</strong></td><td>Crop loss (drought/flood)</td><td>R5&ndash;R50/mo</td><td>Parametric: rainfall &lt;/&gt; threshold at district weather station, checked daily</td><td>&lt;24h to MoMo</td></tr>
-            <tr><td><strong style="color:#2dd4bf;">Hospitalisation Cover</strong></td><td>Daily cash R50&ndash;R200/day</td><td>R20&ndash;R80/mo</td><td>Behavioural: customer reports via USSD; underwriter verifies within 48h</td><td>Daily MoMo from day 2, max 30 days</td></tr>
-            <tr><td><strong style="color:#2dd4bf;">Device Insurance</strong></td><td>Phone theft or damage</td><td>R15&ndash;R60/mo</td><td>Claim via USSD + police case (theft) or photo (damage); underwriter assesses</td><td>&lt;72h device voucher/cash</td></tr>
-            <tr><td><strong style="color:#2dd4bf;">Funeral Cover</strong></td><td>R5k&ndash;R30k lump sum</td><td>R5&ndash;R80/mo</td><td>Death certificate + beneficiary-initiated claim; underwriter assessment</td><td>&lt;48h to beneficiary MoMo</td></tr>
-        </tbody>
-    </table>
+<div class="two-col">
+<div>
+<div class="us-card">
+<div class="us-id">US-01 · Funeral Cover Enrolment</div>
+<div class="us-title">Customer Enrolls in R5/Month Funeral Cover via USSD</div>
+<div class="us-story">“As a low-income MoMo customer, I want to get funeral cover for my family for R5 per month via USSD with no paperwork or agent visit required.”</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Enrolment completes in ≤5 USSD interactions from dial to policy issued</li>
+<li>Customer selects cover amount and enters beneficiary MSISDN</li>
+<li>First premium deducted from MoMo wallet at enrolment</li>
+<li>Policy number and cover summary sent via SMS within 60 seconds</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-02 · Parametric Crop Insurance Claim</div>
+<div class="us-title">Automatic Payout on Rainfall Trigger</div>
+<div class="us-story">“As a farmer with crop insurance, I want my claim to be paid automatically when rainfall falls below the insured threshold, without filing any paperwork.”</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Rainfall data checked daily from weather API for insured district</li>
+<li>When trigger fires: claim created automatically, no customer action needed</li>
+<li>MoMo payout credited within 24 hours of trigger date</li>
+<li>SMS: “Your crop insurance paid R[amount] to your MoMo. Ref: CLM-12345.”</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-03 · Hospitalisation Cash Benefit</div>
+<div class="us-title">Daily Cash Benefit Triggered on Hospital Admission</div>
+<div class="us-story">“As a hospitalised MoMo customer, I want to claim a daily cash benefit by simply reporting my admission via USSD from any phone.”</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Customer dials USSD, selects “Report hospitalisation”</li>
+<li>Enters hospital name and admission date</li>
+<li>Claim sent to underwriter for verification within 2 hours</li>
+<li>Daily benefit paid to MoMo from day 2 of admission, up to 30 days</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-04 · Policy Management</div>
+<div class="us-title">Customer Views and Manages All Active Policies</div>
+<div class="us-story">“As a policyholder with multiple cover types, I want to see all my active policies and premiums in one USSD screen.”</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>All active policies listed: type, cover amount, premium, renewal date</li>
+<li>Option to cancel any policy from the USSD menu</li>
+<li>Cancellation takes effect end of current month</li>
+<li>Beneficiary update available via USSD for funeral cover</li>
+</ul>
+</div>
+</div>
+<div>
+<div class="us-card">
+<div class="us-id">US-05 · Device Insurance Claim</div>
+<div class="us-title">Report Phone Theft or Damage from Borrowed Phone</div>
+<div class="us-story">“As a device insurance policyholder whose phone was stolen, I want to report the claim from a borrowed phone using my MSISDN and PIN.”</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Claim reported via USSD from any phone using MSISDN + PIN authentication</li>
+<li>Police case number entered for theft claims (within 10 days)</li>
+<li>Claim assessed by underwriter within 48 hours</li>
+<li>Approved: device replacement voucher or MoMo equivalent within 72 hours</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-06 · Premium Lapse Warning</div>
+<div class="us-title">Customer Warned Before Policy Lapses</div>
+<div class="us-story">“As a policyholder with a low MoMo balance, I want an SMS warning 3 days before my premium deduction so I can top up in time.”</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Balance checked 3 days before each premium due date</li>
+<li>SMS warning sent if balance insufficient for premium</li>
+<li>5-day grace period before policy lapses</li>
+<li>4 retry attempts for premium deduction over the grace period</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-07 · FSCA Disclosure at Enrolment</div>
+<div class="us-title">Mandatory Product Disclosure Before First Premium</div>
+<div class="us-story">“As a regulator, I want every new policyholder to see the key policy terms and exclusions before their first premium is deducted.”</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Key terms screen: cover amount, exclusions, premium, claim process</li>
+<li>Customer presses 1 to accept or 2 to decline — no policy issued without acceptance</li>
+<li>Acceptance decision and timestamp stored immutably</li>
+<li>Full policy wording sent via SMS URL within 60 seconds of acceptance</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-08 · Underwriter Partnership View</div>
+<div class="us-title">Insurance Partner Monitors Portfolio via Dashboard</div>
+<div class="us-story">“As an insurance underwriter partner, I want a real-time dashboard showing active policies, claims triggered, and loss ratio per product type.”</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Underwriter dashboard shows: active policies, premium volume, claims triggered, loss ratio</li>
+<li>Segmented by product type, market, and time period</li>
+<li>Data refreshed at minimum hourly</li>
+<li>Claim approval / rejection workflow integrated into dashboard</li>
+</ul>
+</div>
+</div>
+</div>
 
-    <h3>5.2 USSD Enrolment Flow</h3>
-    <div class="ussd-mock">Customer dials *189#
+      </section>
+      <section class="doc-section" id="s5">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <h2 class="section-title">Functional Requirements</h2>
+        </div>
+        
+
+<h3>5.1 Product Catalogue &amp; Parametric Triggers</h3>
+<table>
+<thead><tr><th>Product</th><th>Cover</th><th>Premium Range</th><th>Trigger / Claim Mechanism</th><th>Payout SLA</th></tr></thead>
+<tbody>
+<tr><td><strong style="color:#2dd4bf;">Crop Insurance</strong></td><td>Crop loss (drought/flood)</td><td>R5–R50/mo</td><td>Parametric: rainfall &lt;/&gt; threshold at district weather station, checked daily</td><td>&lt;24h to MoMo</td></tr>
+<tr><td><strong style="color:#2dd4bf;">Hospitalisation Cover</strong></td><td>Daily cash R50–R200/day</td><td>R20–R80/mo</td><td>Behavioural: customer reports via USSD; underwriter verifies within 48h</td><td>Daily MoMo from day 2, max 30 days</td></tr>
+<tr><td><strong style="color:#2dd4bf;">Device Insurance</strong></td><td>Phone theft or damage</td><td>R15–R60/mo</td><td>Claim via USSD + police case (theft) or photo (damage); underwriter assesses</td><td>&lt;72h device voucher/cash</td></tr>
+<tr><td><strong style="color:#2dd4bf;">Funeral Cover</strong></td><td>R5k–R30k lump sum</td><td>R5–R80/mo</td><td>Death certificate + beneficiary-initiated claim; underwriter assessment</td><td>&lt;48h to beneficiary MoMo</td></tr>
+</tbody>
+</table>
+<h3>5.2 USSD Enrolment Flow</h3>
+<div class="ussd-mock">Customer dials *189#
 
 MTN Insurance: Welcome to MTN Micro-Cover.
 1. Funeral Cover (from R5/mo)
@@ -387,342 +559,178 @@ MTN Insurance: Policy issued! Ref:POL-2026-881234.
 R10k Funeral Cover active.
 Next premium: 10/06/26 from MoMo.
 Full terms sent by SMS.</div>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-01</code></td><td>The system SHALL support enrolment for all 4 product types via USSD in ≤5 customer interactions from first menu to policy issued. Each USSD response SHALL be ≤160 characters.</td><td><span class="tag tag-must">MUST</span></td><td>USSD protocol constraint</td></tr>
+<tr><td><code>FR-02</code></td><td>A mandatory disclosure screen SHALL be shown before the first premium deduction, displaying: cover amount, key exclusions (1–2 max per screen), monthly premium, and claim process summary. No policy SHALL be issued without the customer pressing 1 to accept.</td><td><span class="tag tag-must">MUST</span></td><td>FSCA mandatory disclosure requirement</td></tr>
+<tr><td><code>FR-03</code></td><td>Monthly premiums SHALL be collected via automated MoMo wallet deduction on the policy renewal date. If balance is insufficient, the system SHALL retry 4 times over a 5-day grace period before lapsing the policy. An SMS warning SHALL be sent 3 days before the renewal date if balance is insufficient.</td><td><span class="tag tag-must">MUST</span></td><td>Grace period maintains customer relationship</td></tr>
+<tr><td><code>FR-04</code></td><td>For parametric products (crop insurance), the system SHALL automatically check weather data daily against the insured threshold and SHALL trigger a claim creation without any customer action when the trigger condition is met. Payout SHALL reach the customer MoMo wallet within 24 hours of trigger date.</td><td><span class="tag tag-must">MUST</span></td><td>Parametric automation is core differentiator</td></tr>
+<tr><td><code>FR-05</code></td><td>Next step: The system SHALL identify one licensed insurance underwriting partner per market prior to product launch in that market. MTN SHALL act as the distribution and administration platform under the underwriter's licence. Underwriter partnership SHALL be in place before any policy is sold in a market.</td><td><span class="tag tag-must">MUST</span></td><td>Regulatory requirement — MTN not licensed insurer</td></tr>
+</tbody>
+</table>
+<h3>5.3 Claims Management</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-06</code></td><td>Parametric claims (crop insurance) SHALL be created, assessed, and paid WITHOUT any customer action, entirely through automated data feeds. The customer SHALL receive an SMS notification when the trigger fires and when the payout is made.</td><td><span class="tag tag-must">MUST</span></td><td>Zero-friction claim is the product promise</td></tr>
+<tr><td><code>FR-07</code></td><td>Non-parametric claims (hospitalisation, device, funeral) SHALL be routed to the underwriting partner via an API for verification within 2 hours of submission. The partner SHALL have a dashboard to approve, request more info, or reject claims with a mandatory reason.</td><td><span class="tag tag-must">MUST</span></td><td>Underwriter API integration required</td></tr>
+<tr><td><code>FR-08</code></td><td>All approved claim payouts SHALL be disbursed to the policyholder (or beneficiary) MoMo wallet within the product-specific SLA (24h parametric, 48h funeral, 72h device). Disbursement failure SHALL trigger automatic retry and SMS notification to operations team.</td><td><span class="tag tag-must">MUST</span></td><td>MoMo API disbursement integration</td></tr>
+<tr><td><code>FR-09</code></td><td>Repudiated (rejected) claims SHALL include a clear reason communicated via SMS in the customer's registered language. An appeals process SHALL be accessible via USSD with a dedicated underwriter review within 5 business days.</td><td><span class="tag tag-should">SHOULD</span></td><td>FSCA TCF requirement on rejected claims</td></tr>
+</tbody>
+</table>
 
-    <table>
-        <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-        <tbody>
-            <tr><td><code>FR-01</code></td><td>The system SHALL support enrolment for all 4 product types via USSD in &le;5 customer interactions from first menu to policy issued. Each USSD response SHALL be &le;160 characters.</td><td><span class="tag tag-must">MUST</span></td><td>USSD protocol constraint</td></tr>
-            <tr><td><code>FR-02</code></td><td>A mandatory disclosure screen SHALL be shown before the first premium deduction, displaying: cover amount, key exclusions (1&ndash;2 max per screen), monthly premium, and claim process summary. No policy SHALL be issued without the customer pressing 1 to accept.</td><td><span class="tag tag-must">MUST</span></td><td>FSCA mandatory disclosure requirement</td></tr>
-            <tr><td><code>FR-03</code></td><td>Monthly premiums SHALL be collected via automated MoMo wallet deduction on the policy renewal date. If balance is insufficient, the system SHALL retry 4 times over a 5-day grace period before lapsing the policy. An SMS warning SHALL be sent 3 days before the renewal date if balance is insufficient.</td><td><span class="tag tag-must">MUST</span></td><td>Grace period maintains customer relationship</td></tr>
-            <tr><td><code>FR-04</code></td><td>For parametric products (crop insurance), the system SHALL automatically check weather data daily against the insured threshold and SHALL trigger a claim creation without any customer action when the trigger condition is met. Payout SHALL reach the customer MoMo wallet within 24 hours of trigger date.</td><td><span class="tag tag-must">MUST</span></td><td>Parametric automation is core differentiator</td></tr>
-            <tr><td><code>FR-05</code></td><td>Next step: The system SHALL identify one licensed insurance underwriting partner per market prior to product launch in that market. MTN SHALL act as the distribution and administration platform under the underwriter&apos;s licence. Underwriter partnership SHALL be in place before any policy is sold in a market.</td><td><span class="tag tag-must">MUST</span></td><td>Regulatory requirement &mdash; MTN not licensed insurer</td></tr>
-        </tbody>
-    </table>
-
-    <h3>5.3 Claims Management</h3>
-    <table>
-        <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-        <tbody>
-            <tr><td><code>FR-06</code></td><td>Parametric claims (crop insurance) SHALL be created, assessed, and paid WITHOUT any customer action, entirely through automated data feeds. The customer SHALL receive an SMS notification when the trigger fires and when the payout is made.</td><td><span class="tag tag-must">MUST</span></td><td>Zero-friction claim is the product promise</td></tr>
-            <tr><td><code>FR-07</code></td><td>Non-parametric claims (hospitalisation, device, funeral) SHALL be routed to the underwriting partner via an API for verification within 2 hours of submission. The partner SHALL have a dashboard to approve, request more info, or reject claims with a mandatory reason.</td><td><span class="tag tag-must">MUST</span></td><td>Underwriter API integration required</td></tr>
-            <tr><td><code>FR-08</code></td><td>All approved claim payouts SHALL be disbursed to the policyholder (or beneficiary) MoMo wallet within the product-specific SLA (24h parametric, 48h funeral, 72h device). Disbursement failure SHALL trigger automatic retry and SMS notification to operations team.</td><td><span class="tag tag-must">MUST</span></td><td>MoMo API disbursement integration</td></tr>
-            <tr><td><code>FR-09</code></td><td>Repudiated (rejected) claims SHALL include a clear reason communicated via SMS in the customer&apos;s registered language. An appeals process SHALL be accessible via USSD with a dedicated underwriter review within 5 business days.</td><td><span class="tag tag-should">SHOULD</span></td><td>FSCA TCF requirement on rejected claims</td></tr>
-        </tbody>
-    </table>
-</section>
-
-<section class="violet">
-    <h2>6. Technical Architecture</h2>
-    <div class="arch-layers">
-        <div class="arch-layer">
-            <div class="arch-layer-label">USSD Channel</div>
-            <div class="arch-layer-content">Customer Feature Phone &rarr; USSD Gateway (per OpCo) &rarr; Insurance USSD App Server (FastAPI) &nbsp;|&nbsp; SMS Gateway (policy confirmations, claim alerts, premium warnings)</div>
+      </section>
+      <section class="doc-section" id="s6">
+        <div class="section-header">
+          <div class="section-num">6</div>
+          <h2 class="section-title">Technical Architecture</h2>
         </div>
-        <div class="arch-layer">
-            <div class="arch-layer-label">Policy Engine</div>
-            <div class="arch-layer-content">Policy Management System (LMS-equivalent) &rarr; Product Catalogue (4 types, per-market config) &rarr; Premium Collection Service (MoMo API, daily scheduler) &rarr; FSCA Disclosure Engine</div>
-        </div>
-        <div class="arch-layer">
-            <div class="arch-layer-label">Claims Engine</div>
-            <div class="arch-layer-content">Parametric Trigger Monitor (weather API, daily batch) &rarr; Automated Claim Creator (parametric) &rarr; Claim Submission API (non-parametric) &rarr; Underwriter Partner API (verification workflow) &rarr; MoMo Payout Service</div>
-        </div>
-        <div class="arch-layer">
-            <div class="arch-layer-label">Data Integrations</div>
-            <div class="arch-layer-content">Weather API (AccuWeather / OpenWeatherMap, district-level) &rarr; Hospitalisation Verification API (per market, health data provider) &rarr; Police Case Verification API (SAPS / market equivalent) &rarr; MoMo API (premium + payout)</div>
-        </div>
-        <div class="arch-layer">
-            <div class="arch-layer-label">Compliance &amp; Ops</div>
-            <div class="arch-layer-content">FSCA Disclosure Store &rarr; POPIA Consent Manager &rarr; Underwriter Dashboard (Grafana) &rarr; Audit Log (Kafka, immutable) &rarr; Loss Ratio Monitor &rarr; Regulatory Reporting Engine</div>
-        </div>
-    </div>
-</section>
+        
 
-<section>
-    <h2>7. Data &amp; AI Model Requirements</h2>
-    <h3>Parametric Trigger Data Sources</h3>
-    <table>
-        <thead><tr><th>Product</th><th>Trigger Data Source</th><th>Threshold Definition</th><th>Update Frequency</th><th>Fallback</th></tr></thead>
-        <tbody>
-            <tr><td>Crop Insurance (Drought)</td><td>AccuWeather / OpenWeatherMap precipitation API at district level</td><td>Cumulative rainfall &lt;X mm over 30-day rolling window (defined per crop, per season, per market)</td><td>Daily at 06:00</td><td>Secondary met API provider; manual assessment if both unavailable</td></tr>
-            <tr><td>Crop Insurance (Flood)</td><td>Same weather API + river gauge data where available</td><td>Cumulative rainfall &gt;Y mm in 72-hour period or flood alert from national met service</td><td>Daily at 06:00</td><td>FAO GIEWS flood alerts as secondary source</td></tr>
-            <tr><td>Hospitalisation</td><td>Customer self-report via USSD + underwriter verification via health provider API or physical document</td><td>Confirmed in-patient admission at registered medical facility, minimum 24h stay</td><td>Per claim event</td><td>Physical documents acceptable; claim processing extends to 5 days</td></tr>
-            <tr><td>Device Insurance</td><td>Customer report + SAPS case number (theft) or photo evidence (damage) submitted via USSD</td><td>Verified theft report or confirmed accidental damage to insured device model</td><td>Per claim event</td><td>Extended verification process for high-value claims</td></tr>
-        </tbody>
-    </table>
-
-    <div class="card teal">
-        <div class="card-title">Next Step: Identify Insurance Underwriting Partner Per Market</div>
-        <div class="card-content">The first and most critical action item for UC-29 is to identify and contract an FSCA-licensed (South Africa) and equivalent-licensed insurance underwriter for each target market. MTN cannot legally sell insurance directly. Potential underwriter partners for South Africa include: Hollard Micro-Insurance, Old Mutual Emerging Markets, Sanlam Sky, Clientele Life. For Ghana: Enterprise Insurance, Prudential Life Ghana. A white-label / MNO distribution partnership model is well-established in African micro-insurance (e.g. Hollard-Tigo in Ghana). Commercial negotiation lead time: 3&ndash;6 months per market.</div>
-    </div>
-    <div class="card teal">
-        <div class="card-title">Next Step: Define Parametric Trigger Data Sources</div>
-        <div class="card-content">Each parametric product requires a legally agreed trigger data source specified in the policy schedule. For crop insurance, this means: selecting the meteorological data provider, defining the specific weather station or gridded data source for each market zone, specifying the rainfall threshold per crop type and season, and having the trigger definition reviewed and approved by the underwriter and regulator. This work requires agricultural expertise and meteorological data analysis, estimated 6&ndash;8 weeks per market for crop insurance parametric design.</div>
-    </div>
-</section>
-
-<section class="violet">
-    <h2>8. Compliance &amp; Regulatory</h2>
-    <table>
-        <thead><tr><th>Framework</th><th>Market</th><th>Key Obligation</th><th>UC-29 Control</th></tr></thead>
-        <tbody>
-            <tr><td><strong style="color:#2dd4bf;">FSCA / FAIS</strong></td><td>South Africa</td><td>Insurance distribution requires FAIS licence or exemption; product disclosure (POPI, TCF); treating customers fairly; claims payment SLAs</td><td>Distribution under underwriter licence; FR-02 mandatory USSD disclosure; FR-09 repudiation reasons; CSAT tracking; underwriter partner holds FAIS licence</td></tr>
-            <tr><td><strong style="color:#2dd4bf;">Long-Term Insurance Act</strong></td><td>South Africa</td><td>Funeral cover is long-term insurance; product approval required; policy terms must meet minimum requirements</td><td>Funeral product issued under underwriter&apos;s LTIA licence; policy wording reviewed by FSCA-registered legal counsel; product approval before launch</td></tr>
-            <tr><td><strong style="color:#2dd4bf;">Short-Term Insurance Act</strong></td><td>South Africa</td><td>Device and crop insurance are short-term; separate product approval; claims handling standards</td><td>Issued under underwriter&apos;s STIA licence; claims handling compliant with Ombudsman for Short-Term Insurance standards; complaints process accessible via USSD</td></tr>
-            <tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Consent for processing health and financial data for claims; data minimisation; right to erasure</td><td>Separate consent for hospitalisation data processing at enrolment; health data never stored beyond claims assessment; POPIA impact assessment per product type</td></tr>
-            <tr><td><strong style="color:#2dd4bf;">IAIS Micro-Insurance</strong></td><td>All markets</td><td>IAIS micro-insurance application paper: proportionate regulation, consumer protection, low-cost administration</td><td>Premium collection via MoMo (no bank account needed); simplified policy terms; USSD claims process; loss ratio monitoring; proportionate to risk and premium size</td></tr>
-            <tr><td><strong style="color:#2dd4bf;">NIA (Nigeria)</strong></td><td>Nigeria</td><td>National Insurance Commission licensing; micro-insurance framework guidelines 2018; product registration</td><td>Per-market underwriter partner holds NIA licence; product registered per NIA micro-insurance framework; premium caps per NIA guidelines</td></tr>
-        </tbody>
-    </table>
-</section>
-
-<section class="teal">
-    <h2>9. Sprint Plan &amp; Roadmap</h2>
-    <div class="sprint-grid">
-        <div class="sprint-card">
-            <div class="sprint-label">Sprint 1 &mdash; Discovery</div>
-            <div class="sprint-title">Underwriter Partnerships &amp; Product Design</div>
-            <div class="sprint-item">&#8226; Identify underwriter partners: SA, Ghana</div>
-            <div class="sprint-item">&#8226; Commercial negotiation: revenue share model</div>
-            <div class="sprint-item">&#8226; FSCA product approval process: SA</div>
-            <div class="sprint-item">&#8226; Parametric trigger data source selection</div>
-            <div class="sprint-item">&#8226; Rainfall threshold definition (crop insurance)</div>
-            <div class="sprint-item">&#8226; USSD flow wireframes (4 product types)</div>
-            <div class="sprint-item">&#8226; POPIA impact assessment per product</div>
-            <div class="sprint-item">&#8226; Claims handling process design</div>
-        </div>
-        <div class="sprint-card">
-            <div class="sprint-label">Sprint 2 &mdash; Core Build</div>
-            <div class="sprint-title">Policy Engine &amp; USSD Integration</div>
-            <div class="sprint-item">&#8226; Policy management system integration</div>
-            <div class="sprint-item">&#8226; USSD enrolment flow (funeral + hospitalisation)</div>
-            <div class="sprint-item">&#8226; MoMo premium collection scheduler</div>
-            <div class="sprint-item">&#8226; FSCA disclosure engine (per product)</div>
-            <div class="sprint-item">&#8226; Parametric trigger monitor (weather API)</div>
-            <div class="sprint-item">&#8226; Underwriter claims API integration</div>
-            <div class="sprint-item">&#8226; MoMo payout disbursement service</div>
-            <div class="sprint-item">&#8226; Underwriter dashboard (Grafana)</div>
-        </div>
-        <div class="sprint-card">
-            <div class="sprint-label">Sprint 3 &mdash; Pilot &amp; Expand</div>
-            <div class="sprint-title">SA Pilot Launch &amp; Ghana Expansion</div>
-            <div class="sprint-item">&#8226; SA pilot: 10,000 policyholders</div>
-            <div class="sprint-item">&#8226; Crop insurance device + funeral cover</div>
-            <div class="sprint-item">&#8226; First parametric trigger event (if applicable)</div>
-            <div class="sprint-item">&#8226; Loss ratio monitoring (underwriter dashboard)</div>
-            <div class="sprint-item">&#8226; Claims repudiation rate tracking</div>
-            <div class="sprint-item">&#8226; Ghana underwriter partner: NIA approval</div>
-            <div class="sprint-item">&#8226; USSD crop insurance enrolment (Ghana)</div>
-            <div class="sprint-item">&#8226; Board financial inclusion impact report</div>
-        </div>
-    </div>
-</section>
-
-<section class="red">
-    <h2>10. Risk Register</h2>
-    <table>
-        <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
-        <tbody>
-            <tr><td><code>R-01</code></td><td>Underwriter partnership negotiation delayed &gt;6 months, blocking launch in key markets</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Engage multiple underwriter candidates simultaneously in Sprint 1. Prioritise underwriters with existing MNO/MFS distribution experience (Hollard, Old Mutual Emerging Markets). Budget 6-month negotiation lead time. Consider white-label approach with existing FSCA-licensed micro-insurer.</td></tr>
-            <tr><td><code>R-02</code></td><td>Parametric trigger weather data insufficient resolution for rural African locations, causing incorrect payouts or missed valid claims</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Evaluate 3 weather data providers at district and sub-district resolution before defining trigger thresholds. Accept gridded satellite precipitation data (CHIRPS) as supplement to station data. Trigger definition reviewed by agricultural meteorologist and agreed with underwriter before product launch.</td></tr>
-            <tr><td><code>R-03</code></td><td>Loss ratio exceeds underwriter expectations in Year 1, making product unviable</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Conservative initial premium rates based on 10-year historical rainfall data. Monthly loss ratio reporting to underwriter. Automatic premium adjustment mechanism after 6-month portfolio review. Stop-loss reinsurance arranged by underwriter for crop insurance (standard practice).</td></tr>
-            <tr><td><code>R-04</code></td><td>Premium collection fails at high rate (MoMo balance insufficient), causing mass policy lapse</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>3-day pre-due-date balance warning SMS. 5-day grace period with 4 retries. Consider micro-premium weekly deduction option (R5/week rather than R20/month) to match low-income cash flow patterns. Policy reinstatement within 30 days without medical exam.</td></tr>
-            <tr><td><code>R-05</code></td><td>Fraudulent hospitalisation claims submitted at scale, exceeding loss ratio tolerance</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Underwriter verification required before payment for hospitalisation claims. Hospital name matched against registered facility database. Velocity rules: maximum 2 hospitalisation claims per policy per year. AI anomaly detection on claim patterns. Suspected fraud flagged for manual review before payment.</td></tr>
-            <tr><td><code>R-06</code></td><td>FSCA product approval delayed, blocking South Africa launch for 12+ months</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Product launched under underwriter&apos;s existing FSCA approval while MTN&apos;s distribution model is reviewed. Engage FSCA Fintech Innovation Hub (regulatory sandbox) early for informal guidance. Appoint dedicated FSCA regulatory counsel. Use simplified product structure (parametric crop, funeral only) for Phase 1 to minimise approval complexity.</td></tr>
-        </tbody>
-    </table>
-</section>
-
-<footer>
-    <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-29 USSD AI Micro-Insurance &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
-    <div>Owner: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
-    <div style="margin-top:8px;font-size:0.82em;">Integrations: MoMo API &middot; Weather API &middot; USSD Gateway &middot; SMS Gateway &middot; Underwriter Claims API &nbsp;&middot;&nbsp; Compliance: FSCA &middot; FAIS &middot; LTIA &middot; STIA &middot; POPIA &middot; NIA &middot; IAIS</div>
-</footer>
-
+<div class="arch-layers">
+<div class="arch-layer">
+<div class="arch-layer-label">USSD Channel</div>
+<div class="arch-layer-content">Customer Feature Phone → USSD Gateway (per OpCo) → Insurance USSD App Server (FastAPI)  |  SMS Gateway (policy confirmations, claim alerts, premium warnings)</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Policy Engine</div>
+<div class="arch-layer-content">Policy Management System (LMS-equivalent) → Product Catalogue (4 types, per-market config) → Premium Collection Service (MoMo API, daily scheduler) → FSCA Disclosure Engine</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Claims Engine</div>
+<div class="arch-layer-content">Parametric Trigger Monitor (weather API, daily batch) → Automated Claim Creator (parametric) → Claim Submission API (non-parametric) → Underwriter Partner API (verification workflow) → MoMo Payout Service</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Data Integrations</div>
+<div class="arch-layer-content">Weather API (AccuWeather / OpenWeatherMap, district-level) → Hospitalisation Verification API (per market, health data provider) → Police Case Verification API (SAPS / market equivalent) → MoMo API (premium + payout)</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Compliance &amp; Ops</div>
+<div class="arch-layer-content">FSCA Disclosure Store → POPIA Consent Manager → Underwriter Dashboard (Grafana) → Audit Log (Kafka, immutable) → Loss Ratio Monitor → Regulatory Reporting Engine</div>
+</div>
 </div>
 
-<!-- EDITABLE DOCUMENT SYSTEM -->
-<style data-editable-system>
-  body.edm [data-eid]:hover{outline:2px dashed rgba(167,139,250,.35)!important;outline-offset:3px;border-radius:3px;cursor:text}
-  body.edm [data-eid]:focus{outline:2px solid #a78bfa!important;outline-offset:3px;border-radius:3px;background:rgba(167,139,250,.07)!important}
-  body.edm [data-eid]:empty::before{content:"Click to add text";color:rgba(167,139,250,.4);font-style:italic;pointer-events:none}
-  #__etb{position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:6px;align-items:center;background:#111827;border:1px solid #374151;border-radius:12px;padding:9px 14px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
-  #__etb button{padding:5px 11px;border-radius:7px;border:1px solid #374151;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;background:#1f2937;color:#d1d5db}
-  #__etb button:hover{border-color:#a78bfa;color:#e8eaff}
-  #__etb .etb-edit{color:#a78bfa}
-  #__etb .etb-save{color:#34d399}
-  #__etb .etb-reset{color:#f87171}
-  #__etb .etb-export{color:#38bdf8}
-  #__etb .etb-msg{font-size:10.5px;color:#6b7280;min-width:90px;text-align:right}
-  #__etb .etb-sep{width:1px;height:20px;background:#374151;margin:0 2px}
-</style>
-<script data-editable-system>
-(function(){
-  'use strict';
-  var KEY = 'edm:' + (location.pathname || location.href);
-  var SELS = 'p,h1,h2,h3,h4,h5,li,td,th,blockquote,.card-content,.card-title,.meta-value,.hero-meta-value,.summary-card p,.risk-detail,.risk-title,.phase-desc,.gap-value,.kpi-val,.kpi-lbl,.story-text,.card-content p,.dependency-detail,.dependency-system,.checklist li,.warning-box,.info-box,.code-block,.gap-item .gap-value,.status-badge,.badge,.tech-tag,.hero-subtitle,caption,dt,dd,.requirement,.storyid';
-  var mode = false, timer = null, ids = [];
+      </section>
+      <section class="doc-section" id="s7">
+        <div class="section-header">
+          <div class="section-num">7</div>
+          <h2 class="section-title">Data & AI Model Requirements</h2>
+        </div>
+        
 
-  function elems(){
-    return [].slice.call(document.querySelectorAll(SELS)).filter(function(el){
-      return !el.closest('#__etb') && !el.closest('script') && !el.closest('style') && !el.closest('noscript');
-    });
-  }
+<h3>Parametric Trigger Data Sources</h3>
+<table>
+<thead><tr><th>Product</th><th>Trigger Data Source</th><th>Threshold Definition</th><th>Update Frequency</th><th>Fallback</th></tr></thead>
+<tbody>
+<tr><td>Crop Insurance (Drought)</td><td>AccuWeather / OpenWeatherMap precipitation API at district level</td><td>Cumulative rainfall &lt;X mm over 30-day rolling window (defined per crop, per season, per market)</td><td>Daily at 06:00</td><td>Secondary met API provider; manual assessment if both unavailable</td></tr>
+<tr><td>Crop Insurance (Flood)</td><td>Same weather API + river gauge data where available</td><td>Cumulative rainfall &gt;Y mm in 72-hour period or flood alert from national met service</td><td>Daily at 06:00</td><td>FAO GIEWS flood alerts as secondary source</td></tr>
+<tr><td>Hospitalisation</td><td>Customer self-report via USSD + underwriter verification via health provider API or physical document</td><td>Confirmed in-patient admission at registered medical facility, minimum 24h stay</td><td>Per claim event</td><td>Physical documents acceptable; claim processing extends to 5 days</td></tr>
+<tr><td>Device Insurance</td><td>Customer report + SAPS case number (theft) or photo evidence (damage) submitted via USSD</td><td>Verified theft report or confirmed accidental damage to insured device model</td><td>Per claim event</td><td>Extended verification process for high-value claims</td></tr>
+</tbody>
+</table>
+<div class="card teal">
+<div class="card-title">Next Step: Identify Insurance Underwriting Partner Per Market</div>
+<div class="card-content">The first and most critical action item for UC-29 is to identify and contract an FSCA-licensed (South Africa) and equivalent-licensed insurance underwriter for each target market. MTN cannot legally sell insurance directly. Potential underwriter partners for South Africa include: Hollard Micro-Insurance, Old Mutual Emerging Markets, Sanlam Sky, Clientele Life. For Ghana: Enterprise Insurance, Prudential Life Ghana. A white-label / MNO distribution partnership model is well-established in African micro-insurance (e.g. Hollard-Tigo in Ghana). Commercial negotiation lead time: 3–6 months per market.</div>
+</div>
+<div class="card teal">
+<div class="card-title">Next Step: Define Parametric Trigger Data Sources</div>
+<div class="card-content">Each parametric product requires a legally agreed trigger data source specified in the policy schedule. For crop insurance, this means: selecting the meteorological data provider, defining the specific weather station or gridded data source for each market zone, specifying the rainfall threshold per crop type and season, and having the trigger definition reviewed and approved by the underwriter and regulator. This work requires agricultural expertise and meteorological data analysis, estimated 6–8 weeks per market for crop insurance parametric design.</div>
+</div>
 
-  function stamp(){
-    ids = [];
-    elems().forEach(function(el,i){
-      el.setAttribute('data-eid', i);
-      ids.push(i);
-    });
-  }
+      </section>
+      <section class="doc-section" id="s8">
+        <div class="section-header">
+          <div class="section-num">8</div>
+          <h2 class="section-title">Compliance & Regulatory</h2>
+        </div>
+        
 
-  function enable(){
-    mode = true;
-    document.body.classList.add('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'true';
-      el.spellcheck = false;
-    });
-    document.addEventListener('input', onInput);
-    refresh();
-  }
+<table>
+<thead><tr><th>Framework</th><th>Market</th><th>Key Obligation</th><th>UC-29 Control</th></tr></thead>
+<tbody>
+<tr><td><strong style="color:#2dd4bf;">FSCA / FAIS</strong></td><td>South Africa</td><td>Insurance distribution requires FAIS licence or exemption; product disclosure (POPI, TCF); treating customers fairly; claims payment SLAs</td><td>Distribution under underwriter licence; FR-02 mandatory USSD disclosure; FR-09 repudiation reasons; CSAT tracking; underwriter partner holds FAIS licence</td></tr>
+<tr><td><strong style="color:#2dd4bf;">Long-Term Insurance Act</strong></td><td>South Africa</td><td>Funeral cover is long-term insurance; product approval required; policy terms must meet minimum requirements</td><td>Funeral product issued under underwriter's LTIA licence; policy wording reviewed by FSCA-registered legal counsel; product approval before launch</td></tr>
+<tr><td><strong style="color:#2dd4bf;">Short-Term Insurance Act</strong></td><td>South Africa</td><td>Device and crop insurance are short-term; separate product approval; claims handling standards</td><td>Issued under underwriter's STIA licence; claims handling compliant with Ombudsman for Short-Term Insurance standards; complaints process accessible via USSD</td></tr>
+<tr><td><strong style="color:#2dd4bf;">POPIA</strong></td><td>South Africa</td><td>Consent for processing health and financial data for claims; data minimisation; right to erasure</td><td>Separate consent for hospitalisation data processing at enrolment; health data never stored beyond claims assessment; POPIA impact assessment per product type</td></tr>
+<tr><td><strong style="color:#2dd4bf;">IAIS Micro-Insurance</strong></td><td>All markets</td><td>IAIS micro-insurance application paper: proportionate regulation, consumer protection, low-cost administration</td><td>Premium collection via MoMo (no bank account needed); simplified policy terms; USSD claims process; loss ratio monitoring; proportionate to risk and premium size</td></tr>
+<tr><td><strong style="color:#2dd4bf;">NIA (Nigeria)</strong></td><td>Nigeria</td><td>National Insurance Commission licensing; micro-insurance framework guidelines 2018; product registration</td><td>Per-market underwriter partner holds NIA licence; product registered per NIA micro-insurance framework; premium caps per NIA guidelines</td></tr>
+</tbody>
+</table>
 
-  function disable(){
-    mode = false;
-    document.body.classList.remove('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'false';
-      el.blur();
-    });
-    document.removeEventListener('input', onInput);
-    refresh();
-  }
+      </section>
+      <section class="doc-section" id="s9">
+        <div class="section-header">
+          <div class="section-num">9</div>
+          <h2 class="section-title">Sprint Plan & Roadmap</h2>
+        </div>
+        
 
-  function onInput(){
-    clearTimeout(timer);
-    msg('Unsaved…');
-    timer = setTimeout(persist, 900);
-  }
+<div class="sprint-grid">
+<div class="sprint-card">
+<div class="sprint-label">Sprint 1 — Discovery</div>
+<div class="sprint-title">Underwriter Partnerships &amp; Product Design</div>
+<div class="sprint-item">• Identify underwriter partners: SA, Ghana</div>
+<div class="sprint-item">• Commercial negotiation: revenue share model</div>
+<div class="sprint-item">• FSCA product approval process: SA</div>
+<div class="sprint-item">• Parametric trigger data source selection</div>
+<div class="sprint-item">• Rainfall threshold definition (crop insurance)</div>
+<div class="sprint-item">• USSD flow wireframes (4 product types)</div>
+<div class="sprint-item">• POPIA impact assessment per product</div>
+<div class="sprint-item">• Claims handling process design</div>
+</div>
+<div class="sprint-card">
+<div class="sprint-label">Sprint 2 — Core Build</div>
+<div class="sprint-title">Policy Engine &amp; USSD Integration</div>
+<div class="sprint-item">• Policy management system integration</div>
+<div class="sprint-item">• USSD enrolment flow (funeral + hospitalisation)</div>
+<div class="sprint-item">• MoMo premium collection scheduler</div>
+<div class="sprint-item">• FSCA disclosure engine (per product)</div>
+<div class="sprint-item">• Parametric trigger monitor (weather API)</div>
+<div class="sprint-item">• Underwriter claims API integration</div>
+<div class="sprint-item">• MoMo payout disbursement service</div>
+<div class="sprint-item">• Underwriter dashboard (Grafana)</div>
+</div>
+<div class="sprint-card">
+<div class="sprint-label">Sprint 3 — Pilot &amp; Expand</div>
+<div class="sprint-title">SA Pilot Launch &amp; Ghana Expansion</div>
+<div class="sprint-item">• SA pilot: 10,000 policyholders</div>
+<div class="sprint-item">• Crop insurance device + funeral cover</div>
+<div class="sprint-item">• First parametric trigger event (if applicable)</div>
+<div class="sprint-item">• Loss ratio monitoring (underwriter dashboard)</div>
+<div class="sprint-item">• Claims repudiation rate tracking</div>
+<div class="sprint-item">• Ghana underwriter partner: NIA approval</div>
+<div class="sprint-item">• USSD crop insurance enrolment (Ghana)</div>
+<div class="sprint-item">• Board financial inclusion impact report</div>
+</div>
+</div>
 
-  function persist(){
-    var store = {};
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null) store[id] = el.innerHTML;
-    });
-    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
-    msg('Saved ✓');
-  }
+      </section>
+      <section class="doc-section" id="s10">
+        <div class="section-header">
+          <div class="section-num">10</div>
+          <h2 class="section-title">Risk Register</h2>
+        </div>
+        
 
-  function restore(){
-    var raw; try { raw = localStorage.getItem(KEY); } catch(e){}
-    if(!raw) return false;
-    var store; try { store = JSON.parse(raw); } catch(e){ return false; }
-    stamp();
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null && store[id] !== undefined) el.innerHTML = store[id];
-    });
-    return true;
-  }
+<table>
+<thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td><code>R-01</code></td><td>Underwriter partnership negotiation delayed &gt;6 months, blocking launch in key markets</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Engage multiple underwriter candidates simultaneously in Sprint 1. Prioritise underwriters with existing MNO/MFS distribution experience (Hollard, Old Mutual Emerging Markets). Budget 6-month negotiation lead time. Consider white-label approach with existing FSCA-licensed micro-insurer.</td></tr>
+<tr><td><code>R-02</code></td><td>Parametric trigger weather data insufficient resolution for rural African locations, causing incorrect payouts or missed valid claims</td><td class="priority-high">Medium</td><td class="priority-high">High</td><td>Evaluate 3 weather data providers at district and sub-district resolution before defining trigger thresholds. Accept gridded satellite precipitation data (CHIRPS) as supplement to station data. Trigger definition reviewed by agricultural meteorologist and agreed with underwriter before product launch.</td></tr>
+<tr><td><code>R-03</code></td><td>Loss ratio exceeds underwriter expectations in Year 1, making product unviable</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Conservative initial premium rates based on 10-year historical rainfall data. Monthly loss ratio reporting to underwriter. Automatic premium adjustment mechanism after 6-month portfolio review. Stop-loss reinsurance arranged by underwriter for crop insurance (standard practice).</td></tr>
+<tr><td><code>R-04</code></td><td>Premium collection fails at high rate (MoMo balance insufficient), causing mass policy lapse</td><td class="priority-med">Medium</td><td class="priority-med">Medium</td><td>3-day pre-due-date balance warning SMS. 5-day grace period with 4 retries. Consider micro-premium weekly deduction option (R5/week rather than R20/month) to match low-income cash flow patterns. Policy reinstatement within 30 days without medical exam.</td></tr>
+<tr><td><code>R-05</code></td><td>Fraudulent hospitalisation claims submitted at scale, exceeding loss ratio tolerance</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Underwriter verification required before payment for hospitalisation claims. Hospital name matched against registered facility database. Velocity rules: maximum 2 hospitalisation claims per policy per year. AI anomaly detection on claim patterns. Suspected fraud flagged for manual review before payment.</td></tr>
+<tr><td><code>R-06</code></td><td>FSCA product approval delayed, blocking South Africa launch for 12+ months</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Product launched under underwriter's existing FSCA approval while MTN's distribution model is reviewed. Engage FSCA Fintech Innovation Hub (regulatory sandbox) early for informal guidance. Appoint dedicated FSCA regulatory counsel. Use simplified product structure (parametric crop, funeral only) for Phase 1 to minimise approval complexity.</td></tr>
+</tbody>
+</table>
 
-  function reset(){
-    if(!confirm('Reset all edits to original content? This cannot be undone.')) return;
-    try { localStorage.removeItem(KEY); } catch(e){}
-    location.reload();
-  }
+      </section>
+    </main>
 
-  function exportDoc(){
-    // Temporarily disable editing for clean export
-    var wasMode = mode;
-    if(wasMode) disable();
-    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    // Remove the editable toolbar and injected system from export
-    html = html.replace(/<style[^>]*data-editable-system[^>]*>[\s\S]*?<\/style>/,'');
-    html = html.replace(/<script[^>]*data-editable-system[^>]*>[\s\S]*?<\/script>/,'');
-    html = html.replace(/<div id="__etb"[^>]*>[\s\S]*?<\/div>/,'');
-    html = html.replace(/<!-- EDITABLE DOCUMENT SYSTEM -->/g,'');
-    html = html.replace(/\sdata-eid="\d+"/g,'');
-    html = html.replace(/\scontenteditable="[^"]*"/g,'');
-    var blob = new Blob([html], {type:'text/html'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = (location.pathname.split('/').pop() || 'document') + '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    if(wasMode) enable();
-    msg('Exported ✓');
-  }
+  </div><!-- /doc-layout -->
 
-  function msg(t){
-    var el = document.getElementById('__etb-msg');
-    if(el){ el.textContent = t; clearTimeout(el._t); if(t==='Saved ✓'||t==='Exported ✓') el._t=setTimeout(function(){el.textContent='';},2500); }
-  }
-
-  function refresh(){
-    var btn = document.getElementById('__etb-btn');
-    var acts = document.getElementById('__etb-acts');
-    if(btn){ btn.textContent = mode ? '🔒 Lock' : '✏️ Edit'; btn.style.background = mode ? '#2d1f5e' : '#1f2937'; btn.style.color = mode ? '#c4b5fd' : '#a78bfa'; }
-    if(acts) acts.style.display = mode ? 'flex' : 'none';
-  }
-
-  function buildToolbar(){
-    var t = document.createElement('div');
-    t.id = '__etb';
-    t.innerHTML =
-      '<span style="font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-right:2px">Document</span>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-edit" id="__etb-btn" onclick="window.__edm.toggle()">✏️ Edit</button>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-share" onclick="window.__edm.share()" title="Copy shareable link">🔗 Share</button>'+
-      '<button class="etb-print" onclick="window.__edm.print()" title="Print / Save as PDF">🖨 Print</button>'+
-      '<div id="__etb-acts" style="display:none;gap:5px;align-items:center">'+
-        '<span class="etb-msg" id="__etb-msg"></span>'+
-        '<button class="etb-save" onclick="window.__edm.save()">💾 Save</button>'+
-        '<button class="etb-reset" onclick="window.__edm.reset()">↺ Reset</button>'+
-        '<button class="etb-export" onclick="window.__edm.export()">⬇ Export</button>'+
-      '</div>';
-    document.body.appendChild(t);
-  }
-
-  function shareDoc(){
-    var base = 'https://fintech-tracker-web.vercel.app';
-    var url = base + location.pathname;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ msg('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
-    } else { prompt('Copy this link:',url); }
-  }
-  function printDoc(){
-    var wasMode = mode;
-    if(wasMode) disable();
-    window.print();
-    if(wasMode) setTimeout(function(){ enable(); }, 500);
-  }
-  window.__edm = {
-    toggle: function(){ mode ? disable() : enable(); },
-    save:   function(){ persist(); },
-    reset:  function(){ reset(); },
-    export: function(){ exportDoc(); },
-    share:  function(){ shareDoc(); },
-    print:  function(){ printDoc(); }
-  };
-
-  function init(){
-    buildToolbar();
-    stamp();
-    var had = restore();
-    if(had) msg('Edits loaded');
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+</div><!-- /doc-shell -->
 
 </body>
 </html>

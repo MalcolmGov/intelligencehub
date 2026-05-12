@@ -1,759 +1,811 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC-24 AI Customer Intelligence Layer — Requirements &amp; Planning</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
-        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
-        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
-        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
-        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
-        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
-        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
-        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
-        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
-        .badge-high { background: #7c3aed; color: #fff; }
-        .badge-must { background: #dc2626; color: #fff; }
-        .badge-should { background: #d97706; color: #fff; }
-        .badge-nice { background: #059669; color: #fff; }
-        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
-        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
-        section.teal { border-left-color: #14b8a6; }
-        section.violet { border-left-color: #7c3aed; }
-        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
-        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
-        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
-        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
-        .card.teal { border-left-color: #14b8a6; }
-        .card.violet { border-left-color: #7c3aed; }
-        .card.amber { border-left-color: #f59e0b; }
-        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
-        .card.teal .card-title { color: #2dd4bf; }
-        .card.violet .card-title { color: #a78bfa; }
-        .card.amber .card-title { color: #f59e0b; }
-        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
-        thead { background: #1e1b4b; }
-        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
-        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
-        tbody tr:hover { background: #1e293b; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
-        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
-        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
-        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .artifacts-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
-        .artifact-link { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; color: #818cf8; font-size: 0.88em; text-decoration: none; font-weight: 600; }
-        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
-        .compare-card.traditional { border-top: 3px solid #dc2626; }
-        .compare-card.ai { border-top: 3px solid #14b8a6; }
-        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
-        .compare-card.traditional .compare-label { color: #f87171; }
-        .compare-card.ai .compare-label { color: #2dd4bf; }
-        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
-        .compare-card.traditional .compare-value { color: #f87171; }
-        .compare-card.ai .compare-value { color: #2dd4bf; }
-        .compare-sub { font-size: 0.85em; color: #64748b; }
-        .step-list { counter-reset: step; list-style: none; padding: 0; }
-        .step-list li { counter-increment: step; padding: 12px 0 12px 48px; position: relative; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.94em; }
-        .step-list li:last-child { border-bottom: none; }
-        .step-list li::before { content: counter(step); position: absolute; left: 0; top: 10px; width: 28px; height: 28px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85em; color: #fff; text-align: center; line-height: 28px; }
-        .phase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 20px 0; }
-        .phase-stage { background: #0f172a; border: 1px solid #334155; padding: 20px 16px; text-align: center; position: relative; }
-        .phase-stage:not(:last-child)::after { content: "→"; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); color: #6366f1; font-size: 1.4em; z-index: 1; }
-        .phase-stage:first-child { border-radius: 6px 0 0 6px; border-left: 3px solid #6366f1; }
-        .phase-stage:last-child { border-radius: 0 6px 6px 0; border-right: 3px solid #14b8a6; }
-        .phase-stage:nth-child(2) { border-left: 3px solid #a78bfa; }
-        .phase-num { font-size: 0.75em; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-        .phase-title { font-size: 0.92em; font-weight: 700; color: #818cf8; margin-bottom: 6px; }
-        .phase-desc { font-size: 0.78em; color: #64748b; line-height: 1.4; }
-        .arch-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
-        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
-        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
-        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
-        .owner-role { font-size: 0.85em; color: #7c3aed; }
-        .silos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 16px 0; }
-        .silo-card { background: #0f172a; border: 1px solid #334155; border-top: 3px solid #dc2626; border-radius: 6px; padding: 14px; text-align: center; }
-        .silo-icon { font-size: 1.6em; margin-bottom: 6px; }
-        .silo-name { font-size: 0.82em; font-weight: 700; color: #f87171; }
-        .silo-desc { font-size: 0.75em; color: #64748b; margin-top: 4px; }
-        .unified-callout { background: linear-gradient(135deg, rgba(45,212,191,0.08), rgba(129,140,248,0.06)); border: 1px solid #0d9488; border-radius: 8px; padding: 20px 24px; margin: 20px 0; text-align: center; }
-        .unified-callout .uc-label { font-size: 0.8em; color: #2dd4bf; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 700; margin-bottom: 6px; }
-        .unified-callout .uc-title { font-size: 1.3em; font-weight: 800; color: #e2e8f0; margin-bottom: 6px; }
-        .unified-callout .uc-sub { font-size: 0.88em; color: #94a3b8; }
-        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UC-24 AI Customer Intelligence Layer — Requirements & Planning</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface-alt:#F1F5F9;
+  --border:rgba(226,232,240,0.9);--border-strong:#CBD5E1;
+  --text-primary:#0F172A;--text-secondary:#334155;--text-muted:#64748B;
+  --accent:#7C3AED;--accent-d:#6D28D9;--accent-light:#EDE9FE;--accent-border:rgba(124,58,237,0.2);
+  --blue:#2563EB;--blue-light:#DBEAFE;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --r:16px;--rs:10px;
+  --shadow-sm:0 1px 4px rgba(15,23,42,0.06),0 2px 8px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.08),0 2px 6px rgba(15,23,42,0.04);
+}
+html{scroll-behavior:smooth;font-size:15px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── Sticky Header ── */
+.doc-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:58px;
+}
+.hdr-left{display:flex;align-items:center;gap:16px}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:var(--text-muted);
+  text-decoration:none;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--border);transition:all 0.15s;
+}
+.back-link:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-light)}
+.hdr-breadcrumb{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.hdr-sep{color:var(--border-strong)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:all 0.15s;font-family:inherit;
+}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
+.hdr-btn.violet{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hdr-btn.violet:hover{background:var(--accent-d)}
+
+/* ── Shell ── */
+.doc-shell{max-width:1220px;margin:0 auto;padding:0 40px 100px}
+
+/* ── Hero ── */
+.doc-hero{padding:52px 0 32px;max-width:800px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero-title{
+  font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.2px;
+  background:linear-gradient(140deg,#0F172A 0%,#312E81 50%,#7C3AED 90%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:14px;
+}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:22px;max-width:680px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;letter-spacing:0.04em;
+  padding:4px 12px;border-radius:20px;
+}
+.badge-p1{background:#FEE2E2;color:#B91C1C}
+.badge-p2{background:#FEF3C7;color:#92400E}
+.badge-progress{background:#FEF3C7;color:#92400E}
+.badge-in-progress{background:#FEF3C7;color:#92400E}
+.badge-done,.badge-complete,.badge-built{background:#D1FAE5;color:#065F46}
+.badge-platform{background:var(--accent-light);color:var(--accent)}
+.badge-neutral{background:var(--surface-alt);color:var(--text-muted);border:1px solid var(--border)}
+.badge-must{background:#FEE2E2;color:#B91C1C;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-should{background:#FEF3C7;color:#92400E;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-nice{background:#D1FAE5;color:#065F46;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+
+/* ── Meta Strip ── */
+.meta-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;margin-bottom:36px;
+}
+.meta-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;
+  box-shadow:var(--shadow-sm);transition:all 0.2s;
+}
+.meta-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.meta-value{font-size:13px;font-weight:700;color:var(--text-primary)}
+.meta-value.violet{color:var(--accent)}
+
+/* ── Progress Bar ── */
+.progress-section{margin:0 0 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow-sm)}
+.progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.progress-label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.progress-pct{font-size:14px;font-weight:800;color:var(--accent)}
+.progress-track{height:8px;background:var(--surface-alt);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:8px;transition:width 0.6s ease}
+.progress-note{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+/* ── Doc Layout ── */
+.doc-layout{display:grid;grid-template-columns:210px 1fr;gap:36px;align-items:start}
+@media(max-width:900px){.doc-layout{grid-template-columns:1fr}.doc-toc{display:none}}
+
+/* ── ToC ── */
+.doc-toc{position:sticky;top:76px}
+.toc-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.toc-title{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.toc-link{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;text-decoration:none;color:var(--text-secondary);font-size:12px;font-weight:500;transition:all 0.15s;margin-bottom:2px}
+.toc-link:hover{background:var(--accent-light);color:var(--accent)}
+.toc-num{font-size:10px;font-weight:700;color:var(--text-muted);min-width:20px}
+
+/* ── Sections ── */
+.doc-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.section-num{width:30px;height:30px;border-radius:8px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+h2.section-title{font-size:18px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+h3{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-top:24px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+p{color:var(--text-secondary);margin-bottom:13px;line-height:1.75;font-size:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+ul,ol{color:var(--text-secondary);margin:0 0 14px 20px;line-height:1.75;font-size:14px}
+li{margin-bottom:5px}
+li strong{color:var(--text-primary)}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.kpi-card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;text-align:center;transition:all 0.2s}
+.kpi-card:hover{background:var(--accent-light);border-color:var(--accent-border);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-value{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-0.8px;line-height:1;margin-bottom:6px}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);line-height:1.4}
+
+/* ── Callouts ── */
+.info-box,.accent-box,.callout-blue{
+  background:var(--blue-light);border:1px solid rgba(37,99,235,0.18);
+  border-left:3px solid var(--blue);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#1E40AF;line-height:1.65;
+}
+.info-box a,.accent-box a,.callout-blue a{color:var(--blue);font-weight:600;text-decoration:none}
+.warning-box,.callout-red{
+  background:#FFF5F5;border:1px solid rgba(220,38,38,0.18);
+  border-left:3px solid var(--red);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#7F1D1D;line-height:1.65;
+}
+.warning-box ul,.callout-red ul{color:#7F1D1D}
+.callout-violet{
+  background:var(--accent-light);border:1px solid var(--accent-border);
+  border-left:3px solid var(--accent);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#3B0764;line-height:1.65;
+}
+.callout-green{
+  background:var(--green-light);border:1px solid rgba(22,163,74,0.2);
+  border-left:3px solid var(--green);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#14532D;line-height:1.65;
+}
+.callout-amber{
+  background:var(--amber-light);border:1px solid rgba(217,119,6,0.2);
+  border-left:3px solid var(--amber);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#78350F;line-height:1.65;
+}
+
+/* ── Cards / Items ── */
+.card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;margin-bottom:10px;transition:all 0.15s}
+.card:hover{border-color:var(--accent-border);background:var(--surface)}
+.card-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:7px}
+.card-content{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Requirements ── */
+.requirement{border-left:3px solid var(--border-strong);padding:10px 14px;margin-bottom:8px;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface-alt)}
+.requirement:hover{border-left-color:var(--accent)}
+.req-body{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Tables ── */
+table,.doc-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}
+th{background:var(--surface-alt);border:1px solid var(--border);padding:10px 14px;font-weight:700;color:var(--text-primary);text-align:left;font-size:11px;letter-spacing:0.05em;text-transform:uppercase}
+td{border:1px solid var(--border);padding:10px 14px;color:var(--text-secondary);vertical-align:top;line-height:1.6}
+tr:hover td{background:var(--surface-alt)}
+
+/* ── User Stories ── */
+.story{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;margin-bottom:12px}
+.story-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.story-text{font-size:13.5px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px}
+.story-ac{font-size:12.5px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--surface);border-radius:7px;border:1px solid var(--border)}
+
+/* ── Dependencies ── */
+.dep-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dep-item:last-child{border-bottom:none}
+.dep-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--surface-alt);border:1px solid var(--border)}
+.dep-body{flex:1}
+.dep-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.dep-desc{font-size:12.5px;color:var(--text-muted)}
+
+/* ── Print ── */
+@media print{.doc-header,.doc-toc{display:none!important}.doc-layout{grid-template-columns:1fr}.doc-section{break-inside:avoid}}
+@media(max-width:768px){.doc-shell{padding:0 16px 60px}.doc-hero{padding:32px 0 20px}.doc-section{padding:22px 18px}}
+
+  </style>
 </head>
 <body>
-<a href="../" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#1e293b;border:1px solid #334155;color:#818cf8;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#312e81';this.style.color='#c7d2fe'" onmouseout="this.style.background='#1e293b';this.style.color='#818cf8'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back</a>
 
-<div class="container">
-    <header>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;">
-            <div>
-                <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Customer Intelligence · Use Case 24</div>
-                <h1>AI Customer Intelligence Layer</h1>
-                <div class="subtitle">Unified AI-powered customer intelligence platform stitching fragmented identity across banking, telephony, support, web and transaction systems into a single enriched profile — with real-time behavioural signals, next-best-action recommendations, POPIA-native consent tracking and bi-directional integration with ARIA (UC18) and PayGuard (UC16)</div>
-                <div>
-                    <span class="badge badge-new">New — Gap Identified by Malcolm</span>
-                    <span class="badge badge-not-started">Not Started — Planning Phase</span>
-                    <span class="badge badge-high">Complexity: High</span>
-                </div>
-                <div style="margin-top:10px;">
-                    <span class="badge badge-compliance">POPIA</span>
-                    <span class="badge badge-compliance">FSCA</span>
-                    <span class="badge badge-compliance">SARB</span>
-                    <span class="badge badge-compliance">FICA</span>
-                    <span class="badge badge-compliance">PCI-DSS</span>
-                </div>
-            </div>
-        </div>
-        <div class="header-grid">
-            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-24</div></div>
-            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
-            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
-            <div class="meta-item"><div class="meta-label">Source Lines</div><div class="meta-value">~6,500 LOC</div></div>
-            <div class="meta-item"><div class="meta-label">Test Lines</div><div class="meta-value">~1,300 LOC</div></div>
-            <div class="meta-item"><div class="meta-label">Files</div><div class="meta-value">28 Files</div></div>
-            <div class="meta-item"><div class="meta-label">Integrations</div><div class="meta-value">8 Systems</div></div>
-            <div class="meta-item"><div class="meta-label">Languages</div><div class="meta-value">Python / TypeScript</div></div>
-        </div>
-        <div class="owner-highlight">
-            <div class="owner-avatar">MG</div>
-            <div>
-                <div class="owner-name-text">Malcolm Govender</div>
-                <div class="owner-role">Head of AI &amp; Engineering · Document Author &amp; Gap Identifier</div>
-            </div>
-        </div>
-    </header>
+<!-- ── Sticky Header ── -->
+<header class="doc-header">
+  <div class="hdr-left">
+    <a href="/index.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+      Back to Tracker
+    </a>
+    <div class="hdr-breadcrumb">
+      <span style="color:var(--text-muted)">UC-24</span>
+      <span class="hdr-sep">/</span>
+      <b>Requirements &amp; User Stories</b>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
 
-    <!-- 1. EXECUTIVE SUMMARY -->
-    <section>
-        <h2>1. Executive Summary</h2>
-        <p>South African financial institutions operate in one of the world's most demanding regulatory environments — POPIA, FSCA, SARB and FICA create overlapping obligations around data minimisation, consent, customer due diligence and fraud prevention. Yet the systems that hold customer data remain deeply fragmented: a customer's banking profile, call-centre history, transactional behaviour, web interactions and KYC records live in six or more isolated platforms with no unified identity layer connecting them.</p>
-        <p>This fragmentation is not merely an operational inconvenience — it is a strategic liability. Relationship managers lack context. Fraud models operate on incomplete signals. Cross-sell and next-best-action engines fire against stale, partial data. POPIA consent obligations cannot be reliably tracked or enforced across systems. The result: missed revenue, elevated regulatory exposure and a customer experience that feels disjointed despite significant technology investment.</p>
-        <p>UC-24 establishes the <strong style="color:#818cf8;">AI Customer Intelligence Layer</strong> — a unified platform that resolves fragmented identities across all source systems, assembles a continuously-updated Unified Customer Profile, enriches it with real-time behavioural signals, and powers AI-driven next-best-action recommendations accessible across every customer-facing touchpoint. It integrates bi-directionally with ARIA (UC18, voice interaction) and PayGuard (UC16, fraud risk) to share and consume signals in real time. POPIA consent is tracked natively, with right-to-erasure propagation engineered into the core data model from day one.</p>
-        <p>Malcolm Govender identified this gap following a cross-system data audit that revealed customers appearing under different identities in six source systems with no shared key, consent records scattered across three platforms, and the fraud model operating without 40% of available behavioural signals. The business case for a unified intelligence layer is clear and urgent.</p>
-        <div class="comparison-box">
-            <div class="compare-card traditional">
-                <div class="compare-label">Traditional Delivery</div>
-                <div class="compare-value">6 Months</div>
-                <div class="compare-sub">4 engineers × 6 months — architecture, integration, compliance</div>
-            </div>
-            <div class="compare-card ai">
-                <div class="compare-label">AI-Assisted Delivery</div>
-                <div class="compare-value">16 Hours</div>
-                <div class="compare-sub">Malcolm Govender — AI-accelerated implementation target</div>
-            </div>
+<!-- ── Page Shell ── -->
+<div class="doc-shell">
+
+  <!-- ── Hero ── -->
+  <div class="doc-hero">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      AI Programme · UC-24
+    </div>
+    <h1 class="hero-title">AI Customer Intelligence Layer</h1>
+    <p class="hero-subtitle"></p>
+    <div class="hero-badges">
+      <span class="badge badge-neutral">New — Gap Identified by Malcolm</span>
+      <span class="badge badge-neutral">Not Started — Planning Phase</span>
+      <span class="badge badge-neutral">Complexity: High</span>
+      <span class="badge badge-neutral">POPIA</span>
+      <span class="badge badge-neutral">FSCA</span>
+      <span class="badge badge-neutral">SARB</span>
+      <span class="badge badge-neutral">FICA</span>
+      <span class="badge badge-neutral">PCI-DSS</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">NICE TO HAVE</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">MUST</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">SHOULD</span>
+      <span class="badge badge-neutral">NICE TO HAVE</span>
+    </div>
+  </div>
+
+  <!-- ── Metadata Strip ── -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-label">Use Case ID</div>
+      <div class="meta-value ">UC-24</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Version</div>
+      <div class="meta-value ">v1.0</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Document Date</div>
+      <div class="meta-value ">May 2026</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Source Lines</div>
+      <div class="meta-value">~6,500 LOC</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Test Lines</div>
+      <div class="meta-value">~1,300 LOC</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Files</div>
+      <div class="meta-value">28 Files</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Integrations</div>
+      <div class="meta-value">8 Systems</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Languages</div>
+      <div class="meta-value">Python / TypeScript</div>
+    </div>
+  </div>
+
+  
+
+  <!-- ── Document Layout ── -->
+  <div class="doc-layout">
+
+    <!-- ToC -->
+    <aside class="doc-toc">
+      <div class="toc-inner">
+        <div class="toc-title">Contents</div>
+        <a href="#s1" class="toc-link"><span class="toc-num">01</span>Executive Summary</a>
+        <a href="#s2" class="toc-link"><span class="toc-num">02</span>Problem Statement</a>
+        <a href="#s3" class="toc-link"><span class="toc-num">03</span>Solution Overview</a>
+        <a href="#s4" class="toc-link"><span class="toc-num">04</span>Functional Requirements</a>
+        <a href="#s5" class="toc-link"><span class="toc-num">05</span>Non-Functional Requirements</a>
+        <a href="#s6" class="toc-link"><span class="toc-num">06</span>Technical Architecture</a>
+        <a href="#s7" class="toc-link"><span class="toc-num">07</span>Compliance & Regulatory Framework</a>
+        <a href="#s8" class="toc-link"><span class="toc-num">08</span>Success Metrics</a>
+        <a href="#s9" class="toc-link"><span class="toc-num">09</span>Next Steps</a>
+        <a href="#s10" class="toc-link"><span class="toc-num">10</span>Related Artefacts</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="doc-content">
+      <section class="doc-section" id="s1">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2 class="section-title">Executive Summary</h2>
         </div>
-    </section>
+        
 
-    <!-- 2. PROBLEM STATEMENT -->
-    <section class="violet">
-        <h2>2. Problem Statement</h2>
-        <p>The core problem is that no single source of truth for customer identity or behaviour exists across the organisation. The following six siloed systems each hold an incomplete, often inconsistent picture of the same customer:</p>
-
-        <div class="silos-grid">
-            <div class="silo-card">
-                <div class="silo-icon">🏦</div>
-                <div class="silo-name">Core Banking</div>
-                <div class="silo-desc">Account data, balances, KYC — no behavioural signals</div>
-            </div>
-            <div class="silo-card">
-                <div class="silo-icon">📞</div>
-                <div class="silo-name">Telephony / IVR</div>
-                <div class="silo-desc">Call records, voice interactions — no profile linkage</div>
-            </div>
-            <div class="silo-card">
-                <div class="silo-icon">🎫</div>
-                <div class="silo-name">Support CRM</div>
-                <div class="silo-desc">Tickets, complaints — siloed from transactions</div>
-            </div>
-            <div class="silo-card">
-                <div class="silo-icon">🌐</div>
-                <div class="silo-name">Web / App</div>
-                <div class="silo-desc">Digital behaviour — anonymous, not linked to customer ID</div>
-            </div>
-            <div class="silo-card">
-                <div class="silo-icon">💳</div>
-                <div class="silo-name">Transactions</div>
-                <div class="silo-desc">Payment history — no consent or preference context</div>
-            </div>
-            <div class="silo-card">
-                <div class="silo-icon">📋</div>
-                <div class="silo-name">KYC / FICA</div>
-                <div class="silo-desc">Identity documents — no linkage to behaviour or consent</div>
-            </div>
-        </div>
-
-        <div class="card violet" style="margin-top:20px;">
-            <div class="card-title">No Unified Customer View — Relationship Managers Operate Blind</div>
-            <div class="card-content">Relationship managers must manually cross-reference three to five systems to assemble a customer picture before any meaningful interaction. This adds 8–12 minutes of preparation per customer engagement, degrades conversation quality and creates errors when different systems show conflicting information. Next-best-action recommendations are impossible without a unified profile to reason over.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">POPIA Consent Gaps — Material Regulatory Exposure</div>
-            <div class="card-content">Consent records are maintained independently in three separate systems with no synchronisation mechanism. When a customer withdraws consent in one system, this change does not propagate to others. POPIA Section 11 (lawful basis) and Section 24 (right to object/withdraw) obligations cannot be reliably met. The estimated POPIA exposure from known consent gaps exceeds R10 million in potential administrative penalties under Section 107.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Fraud Models Operating on Incomplete Signals</div>
-            <div class="card-content">PayGuard (UC16) fraud risk scoring operates primarily on transaction data, without access to behavioural signals from web and app interactions, call-centre patterns or cross-channel velocity. Industry benchmarks show that multi-channel behavioural signals improve fraud detection precision by 25–40%. This integration gap represents both a financial loss and a false-positive cost to legitimate customers.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Identity Resolution — Six Systems, No Shared Key</div>
-            <div class="card-content">A single customer may appear as up to six distinct records across source systems — different name variants, multiple phone numbers, historical ID numbers and various email addresses. Without a probabilistic entity resolution engine, these records cannot be confidently linked, making unified profiling impossible and duplicate-contact compliance reporting unreliable.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Cross-Sell Conversion Severely Constrained by Data Fragmentation</div>
-            <div class="card-content">Product recommendation engines fire against stale, single-system data. Customers receive irrelevant offers because the recommendation model lacks visibility into recent complaints, product holdings in other divisions, or shifts in transaction behaviour indicating new financial needs. Cross-sell conversion rates remain significantly below achievable benchmarks.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Manual Compliance Effort — Data Subject Requests Cannot Be Fulfilled Efficiently</div>
-            <div class="card-content">POPIA Section 23 (right of access) and Section 24 (right to erasure/correction) requests currently require manual investigation across all six source systems. A single data subject access request takes 3–5 business days and involves four teams. POPIA mandates 30-day fulfilment. Without a unified identity layer and automated propagation, this obligation remains operationally fragile.</div>
-        </div>
-    </section>
-
-    <!-- 3. SOLUTION OVERVIEW -->
-    <section>
-        <h2>3. Solution Overview</h2>
-        <p>The AI Customer Intelligence Layer is delivered in three structured phases, each building on the last. Phase 1 establishes the identity and data foundation. Phase 2 adds the AI intelligence layer. Phase 3 integrates with the broader ARIA and PayGuard ecosystem and enables the customer-facing 360 view.</p>
-
-        <div class="phase-grid">
-            <div class="phase-stage">
-                <div class="phase-num">Phase 1</div>
-                <div class="phase-title">Data Stitching &amp; Unified Profile</div>
-                <div class="phase-desc">Entity resolution engine. Unified Customer Profile store. POPIA consent model. Multi-source ingestion pipeline. Right-to-erasure propagation.</div>
-            </div>
-            <div class="phase-stage">
-                <div class="phase-num">Phase 2</div>
-                <div class="phase-title">AI Intelligence Layer</div>
-                <div class="phase-desc">Real-time behavioural signal ingestion. Next-best-action recommendation engine. Propensity models. Churn prediction. Sentiment enrichment.</div>
-            </div>
-            <div class="phase-stage">
-                <div class="phase-num">Phase 3</div>
-                <div class="phase-title">System Integrations</div>
-                <div class="phase-desc">ARIA (UC18) voice interaction integration. PayGuard (UC16) fraud signal sharing. Admin 360 dashboard. Audit trail. API surface for all consumers.</div>
-            </div>
-        </div>
-
-        <div class="unified-callout">
-            <div class="uc-label">Target State</div>
-            <div class="uc-title">Single Unified Customer Profile — &lt;200ms API Response</div>
-            <div class="uc-sub">One API call returns a complete, consent-verified, AI-enriched customer profile stitched from all source systems — accessible by any authorised internal consumer in real time</div>
-        </div>
-
-        <h3>Core Capabilities</h3>
-        <div class="card">
-            <div class="card-title">Probabilistic Entity Resolution Engine</div>
-            <div class="card-content">Multi-attribute matching across name variants (Soundex / phonetic normalisation), RSA ID number, passport number, all known phone numbers (mobile/landline), email addresses and account numbers. Confidence scoring with human-review queue for ambiguous matches. Golden record assembly from highest-confidence attributes across sources.</div>
-        </div>
-        <div class="card">
-            <div class="card-title">Unified Customer Profile Store</div>
-            <div class="card-content">Event-sourced profile store maintaining full history of all attribute changes with source attribution and timestamp. Profile schema includes: identity attributes, product holdings, financial behaviour summary, communication preferences, consent records, risk profile, AI-generated propensity scores and next-best-action signals. POPIA-compliant data minimisation enforced at schema level.</div>
-        </div>
-        <div class="card">
-            <div class="card-title">POPIA-Native Consent Management</div>
-            <div class="card-content">Purpose-specific consent records stored with lawful basis, collection date, channel, expiry and withdrawal state. Consent changes propagate automatically to all source systems via integration bus. Right-to-erasure triggers coordinated deletion across all linked records with audit confirmation. Data subject request workflow automated end-to-end.</div>
-        </div>
-        <div class="card">
-            <div class="card-title">Real-Time Behavioural Signal Ingestion</div>
-            <div class="card-content">Event streaming pipeline consuming signals from web/app clickstream, IVR interaction events, transaction events and support ticket state changes. Sub-second signal ingestion latency. Behavioural features computed incrementally and merged into the live profile. Signals used to update propensity scores and next-best-action recommendations in near real time.</div>
-        </div>
-        <div class="card">
-            <div class="card-title">AI Next-Best-Action Recommendation Engine</div>
-            <div class="card-content">Ensemble model combining collaborative filtering, propensity scoring and contextual bandits to generate ranked product and service recommendations. Recommendations contextualised by channel (voice, digital, branch), recency of behavioural signals and customer lifecycle stage. POPIA consent verified before any personalised recommendation is surfaced.</div>
-        </div>
-        <div class="card teal">
-            <div class="card-title">Bi-Directional ARIA (UC18) Integration</div>
-            <div class="card-content">ARIA voice assistant queries the Unified Customer Profile API to contextualise voice interactions with full customer history, product holdings and sentiment profile. AI layer returns next-best-action recommendations to ARIA at call time. Post-call sentiment and outcome signals fed back into the profile for continuous enrichment.</div>
-        </div>
-        <div class="card teal">
-            <div class="card-title">Bi-Directional PayGuard (UC16) Integration</div>
-            <div class="card-content">PayGuard fraud risk engine subscribes to real-time behavioural signals from the intelligence layer — web velocity, IVR anomalies and cross-channel authentication patterns. In return, PayGuard fraud risk scores are written back into the Unified Customer Profile for use by relationship managers and recommendation engine context filtering.</div>
-        </div>
-    </section>
-
-    <!-- 4. FUNCTIONAL REQUIREMENTS -->
-    <section class="teal">
-        <h2>4. Functional Requirements</h2>
-
-        <h3>4.1 Entity Resolution &amp; Identity Management</h3>
-        <table>
-            <thead>
-                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>FR-24-01</strong></td><td>Entity resolution engine shall match customer records across all six source systems using multi-attribute probabilistic matching — RSA ID, passport, name (phonetic), phone, email and account number; produce confidence score per match</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-02</strong></td><td>Entity resolution engine shall assemble a Golden Record from highest-confidence attributes across all matched source records; flag conflicting attributes for human review</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-03</strong></td><td>Ambiguous match queue shall route records with confidence score between 60–85% to a human review interface; reviewer decision recorded with audit trail and used to improve model</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-04</strong></td><td>System shall support incremental identity resolution — new records ingested from source systems shall be matched against existing Golden Records within 60 seconds of ingestion</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-05</strong></td><td>Entity resolution model shall provide explainability output — matched attributes and their weights — for any Golden Record on request, to support POPIA data subject queries and audit</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-            </tbody>
-        </table>
-
-        <h3>4.2 Unified Customer Profile API</h3>
-        <table>
-            <thead>
-                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>FR-24-06</strong></td><td>Unified Customer Profile API shall return a complete, consent-verified customer profile within 200ms at the 95th percentile; profile shall include identity, product holdings, behavioural summary, consent state and AI-enriched signals</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-07</strong></td><td>Profile API shall expose caller-scoped views — relationship manager view, fraud risk view, recommendation engine view — with field-level access control enforced based on authenticated caller identity and purpose</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-08</strong></td><td>Profile mutations (updates, corrections) shall be event-sourced — every change recorded with timestamp, source system, actor identity and reason; full profile history reconstructable at any point in time</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-09</strong></td><td>Profile API shall include a POPIA consent verification endpoint — given a customer ID and processing purpose, return current consent state (granted/withdrawn/expired) with associated metadata</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-10</strong></td><td>Profile API shall support bulk retrieval for batch processing use cases (e.g., campaign eligibility) with rate limiting and purpose-bound access tokens; individual record response caching with 30-second TTL</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-            </tbody>
-        </table>
-
-        <h3>4.3 POPIA Consent Management &amp; Right-to-Erasure</h3>
-        <table>
-            <thead>
-                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>FR-24-11</strong></td><td>Consent management module shall store purpose-specific consent records with: lawful basis, collection date, collection channel, consent version, expiry date and current state (granted/withdrawn/expired); one record per purpose per customer</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-12</strong></td><td>Consent withdrawal events shall propagate automatically to all six source systems via integration bus within 5 minutes of withdrawal recording; propagation success/failure logged per target system with retry mechanism</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-13</strong></td><td>Right-to-erasure request workflow shall trigger coordinated deletion across all linked records in all source systems within 30 calendar days; each deletion confirmed and recorded in the erasure audit log; customer notified upon completion</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-14</strong></td><td>Data subject access requests (POPIA Section 23) shall be fulfilled via automated report generation compiling all personal data held across linked source systems; report generated within 24 hours of request; delivered via secure channel</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-15</strong></td><td>Consent expiry shall be monitored continuously; customers with expiring consent notified 30 days in advance via preferred channel; re-consent workflow triggered automatically; processing suspended if consent lapses without renewal</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-16</strong></td><td>Consent model shall support granular purpose categories aligned to POPIA Sections 11–14: marketing, fraud prevention, product improvement, regulatory reporting, third-party sharing; each tracked and enforced independently</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-            </tbody>
-        </table>
-
-        <h3>4.4 AI Intelligence Layer</h3>
-        <table>
-            <thead>
-                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>FR-24-17</strong></td><td>Next-best-action recommendation engine shall generate ranked product and service recommendations for each customer; updated when new behavioural signals are received; POPIA marketing consent verified before surfacing any personalised recommendation</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-18</strong></td><td>Real-time behavioural signal ingestion pipeline shall consume events from web/app clickstream, IVR, transactions and support systems with sub-5-second end-to-end latency from event emission to profile enrichment</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-19</strong></td><td>Churn propensity model shall score each customer daily on likelihood of product cancellation or account closure within 90 days; scores stored in profile; high-churn-risk customers surfaced to relationship managers via dashboard alert</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-20</strong></td><td>Sentiment enrichment module shall analyse support ticket text and IVR transcripts (from ARIA UC18) using NLP to produce a customer sentiment score; sentiment trend tracked over rolling 90 days and surfaced in the 360 view</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-21</strong></td><td>Customer lifecycle stage classification (prospect / new / active / at-risk / churned) shall be computed from behavioural and transactional signals and updated in the profile within 24 hours of a stage-change trigger event</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-22</strong></td><td>Cross-sell propensity scores shall be computed per eligible product category per customer; model shall incorporate product holding gaps, transaction category analysis, life event signals and peer group benchmarks</td><td><span class="badge badge-nice" style="margin:0;padding:3px 10px;font-size:0.75em;">NICE TO HAVE</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-            </tbody>
-        </table>
-
-        <h3>4.5 System Integrations</h3>
-        <table>
-            <thead>
-                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>FR-24-23</strong></td><td>ARIA (UC18) integration: intelligence layer shall expose a synchronous profile context API consumed by ARIA at call initiation; response must include full profile, consent state and ranked next-best-action list within 200ms</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-24</strong></td><td>ARIA (UC18) integration: post-call events (outcome, sentiment, product discussed, agent notes) shall be written back to the customer profile via async event within 60 seconds of call completion</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-25</strong></td><td>PayGuard (UC16) integration: intelligence layer shall publish real-time behavioural signals (web velocity, IVR anomalies, cross-channel auth patterns) to PayGuard's fraud signal bus; event schema agreed and versioned between teams</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-26</strong></td><td>PayGuard (UC16) integration: fraud risk scores produced by PayGuard shall be written back into the Unified Customer Profile within 10 seconds of score generation; scores used to filter next-best-action recommendations and contextualise RM alerts</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-27</strong></td><td>All six source system integrations shall use schema-versioned event contracts; breaking changes require version bump and parallel support period of minimum 30 days to avoid consumer disruption</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-            </tbody>
-        </table>
-
-        <h3>4.6 Admin Dashboard &amp; Audit Trail</h3>
-        <table>
-            <thead>
-                <tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>FR-24-28</strong></td><td>Admin dashboard shall present a Customer 360 view displaying: unified identity, product holdings, behavioural summary, consent status per purpose, next-best-action recommendations, fraud risk score, churn risk score and sentiment trend</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-29</strong></td><td>Audit trail shall log every read and write operation against any customer profile — recording: actor identity, caller system, purpose claim, timestamp, fields accessed and any data returned or modified; logs immutable and retained for 5 years</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-30</strong></td><td>Dashboard shall include a POPIA compliance view: consent coverage rate per purpose, pending erasure requests, data subject access request status, consent expiry forecast and cross-system propagation health</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-31</strong></td><td>Entity resolution management interface shall allow data stewards to review ambiguous matches, confirm or reject Golden Record linkages, and trigger manual re-resolution for specific records; all decisions logged</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-                <tr><td><strong>FR-24-32</strong></td><td>Audit export capability shall produce POPIA-compliant audit reports in PDF and CSV format for regulatory submissions, covering a specified date range and filtered by customer ID, actor or purpose category</td><td><span class="badge badge-nice" style="margin:0;padding:3px 10px;font-size:0.75em;">NICE TO HAVE</span></td><td style="color:#f59e0b;">Not Built</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 5. NON-FUNCTIONAL REQUIREMENTS -->
-    <section>
-        <h2>5. Non-Functional Requirements</h2>
-        <table>
-            <thead>
-                <tr><th>Category</th><th>Requirement</th><th>Target</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>API Latency</strong></td><td>Unified Customer Profile API P95 response time</td><td>&lt; 200ms</td></tr>
-                <tr><td><strong>API Latency</strong></td><td>Consent verification endpoint P95 response time</td><td>&lt; 50ms</td></tr>
-                <tr><td><strong>Signal Ingestion</strong></td><td>End-to-end latency from behavioural event emission to profile enrichment</td><td>&lt; 5 seconds</td></tr>
-                <tr><td><strong>Entity Resolution</strong></td><td>Incremental match processing latency for new ingested records</td><td>&lt; 60 seconds</td></tr>
-                <tr><td><strong>Throughput</strong></td><td>Concurrent profile API reads across all consuming systems</td><td>&ge; 5,000 req/sec</td></tr>
-                <tr><td><strong>Throughput</strong></td><td>Behavioural events processed per second at peak</td><td>&ge; 50,000 events/sec</td></tr>
-                <tr><td><strong>Availability</strong></td><td>Unified Customer Profile API uptime SLA</td><td>99.95%</td></tr>
-                <tr><td><strong>Data Durability</strong></td><td>Profile store RPO (recovery point objective)</td><td>&lt; 1 minute</td></tr>
-                <tr><td><strong>Data Durability</strong></td><td>Profile store RTO (recovery time objective)</td><td>&lt; 5 minutes</td></tr>
-                <tr><td><strong>POPIA Compliance</strong></td><td>Consent propagation to all source systems after withdrawal event</td><td>&lt; 5 minutes</td></tr>
-                <tr><td><strong>POPIA Compliance</strong></td><td>Right-to-erasure completion across all linked source systems</td><td>&lt; 30 calendar days</td></tr>
-                <tr><td><strong>POPIA Compliance</strong></td><td>Data subject access request report generation</td><td>&lt; 24 hours</td></tr>
-                <tr><td><strong>Security</strong></td><td>All personal data encrypted at rest (AES-256) and in transit (TLS 1.3)</td><td>Mandatory</td></tr>
-                <tr><td><strong>Security</strong></td><td>Field-level access control enforced at API layer — no over-exposure of personal data to callers without declared purpose</td><td>Mandatory</td></tr>
-                <tr><td><strong>Audit Retention</strong></td><td>Immutable audit log retention period for all profile access and mutation events</td><td>5 years minimum</td></tr>
-                <tr><td><strong>Scalability</strong></td><td>Profile store designed to support growth to 10 million customer records without re-architecture</td><td>Horizontal scale</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 6. TECHNICAL ARCHITECTURE -->
-    <section class="violet">
-        <h2>6. Technical Architecture</h2>
-        <p>The AI Customer Intelligence Layer is composed of six primary components connected via an asynchronous event integration bus. The architecture is designed for horizontal scalability, event-driven enrichment and strict data access control.</p>
-
-        <div class="arch-row">
-            <div class="card violet">
-                <div class="card-title">Entity Resolution Engine (Python)</div>
-                <div class="card-content">Probabilistic record linkage using blocking strategies (Soundex, phonetic normalisation, RSA ID normalisation) followed by pairwise comparison with weighted attribute scoring. Splink or custom scikit-learn model for match probability. Confidence bands: &gt;85% auto-merge, 60–85% human review queue, &lt;60% no match. Golden Record assembly merges highest-confidence attributes with source attribution retained.</div>
-            </div>
-            <div class="card violet">
-                <div class="card-title">Unified Profile Store (Python + TypeScript)</div>
-                <div class="card-content">Event-sourced profile store built on PostgreSQL with Redis caching layer for hot profile reads. Profile schema versioned with forward/backward compatibility. POPIA data minimisation enforced at write time — only permitted fields stored per purpose. Full event history retained for audit reconstruction. Consent state stored as first-class profile attribute, not a sidecar.</div>
-            </div>
-        </div>
-        <div class="arch-row">
-            <div class="card violet">
-                <div class="card-title">Behavioural Signal Ingestion Pipeline (Python)</div>
-                <div class="card-content">Apache Kafka or AWS Kinesis event streaming backbone consuming events from six source systems. Schema Registry enforces event contract versioning. Stream processors (Faust / AWS Lambda) compute incremental behavioural features and write enriched signals to the profile store. Dead-letter queue with alerting for failed event processing. Sub-5-second end-to-end latency target.</div>
-            </div>
-            <div class="card violet">
-                <div class="card-title">AI Recommendation &amp; Propensity Engine (Python)</div>
-                <div class="card-content">Ensemble model: collaborative filtering (matrix factorisation) combined with XGBoost propensity scoring and a contextual bandit layer for channel-specific recommendation ranking. Models retrained weekly on updated profile and behavioural data. POPIA consent gate enforced pre-inference — no personalised output generated without verified marketing consent. Model outputs stored back in profile for API access.</div>
-            </div>
-        </div>
-        <div class="arch-row">
-            <div class="card violet">
-                <div class="card-title">Integration Bus &amp; Consent Propagation (Python)</div>
-                <div class="card-content">Event-driven integration bus managing bi-directional message flow between the intelligence layer, six source systems, ARIA (UC18) and PayGuard (UC16). Consent withdrawal events published as priority messages with guaranteed delivery and receipt acknowledgement from each target system. Integration health dashboard shows per-system delivery latency and error rates. Circuit breaker pattern applied per integration endpoint.</div>
-            </div>
-            <div class="card violet">
-                <div class="card-title">API Layer &amp; Access Control (TypeScript / FastAPI)</div>
-                <div class="card-content">RESTful Profile API with OpenAPI 3.0 specification. OAuth 2.0 / JWT authentication. Caller identity bound to purpose claim at token issuance time — field-level filtering applied per purpose at query time. Rate limiting per caller. Distributed caching (Redis) for hot profiles. Audit log write on every API call (async, does not add to response latency). API gateway with mTLS for internal service-to-service calls.</div>
-            </div>
-        </div>
-        <div class="card violet" style="margin-top:4px;">
-            <div class="card-title">Admin Dashboard &amp; Customer 360 View (TypeScript / React)</div>
-            <div class="card-content">Single-page application providing Customer 360 view, POPIA compliance monitoring, entity resolution management interface and audit log search. Role-based access control with four roles: RM (read-only profile view), Data Steward (entity resolution, consent management), Compliance Officer (POPIA reporting, erasure workflows) and System Admin (full access). All dashboard actions logged in the audit trail. Built as an internal web application, not exposed externally.</div>
-        </div>
-    </section>
-
-    <!-- 7. COMPLIANCE & REGULATORY -->
-    <section class="teal">
-        <h2>7. Compliance &amp; Regulatory Framework</h2>
-        <p>UC-24 operates at the intersection of customer data, AI inference and multi-system integration — making regulatory compliance a first-order engineering requirement, not a post-build concern. The following frameworks govern the design and operation of the intelligence layer.</p>
-
-        <h3>7.1 POPIA — Protection of Personal Information Act</h3>
-        <table>
-            <thead>
-                <tr><th>POPIA Section</th><th>Obligation</th><th>How UC-24 Addresses It</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>Section 8</strong></td><td>Accountability — responsible party must ensure all conditions for lawful processing are met</td><td>Intelligence layer is the authoritative system of record for consent and lawful basis; all processing purpose-bound and auditable</td></tr>
-                <tr><td><strong>Section 9</strong></td><td>Processing limitation — personal information may only be processed if adequate, relevant and not excessive</td><td>POPIA data minimisation enforced at profile schema level; purpose claims validated at API access time; field-level filtering removes over-exposure</td></tr>
-                <tr><td><strong>Section 10</strong></td><td>Purpose specification — personal information must be collected for a specific, explicitly defined and lawful purpose</td><td>All stored personal data tagged with originating purpose at ingest time; purpose registry maintained and auditable</td></tr>
-                <tr><td><strong>Section 11</strong></td><td>Further processing limitation — further processing must be compatible with original purpose</td><td>Purpose-claim enforcement at API layer prevents consumption of personal data for incompatible secondary purposes</td></tr>
-                <tr><td><strong>Section 12</strong></td><td>Information quality — personal information must be complete, accurate and not misleading</td><td>Golden Record assembly resolves conflicts; data quality scores tracked per attribute; staleness indicators prevent use of outdated data</td></tr>
-                <tr><td><strong>Section 14</strong></td><td>Information security — appropriate technical measures to safeguard personal information</td><td>AES-256 encryption at rest; TLS 1.3 in transit; field-level access control; immutable audit log; zero-trust internal API authentication</td></tr>
-                <tr><td><strong>Section 18</strong></td><td>Notification — data subjects must be notified of purpose of collection and rights</td><td>Consent collection workflow includes purpose disclosure; data subject portal provides access to all held data and consent records</td></tr>
-                <tr><td><strong>Section 22</strong></td><td>Notification of security compromises — data subjects notified of breaches without unreasonable delay</td><td>Security incident detection integrated with audit log anomaly alerting; breach notification workflow built into compliance dashboard</td></tr>
-                <tr><td><strong>Section 23</strong></td><td>Right of access — data subjects may request all personal information held</td><td>Automated data subject access request workflow generates comprehensive report across all linked source systems within 24 hours</td></tr>
-                <tr><td><strong>Section 24</strong></td><td>Right to correction or deletion — data subjects may request correction or erasure</td><td>Erasure workflow triggers coordinated deletion across all six source systems with confirmation audit trail; correction workflow updates Golden Record with source attribution</td></tr>
-                <tr><td><strong>Section 25</strong></td><td>Right to object — data subjects may object to processing at any time</td><td>Consent withdrawal propagated to all source systems within 5 minutes; processing suspended immediately upon objection receipt</td></tr>
-            </tbody>
-        </table>
-
-        <h3>7.2 Additional Regulatory Frameworks</h3>
-        <table>
-            <thead>
-                <tr><th>Framework</th><th>Specific Requirement</th><th>How UC-24 Addresses It</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><strong>FSCA</strong></td><td>Conduct of Business standards — customer information used for product recommendations must be based on complete and accurate customer profiles (FAIS Act Section 8)</td><td>Unified Customer Profile ensures recommendations based on complete, current and consent-verified data; recommendation audit trail supports FSCA inspection evidence</td></tr>
-                <tr><td><strong>SARB</strong></td><td>Technology risk management — customer data systems must maintain data integrity, access controls and audit trails appropriate to their criticality</td><td>Immutable 5-year audit log; event-sourced profile store with full reconstruction capability; RTO/RPO targets aligned to SARB operational resilience guidance</td></tr>
-                <tr><td><strong>FICA</strong></td><td>Know Your Customer / Customer Due Diligence — customer identity data must be verified, current and accessible for AML/CFT monitoring</td><td>Unified Customer Profile consolidates KYC attributes from all source systems; Golden Record provides single verified identity for FICA CDD purposes; identity freshness tracked and flagged when re-verification is required</td></tr>
-                <tr><td><strong>PCI-DSS v4.0</strong></td><td>Req 7: Restrict access to system components and cardholder data; Req 10: Log and monitor all access to system components and cardholder data</td><td>Field-level access control at API layer; purpose-bound caller tokens; immutable access audit log covering all cardholder data fields in the profile</td></tr>
-                <tr><td><strong>AI Ethics / FSCA Guidance</strong></td><td>Emerging FSCA expectations on explainability and fairness in AI-generated customer recommendations</td><td>Next-best-action engine produces explainability output per recommendation; bias monitoring on recommendation distribution by demographic segment; human override capability built into RM interface</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 8. SUCCESS METRICS -->
-    <section>
-        <h2>8. Success Metrics</h2>
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">25–35%</div>
-                <div class="metric-label">Cross-sell conversion uplift from AI next-best-action</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">R10M+</div>
-                <div class="metric-label">POPIA regulatory exposure eliminated via consent management</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">80%</div>
-                <div class="metric-label">Reduction in manual POPIA compliance effort</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">6</div>
-                <div class="metric-label">Siloed source systems unified under single customer identity</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">&lt;200ms</div>
-                <div class="metric-label">Unified Customer Profile API P95 response time</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">24hrs</div>
-                <div class="metric-label">Data subject access request fulfilment time (automated)</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">&lt;5 min</div>
-                <div class="metric-label">Consent withdrawal propagation to all source systems</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">40%+</div>
-                <div class="metric-label">Improvement in fraud signal coverage to PayGuard (UC16)</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-value">100%</div>
-                <div class="metric-label">Profile read/write operations covered by immutable audit trail</div>
-            </div>
-        </div>
-        <p style="margin-top:20px;">The financial case is clear: eliminating R10M+ in POPIA exposure, capturing cross-sell uplift of 25–35% against an enriched customer base, and reducing compliance overhead by 80% deliver a business case that justifies investment with payback well within 12 months. The operational case is equally compelling — relationship managers operating with a complete customer view, fraud models enriched with behavioural signals, and POPIA obligations automated rather than manually managed.</p>
-    </section>
-
-    <!-- 9. NEXT STEPS -->
-    <section class="violet">
-        <h2>9. Next Steps</h2>
-        <h3>Phase 1 — Foundation Audit &amp; Design (Weeks 1–4)</h3>
-        <ol class="step-list">
-            <li>Conduct cross-system data audit — inventory all customer-related data fields in each of the six source systems; document current identity keys, consent record locations and data quality issues</li>
-            <li>Design entity resolution matching strategy — define attribute weighting model, blocking strategy and confidence threshold bands; establish human review queue workflow and tooling</li>
-            <li>Define Unified Customer Profile schema — agree field set, consent model structure, data minimisation rules and purpose taxonomy with compliance, legal and business stakeholders</li>
-            <li>Establish POPIA consent baseline — identify all current consent records across three systems; assess gaps, conflicts and expired consents; define migration strategy for Day 1 consent state</li>
-        </ol>
-        <h3>Phase 2 — Core Build (Weeks 5–12)</h3>
-        <ol class="step-list">
-            <li>Build and validate entity resolution engine — train on historical customer records with known ground truth; achieve &gt;90% precision on test set before production ingestion begins</li>
-            <li>Deploy event-sourced Unified Customer Profile store — initial population from core banking system as the highest-quality source; progressively merge additional source systems</li>
-            <li>Implement POPIA consent management module — consent record migration, withdrawal propagation pipeline, erasure workflow and data subject access request automation</li>
-            <li>Build behavioural signal ingestion pipeline — connect to web/app, IVR and transaction event streams; validate sub-5-second end-to-end latency under load</li>
-            <li>Develop and validate Unified Customer Profile API — performance testing to confirm P95 &lt;200ms target; field-level access control integration testing with purpose-claim enforcement</li>
-        </ol>
-        <h3>Phase 3 — AI Layer &amp; Integrations (Weeks 13–20)</h3>
-        <ol class="step-list">
-            <li>Train and deploy next-best-action recommendation engine — A/B test against existing recommendation approach; measure cross-sell conversion uplift in controlled cohort before full rollout</li>
-            <li>Deliver ARIA (UC18) bi-directional integration — coordinate with UC18 team on API contract; validate &lt;200ms profile context response at call initiation; test post-call writeback</li>
-            <li>Deliver PayGuard (UC16) bi-directional integration — coordinate on behavioural signal schema; validate fraud risk score writeback to profile; measure improvement in fraud signal coverage</li>
-            <li>Launch Customer 360 admin dashboard — pilot with a cohort of relationship managers; gather structured feedback on profile completeness, recommendation relevance and POPIA workflow usability</li>
-            <li>Complete compliance validation — conduct POPIA readiness assessment with legal; verify all Sections 8–25 obligations met; produce audit evidence pack for FSCA and SARB review readiness</li>
-        </ol>
-    </section>
-
-    <!-- RELATED ARTEFACTS -->
-    <section>
-        <h2>Related Artefacts</h2>
-        <div class="artifacts-row">
-            <a class="artifact-link" href="#">Requirements (this document)</a>
-            <a class="artifact-link" href="#">Entity Resolution Design Specification</a>
-            <a class="artifact-link" href="#">Unified Profile Schema v1.0</a>
-            <a class="artifact-link" href="#">POPIA Consent Model &amp; Purpose Registry</a>
-            <a class="artifact-link" href="#">UC18 ARIA Integration Contract</a>
-            <a class="artifact-link" href="#">UC16 PayGuard Signal Schema</a>
-            <a class="artifact-link" href="#">API OpenAPI 3.0 Specification</a>
-        </div>
-    </section>
-
-    <footer>
-        <p>UC-24 AI Customer Intelligence Layer — Requirements &amp; Planning Document v1.0</p>
-        <p style="margin-top:6px;">Gap Identified &amp; Authored by: <strong style="color:#818cf8;">Malcolm Govender</strong>, Head of AI &amp; Engineering &nbsp;·&nbsp; May 2026</p>
-        <p style="margin-top:6px;">South African Fintech AI Transformation Programme</p>
-    </footer>
+<p>South African financial institutions operate in one of the world's most demanding regulatory environments — POPIA, FSCA, SARB and FICA create overlapping obligations around data minimisation, consent, customer due diligence and fraud prevention. Yet the systems that hold customer data remain deeply fragmented: a customer's banking profile, call-centre history, transactional behaviour, web interactions and KYC records live in six or more isolated platforms with no unified identity layer connecting them.</p>
+<p>This fragmentation is not merely an operational inconvenience — it is a strategic liability. Relationship managers lack context. Fraud models operate on incomplete signals. Cross-sell and next-best-action engines fire against stale, partial data. POPIA consent obligations cannot be reliably tracked or enforced across systems. The result: missed revenue, elevated regulatory exposure and a customer experience that feels disjointed despite significant technology investment.</p>
+<p>UC-24 establishes the <strong style="color:#818cf8;">AI Customer Intelligence Layer</strong> — a unified platform that resolves fragmented identities across all source systems, assembles a continuously-updated Unified Customer Profile, enriches it with real-time behavioural signals, and powers AI-driven next-best-action recommendations accessible across every customer-facing touchpoint. It integrates bi-directionally with ARIA (UC18, voice interaction) and PayGuard (UC16, fraud risk) to share and consume signals in real time. POPIA consent is tracked natively, with right-to-erasure propagation engineered into the core data model from day one.</p>
+<p>Malcolm Govender identified this gap following a cross-system data audit that revealed customers appearing under different identities in six source systems with no shared key, consent records scattered across three platforms, and the fraud model operating without 40% of available behavioural signals. The business case for a unified intelligence layer is clear and urgent.</p>
+<div class="comparison-box">
+<div class="compare-card traditional">
+<div class="compare-label">Traditional Delivery</div>
+<div class="compare-value">6 Months</div>
+<div class="compare-sub">4 engineers × 6 months — architecture, integration, compliance</div>
+</div>
+<div class="compare-card ai">
+<div class="compare-label">AI-Assisted Delivery</div>
+<div class="compare-value">16 Hours</div>
+<div class="compare-sub">Malcolm Govender — AI-accelerated implementation target</div>
+</div>
 </div>
 
-<!-- EDITABLE DOCUMENT SYSTEM -->
-<style data-editable-system>
-  body.edm [data-eid]:hover{outline:2px dashed rgba(167,139,250,.35)!important;outline-offset:3px;border-radius:3px;cursor:text}
-  body.edm [data-eid]:focus{outline:2px solid #a78bfa!important;outline-offset:3px;border-radius:3px;background:rgba(167,139,250,.07)!important}
-  body.edm [data-eid]:empty::before{content:"Click to add text";color:rgba(167,139,250,.4);font-style:italic;pointer-events:none}
-  #__etb{position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:6px;align-items:center;background:#111827;border:1px solid #374151;border-radius:12px;padding:9px 14px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
-  #__etb button{padding:5px 11px;border-radius:7px;border:1px solid #374151;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;background:#1f2937;color:#d1d5db}
-  #__etb button:hover{border-color:#a78bfa;color:#e8eaff}
-  #__etb .etb-edit{color:#a78bfa}
-  #__etb .etb-save{color:#34d399}
-  #__etb .etb-reset{color:#f87171}
-  #__etb .etb-export{color:#38bdf8}
-  #__etb .etb-msg{font-size:10.5px;color:#6b7280;min-width:90px;text-align:right}
-  #__etb .etb-sep{width:1px;height:20px;background:#374151;margin:0 2px}
-</style>
-<script data-editable-system>
-(function(){
-  'use strict';
-  var KEY = 'edm:' + (location.pathname || location.href);
-  var SELS = 'p,h1,h2,h3,h4,h5,li,td,th,blockquote,.card-content,.card-title,.meta-value,.hero-meta-value,.summary-card p,.risk-detail,.risk-title,.phase-desc,.gap-value,.kpi-val,.kpi-lbl,.story-text,.card-content p,.dependency-detail,.dependency-system,.checklist li,.warning-box,.info-box,.code-block,.gap-item .gap-value,.status-badge,.badge,.tech-tag,.hero-subtitle,caption,dt,dd,.requirement,.storyid';
-  var mode = false, timer = null, ids = [];
+      </section>
+      <section class="doc-section" id="s2">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <h2 class="section-title">Problem Statement</h2>
+        </div>
+        
 
-  function elems(){
-    return [].slice.call(document.querySelectorAll(SELS)).filter(function(el){
-      return !el.closest('#__etb') && !el.closest('script') && !el.closest('style') && !el.closest('noscript');
-    });
-  }
+<p>The core problem is that no single source of truth for customer identity or behaviour exists across the organisation. The following six siloed systems each hold an incomplete, often inconsistent picture of the same customer:</p>
+<div class="silos-grid">
+<div class="silo-card">
+<div class="silo-icon">🏦</div>
+<div class="silo-name">Core Banking</div>
+<div class="silo-desc">Account data, balances, KYC — no behavioural signals</div>
+</div>
+<div class="silo-card">
+<div class="silo-icon">📞</div>
+<div class="silo-name">Telephony / IVR</div>
+<div class="silo-desc">Call records, voice interactions — no profile linkage</div>
+</div>
+<div class="silo-card">
+<div class="silo-icon">🎫</div>
+<div class="silo-name">Support CRM</div>
+<div class="silo-desc">Tickets, complaints — siloed from transactions</div>
+</div>
+<div class="silo-card">
+<div class="silo-icon">🌐</div>
+<div class="silo-name">Web / App</div>
+<div class="silo-desc">Digital behaviour — anonymous, not linked to customer ID</div>
+</div>
+<div class="silo-card">
+<div class="silo-icon">💳</div>
+<div class="silo-name">Transactions</div>
+<div class="silo-desc">Payment history — no consent or preference context</div>
+</div>
+<div class="silo-card">
+<div class="silo-icon">📋</div>
+<div class="silo-name">KYC / FICA</div>
+<div class="silo-desc">Identity documents — no linkage to behaviour or consent</div>
+</div>
+</div>
+<div class="card violet" style="margin-top:20px;">
+<div class="card-title">No Unified Customer View — Relationship Managers Operate Blind</div>
+<div class="card-content">Relationship managers must manually cross-reference three to five systems to assemble a customer picture before any meaningful interaction. This adds 8–12 minutes of preparation per customer engagement, degrades conversation quality and creates errors when different systems show conflicting information. Next-best-action recommendations are impossible without a unified profile to reason over.</div>
+</div>
+<div class="card violet">
+<div class="card-title">POPIA Consent Gaps — Material Regulatory Exposure</div>
+<div class="card-content">Consent records are maintained independently in three separate systems with no synchronisation mechanism. When a customer withdraws consent in one system, this change does not propagate to others. POPIA Section 11 (lawful basis) and Section 24 (right to object/withdraw) obligations cannot be reliably met. The estimated POPIA exposure from known consent gaps exceeds R10 million in potential administrative penalties under Section 107.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Fraud Models Operating on Incomplete Signals</div>
+<div class="card-content">PayGuard (UC16) fraud risk scoring operates primarily on transaction data, without access to behavioural signals from web and app interactions, call-centre patterns or cross-channel velocity. Industry benchmarks show that multi-channel behavioural signals improve fraud detection precision by 25–40%. This integration gap represents both a financial loss and a false-positive cost to legitimate customers.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Identity Resolution — Six Systems, No Shared Key</div>
+<div class="card-content">A single customer may appear as up to six distinct records across source systems — different name variants, multiple phone numbers, historical ID numbers and various email addresses. Without a probabilistic entity resolution engine, these records cannot be confidently linked, making unified profiling impossible and duplicate-contact compliance reporting unreliable.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Cross-Sell Conversion Severely Constrained by Data Fragmentation</div>
+<div class="card-content">Product recommendation engines fire against stale, single-system data. Customers receive irrelevant offers because the recommendation model lacks visibility into recent complaints, product holdings in other divisions, or shifts in transaction behaviour indicating new financial needs. Cross-sell conversion rates remain significantly below achievable benchmarks.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Manual Compliance Effort — Data Subject Requests Cannot Be Fulfilled Efficiently</div>
+<div class="card-content">POPIA Section 23 (right of access) and Section 24 (right to erasure/correction) requests currently require manual investigation across all six source systems. A single data subject access request takes 3–5 business days and involves four teams. POPIA mandates 30-day fulfilment. Without a unified identity layer and automated propagation, this obligation remains operationally fragile.</div>
+</div>
 
-  function stamp(){
-    ids = [];
-    elems().forEach(function(el,i){
-      el.setAttribute('data-eid', i);
-      ids.push(i);
-    });
-  }
+      </section>
+      <section class="doc-section" id="s3">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <h2 class="section-title">Solution Overview</h2>
+        </div>
+        
 
-  function enable(){
-    mode = true;
-    document.body.classList.add('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'true';
-      el.spellcheck = false;
-    });
-    document.addEventListener('input', onInput);
-    refresh();
-  }
+<p>The AI Customer Intelligence Layer is delivered in three structured phases, each building on the last. Phase 1 establishes the identity and data foundation. Phase 2 adds the AI intelligence layer. Phase 3 integrates with the broader ARIA and PayGuard ecosystem and enables the customer-facing 360 view.</p>
+<div class="phase-grid">
+<div class="phase-stage">
+<div class="phase-num">Phase 1</div>
+<div class="phase-title">Data Stitching &amp; Unified Profile</div>
+<div class="phase-desc">Entity resolution engine. Unified Customer Profile store. POPIA consent model. Multi-source ingestion pipeline. Right-to-erasure propagation.</div>
+</div>
+<div class="phase-stage">
+<div class="phase-num">Phase 2</div>
+<div class="phase-title">AI Intelligence Layer</div>
+<div class="phase-desc">Real-time behavioural signal ingestion. Next-best-action recommendation engine. Propensity models. Churn prediction. Sentiment enrichment.</div>
+</div>
+<div class="phase-stage">
+<div class="phase-num">Phase 3</div>
+<div class="phase-title">System Integrations</div>
+<div class="phase-desc">ARIA (UC18) voice interaction integration. PayGuard (UC16) fraud signal sharing. Admin 360 dashboard. Audit trail. API surface for all consumers.</div>
+</div>
+</div>
+<div class="unified-callout">
+<div class="uc-label">Target State</div>
+<div class="uc-title">Single Unified Customer Profile — &lt;200ms API Response</div>
+<div class="uc-sub">One API call returns a complete, consent-verified, AI-enriched customer profile stitched from all source systems — accessible by any authorised internal consumer in real time</div>
+</div>
+<h3>Core Capabilities</h3>
+<div class="card">
+<div class="card-title">Probabilistic Entity Resolution Engine</div>
+<div class="card-content">Multi-attribute matching across name variants (Soundex / phonetic normalisation), RSA ID number, passport number, all known phone numbers (mobile/landline), email addresses and account numbers. Confidence scoring with human-review queue for ambiguous matches. Golden record assembly from highest-confidence attributes across sources.</div>
+</div>
+<div class="card">
+<div class="card-title">Unified Customer Profile Store</div>
+<div class="card-content">Event-sourced profile store maintaining full history of all attribute changes with source attribution and timestamp. Profile schema includes: identity attributes, product holdings, financial behaviour summary, communication preferences, consent records, risk profile, AI-generated propensity scores and next-best-action signals. POPIA-compliant data minimisation enforced at schema level.</div>
+</div>
+<div class="card">
+<div class="card-title">POPIA-Native Consent Management</div>
+<div class="card-content">Purpose-specific consent records stored with lawful basis, collection date, channel, expiry and withdrawal state. Consent changes propagate automatically to all source systems via integration bus. Right-to-erasure triggers coordinated deletion across all linked records with audit confirmation. Data subject request workflow automated end-to-end.</div>
+</div>
+<div class="card">
+<div class="card-title">Real-Time Behavioural Signal Ingestion</div>
+<div class="card-content">Event streaming pipeline consuming signals from web/app clickstream, IVR interaction events, transaction events and support ticket state changes. Sub-second signal ingestion latency. Behavioural features computed incrementally and merged into the live profile. Signals used to update propensity scores and next-best-action recommendations in near real time.</div>
+</div>
+<div class="card">
+<div class="card-title">AI Next-Best-Action Recommendation Engine</div>
+<div class="card-content">Ensemble model combining collaborative filtering, propensity scoring and contextual bandits to generate ranked product and service recommendations. Recommendations contextualised by channel (voice, digital, branch), recency of behavioural signals and customer lifecycle stage. POPIA consent verified before any personalised recommendation is surfaced.</div>
+</div>
+<div class="card teal">
+<div class="card-title">Bi-Directional ARIA (UC18) Integration</div>
+<div class="card-content">ARIA voice assistant queries the Unified Customer Profile API to contextualise voice interactions with full customer history, product holdings and sentiment profile. AI layer returns next-best-action recommendations to ARIA at call time. Post-call sentiment and outcome signals fed back into the profile for continuous enrichment.</div>
+</div>
+<div class="card teal">
+<div class="card-title">Bi-Directional PayGuard (UC16) Integration</div>
+<div class="card-content">PayGuard fraud risk engine subscribes to real-time behavioural signals from the intelligence layer — web velocity, IVR anomalies and cross-channel authentication patterns. In return, PayGuard fraud risk scores are written back into the Unified Customer Profile for use by relationship managers and recommendation engine context filtering.</div>
+</div>
 
-  function disable(){
-    mode = false;
-    document.body.classList.remove('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'false';
-      el.blur();
-    });
-    document.removeEventListener('input', onInput);
-    refresh();
-  }
+      </section>
+      <section class="doc-section" id="s4">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <h2 class="section-title">Functional Requirements</h2>
+        </div>
+        
 
-  function onInput(){
-    clearTimeout(timer);
-    msg('Unsaved…');
-    timer = setTimeout(persist, 900);
-  }
+<h3>4.1 Entity Resolution &amp; Identity Management</h3>
+<table>
+<thead>
+<tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FR-24-01</strong></td><td>Entity resolution engine shall match customer records across all six source systems using multi-attribute probabilistic matching — RSA ID, passport, name (phonetic), phone, email and account number; produce confidence score per match</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-02</strong></td><td>Entity resolution engine shall assemble a Golden Record from highest-confidence attributes across all matched source records; flag conflicting attributes for human review</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-03</strong></td><td>Ambiguous match queue shall route records with confidence score between 60–85% to a human review interface; reviewer decision recorded with audit trail and used to improve model</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-04</strong></td><td>System shall support incremental identity resolution — new records ingested from source systems shall be matched against existing Golden Records within 60 seconds of ingestion</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-05</strong></td><td>Entity resolution model shall provide explainability output — matched attributes and their weights — for any Golden Record on request, to support POPIA data subject queries and audit</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+</tbody>
+</table>
+<h3>4.2 Unified Customer Profile API</h3>
+<table>
+<thead>
+<tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FR-24-06</strong></td><td>Unified Customer Profile API shall return a complete, consent-verified customer profile within 200ms at the 95th percentile; profile shall include identity, product holdings, behavioural summary, consent state and AI-enriched signals</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-07</strong></td><td>Profile API shall expose caller-scoped views — relationship manager view, fraud risk view, recommendation engine view — with field-level access control enforced based on authenticated caller identity and purpose</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-08</strong></td><td>Profile mutations (updates, corrections) shall be event-sourced — every change recorded with timestamp, source system, actor identity and reason; full profile history reconstructable at any point in time</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-09</strong></td><td>Profile API shall include a POPIA consent verification endpoint — given a customer ID and processing purpose, return current consent state (granted/withdrawn/expired) with associated metadata</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-10</strong></td><td>Profile API shall support bulk retrieval for batch processing use cases (e.g., campaign eligibility) with rate limiting and purpose-bound access tokens; individual record response caching with 30-second TTL</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+</tbody>
+</table>
+<h3>4.3 POPIA Consent Management &amp; Right-to-Erasure</h3>
+<table>
+<thead>
+<tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FR-24-11</strong></td><td>Consent management module shall store purpose-specific consent records with: lawful basis, collection date, collection channel, consent version, expiry date and current state (granted/withdrawn/expired); one record per purpose per customer</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-12</strong></td><td>Consent withdrawal events shall propagate automatically to all six source systems via integration bus within 5 minutes of withdrawal recording; propagation success/failure logged per target system with retry mechanism</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-13</strong></td><td>Right-to-erasure request workflow shall trigger coordinated deletion across all linked records in all source systems within 30 calendar days; each deletion confirmed and recorded in the erasure audit log; customer notified upon completion</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-14</strong></td><td>Data subject access requests (POPIA Section 23) shall be fulfilled via automated report generation compiling all personal data held across linked source systems; report generated within 24 hours of request; delivered via secure channel</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-15</strong></td><td>Consent expiry shall be monitored continuously; customers with expiring consent notified 30 days in advance via preferred channel; re-consent workflow triggered automatically; processing suspended if consent lapses without renewal</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-16</strong></td><td>Consent model shall support granular purpose categories aligned to POPIA Sections 11–14: marketing, fraud prevention, product improvement, regulatory reporting, third-party sharing; each tracked and enforced independently</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+</tbody>
+</table>
+<h3>4.4 AI Intelligence Layer</h3>
+<table>
+<thead>
+<tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FR-24-17</strong></td><td>Next-best-action recommendation engine shall generate ranked product and service recommendations for each customer; updated when new behavioural signals are received; POPIA marketing consent verified before surfacing any personalised recommendation</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-18</strong></td><td>Real-time behavioural signal ingestion pipeline shall consume events from web/app clickstream, IVR, transactions and support systems with sub-5-second end-to-end latency from event emission to profile enrichment</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-19</strong></td><td>Churn propensity model shall score each customer daily on likelihood of product cancellation or account closure within 90 days; scores stored in profile; high-churn-risk customers surfaced to relationship managers via dashboard alert</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-20</strong></td><td>Sentiment enrichment module shall analyse support ticket text and IVR transcripts (from ARIA UC18) using NLP to produce a customer sentiment score; sentiment trend tracked over rolling 90 days and surfaced in the 360 view</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-21</strong></td><td>Customer lifecycle stage classification (prospect / new / active / at-risk / churned) shall be computed from behavioural and transactional signals and updated in the profile within 24 hours of a stage-change trigger event</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-22</strong></td><td>Cross-sell propensity scores shall be computed per eligible product category per customer; model shall incorporate product holding gaps, transaction category analysis, life event signals and peer group benchmarks</td><td><span class="badge badge-nice" style="margin:0;padding:3px 10px;font-size:0.75em;">NICE TO HAVE</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+</tbody>
+</table>
+<h3>4.5 System Integrations</h3>
+<table>
+<thead>
+<tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FR-24-23</strong></td><td>ARIA (UC18) integration: intelligence layer shall expose a synchronous profile context API consumed by ARIA at call initiation; response must include full profile, consent state and ranked next-best-action list within 200ms</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-24</strong></td><td>ARIA (UC18) integration: post-call events (outcome, sentiment, product discussed, agent notes) shall be written back to the customer profile via async event within 60 seconds of call completion</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-25</strong></td><td>PayGuard (UC16) integration: intelligence layer shall publish real-time behavioural signals (web velocity, IVR anomalies, cross-channel auth patterns) to PayGuard's fraud signal bus; event schema agreed and versioned between teams</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-26</strong></td><td>PayGuard (UC16) integration: fraud risk scores produced by PayGuard shall be written back into the Unified Customer Profile within 10 seconds of score generation; scores used to filter next-best-action recommendations and contextualise RM alerts</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-27</strong></td><td>All six source system integrations shall use schema-versioned event contracts; breaking changes require version bump and parallel support period of minimum 30 days to avoid consumer disruption</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+</tbody>
+</table>
+<h3>4.6 Admin Dashboard &amp; Audit Trail</h3>
+<table>
+<thead>
+<tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FR-24-28</strong></td><td>Admin dashboard shall present a Customer 360 view displaying: unified identity, product holdings, behavioural summary, consent status per purpose, next-best-action recommendations, fraud risk score, churn risk score and sentiment trend</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-29</strong></td><td>Audit trail shall log every read and write operation against any customer profile — recording: actor identity, caller system, purpose claim, timestamp, fields accessed and any data returned or modified; logs immutable and retained for 5 years</td><td><span class="badge badge-must" style="margin:0;padding:3px 10px;font-size:0.75em;">MUST</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-30</strong></td><td>Dashboard shall include a POPIA compliance view: consent coverage rate per purpose, pending erasure requests, data subject access request status, consent expiry forecast and cross-system propagation health</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-31</strong></td><td>Entity resolution management interface shall allow data stewards to review ambiguous matches, confirm or reject Golden Record linkages, and trigger manual re-resolution for specific records; all decisions logged</td><td><span class="badge badge-should" style="margin:0;padding:3px 10px;font-size:0.75em;">SHOULD</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+<tr><td><strong>FR-24-32</strong></td><td>Audit export capability shall produce POPIA-compliant audit reports in PDF and CSV format for regulatory submissions, covering a specified date range and filtered by customer ID, actor or purpose category</td><td><span class="badge badge-nice" style="margin:0;padding:3px 10px;font-size:0.75em;">NICE TO HAVE</span></td><td style="color:#f59e0b;">Not Built</td></tr>
+</tbody>
+</table>
 
-  function persist(){
-    var store = {};
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null) store[id] = el.innerHTML;
-    });
-    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
-    msg('Saved ✓');
-  }
+      </section>
+      <section class="doc-section" id="s5">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <h2 class="section-title">Non-Functional Requirements</h2>
+        </div>
+        
 
-  function restore(){
-    var raw; try { raw = localStorage.getItem(KEY); } catch(e){}
-    if(!raw) return false;
-    var store; try { store = JSON.parse(raw); } catch(e){ return false; }
-    stamp();
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null && store[id] !== undefined) el.innerHTML = store[id];
-    });
-    return true;
-  }
+<table>
+<thead>
+<tr><th>Category</th><th>Requirement</th><th>Target</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>API Latency</strong></td><td>Unified Customer Profile API P95 response time</td><td>&lt; 200ms</td></tr>
+<tr><td><strong>API Latency</strong></td><td>Consent verification endpoint P95 response time</td><td>&lt; 50ms</td></tr>
+<tr><td><strong>Signal Ingestion</strong></td><td>End-to-end latency from behavioural event emission to profile enrichment</td><td>&lt; 5 seconds</td></tr>
+<tr><td><strong>Entity Resolution</strong></td><td>Incremental match processing latency for new ingested records</td><td>&lt; 60 seconds</td></tr>
+<tr><td><strong>Throughput</strong></td><td>Concurrent profile API reads across all consuming systems</td><td>≥ 5,000 req/sec</td></tr>
+<tr><td><strong>Throughput</strong></td><td>Behavioural events processed per second at peak</td><td>≥ 50,000 events/sec</td></tr>
+<tr><td><strong>Availability</strong></td><td>Unified Customer Profile API uptime SLA</td><td>99.95%</td></tr>
+<tr><td><strong>Data Durability</strong></td><td>Profile store RPO (recovery point objective)</td><td>&lt; 1 minute</td></tr>
+<tr><td><strong>Data Durability</strong></td><td>Profile store RTO (recovery time objective)</td><td>&lt; 5 minutes</td></tr>
+<tr><td><strong>POPIA Compliance</strong></td><td>Consent propagation to all source systems after withdrawal event</td><td>&lt; 5 minutes</td></tr>
+<tr><td><strong>POPIA Compliance</strong></td><td>Right-to-erasure completion across all linked source systems</td><td>&lt; 30 calendar days</td></tr>
+<tr><td><strong>POPIA Compliance</strong></td><td>Data subject access request report generation</td><td>&lt; 24 hours</td></tr>
+<tr><td><strong>Security</strong></td><td>All personal data encrypted at rest (AES-256) and in transit (TLS 1.3)</td><td>Mandatory</td></tr>
+<tr><td><strong>Security</strong></td><td>Field-level access control enforced at API layer — no over-exposure of personal data to callers without declared purpose</td><td>Mandatory</td></tr>
+<tr><td><strong>Audit Retention</strong></td><td>Immutable audit log retention period for all profile access and mutation events</td><td>5 years minimum</td></tr>
+<tr><td><strong>Scalability</strong></td><td>Profile store designed to support growth to 10 million customer records without re-architecture</td><td>Horizontal scale</td></tr>
+</tbody>
+</table>
 
-  function reset(){
-    if(!confirm('Reset all edits to original content? This cannot be undone.')) return;
-    try { localStorage.removeItem(KEY); } catch(e){}
-    location.reload();
-  }
+      </section>
+      <section class="doc-section" id="s6">
+        <div class="section-header">
+          <div class="section-num">6</div>
+          <h2 class="section-title">Technical Architecture</h2>
+        </div>
+        
 
-  function exportDoc(){
-    // Temporarily disable editing for clean export
-    var wasMode = mode;
-    if(wasMode) disable();
-    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    // Remove the editable toolbar and injected system from export
-    html = html.replace(/<style[^>]*data-editable-system[^>]*>[\s\S]*?<\/style>/,'');
-    html = html.replace(/<script[^>]*data-editable-system[^>]*>[\s\S]*?<\/script>/,'');
-    html = html.replace(/<div id="__etb"[^>]*>[\s\S]*?<\/div>/,'');
-    html = html.replace(/<!-- EDITABLE DOCUMENT SYSTEM -->/g,'');
-    html = html.replace(/\sdata-eid="\d+"/g,'');
-    html = html.replace(/\scontenteditable="[^"]*"/g,'');
-    var blob = new Blob([html], {type:'text/html'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = (location.pathname.split('/').pop() || 'document') + '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    if(wasMode) enable();
-    msg('Exported ✓');
-  }
+<p>The AI Customer Intelligence Layer is composed of six primary components connected via an asynchronous event integration bus. The architecture is designed for horizontal scalability, event-driven enrichment and strict data access control.</p>
+<div class="arch-row">
+<div class="card violet">
+<div class="card-title">Entity Resolution Engine (Python)</div>
+<div class="card-content">Probabilistic record linkage using blocking strategies (Soundex, phonetic normalisation, RSA ID normalisation) followed by pairwise comparison with weighted attribute scoring. Splink or custom scikit-learn model for match probability. Confidence bands: &gt;85% auto-merge, 60–85% human review queue, &lt;60% no match. Golden Record assembly merges highest-confidence attributes with source attribution retained.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Unified Profile Store (Python + TypeScript)</div>
+<div class="card-content">Event-sourced profile store built on PostgreSQL with Redis caching layer for hot profile reads. Profile schema versioned with forward/backward compatibility. POPIA data minimisation enforced at write time — only permitted fields stored per purpose. Full event history retained for audit reconstruction. Consent state stored as first-class profile attribute, not a sidecar.</div>
+</div>
+</div>
+<div class="arch-row">
+<div class="card violet">
+<div class="card-title">Behavioural Signal Ingestion Pipeline (Python)</div>
+<div class="card-content">Apache Kafka or AWS Kinesis event streaming backbone consuming events from six source systems. Schema Registry enforces event contract versioning. Stream processors (Faust / AWS Lambda) compute incremental behavioural features and write enriched signals to the profile store. Dead-letter queue with alerting for failed event processing. Sub-5-second end-to-end latency target.</div>
+</div>
+<div class="card violet">
+<div class="card-title">AI Recommendation &amp; Propensity Engine (Python)</div>
+<div class="card-content">Ensemble model: collaborative filtering (matrix factorisation) combined with XGBoost propensity scoring and a contextual bandit layer for channel-specific recommendation ranking. Models retrained weekly on updated profile and behavioural data. POPIA consent gate enforced pre-inference — no personalised output generated without verified marketing consent. Model outputs stored back in profile for API access.</div>
+</div>
+</div>
+<div class="arch-row">
+<div class="card violet">
+<div class="card-title">Integration Bus &amp; Consent Propagation (Python)</div>
+<div class="card-content">Event-driven integration bus managing bi-directional message flow between the intelligence layer, six source systems, ARIA (UC18) and PayGuard (UC16). Consent withdrawal events published as priority messages with guaranteed delivery and receipt acknowledgement from each target system. Integration health dashboard shows per-system delivery latency and error rates. Circuit breaker pattern applied per integration endpoint.</div>
+</div>
+<div class="card violet">
+<div class="card-title">API Layer &amp; Access Control (TypeScript / FastAPI)</div>
+<div class="card-content">RESTful Profile API with OpenAPI 3.0 specification. OAuth 2.0 / JWT authentication. Caller identity bound to purpose claim at token issuance time — field-level filtering applied per purpose at query time. Rate limiting per caller. Distributed caching (Redis) for hot profiles. Audit log write on every API call (async, does not add to response latency). API gateway with mTLS for internal service-to-service calls.</div>
+</div>
+</div>
+<div class="card violet" style="margin-top:4px;">
+<div class="card-title">Admin Dashboard &amp; Customer 360 View (TypeScript / React)</div>
+<div class="card-content">Single-page application providing Customer 360 view, POPIA compliance monitoring, entity resolution management interface and audit log search. Role-based access control with four roles: RM (read-only profile view), Data Steward (entity resolution, consent management), Compliance Officer (POPIA reporting, erasure workflows) and System Admin (full access). All dashboard actions logged in the audit trail. Built as an internal web application, not exposed externally.</div>
+</div>
 
-  function msg(t){
-    var el = document.getElementById('__etb-msg');
-    if(el){ el.textContent = t; clearTimeout(el._t); if(t==='Saved ✓'||t==='Exported ✓') el._t=setTimeout(function(){el.textContent='';},2500); }
-  }
+      </section>
+      <section class="doc-section" id="s7">
+        <div class="section-header">
+          <div class="section-num">7</div>
+          <h2 class="section-title">Compliance & Regulatory Framework</h2>
+        </div>
+        
 
-  function refresh(){
-    var btn = document.getElementById('__etb-btn');
-    var acts = document.getElementById('__etb-acts');
-    if(btn){ btn.textContent = mode ? '🔒 Lock' : '✏️ Edit'; btn.style.background = mode ? '#2d1f5e' : '#1f2937'; btn.style.color = mode ? '#c4b5fd' : '#a78bfa'; }
-    if(acts) acts.style.display = mode ? 'flex' : 'none';
-  }
+<p>UC-24 operates at the intersection of customer data, AI inference and multi-system integration — making regulatory compliance a first-order engineering requirement, not a post-build concern. The following frameworks govern the design and operation of the intelligence layer.</p>
+<h3>7.1 POPIA — Protection of Personal Information Act</h3>
+<table>
+<thead>
+<tr><th>POPIA Section</th><th>Obligation</th><th>How UC-24 Addresses It</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Section 8</strong></td><td>Accountability — responsible party must ensure all conditions for lawful processing are met</td><td>Intelligence layer is the authoritative system of record for consent and lawful basis; all processing purpose-bound and auditable</td></tr>
+<tr><td><strong>Section 9</strong></td><td>Processing limitation — personal information may only be processed if adequate, relevant and not excessive</td><td>POPIA data minimisation enforced at profile schema level; purpose claims validated at API access time; field-level filtering removes over-exposure</td></tr>
+<tr><td><strong>Section 10</strong></td><td>Purpose specification — personal information must be collected for a specific, explicitly defined and lawful purpose</td><td>All stored personal data tagged with originating purpose at ingest time; purpose registry maintained and auditable</td></tr>
+<tr><td><strong>Section 11</strong></td><td>Further processing limitation — further processing must be compatible with original purpose</td><td>Purpose-claim enforcement at API layer prevents consumption of personal data for incompatible secondary purposes</td></tr>
+<tr><td><strong>Section 12</strong></td><td>Information quality — personal information must be complete, accurate and not misleading</td><td>Golden Record assembly resolves conflicts; data quality scores tracked per attribute; staleness indicators prevent use of outdated data</td></tr>
+<tr><td><strong>Section 14</strong></td><td>Information security — appropriate technical measures to safeguard personal information</td><td>AES-256 encryption at rest; TLS 1.3 in transit; field-level access control; immutable audit log; zero-trust internal API authentication</td></tr>
+<tr><td><strong>Section 18</strong></td><td>Notification — data subjects must be notified of purpose of collection and rights</td><td>Consent collection workflow includes purpose disclosure; data subject portal provides access to all held data and consent records</td></tr>
+<tr><td><strong>Section 22</strong></td><td>Notification of security compromises — data subjects notified of breaches without unreasonable delay</td><td>Security incident detection integrated with audit log anomaly alerting; breach notification workflow built into compliance dashboard</td></tr>
+<tr><td><strong>Section 23</strong></td><td>Right of access — data subjects may request all personal information held</td><td>Automated data subject access request workflow generates comprehensive report across all linked source systems within 24 hours</td></tr>
+<tr><td><strong>Section 24</strong></td><td>Right to correction or deletion — data subjects may request correction or erasure</td><td>Erasure workflow triggers coordinated deletion across all six source systems with confirmation audit trail; correction workflow updates Golden Record with source attribution</td></tr>
+<tr><td><strong>Section 25</strong></td><td>Right to object — data subjects may object to processing at any time</td><td>Consent withdrawal propagated to all source systems within 5 minutes; processing suspended immediately upon objection receipt</td></tr>
+</tbody>
+</table>
+<h3>7.2 Additional Regulatory Frameworks</h3>
+<table>
+<thead>
+<tr><th>Framework</th><th>Specific Requirement</th><th>How UC-24 Addresses It</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>FSCA</strong></td><td>Conduct of Business standards — customer information used for product recommendations must be based on complete and accurate customer profiles (FAIS Act Section 8)</td><td>Unified Customer Profile ensures recommendations based on complete, current and consent-verified data; recommendation audit trail supports FSCA inspection evidence</td></tr>
+<tr><td><strong>SARB</strong></td><td>Technology risk management — customer data systems must maintain data integrity, access controls and audit trails appropriate to their criticality</td><td>Immutable 5-year audit log; event-sourced profile store with full reconstruction capability; RTO/RPO targets aligned to SARB operational resilience guidance</td></tr>
+<tr><td><strong>FICA</strong></td><td>Know Your Customer / Customer Due Diligence — customer identity data must be verified, current and accessible for AML/CFT monitoring</td><td>Unified Customer Profile consolidates KYC attributes from all source systems; Golden Record provides single verified identity for FICA CDD purposes; identity freshness tracked and flagged when re-verification is required</td></tr>
+<tr><td><strong>PCI-DSS v4.0</strong></td><td>Req 7: Restrict access to system components and cardholder data; Req 10: Log and monitor all access to system components and cardholder data</td><td>Field-level access control at API layer; purpose-bound caller tokens; immutable access audit log covering all cardholder data fields in the profile</td></tr>
+<tr><td><strong>AI Ethics / FSCA Guidance</strong></td><td>Emerging FSCA expectations on explainability and fairness in AI-generated customer recommendations</td><td>Next-best-action engine produces explainability output per recommendation; bias monitoring on recommendation distribution by demographic segment; human override capability built into RM interface</td></tr>
+</tbody>
+</table>
 
-  function buildToolbar(){
-    var t = document.createElement('div');
-    t.id = '__etb';
-    t.innerHTML =
-      '<span style="font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-right:2px">Document</span>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-edit" id="__etb-btn" onclick="window.__edm.toggle()">✏️ Edit</button>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-share" onclick="window.__edm.share()" title="Copy shareable link">🔗 Share</button>'+
-      '<button class="etb-print" onclick="window.__edm.print()" title="Print / Save as PDF">🖨 Print</button>'+
-      '<div id="__etb-acts" style="display:none;gap:5px;align-items:center">'+
-        '<span class="etb-msg" id="__etb-msg"></span>'+
-        '<button class="etb-save" onclick="window.__edm.save()">💾 Save</button>'+
-        '<button class="etb-reset" onclick="window.__edm.reset()">↺ Reset</button>'+
-        '<button class="etb-export" onclick="window.__edm.export()">⬇ Export</button>'+
-      '</div>';
-    document.body.appendChild(t);
-  }
+      </section>
+      <section class="doc-section" id="s8">
+        <div class="section-header">
+          <div class="section-num">8</div>
+          <h2 class="section-title">Success Metrics</h2>
+        </div>
+        
 
-  function shareDoc(){
-    var base = 'https://fintech-tracker-web.vercel.app';
-    var url = base + location.pathname;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ msg('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
-    } else { prompt('Copy this link:',url); }
-  }
-  function printDoc(){
-    var wasMode = mode;
-    if(wasMode) disable();
-    window.print();
-    if(wasMode) setTimeout(function(){ enable(); }, 500);
-  }
-  window.__edm = {
-    toggle: function(){ mode ? disable() : enable(); },
-    save:   function(){ persist(); },
-    reset:  function(){ reset(); },
-    export: function(){ exportDoc(); },
-    share:  function(){ shareDoc(); },
-    print:  function(){ printDoc(); }
-  };
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-value">25–35%</div>
+<div class="metric-label">Cross-sell conversion uplift from AI next-best-action</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">R10M+</div>
+<div class="metric-label">POPIA regulatory exposure eliminated via consent management</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">80%</div>
+<div class="metric-label">Reduction in manual POPIA compliance effort</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">6</div>
+<div class="metric-label">Siloed source systems unified under single customer identity</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">&lt;200ms</div>
+<div class="metric-label">Unified Customer Profile API P95 response time</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">24hrs</div>
+<div class="metric-label">Data subject access request fulfilment time (automated)</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">&lt;5 min</div>
+<div class="metric-label">Consent withdrawal propagation to all source systems</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">40%+</div>
+<div class="metric-label">Improvement in fraud signal coverage to PayGuard (UC16)</div>
+</div>
+<div class="metric-card">
+<div class="metric-value">100%</div>
+<div class="metric-label">Profile read/write operations covered by immutable audit trail</div>
+</div>
+</div>
+<p style="margin-top:20px;">The financial case is clear: eliminating R10M+ in POPIA exposure, capturing cross-sell uplift of 25–35% against an enriched customer base, and reducing compliance overhead by 80% deliver a business case that justifies investment with payback well within 12 months. The operational case is equally compelling — relationship managers operating with a complete customer view, fraud models enriched with behavioural signals, and POPIA obligations automated rather than manually managed.</p>
 
-  function init(){
-    buildToolbar();
-    stamp();
-    var had = restore();
-    if(had) msg('Edits loaded');
-  }
+      </section>
+      <section class="doc-section" id="s9">
+        <div class="section-header">
+          <div class="section-num">9</div>
+          <h2 class="section-title">Next Steps</h2>
+        </div>
+        
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+<h3>Phase 1 — Foundation Audit &amp; Design (Weeks 1–4)</h3>
+<ol class="step-list">
+<li>Conduct cross-system data audit — inventory all customer-related data fields in each of the six source systems; document current identity keys, consent record locations and data quality issues</li>
+<li>Design entity resolution matching strategy — define attribute weighting model, blocking strategy and confidence threshold bands; establish human review queue workflow and tooling</li>
+<li>Define Unified Customer Profile schema — agree field set, consent model structure, data minimisation rules and purpose taxonomy with compliance, legal and business stakeholders</li>
+<li>Establish POPIA consent baseline — identify all current consent records across three systems; assess gaps, conflicts and expired consents; define migration strategy for Day 1 consent state</li>
+</ol>
+<h3>Phase 2 — Core Build (Weeks 5–12)</h3>
+<ol class="step-list">
+<li>Build and validate entity resolution engine — train on historical customer records with known ground truth; achieve &gt;90% precision on test set before production ingestion begins</li>
+<li>Deploy event-sourced Unified Customer Profile store — initial population from core banking system as the highest-quality source; progressively merge additional source systems</li>
+<li>Implement POPIA consent management module — consent record migration, withdrawal propagation pipeline, erasure workflow and data subject access request automation</li>
+<li>Build behavioural signal ingestion pipeline — connect to web/app, IVR and transaction event streams; validate sub-5-second end-to-end latency under load</li>
+<li>Develop and validate Unified Customer Profile API — performance testing to confirm P95 &lt;200ms target; field-level access control integration testing with purpose-claim enforcement</li>
+</ol>
+<h3>Phase 3 — AI Layer &amp; Integrations (Weeks 13–20)</h3>
+<ol class="step-list">
+<li>Train and deploy next-best-action recommendation engine — A/B test against existing recommendation approach; measure cross-sell conversion uplift in controlled cohort before full rollout</li>
+<li>Deliver ARIA (UC18) bi-directional integration — coordinate with UC18 team on API contract; validate &lt;200ms profile context response at call initiation; test post-call writeback</li>
+<li>Deliver PayGuard (UC16) bi-directional integration — coordinate on behavioural signal schema; validate fraud risk score writeback to profile; measure improvement in fraud signal coverage</li>
+<li>Launch Customer 360 admin dashboard — pilot with a cohort of relationship managers; gather structured feedback on profile completeness, recommendation relevance and POPIA workflow usability</li>
+<li>Complete compliance validation — conduct POPIA readiness assessment with legal; verify all Sections 8–25 obligations met; produce audit evidence pack for FSCA and SARB review readiness</li>
+</ol>
+
+      </section>
+      <section class="doc-section" id="s10">
+        <div class="section-header">
+          <div class="section-num">10</div>
+          <h2 class="section-title">Related Artefacts</h2>
+        </div>
+        
+
+<div class="artifacts-row">
+<a class="artifact-link" href="#">Requirements (this document)</a>
+<a class="artifact-link" href="#">Entity Resolution Design Specification</a>
+<a class="artifact-link" href="#">Unified Profile Schema v1.0</a>
+<a class="artifact-link" href="#">POPIA Consent Model &amp; Purpose Registry</a>
+<a class="artifact-link" href="#">UC18 ARIA Integration Contract</a>
+<a class="artifact-link" href="#">UC16 PayGuard Signal Schema</a>
+<a class="artifact-link" href="#">API OpenAPI 3.0 Specification</a>
+</div>
+
+      </section>
+    </main>
+
+  </div><!-- /doc-layout -->
+
+</div><!-- /doc-shell -->
 
 </body>
 </html>

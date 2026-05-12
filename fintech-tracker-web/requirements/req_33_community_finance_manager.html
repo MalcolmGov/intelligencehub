@@ -1,746 +1,739 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC-33 AI Community Finance Manager — Stokvel / Chama / ROSCA — Requirements &amp; Planning</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%); border: 1px solid #312e81; border-radius: 10px; padding: 36px; margin-bottom: 40px; box-shadow: 0 4px 24px rgba(99,102,241,0.15); }
-        h1 { font-size: 2.2em; margin-bottom: 8px; color: #818cf8; font-weight: 700; }
-        .subtitle { color: #94a3b8; font-size: 1.05em; margin-bottom: 20px; }
-        .header-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 24px; }
-        .meta-item { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-left: 3px solid #6366f1; padding: 14px; border-radius: 6px; }
-        .meta-label { font-size: 0.78em; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
-        .meta-value { font-size: 1em; color: #e2e8f0; font-weight: 600; }
-        .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 0.78em; font-weight: 700; margin-right: 8px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-        .badge-new { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 0 12px rgba(99,102,241,0.4); }
-        .badge-not-started { background: #1e293b; color: #f59e0b; border: 1px solid #78350f; }
-        .badge-high { background: #7c3aed; color: #fff; }
-        .badge-p2 { background: linear-gradient(135deg, #0891b2, #0e7490); color: #fff; }
-        .badge-compliance { background: rgba(20,184,166,0.15); color: #2dd4bf; border: 1px solid #0d9488; }
-        .badge-teal { background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid #059669; }
-        section { margin-bottom: 40px; background: #1e293b; padding: 30px; border: 1px solid #334155; border-radius: 8px; border-left: 4px solid #6366f1; }
-        section.teal { border-left-color: #14b8a6; }
-        section.violet { border-left-color: #7c3aed; }
-        section.amber { border-left-color: #f59e0b; }
-        section.red { border-left-color: #dc2626; }
-        h2 { font-size: 1.5em; color: #818cf8; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
-        h3 { font-size: 1.15em; color: #a78bfa; margin-top: 22px; margin-bottom: 10px; font-weight: 600; }
-        p { color: #cbd5e1; margin-bottom: 12px; font-size: 0.97em; }
-        ul { color: #cbd5e1; font-size: 0.95em; padding-left: 22px; margin-bottom: 12px; }
-        ul li { margin-bottom: 5px; }
-        .card { background: #0f172a; border: 1px solid #334155; border-left: 3px solid #6366f1; border-radius: 6px; padding: 16px; margin: 12px 0; }
-        .card.teal { border-left-color: #14b8a6; }
-        .card.violet { border-left-color: #7c3aed; }
-        .card.amber { border-left-color: #f59e0b; }
-        .card.red { border-left-color: #dc2626; }
-        .card.green { border-left-color: #34d399; }
-        .card-title { font-weight: 700; color: #818cf8; margin-bottom: 6px; font-size: 0.95em; }
-        .card.teal .card-title { color: #2dd4bf; }
-        .card.violet .card-title { color: #a78bfa; }
-        .card.amber .card-title { color: #f59e0b; }
-        .card.red .card-title { color: #f87171; }
-        .card.green .card-title { color: #34d399; }
-        .card-content { font-size: 0.92em; color: #94a3b8; line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin: 16px 0; background: #0f172a; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
-        thead { background: #1e1b4b; }
-        th { padding: 12px 16px; text-align: left; color: #818cf8; font-weight: 700; font-size: 0.88em; text-transform: uppercase; letter-spacing: 0.04em; }
-        td { padding: 12px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.93em; }
-        tbody tr:hover { background: #1e293b; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
-        .metric-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; border-top: 3px solid #14b8a6; }
-        .metric-card.indigo { border-top-color: #6366f1; }
-        .metric-card.violet { border-top-color: #7c3aed; }
-        .metric-card.amber { border-top-color: #f59e0b; }
-        .metric-value { font-size: 2em; font-weight: 800; color: #2dd4bf; margin-bottom: 4px; }
-        .metric-card.indigo .metric-value { color: #818cf8; }
-        .metric-card.violet .metric-value { color: #a78bfa; }
-        .metric-card.amber .metric-value { color: #f59e0b; }
-        .metric-label { font-size: 0.82em; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
-        .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-        .compare-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 20px; }
-        .compare-card.traditional { border-top: 3px solid #dc2626; }
-        .compare-card.ai { border-top: 3px solid #14b8a6; }
-        .compare-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; }
-        .compare-card.traditional .compare-label { color: #f87171; }
-        .compare-card.ai .compare-label { color: #2dd4bf; }
-        .compare-value { font-size: 1.8em; font-weight: 800; margin-bottom: 4px; }
-        .compare-card.traditional .compare-value { color: #f87171; }
-        .compare-card.ai .compare-value { color: #2dd4bf; }
-        .compare-sub { font-size: 0.85em; color: #64748b; }
-        .owner-highlight { background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1)); border: 1px solid #4f46e5; border-radius: 8px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-top: 20px; }
-        .owner-avatar { width: 42px; height: 42px; background: linear-gradient(135deg, #6366f1, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1em; color: #fff; flex-shrink: 0; }
-        .owner-name-text { font-weight: 700; color: #a5b4fc; font-size: 1.05em; }
-        .owner-role { font-size: 0.85em; color: #7c3aed; }
-        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
-        .us-card { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 18px; margin-bottom: 14px; }
-        .us-id { font-size: 0.78em; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-        .us-title { font-size: 1em; font-weight: 700; color: #e2e8f0; margin-bottom: 8px; }
-        .us-story { font-size: 0.9em; color: #94a3b8; font-style: italic; margin-bottom: 10px; line-height: 1.5; }
-        .us-ac-label { font-size: 0.78em; font-weight: 700; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
-        .us-ac { font-size: 0.88em; color: #cbd5e1; padding-left: 16px; }
-        .us-ac li { margin-bottom: 3px; }
-        .arch-layers { display: flex; flex-direction: column; gap: 0; margin: 16px 0; }
-        .arch-layer { padding: 14px 20px; display: flex; align-items: center; gap: 16px; border: 1px solid #334155; }
-        .arch-layer:first-child { border-radius: 8px 8px 0 0; background: rgba(99,102,241,0.12); border-color: #6366f1; }
-        .arch-layer:nth-child(2) { background: rgba(124,58,237,0.1); border-color: #7c3aed; }
-        .arch-layer:nth-child(3) { background: rgba(20,184,166,0.08); border-color: #14b8a6; }
-        .arch-layer:nth-child(4) { background: rgba(245,158,11,0.08); border-color: #d97706; }
-        .arch-layer:last-child { border-radius: 0 0 8px 8px; background: rgba(71,85,105,0.1); }
-        .arch-layer-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; min-width: 140px; }
-        .arch-layer:first-child .arch-layer-label { color: #818cf8; }
-        .arch-layer:nth-child(2) .arch-layer-label { color: #a78bfa; }
-        .arch-layer:nth-child(3) .arch-layer-label { color: #2dd4bf; }
-        .arch-layer:nth-child(4) .arch-layer-label { color: #f59e0b; }
-        .arch-layer:last-child .arch-layer-label { color: #64748b; }
-        .arch-layer-content { font-size: 0.87em; color: #cbd5e1; }
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 12px 0; }
-        .market-pill { background: rgba(99,102,241,0.08); border: 1px solid #312e81; border-radius: 6px; padding: 8px 10px; text-align: center; font-size: 0.8em; color: #a5b4fc; font-weight: 600; }
-        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 700; margin-right: 4px; }
-        .tag-must { background: rgba(220,38,38,0.15); color: #f87171; border: 1px solid #7f1d1d; }
-        .tag-should { background: rgba(217,119,6,0.15); color: #fbbf24; border: 1px solid #78350f; }
-        .tag-nice { background: rgba(5,150,105,0.15); color: #34d399; border: 1px solid #064e3b; }
-        .priority-high { color: #f87171; font-weight: 700; }
-        .priority-med { color: #fbbf24; font-weight: 700; }
-        code { background: #0f172a; border: 1px solid #334155; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.85em; color: #34d399; }
-        footer { margin-top: 40px; padding: 24px; border-top: 1px solid #334155; text-align: center; color: #475569; font-size: 0.88em; background: #1e293b; border-radius: 8px; }
-        @media (max-width: 768px) { .two-col, .comparison-box { grid-template-columns: 1fr; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UC-33 AI Community Finance Manager — Stokvel / Chama / ROSCA — Requirements & Planning</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface-alt:#F1F5F9;
+  --border:rgba(226,232,240,0.9);--border-strong:#CBD5E1;
+  --text-primary:#0F172A;--text-secondary:#334155;--text-muted:#64748B;
+  --accent:#7C3AED;--accent-d:#6D28D9;--accent-light:#EDE9FE;--accent-border:rgba(124,58,237,0.2);
+  --blue:#2563EB;--blue-light:#DBEAFE;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --r:16px;--rs:10px;
+  --shadow-sm:0 1px 4px rgba(15,23,42,0.06),0 2px 8px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.08),0 2px 6px rgba(15,23,42,0.04);
+}
+html{scroll-behavior:smooth;font-size:15px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── Sticky Header ── */
+.doc-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:58px;
+}
+.hdr-left{display:flex;align-items:center;gap:16px}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:var(--text-muted);
+  text-decoration:none;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--border);transition:all 0.15s;
+}
+.back-link:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-light)}
+.hdr-breadcrumb{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.hdr-sep{color:var(--border-strong)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:all 0.15s;font-family:inherit;
+}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
+.hdr-btn.violet{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hdr-btn.violet:hover{background:var(--accent-d)}
+
+/* ── Shell ── */
+.doc-shell{max-width:1220px;margin:0 auto;padding:0 40px 100px}
+
+/* ── Hero ── */
+.doc-hero{padding:52px 0 32px;max-width:800px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero-title{
+  font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.2px;
+  background:linear-gradient(140deg,#0F172A 0%,#312E81 50%,#7C3AED 90%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:14px;
+}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:22px;max-width:680px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;letter-spacing:0.04em;
+  padding:4px 12px;border-radius:20px;
+}
+.badge-p1{background:#FEE2E2;color:#B91C1C}
+.badge-p2{background:#FEF3C7;color:#92400E}
+.badge-progress{background:#FEF3C7;color:#92400E}
+.badge-in-progress{background:#FEF3C7;color:#92400E}
+.badge-done,.badge-complete,.badge-built{background:#D1FAE5;color:#065F46}
+.badge-platform{background:var(--accent-light);color:var(--accent)}
+.badge-neutral{background:var(--surface-alt);color:var(--text-muted);border:1px solid var(--border)}
+.badge-must{background:#FEE2E2;color:#B91C1C;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-should{background:#FEF3C7;color:#92400E;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-nice{background:#D1FAE5;color:#065F46;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+
+/* ── Meta Strip ── */
+.meta-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;margin-bottom:36px;
+}
+.meta-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;
+  box-shadow:var(--shadow-sm);transition:all 0.2s;
+}
+.meta-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.meta-value{font-size:13px;font-weight:700;color:var(--text-primary)}
+.meta-value.violet{color:var(--accent)}
+
+/* ── Progress Bar ── */
+.progress-section{margin:0 0 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow-sm)}
+.progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.progress-label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.progress-pct{font-size:14px;font-weight:800;color:var(--accent)}
+.progress-track{height:8px;background:var(--surface-alt);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:8px;transition:width 0.6s ease}
+.progress-note{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+/* ── Doc Layout ── */
+.doc-layout{display:grid;grid-template-columns:210px 1fr;gap:36px;align-items:start}
+@media(max-width:900px){.doc-layout{grid-template-columns:1fr}.doc-toc{display:none}}
+
+/* ── ToC ── */
+.doc-toc{position:sticky;top:76px}
+.toc-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.toc-title{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.toc-link{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;text-decoration:none;color:var(--text-secondary);font-size:12px;font-weight:500;transition:all 0.15s;margin-bottom:2px}
+.toc-link:hover{background:var(--accent-light);color:var(--accent)}
+.toc-num{font-size:10px;font-weight:700;color:var(--text-muted);min-width:20px}
+
+/* ── Sections ── */
+.doc-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.section-num{width:30px;height:30px;border-radius:8px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+h2.section-title{font-size:18px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+h3{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-top:24px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+p{color:var(--text-secondary);margin-bottom:13px;line-height:1.75;font-size:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+ul,ol{color:var(--text-secondary);margin:0 0 14px 20px;line-height:1.75;font-size:14px}
+li{margin-bottom:5px}
+li strong{color:var(--text-primary)}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.kpi-card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;text-align:center;transition:all 0.2s}
+.kpi-card:hover{background:var(--accent-light);border-color:var(--accent-border);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-value{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-0.8px;line-height:1;margin-bottom:6px}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);line-height:1.4}
+
+/* ── Callouts ── */
+.info-box,.accent-box,.callout-blue{
+  background:var(--blue-light);border:1px solid rgba(37,99,235,0.18);
+  border-left:3px solid var(--blue);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#1E40AF;line-height:1.65;
+}
+.info-box a,.accent-box a,.callout-blue a{color:var(--blue);font-weight:600;text-decoration:none}
+.warning-box,.callout-red{
+  background:#FFF5F5;border:1px solid rgba(220,38,38,0.18);
+  border-left:3px solid var(--red);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#7F1D1D;line-height:1.65;
+}
+.warning-box ul,.callout-red ul{color:#7F1D1D}
+.callout-violet{
+  background:var(--accent-light);border:1px solid var(--accent-border);
+  border-left:3px solid var(--accent);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#3B0764;line-height:1.65;
+}
+.callout-green{
+  background:var(--green-light);border:1px solid rgba(22,163,74,0.2);
+  border-left:3px solid var(--green);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#14532D;line-height:1.65;
+}
+.callout-amber{
+  background:var(--amber-light);border:1px solid rgba(217,119,6,0.2);
+  border-left:3px solid var(--amber);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#78350F;line-height:1.65;
+}
+
+/* ── Cards / Items ── */
+.card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;margin-bottom:10px;transition:all 0.15s}
+.card:hover{border-color:var(--accent-border);background:var(--surface)}
+.card-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:7px}
+.card-content{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Requirements ── */
+.requirement{border-left:3px solid var(--border-strong);padding:10px 14px;margin-bottom:8px;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface-alt)}
+.requirement:hover{border-left-color:var(--accent)}
+.req-body{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Tables ── */
+table,.doc-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}
+th{background:var(--surface-alt);border:1px solid var(--border);padding:10px 14px;font-weight:700;color:var(--text-primary);text-align:left;font-size:11px;letter-spacing:0.05em;text-transform:uppercase}
+td{border:1px solid var(--border);padding:10px 14px;color:var(--text-secondary);vertical-align:top;line-height:1.6}
+tr:hover td{background:var(--surface-alt)}
+
+/* ── User Stories ── */
+.story{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;margin-bottom:12px}
+.story-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.story-text{font-size:13.5px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px}
+.story-ac{font-size:12.5px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--surface);border-radius:7px;border:1px solid var(--border)}
+
+/* ── Dependencies ── */
+.dep-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dep-item:last-child{border-bottom:none}
+.dep-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--surface-alt);border:1px solid var(--border)}
+.dep-body{flex:1}
+.dep-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.dep-desc{font-size:12.5px;color:var(--text-muted)}
+
+/* ── Print ── */
+@media print{.doc-header,.doc-toc{display:none!important}.doc-layout{grid-template-columns:1fr}.doc-section{break-inside:avoid}}
+@media(max-width:768px){.doc-shell{padding:0 16px 60px}.doc-hero{padding:32px 0 20px}.doc-section{padding:22px 18px}}
+
+  </style>
 </head>
 <body>
-<a href="../index.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:rgba(30,41,59,.92);border:1px solid rgba(99,102,241,.35);color:#a5b4fc;font-size:13px;font-weight:600;text-decoration:none;backdrop-filter:blur(8px);">&#8592; Back to Tracker</a>
 
-<div class="container">
+<!-- ── Sticky Header ── -->
+<header class="doc-header">
+  <div class="hdr-left">
+    <a href="/index.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+      Back to Tracker
+    </a>
+    <div class="hdr-breadcrumb">
+      <span style="color:var(--text-muted)">UC-33</span>
+      <span class="hdr-sep">/</span>
+      <b>Requirements &amp; User Stories</b>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
 
-    <header>
-        <div>
-            <div style="font-size:0.82em;color:#6366f1;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">MTN Group Fintech &middot; Use Case 33</div>
-            <h1>AI Community Finance Manager</h1>
-            <div class="subtitle">Digitises and automates Africa's most culturally embedded savings institution &mdash; rotating community savings groups known as Stokvels (South Africa), Chamas (Kenya), and Esusu (Nigeria). AI manages the full group lifecycle, accessing a R50 billion stokvel market in South Africa alone.</div>
-            <div>
-                <span class="badge badge-new">New &mdash; Gap Identified by Malcolm</span>
-                <span class="badge badge-not-started">Not Started &mdash; 0%</span>
-                <span class="badge badge-p2">Priority: P2</span>
-                <span class="badge badge-high">Complexity: High</span>
-            </div>
-            <div style="margin-top:10px;">
-                <span class="badge badge-compliance">POPIA</span>
-                <span class="badge badge-compliance">NDPR</span>
-                <span class="badge badge-compliance">Kenya DPA</span>
-                <span class="badge badge-teal">Stokvel / Chama / Esusu</span>
-                <span class="badge badge-teal">WhatsApp + USSD</span>
-                <span class="badge badge-teal">Multi-Currency</span>
-            </div>
+<!-- ── Page Shell ── -->
+<div class="doc-shell">
+
+  <!-- ── Hero ── -->
+  <div class="doc-hero">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      AI Programme · UC-33
+    </div>
+    <h1 class="hero-title">AI Community Finance Manager</h1>
+    <p class="hero-subtitle"></p>
+    <div class="hero-badges">
+      <span class="badge badge-neutral">New — Gap Identified by Malcolm</span>
+      <span class="badge badge-in-progress">Not Started — 0%</span>
+      <span class="badge badge-p2">Priority: P2</span>
+      <span class="badge badge-neutral">Complexity: High</span>
+      <span class="badge badge-neutral">POPIA</span>
+      <span class="badge badge-neutral">NDPR</span>
+      <span class="badge badge-neutral">Kenya DPA</span>
+      <span class="badge badge-neutral">Stokvel / Chama / Esusu</span>
+      <span class="badge badge-neutral">WhatsApp + USSD</span>
+      <span class="badge badge-neutral">Multi-Currency</span>
+    </div>
+  </div>
+
+  <!-- ── Metadata Strip ── -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-label">Use Case ID</div>
+      <div class="meta-value ">UC-33</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Version</div>
+      <div class="meta-value ">v1.0</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Document Date</div>
+      <div class="meta-value ">May 2026</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Priority</div>
+      <div class="meta-value">P2</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Strategic Driver</div>
+      <div class="meta-value">Market Expansion</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Business Value</div>
+      <div class="meta-value">R50B stokvel market (SA)</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Cultural Scope</div>
+      <div class="meta-value">SA, Kenya, Nigeria + 5 markets</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Interface</div>
+      <div class="meta-value">WhatsApp + USSD + App</div>
+    </div>
+  </div>
+
+  
+
+  <!-- ── Document Layout ── -->
+  <div class="doc-layout">
+
+    <!-- ToC -->
+    <aside class="doc-toc">
+      <div class="toc-inner">
+        <div class="toc-title">Contents</div>
+        <a href="#s1" class="toc-link"><span class="toc-num">01</span>Executive Summary & Business Case</a>
+        <a href="#s2" class="toc-link"><span class="toc-num">02</span>Problem Statement</a>
+        <a href="#s3" class="toc-link"><span class="toc-num">03</span>Objectives & Success Metrics</a>
+        <a href="#s4" class="toc-link"><span class="toc-num">04</span>User Stories & Acceptance Criteria</a>
+        <a href="#s5" class="toc-link"><span class="toc-num">05</span>Functional Requirements</a>
+        <a href="#s6" class="toc-link"><span class="toc-num">06</span>Technical Architecture</a>
+        <a href="#s7" class="toc-link"><span class="toc-num">07</span>Data & AI Model Requirements</a>
+        <a href="#s8" class="toc-link"><span class="toc-num">08</span>Compliance & Regulatory</a>
+        <a href="#s9" class="toc-link"><span class="toc-num">09</span>Sprint Plan & Roadmap</a>
+        <a href="#s10" class="toc-link"><span class="toc-num">10</span>Risk Register</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="doc-content">
+      <section class="doc-section" id="s1">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2 class="section-title">Executive Summary & Business Case</h2>
         </div>
-        <div class="header-grid">
-            <div class="meta-item"><div class="meta-label">Use Case ID</div><div class="meta-value">UC-33</div></div>
-            <div class="meta-item"><div class="meta-label">Version</div><div class="meta-value">v1.0</div></div>
-            <div class="meta-item"><div class="meta-label">Document Date</div><div class="meta-value">May 2026</div></div>
-            <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value">P2</div></div>
-            <div class="meta-item"><div class="meta-label">Strategic Driver</div><div class="meta-value">Market Expansion</div></div>
-            <div class="meta-item"><div class="meta-label">Business Value</div><div class="meta-value">R50B stokvel market (SA)</div></div>
-            <div class="meta-item"><div class="meta-label">Cultural Scope</div><div class="meta-value">SA, Kenya, Nigeria + 5 markets</div></div>
-            <div class="meta-item"><div class="meta-label">Interface</div><div class="meta-value">WhatsApp + USSD + App</div></div>
-        </div>
-        <div class="owner-highlight">
-            <div class="owner-avatar">MG</div>
-            <div>
-                <div class="owner-name-text">Malcolm Govender</div>
-                <div class="owner-role">Head of AI &amp; Engineering &middot; Document Author &amp; Use Case Owner</div>
-            </div>
-        </div>
-    </header>
+        
 
-    <!-- 1. EXECUTIVE SUMMARY -->
-    <section>
-        <h2>1. Executive Summary &amp; Business Case</h2>
-        <p>Rotating savings groups are among the oldest and most culturally embedded financial institutions in Africa. Known as <strong style="color:#818cf8;">Stokvels</strong> in South Africa, <strong style="color:#818cf8;">Chamas</strong> in Kenya, <strong style="color:#818cf8;">Esusu</strong> or <strong style="color:#818cf8;">Ajo</strong> in Nigeria, <strong style="color:#818cf8;">Tontines</strong> in West Africa, and <strong style="color:#818cf8;">Susu</strong> in Ghana, these rotating community credit associations (ROSCAs) mobilise an estimated R50 billion annually in South Africa alone, with the pan-African total estimated at $50&ndash;100 billion. They operate entirely in cash and informally, managed through personal trust, physical meetings, and handwritten ledgers.</p>
-        <p>The informal, cash-based nature of these groups creates three critical problems: non-payment risk (members who default disrupt the entire rotation), opacity (the group treasurer holds unchecked authority over group funds), and security (large cash payouts create robbery risk). MTN MoMo, as the dominant mobile money platform across these markets, is uniquely positioned to digitise and formalise ROSCA operations &mdash; making them safer, more transparent, and more accountable while preserving the cultural trust and social dynamics that make them effective savings vehicles.</p>
-        <p>UC-33 builds an AI-powered ROSCA management platform on top of the MoMo API, accessible via WhatsApp, USSD, and the MoMo app. Group creation, member onboarding, contribution reminders, rotating payout execution, and dispute resolution are all managed by the AI. Critically, the platform is designed with cultural rule customisation &mdash; the immense variation in ROSCA rules across SA (grocery stokvels, investment stokvels, burial societies), Kenya (chama investment structures), and Nigeria (competitive bidding esusu) is accommodated through a configurable rule engine rather than a one-size-fits-all model.</p>
-
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">R50B</div>
-                <div class="metric-label">Stokvel Market (SA alone, annual)</div>
-            </div>
-            <div class="metric-card indigo">
-                <div class="metric-value">11M+</div>
-                <div class="metric-label">South Africans in Stokvel Groups</div>
-            </div>
-            <div class="metric-card violet">
-                <div class="metric-value">$100B+</div>
-                <div class="metric-label">Pan-African ROSCA Market (estimated)</div>
-            </div>
-            <div class="metric-card amber">
-                <div class="metric-value">8</div>
-                <div class="metric-label">MTN Markets with Significant ROSCA Activity</div>
-            </div>
-        </div>
-
-        <div class="comparison-box" style="margin-top:20px;">
-            <div class="compare-card traditional">
-                <div class="compare-label">Traditional ROSCA (Cash/Informal)</div>
-                <div class="compare-value">High Risk</div>
-                <div class="compare-sub">Cash management; non-payment disrupts rotation; treasurer has unchecked authority; robbery risk on payout day; no dispute resolution; no record-keeping</div>
-            </div>
-            <div class="compare-card ai">
-                <div class="compare-label">AI Community Finance Manager (UC-33)</div>
-                <div class="compare-value">Transparent</div>
-                <div class="compare-sub">MoMo digital payments; AI manages rotation; transparent ledger visible to all members; AI dispute mediation; automated reminders; cultural rule customisation</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 2. PROBLEM STATEMENT -->
-    <section class="violet">
-        <h2>2. Problem Statement</h2>
-
-        <div class="card violet">
-            <div class="card-title">Problem 1 &mdash; Cash-Based ROSCAs Are Vulnerable and Exclusionary</div>
-            <div class="card-content">Traditional stokvel/chama operations require physical cash, physical meetings, and physical presence for payouts. This creates vulnerability to theft and robbery (particularly on payout day), exclusion of members who have moved to a different city or country, and dependency on a trusted treasurer who becomes a single point of failure for the group's finances. When a treasurer defaults, steals, or is incapacitated, the entire group's savings are at risk with no formal recourse mechanism.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Problem 2 &mdash; Digital Money Platforms Ignore the ROSCA Market</div>
-            <div class="card-content">Despite the enormous scale of ROSCA activity across MTN's markets, no mainstream mobile money platform has built a product that genuinely accommodates the social, cultural, and operational realities of stokvel/chama/esusu groups. Existing "savings group" features are generic and fail to accommodate the specific rotation mechanics, contribution timing rules, penalty structures, and cultural decision-making norms that define each community's specific ROSCA variant. This represents a significant unaddressed market need that UC-33 is positioned to fill.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Problem 3 &mdash; Dispute Resolution in ROSCAs is Informal and Relationship-Damaging</div>
-            <div class="card-content">When a member fails to contribute, the group faces a dilemma: invoke informal social pressure (damaging the relationship), postpone the payout (harming the member in rotation), or absorb the shortfall (creating resentment). There is no neutral third-party mechanism. AI-mediated dispute resolution, backed by a transparent ledger, provides a culturally neutral mechanism for handling contribution failures, payout disputes, and member departures without damaging personal relationships within the group.</div>
-        </div>
-    </section>
-
-    <!-- 3. OBJECTIVES & SUCCESS METRICS -->
-    <section class="teal">
-        <h2>3. Objectives &amp; Success Metrics</h2>
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-value">500K</div>
-                <div class="metric-label">Active ROSCA Groups on Platform (12-month)</div>
-            </div>
-            <div class="metric-card indigo">
-                <div class="metric-value">5M</div>
-                <div class="metric-label">New MoMo Users via ROSCA Acquisition</div>
-            </div>
-            <div class="metric-card violet">
-                <div class="metric-value">&lt;1%</div>
-                <div class="metric-label">Payout Failure Rate (vs ~15% cash)</div>
-            </div>
-            <div class="metric-card amber">
-                <div class="metric-value">8</div>
-                <div class="metric-label">Markets with Culturally-Customised Rule Sets</div>
-            </div>
-        </div>
-        <table style="margin-top:20px;">
-            <thead><tr><th>KPI</th><th>Baseline</th><th>6-Month Target</th><th>12-Month Target</th><th>Measurement</th></tr></thead>
-            <tbody>
-                <tr><td>Active ROSCA groups on platform</td><td>0</td><td class="priority-med">50,000</td><td class="priority-high">500,000</td><td>Group creation events</td></tr>
-                <tr><td>Total group membership</td><td>0</td><td class="priority-med">500K members</td><td class="priority-high">5M members</td><td>Member enrolment events</td></tr>
-                <tr><td>MoMo wallet activations via ROSCA</td><td>0</td><td class="priority-med">200K new wallets</td><td class="priority-high">2M new wallets</td><td>New account attribution</td></tr>
-                <tr><td>Payout success rate</td><td>N/A</td><td class="priority-high">&gt;99%</td><td class="priority-high">&gt;99.5%</td><td>Payout execution logs</td></tr>
-                <tr><td>Contribution reminder effectiveness</td><td>N/A</td><td class="priority-high">&gt;85% on-time contribution rate</td><td class="priority-high">&gt;92%</td><td>Contribution timing logs</td></tr>
-                <tr><td>Dispute resolution rate (AI-mediated)</td><td>N/A</td><td class="priority-med">&gt;70% resolved without escalation</td><td class="priority-high">&gt;85%</td><td>Dispute resolution events</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 4. USER STORIES -->
-    <section>
-        <h2>4. User Stories &amp; Acceptance Criteria</h2>
-
-        <div class="us-card">
-            <div class="us-id">US-33-01</div>
-            <div class="us-title">Group Creation — Stokvel Founder</div>
-            <div class="us-story">"As Mama Thandi, a stokvel founder in Soweto, I want to create our 12-member grocery stokvel on MoMo in under 10 minutes and invite all members via WhatsApp, so that we can stop handling cash at our monthly meetings."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Group creation wizard: group name, type (grocery/investment/burial society), member count, contribution amount, frequency, rotation order</li>
-                <li>Invitation sent via WhatsApp link to each member's number &mdash; non-MoMo members prompted to register</li>
-                <li>Group creation completable in under 10 minutes including first member invitation</li>
-                <li>Group creator assigned "admin" role; additional co-admins configurable</li>
-                <li>Group rules stored as digital record, accessible to all members at any time</li>
-                <li>Cultural rule preset: SA grocery stokvel template pre-loaded with sensible defaults</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-33-02</div>
-            <div class="us-title">Automated Contribution Reminder &amp; Collection</div>
-            <div class="us-story">"As a group member, I want to receive a WhatsApp reminder 3 days before my contribution is due and be able to pay directly from the reminder message, so that I never miss a contribution and let the group down."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>AI sends WhatsApp reminder at T-7 days and T-3 days before contribution due date</li>
-                <li>Reminder includes contribution amount, due date, and one-tap payment link</li>
-                <li>Payment link executes MoMo transfer from member wallet to group pool wallet</li>
-                <li>USSD fallback: member can pay via *165*STOKVEL# without WhatsApp</li>
-                <li>Group admin and all members see real-time contribution status on group dashboard</li>
-                <li>Late payment automated follow-up: 24h overdue notification to member and admin</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-33-03</div>
-            <div class="us-title">Rotating Payout Execution</div>
-            <div class="us-story">"As Nkechi, the member receiving this month's payout, I want the full group contribution pool to be sent automatically to my MoMo wallet on the payout date without anyone having to manually collect cash, so that I receive my money safely and on time."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>AI calculates payout amount based on confirmed contributions and group rules (penalty deductions if applicable)</li>
-                <li>Payout executed automatically on configured date to recipient's MoMo wallet</li>
-                <li>All group members receive payout confirmation notification with amount and recipient</li>
-                <li>If outstanding contributions exist, payout is reduced by configured penalty/shortfall rule (configurable per group)</li>
-                <li>Payout history stored in immutable group ledger accessible to all members</li>
-                <li>Next rotation position displayed to all members after each payout</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-33-04</div>
-            <div class="us-title">AI Dispute Resolution</div>
-            <div class="us-story">"As a group admin, when a member disputes a missed contribution claim, I want the AI to present the objective contribution record and propose a resolution, so that we can resolve the dispute without it becoming personal and damaging friendships."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Dispute raised via WhatsApp or app; AI presents verified contribution record to all parties</li>
-                <li>AI proposes resolution options based on group rules (penalty payment, postponed payout, position swap)</li>
-                <li>Group admin votes to accept proposed resolution; majority voting rules configurable</li>
-                <li>Unresolved disputes after 7 days escalated to MTN customer service for human arbitration</li>
-                <li>Dispute outcome recorded in group ledger with all member visibility</li>
-                <li>Resolution statistics shared with admin for transparency</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-33-05</div>
-            <div class="us-title">Chama Investment Track — Kenya</div>
-            <div class="us-story">"As a Nairobi Chama treasurer, I want to manage our chama's investment pool separately from the rotating payout pool, with AI tracking returns and member equity stakes, so that we can run a more sophisticated savings club."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Chama template includes: rotating payout pool (ROSCA) + investment pool (separate wallet)</li>
-                <li>Investment contributions tracked with per-member equity percentage</li>
-                <li>Integration with MoMo Invest for pooled investment product access</li>
-                <li>Monthly investment return report distributed to all members via WhatsApp</li>
-                <li>Member equity redemption process supported with AI-guided valuation</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-33-06</div>
-            <div class="us-title">Multi-Currency Cross-Border Group</div>
-            <div class="us-story">"As a Nigerian diaspora member living in South Africa, I want to participate in our family esusu group across borders with automatic currency conversion, so that distance doesn't exclude me from our family savings tradition."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Group supports members in multiple countries with different MoMo currency wallets</li>
-                <li>Contributions in local currency converted at MoMo FX rate at time of contribution</li>
-                <li>Payout issued in recipient's local currency at prevailing FX rate on payout date</li>
-                <li>FX rate shown to member before contribution confirmation</li>
-                <li>Cross-border transfer compliance: KYC verified members only for cross-border groups</li>
-            </ul>
-        </div>
-
-        <div class="us-card">
-            <div class="us-id">US-33-07</div>
-            <div class="us-title">Cultural Rule Customisation — West Africa Tontine</div>
-            <div class="us-story">"As a tontine organiser in Ivory Coast, I want to configure competitive bidding rules where the rotation order is determined by who bids the highest interest to the group each cycle, so that our local tontine traditions are respected."</div>
-            <div class="us-ac-label">Acceptance Criteria</div>
-            <ul class="us-ac">
-                <li>Advanced rule configuration supports: fixed rotation, random rotation, bid-based rotation, admin-assigned rotation</li>
-                <li>Bid-based rotation: members submit sealed bids; highest bid (interest to group pool) wins that cycle's payout</li>
-                <li>Bid management via WhatsApp or app interface</li>
-                <li>Rule set saved as group template; shareable with other groups in same community</li>
-                <li>Market-specific rule templates pre-built for SA stokvel, Kenya chama, Nigeria esusu, West Africa tontine</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- 5. FUNCTIONAL REQUIREMENTS -->
-    <section>
-        <h2>5. Functional Requirements</h2>
-
-        <h3>5.1 Group Lifecycle Management</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-01</code></td><td>The system SHALL support creation of ROSCA groups with configurable: member count (2&ndash;50), contribution amount, contribution frequency (weekly/monthly/custom), rotation order (fixed/random/bid), payout date, and late contribution penalty rules.</td><td><span class="tag tag-must">MUST</span></td><td>Core ROSCA model</td></tr>
-                <tr><td><code>FR-02</code></td><td>Group invitations SHALL be deliverable via WhatsApp link, SMS, and in-app share. Non-MoMo recipients SHALL be prompted to create a MoMo wallet to join.</td><td><span class="tag tag-must">MUST</span></td><td>Member acquisition driver</td></tr>
-                <tr><td><code>FR-03</code></td><td>A group pool MoMo wallet SHALL be created automatically on group activation, held in trust by MTN MoMo, inaccessible to any individual member including the group admin until the configured payout date.</td><td><span class="tag tag-must">MUST</span></td><td>Eliminates treasurer risk</td></tr>
-                <tr><td><code>FR-04</code></td><td>Member departure SHALL be handled via AI-mediated process: departing member's position filled by waitlist candidate or group votes to restructure. Partial contribution refund calculated per group rules.</td><td><span class="tag tag-should">SHOULD</span></td><td>Cultural sensitivity required</td></tr>
-                <tr><td><code>FR-05</code></td><td>The system SHALL support multiple group types as configurable templates: SA grocery stokvel, SA investment stokvel, SA burial society, Kenya chama (ROSCA + investment), Nigeria esusu, Nigeria ajo (competitive), West Africa tontine.</td><td><span class="tag tag-must">MUST</span></td><td>Cultural rule customisation</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.2 AI Contribution Management &amp; Reminders</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-06</code></td><td>AI reminder engine SHALL send personalised contribution reminders at T-7 days and T-3 days before due date via WhatsApp (primary) and SMS (fallback). Reminder SHALL include one-tap payment link.</td><td><span class="tag tag-must">MUST</span></td><td>Contribution timeliness critical</td></tr>
-                <tr><td><code>FR-07</code></td><td>Overdue contributions SHALL trigger escalating notifications: T+1 day (member notification), T+2 days (admin notification), T+5 days (group notification with resolution options).</td><td><span class="tag tag-must">MUST</span></td><td>Transparent accountability</td></tr>
-                <tr><td><code>FR-08</code></td><td>Late contribution penalties SHALL be calculated and applied automatically per group rules (configurable: fixed fee, percentage, payout position demotion) with transparent calculation shown to member.</td><td><span class="tag tag-should">SHOULD</span></td><td>Group rule customisation</td></tr>
-            </tbody>
-        </table>
-
-        <h3>5.3 Dual Interface — WhatsApp &amp; USSD</h3>
-        <table>
-            <thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
-            <tbody>
-                <tr><td><code>FR-09</code></td><td>All core ROSCA actions (check balance, view rotation, make contribution, view payout status) SHALL be accessible via WhatsApp chatbot in English, Zulu, Swahili, Hausa, Yoruba, French.</td><td><span class="tag tag-must">MUST</span></td><td>WhatsApp primary for ROSCA groups</td></tr>
-                <tr><td><code>FR-10</code></td><td>USSD fallback (*165*STOKVEL# or equivalent) SHALL support contribution payment, balance check, and next payout date query for feature-phone members.</td><td><span class="tag tag-must">MUST</span></td><td>Digital equity requirement</td></tr>
-                <tr><td><code>FR-11</code></td><td>Group admin dashboard in MoMo app SHALL show: all member contribution status, group pool balance, payout schedule, dispute log, and export to CSV/PDF for record-keeping.</td><td><span class="tag tag-should">SHOULD</span></td><td>Treasurer replacement functionality</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 6. TECHNICAL ARCHITECTURE -->
-    <section class="violet">
-        <h2>6. Technical Architecture</h2>
-        <div class="arch-layers">
-            <div class="arch-layer">
-                <div class="arch-layer-label">User Interfaces</div>
-                <div class="arch-layer-content">WhatsApp Business API chatbot (6 languages) &rarr; MoMo App (Group Dashboard, Admin Portal) &rarr; USSD *165*STOKVEL# &rarr; SMS fallback &rarr; Web portal (admin)</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">AI Community Manager</div>
-                <div class="arch-layer-content">NL Intent Engine &rarr; Contribution Reminder Engine (personalised timing) &rarr; AI Dispute Mediator &rarr; Payout Calculator (penalty logic, FX conversion) &rarr; Rule Engine (cultural templates)</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Group Finance Layer</div>
-                <div class="arch-layer-content">Group Pool Wallet (MoMo Trust Account) &rarr; Contribution Ledger (immutable) &rarr; Rotation Schedule Manager &rarr; Payout Executor &rarr; Multi-currency FX Handler &rarr; Investment Pool (Chama)</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Notification &amp; Engagement</div>
-                <div class="arch-layer-content">WhatsApp Business API &rarr; SMS Gateway &rarr; Push Notification Service &rarr; Personalised reminder scheduler &rarr; Group broadcast notifications &rarr; Dispute escalation alerts</div>
-            </div>
-            <div class="arch-layer">
-                <div class="arch-layer-label">Data &amp; Compliance</div>
-                <div class="arch-layer-content">Group ledger (append-only, all members readable) &rarr; Per-market data residency &rarr; KYC verification for cross-border groups &rarr; POPIA consent per member &rarr; AML transaction monitoring</div>
-            </div>
-        </div>
-
-        <h3>Cultural Rule Variations by Market</h3>
-        <table>
-            <thead><tr><th>Market</th><th>ROSCA Name</th><th>Key Variations</th><th>Template Built</th></tr></thead>
-            <tbody>
-                <tr><td>South Africa</td><td>Stokvel</td><td>Grocery (bulk purchase), Investment, Burial society with death benefit</td><td>Phase 1</td></tr>
-                <tr><td>Kenya</td><td>Chama</td><td>ROSCA + investment pool hybrid; table banking; formal registration common</td><td>Phase 1</td></tr>
-                <tr><td>Nigeria</td><td>Esusu / Ajo</td><td>Competitive bidding variant; daily contribution variant (ajo); rotating payout</td><td>Phase 1</td></tr>
-                <tr><td>Ghana</td><td>Susu</td><td>Daily contributions via susu collector; lump sum return at cycle end</td><td>Phase 2</td></tr>
-                <tr><td>West Africa (CI, Benin, Guinea)</td><td>Tontine</td><td>Competitive interest bidding for rotation priority; group feast tradition</td><td>Phase 2</td></tr>
-                <tr><td>Uganda / Rwanda</td><td>Chilembe / Likilimba</td><td>Similar to stokvel; burial society overlap; women's groups dominant</td><td>Phase 2</td></tr>
-                <tr><td>Ethiopia</td><td>Iqub / Idir</td><td>Iqub (ROSCA) + Idir (mutual insurance/burial); often coexist in same group</td><td>Phase 3</td></tr>
-                <tr><td>Zambia</td><td>Chilimba</td><td>Community burial society; savings rotation; church group often the organiser</td><td>Phase 3</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <!-- 7. DATA & AI MODEL -->
-    <section>
-        <h2>7. Data &amp; AI Model Requirements</h2>
-
-        <div class="card">
-            <div class="card-title">AI Contribution Reminder Personalisation</div>
-            <div class="card-content">Behavioural model per member: optimal reminder timing (when the member historically responds fastest), preferred channel (WhatsApp vs SMS), payment device (smartphone vs feature phone). Reminder timing personalised based on member payment history to maximise on-time contribution rate. No cross-member data sharing &mdash; each member's model built from their own interaction history.</div>
-        </div>
-        <div class="card teal">
-            <div class="card-title">AI Dispute Mediator</div>
-            <div class="card-content">Rules-based + NL approach: objective ledger data presented first (contribution records, timestamps, amounts). NL generation produces neutral, culturally appropriate dispute summary in member's language. Resolution options generated from group rule set. Escalation classifier identifies disputes likely to require human arbitration (e.g., theft allegations, admin misconduct) and routes immediately to MTN customer service.</div>
-        </div>
-        <div class="card violet">
-            <div class="card-title">Non-Payment Prediction</div>
-            <div class="card-content">Member-level risk model predicting likelihood of non-payment for upcoming contribution based on: payment history (on-time rate, average days late), MoMo wallet activity (balance trends, transaction frequency), contribution size relative to typical wallet balance. High-risk members receive earlier reminders and optional partial payment options. Model retrained monthly per group.</div>
-        </div>
-
-        <h3>Ethnographic Research Requirements (Pre-Development)</h3>
-        <div class="card amber">
-            <div class="card-title">Next Step: Ethnographic Research Programme</div>
-            <div class="card-content">Before development begins, MTN must commission ethnographic research across South Africa, Kenya, and Nigeria to map the full variation in stokvel/chama/esusu rule sets, social dynamics, dispute resolution customs, and cultural norms around money in group settings. Research questions: What are the boundaries of acceptable AI mediation? What decisions must remain human? How do groups handle death of a member, pregnancy leave, or financial emergency? What are the taboos around group money management? This research directly informs the cultural rule template library and dispute mediation protocols. Estimated: 3-month programme, 50 focus groups across 3 markets.</div>
-        </div>
-    </section>
-
-    <!-- 8. COMPLIANCE -->
-    <section class="amber">
-        <h2>8. Compliance &amp; Regulatory</h2>
-
-        <div class="card amber">
-            <div class="card-title">Collective Investment Scheme Risk (South Africa)</div>
-            <div class="card-content">Investment stokvels that pool member funds for collective investment may be classified as Collective Investment Schemes (CIS) under the Collective Investment Schemes Control Act (CISCA), requiring registration with the FSCA. MTN must obtain legal opinion on whether the platform constitutes CIS management or merely provides payment infrastructure for self-directed groups. Recommended approach: platform provides payment rails and record-keeping only; investment decisions remain entirely with group members; no platform recommendation of investment products.</div>
-        </div>
-        <div class="card amber">
-            <div class="card-title">Trust Account Obligations</div>
-            <div class="card-content">Group pool wallets holding member contributions in trust must comply with trust account regulations in each market. In South Africa, holding client funds in trust triggers obligations under the Financial Sector Regulation Act. The trust account model must be reviewed by Group Legal to ensure MTN MoMo's e-money licence covers the group pooling model. Alternative structure: each member pays directly to the payout recipient on payout date, bypassing pooling entirely.</div>
-        </div>
-        <div class="card amber">
-            <div class="card-title">AML / KYC for Cross-Border Groups</div>
-            <div class="card-content">Cross-border ROSCA groups with members in multiple countries trigger cross-border payment compliance: FICA (SA), EFCC regulations (Nigeria), CBK foreign exchange rules (Kenya). KYC verification is mandatory for all members of cross-border groups. Transaction monitoring must flag unusual patterns (e.g., rapid succession of large cross-border contributions). The FIC Act (SA) requires reporting of cross-border transactions above ZAR 10,000 equivalent.</div>
-        </div>
-
-        <h3>Per-Member POPIA Consent Requirements</h3>
-        <ul>
-            <li>Each group member must provide individual POPIA consent for: processing of their contribution data, sharing of their payment status with other group members, AI reminder processing, dispute mediation using their transaction records</li>
-            <li>Group admin has additional consent scope: access to all member contribution records for admin purposes</li>
-            <li>Member withdrawal from group must trigger right-to-erasure process for their personal data while preserving the group ledger integrity (contribution amounts without personal identifiers may be retained)</li>
-            <li>WhatsApp-based interactions subject to Meta's data processing terms; members must be informed of WhatsApp data sharing in addition to MTN POPIA consent</li>
-        </ul>
-    </section>
-
-    <!-- 9. SPRINT PLAN -->
-    <section class="teal">
-        <h2>9. Sprint Plan &amp; Roadmap</h2>
-
-        <h3>Sprint 1 (Weeks 1&ndash;3): Research, Foundation &amp; Core ROSCA</h3>
-        <div class="card teal">
-            <div class="card-title">Sprint 1 Deliverables</div>
-            <div class="card-content">
-                <ul>
-                    <li>Ethnographic research programme kick-off: partner selection, research protocol, market access (SA, Kenya, Nigeria)</li>
-                    <li>Group creation wizard: MoMo app + web, 3 initial templates (SA grocery stokvel, Kenya chama, Nigeria esusu)</li>
-                    <li>Group pool MoMo wallet creation (trust account model review completed)</li>
-                    <li>Member invitation flow: WhatsApp Business API integration, MoMo new-user registration prompts</li>
-                    <li>Contribution collection: one-tap WhatsApp payment link, MoMo wallet auto-debit on due date</li>
-                    <li>Immutable group ledger: contribution records, payout history, all-member read access</li>
-                    <li>USSD fallback: *165*STOKVEL# contribution and balance check</li>
-                </ul>
-            </div>
-        </div>
-
-        <h3>Sprint 2 (Weeks 4&ndash;6): AI Features, Reminders &amp; Dispute Resolution</h3>
-        <div class="card teal">
-            <div class="card-title">Sprint 2 Deliverables</div>
-            <div class="card-content">
-                <ul>
-                    <li>AI reminder engine: personalised timing, WhatsApp + SMS dual channel, escalating overdue notifications</li>
-                    <li>Rotating payout automation: payout calculator (penalties, FX), automatic MoMo transfer on payout date</li>
-                    <li>AI dispute mediator v1: ledger-based evidence presentation, rules-based resolution options, member voting</li>
-                    <li>Non-payment prediction model: per-member risk scoring, early intervention triggers</li>
-                    <li>WhatsApp chatbot: 6-language support, core ROSCA queries, contribution prompts</li>
-                    <li>Admin dashboard: contribution status, payout schedule, dispute log, CSV export</li>
-                    <li>POPIA consent flows: per-member consent, WhatsApp data disclosure, withdrawal mechanism</li>
-                </ul>
-            </div>
-        </div>
-
-        <h3>Sprint 3 (Weeks 7&ndash;9): Multi-Currency, Pilot &amp; Compliance</h3>
-        <div class="card teal">
-            <div class="card-title">Sprint 3 Deliverables</div>
-            <div class="card-content">
-                <ul>
-                    <li>Multi-currency support: FX conversion for cross-border groups, CBK/SARB/CBN compliance</li>
-                    <li>Chama investment pool module: equity tracking, MoMo Invest integration, monthly return reports</li>
-                    <li>Competitive bidding (ajo/tontine) rule engine: sealed bid management, auction mechanics</li>
-                    <li>Pilot: MTN South Africa (1,000 stokvel groups), MTN Kenya (500 chama groups), MTN Nigeria (500 esusu groups)</li>
-                    <li>Legal opinion: CIS classification risk, trust account model, AML for cross-border groups</li>
-                    <li>Ethnographic research synthesis: cultural rule library expansion based on field findings</li>
-                    <li>Group acquisition metrics: new MoMo wallet activations attributed to ROSCA group membership</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- 10. RISK REGISTER -->
-    <section class="red">
-        <h2>10. Risk Register</h2>
-        <table>
-            <thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
-            <tbody>
-                <tr><td><code>R-01</code></td><td>FSCA classifies investment stokvel/chama pooling as unlicensed collective investment scheme</td><td class="priority-med">Medium</td><td class="priority-high">Very High</td><td>Obtain FSCA legal opinion before launch. Phase 1 excludes investment pool features (SA only). Payment rail + record-keeping model minimises CIS exposure. Engage FSCA proactively to confirm regulatory position.</td></tr>
-                <tr><td><code>R-02</code></td><td>Cultural misalignment: platform rules do not accommodate important local ROSCA variants discovered in ethnographic research</td><td class="priority-high">High</td><td class="priority-med">Medium</td><td>Ethnographic research programme mandatory precursor to development. Rule engine designed for maximum configurability. Post-research template library iteration before launch. Community co-design pilots with actual stokvel/chama groups.</td></tr>
-                <tr><td><code>R-03</code></td><td>Member non-payment causes group payout failure, damaging trust in platform and MTN brand</td><td class="priority-high">High</td><td class="priority-high">High</td><td>Non-payment prediction model enables early intervention. Platform must not be seen to "promise" payout — it executes what the group has contributed. Clear communication: platform facilitates, does not guarantee. Option: MTN liquidity bridge for shortfalls (commercial decision).</td></tr>
-                <tr><td><code>R-04</code></td><td>WhatsApp Business API policy changes disrupt primary communication channel for group management</td><td class="priority-med">Low-Medium</td><td class="priority-high">High</td><td>SMS as co-primary channel from day one. USSD backup for all core functions. In-app notifications as tertiary channel. API dependency risk included in commercial risk register.</td></tr>
-                <tr><td><code>R-05</code></td><td>Trust account model creates regulatory liability for MTN MoMo as trustee of group pool funds</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Legal review of trust account model before launch. Alternative payment flow (direct member-to-recipient) evaluated. Trustee liability insurance obtained. Group pool wallets clearly structured as client money, separated from MTN operational funds.</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <footer>
-        <div style="margin-bottom:8px;font-weight:700;color:#64748b;">UC-33 AI Community Finance Manager — Stokvel / Chama / ROSCA &middot; MTN Group Fintech &middot; Requirements Document v1.0</div>
-        <div>Document Author: Malcolm Govender &mdash; Head of AI &amp; Engineering &nbsp;|&nbsp; Generated: May 2026 &nbsp;|&nbsp; Classification: Internal &mdash; Confidential</div>
-        <div style="margin-top:8px;font-size:0.82em;">Integrations: MoMo API &nbsp;&middot;&nbsp; WhatsApp Business API &nbsp;&middot;&nbsp; MoMo Invest &nbsp;&middot;&nbsp; UC-25 USSD AI &nbsp;&middot;&nbsp; Compliance: POPIA &middot; NDPR &middot; Kenya DPA &middot; FISCA &middot; FICA &middot; AML</div>
-    </footer>
-
+<p>Rotating savings groups are among the oldest and most culturally embedded financial institutions in Africa. Known as <strong style="color:#818cf8;">Stokvels</strong> in South Africa, <strong style="color:#818cf8;">Chamas</strong> in Kenya, <strong style="color:#818cf8;">Esusu</strong> or <strong style="color:#818cf8;">Ajo</strong> in Nigeria, <strong style="color:#818cf8;">Tontines</strong> in West Africa, and <strong style="color:#818cf8;">Susu</strong> in Ghana, these rotating community credit associations (ROSCAs) mobilise an estimated R50 billion annually in South Africa alone, with the pan-African total estimated at $50–100 billion. They operate entirely in cash and informally, managed through personal trust, physical meetings, and handwritten ledgers.</p>
+<p>The informal, cash-based nature of these groups creates three critical problems: non-payment risk (members who default disrupt the entire rotation), opacity (the group treasurer holds unchecked authority over group funds), and security (large cash payouts create robbery risk). MTN MoMo, as the dominant mobile money platform across these markets, is uniquely positioned to digitise and formalise ROSCA operations — making them safer, more transparent, and more accountable while preserving the cultural trust and social dynamics that make them effective savings vehicles.</p>
+<p>UC-33 builds an AI-powered ROSCA management platform on top of the MoMo API, accessible via WhatsApp, USSD, and the MoMo app. Group creation, member onboarding, contribution reminders, rotating payout execution, and dispute resolution are all managed by the AI. Critically, the platform is designed with cultural rule customisation — the immense variation in ROSCA rules across SA (grocery stokvels, investment stokvels, burial societies), Kenya (chama investment structures), and Nigeria (competitive bidding esusu) is accommodated through a configurable rule engine rather than a one-size-fits-all model.</p>
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-value">R50B</div>
+<div class="metric-label">Stokvel Market (SA alone, annual)</div>
+</div>
+<div class="metric-card indigo">
+<div class="metric-value">11M+</div>
+<div class="metric-label">South Africans in Stokvel Groups</div>
+</div>
+<div class="metric-card violet">
+<div class="metric-value">$100B+</div>
+<div class="metric-label">Pan-African ROSCA Market (estimated)</div>
+</div>
+<div class="metric-card amber">
+<div class="metric-value">8</div>
+<div class="metric-label">MTN Markets with Significant ROSCA Activity</div>
+</div>
+</div>
+<div class="comparison-box" style="margin-top:20px;">
+<div class="compare-card traditional">
+<div class="compare-label">Traditional ROSCA (Cash/Informal)</div>
+<div class="compare-value">High Risk</div>
+<div class="compare-sub">Cash management; non-payment disrupts rotation; treasurer has unchecked authority; robbery risk on payout day; no dispute resolution; no record-keeping</div>
+</div>
+<div class="compare-card ai">
+<div class="compare-label">AI Community Finance Manager (UC-33)</div>
+<div class="compare-value">Transparent</div>
+<div class="compare-sub">MoMo digital payments; AI manages rotation; transparent ledger visible to all members; AI dispute mediation; automated reminders; cultural rule customisation</div>
+</div>
 </div>
 
-<!-- EDITABLE DOCUMENT SYSTEM -->
-<style data-editable-system>
-  body.edm [data-eid]:hover{outline:2px dashed rgba(167,139,250,.35)!important;outline-offset:3px;border-radius:3px;cursor:text}
-  body.edm [data-eid]:focus{outline:2px solid #a78bfa!important;outline-offset:3px;border-radius:3px;background:rgba(167,139,250,.07)!important}
-  body.edm [data-eid]:empty::before{content:"Click to add text";color:rgba(167,139,250,.4);font-style:italic;pointer-events:none}
-  #__etb{position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:6px;align-items:center;background:#111827;border:1px solid #374151;border-radius:12px;padding:9px 14px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
-  #__etb button{padding:5px 11px;border-radius:7px;border:1px solid #374151;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;background:#1f2937;color:#d1d5db}
-  #__etb button:hover{border-color:#a78bfa;color:#e8eaff}
-  #__etb .etb-edit{color:#a78bfa}
-  #__etb .etb-save{color:#34d399}
-  #__etb .etb-reset{color:#f87171}
-  #__etb .etb-export{color:#38bdf8}
-  #__etb .etb-msg{font-size:10.5px;color:#6b7280;min-width:90px;text-align:right}
-  #__etb .etb-sep{width:1px;height:20px;background:#374151;margin:0 2px}
-</style>
-<script data-editable-system>
-(function(){
-  'use strict';
-  var KEY = 'edm:' + (location.pathname || location.href);
-  var SELS = 'p,h1,h2,h3,h4,h5,li,td,th,blockquote,.card-content,.card-title,.meta-value,.hero-meta-value,.summary-card p,.risk-detail,.risk-title,.phase-desc,.gap-value,.kpi-val,.kpi-lbl,.story-text,.card-content p,.dependency-detail,.dependency-system,.checklist li,.warning-box,.info-box,.code-block,.gap-item .gap-value,.status-badge,.badge,.tech-tag,.hero-subtitle,caption,dt,dd,.requirement,.storyid';
-  var mode = false, timer = null, ids = [];
+      </section>
+      <section class="doc-section" id="s2">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <h2 class="section-title">Problem Statement</h2>
+        </div>
+        
 
-  function elems(){
-    return [].slice.call(document.querySelectorAll(SELS)).filter(function(el){
-      return !el.closest('#__etb') && !el.closest('script') && !el.closest('style') && !el.closest('noscript');
-    });
-  }
+<div class="card violet">
+<div class="card-title">Problem 1 — Cash-Based ROSCAs Are Vulnerable and Exclusionary</div>
+<div class="card-content">Traditional stokvel/chama operations require physical cash, physical meetings, and physical presence for payouts. This creates vulnerability to theft and robbery (particularly on payout day), exclusion of members who have moved to a different city or country, and dependency on a trusted treasurer who becomes a single point of failure for the group's finances. When a treasurer defaults, steals, or is incapacitated, the entire group's savings are at risk with no formal recourse mechanism.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Problem 2 — Digital Money Platforms Ignore the ROSCA Market</div>
+<div class="card-content">Despite the enormous scale of ROSCA activity across MTN's markets, no mainstream mobile money platform has built a product that genuinely accommodates the social, cultural, and operational realities of stokvel/chama/esusu groups. Existing "savings group" features are generic and fail to accommodate the specific rotation mechanics, contribution timing rules, penalty structures, and cultural decision-making norms that define each community's specific ROSCA variant. This represents a significant unaddressed market need that UC-33 is positioned to fill.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Problem 3 — Dispute Resolution in ROSCAs is Informal and Relationship-Damaging</div>
+<div class="card-content">When a member fails to contribute, the group faces a dilemma: invoke informal social pressure (damaging the relationship), postpone the payout (harming the member in rotation), or absorb the shortfall (creating resentment). There is no neutral third-party mechanism. AI-mediated dispute resolution, backed by a transparent ledger, provides a culturally neutral mechanism for handling contribution failures, payout disputes, and member departures without damaging personal relationships within the group.</div>
+</div>
 
-  function stamp(){
-    ids = [];
-    elems().forEach(function(el,i){
-      el.setAttribute('data-eid', i);
-      ids.push(i);
-    });
-  }
+      </section>
+      <section class="doc-section" id="s3">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <h2 class="section-title">Objectives & Success Metrics</h2>
+        </div>
+        
 
-  function enable(){
-    mode = true;
-    document.body.classList.add('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'true';
-      el.spellcheck = false;
-    });
-    document.addEventListener('input', onInput);
-    refresh();
-  }
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-value">500K</div>
+<div class="metric-label">Active ROSCA Groups on Platform (12-month)</div>
+</div>
+<div class="metric-card indigo">
+<div class="metric-value">5M</div>
+<div class="metric-label">New MoMo Users via ROSCA Acquisition</div>
+</div>
+<div class="metric-card violet">
+<div class="metric-value">&lt;1%</div>
+<div class="metric-label">Payout Failure Rate (vs ~15% cash)</div>
+</div>
+<div class="metric-card amber">
+<div class="metric-value">8</div>
+<div class="metric-label">Markets with Culturally-Customised Rule Sets</div>
+</div>
+</div>
+<table style="margin-top:20px;">
+<thead><tr><th>KPI</th><th>Baseline</th><th>6-Month Target</th><th>12-Month Target</th><th>Measurement</th></tr></thead>
+<tbody>
+<tr><td>Active ROSCA groups on platform</td><td>0</td><td class="priority-med">50,000</td><td class="priority-high">500,000</td><td>Group creation events</td></tr>
+<tr><td>Total group membership</td><td>0</td><td class="priority-med">500K members</td><td class="priority-high">5M members</td><td>Member enrolment events</td></tr>
+<tr><td>MoMo wallet activations via ROSCA</td><td>0</td><td class="priority-med">200K new wallets</td><td class="priority-high">2M new wallets</td><td>New account attribution</td></tr>
+<tr><td>Payout success rate</td><td>N/A</td><td class="priority-high">&gt;99%</td><td class="priority-high">&gt;99.5%</td><td>Payout execution logs</td></tr>
+<tr><td>Contribution reminder effectiveness</td><td>N/A</td><td class="priority-high">&gt;85% on-time contribution rate</td><td class="priority-high">&gt;92%</td><td>Contribution timing logs</td></tr>
+<tr><td>Dispute resolution rate (AI-mediated)</td><td>N/A</td><td class="priority-med">&gt;70% resolved without escalation</td><td class="priority-high">&gt;85%</td><td>Dispute resolution events</td></tr>
+</tbody>
+</table>
 
-  function disable(){
-    mode = false;
-    document.body.classList.remove('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'false';
-      el.blur();
-    });
-    document.removeEventListener('input', onInput);
-    refresh();
-  }
+      </section>
+      <section class="doc-section" id="s4">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <h2 class="section-title">User Stories & Acceptance Criteria</h2>
+        </div>
+        
 
-  function onInput(){
-    clearTimeout(timer);
-    msg('Unsaved…');
-    timer = setTimeout(persist, 900);
-  }
+<div class="us-card">
+<div class="us-id">US-33-01</div>
+<div class="us-title">Group Creation — Stokvel Founder</div>
+<div class="us-story">"As Mama Thandi, a stokvel founder in Soweto, I want to create our 12-member grocery stokvel on MoMo in under 10 minutes and invite all members via WhatsApp, so that we can stop handling cash at our monthly meetings."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Group creation wizard: group name, type (grocery/investment/burial society), member count, contribution amount, frequency, rotation order</li>
+<li>Invitation sent via WhatsApp link to each member's number — non-MoMo members prompted to register</li>
+<li>Group creation completable in under 10 minutes including first member invitation</li>
+<li>Group creator assigned "admin" role; additional co-admins configurable</li>
+<li>Group rules stored as digital record, accessible to all members at any time</li>
+<li>Cultural rule preset: SA grocery stokvel template pre-loaded with sensible defaults</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-33-02</div>
+<div class="us-title">Automated Contribution Reminder &amp; Collection</div>
+<div class="us-story">"As a group member, I want to receive a WhatsApp reminder 3 days before my contribution is due and be able to pay directly from the reminder message, so that I never miss a contribution and let the group down."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>AI sends WhatsApp reminder at T-7 days and T-3 days before contribution due date</li>
+<li>Reminder includes contribution amount, due date, and one-tap payment link</li>
+<li>Payment link executes MoMo transfer from member wallet to group pool wallet</li>
+<li>USSD fallback: member can pay via *165*STOKVEL# without WhatsApp</li>
+<li>Group admin and all members see real-time contribution status on group dashboard</li>
+<li>Late payment automated follow-up: 24h overdue notification to member and admin</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-33-03</div>
+<div class="us-title">Rotating Payout Execution</div>
+<div class="us-story">"As Nkechi, the member receiving this month's payout, I want the full group contribution pool to be sent automatically to my MoMo wallet on the payout date without anyone having to manually collect cash, so that I receive my money safely and on time."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>AI calculates payout amount based on confirmed contributions and group rules (penalty deductions if applicable)</li>
+<li>Payout executed automatically on configured date to recipient's MoMo wallet</li>
+<li>All group members receive payout confirmation notification with amount and recipient</li>
+<li>If outstanding contributions exist, payout is reduced by configured penalty/shortfall rule (configurable per group)</li>
+<li>Payout history stored in immutable group ledger accessible to all members</li>
+<li>Next rotation position displayed to all members after each payout</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-33-04</div>
+<div class="us-title">AI Dispute Resolution</div>
+<div class="us-story">"As a group admin, when a member disputes a missed contribution claim, I want the AI to present the objective contribution record and propose a resolution, so that we can resolve the dispute without it becoming personal and damaging friendships."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Dispute raised via WhatsApp or app; AI presents verified contribution record to all parties</li>
+<li>AI proposes resolution options based on group rules (penalty payment, postponed payout, position swap)</li>
+<li>Group admin votes to accept proposed resolution; majority voting rules configurable</li>
+<li>Unresolved disputes after 7 days escalated to MTN customer service for human arbitration</li>
+<li>Dispute outcome recorded in group ledger with all member visibility</li>
+<li>Resolution statistics shared with admin for transparency</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-33-05</div>
+<div class="us-title">Chama Investment Track — Kenya</div>
+<div class="us-story">"As a Nairobi Chama treasurer, I want to manage our chama's investment pool separately from the rotating payout pool, with AI tracking returns and member equity stakes, so that we can run a more sophisticated savings club."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Chama template includes: rotating payout pool (ROSCA) + investment pool (separate wallet)</li>
+<li>Investment contributions tracked with per-member equity percentage</li>
+<li>Integration with MoMo Invest for pooled investment product access</li>
+<li>Monthly investment return report distributed to all members via WhatsApp</li>
+<li>Member equity redemption process supported with AI-guided valuation</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-33-06</div>
+<div class="us-title">Multi-Currency Cross-Border Group</div>
+<div class="us-story">"As a Nigerian diaspora member living in South Africa, I want to participate in our family esusu group across borders with automatic currency conversion, so that distance doesn't exclude me from our family savings tradition."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Group supports members in multiple countries with different MoMo currency wallets</li>
+<li>Contributions in local currency converted at MoMo FX rate at time of contribution</li>
+<li>Payout issued in recipient's local currency at prevailing FX rate on payout date</li>
+<li>FX rate shown to member before contribution confirmation</li>
+<li>Cross-border transfer compliance: KYC verified members only for cross-border groups</li>
+</ul>
+</div>
+<div class="us-card">
+<div class="us-id">US-33-07</div>
+<div class="us-title">Cultural Rule Customisation — West Africa Tontine</div>
+<div class="us-story">"As a tontine organiser in Ivory Coast, I want to configure competitive bidding rules where the rotation order is determined by who bids the highest interest to the group each cycle, so that our local tontine traditions are respected."</div>
+<div class="us-ac-label">Acceptance Criteria</div>
+<ul class="us-ac">
+<li>Advanced rule configuration supports: fixed rotation, random rotation, bid-based rotation, admin-assigned rotation</li>
+<li>Bid-based rotation: members submit sealed bids; highest bid (interest to group pool) wins that cycle's payout</li>
+<li>Bid management via WhatsApp or app interface</li>
+<li>Rule set saved as group template; shareable with other groups in same community</li>
+<li>Market-specific rule templates pre-built for SA stokvel, Kenya chama, Nigeria esusu, West Africa tontine</li>
+</ul>
+</div>
 
-  function persist(){
-    var store = {};
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null) store[id] = el.innerHTML;
-    });
-    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
-    msg('Saved ✓');
-  }
+      </section>
+      <section class="doc-section" id="s5">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <h2 class="section-title">Functional Requirements</h2>
+        </div>
+        
 
-  function restore(){
-    var raw; try { raw = localStorage.getItem(KEY); } catch(e){}
-    if(!raw) return false;
-    var store; try { store = JSON.parse(raw); } catch(e){ return false; }
-    stamp();
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null && store[id] !== undefined) el.innerHTML = store[id];
-    });
-    return true;
-  }
+<h3>5.1 Group Lifecycle Management</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-01</code></td><td>The system SHALL support creation of ROSCA groups with configurable: member count (2–50), contribution amount, contribution frequency (weekly/monthly/custom), rotation order (fixed/random/bid), payout date, and late contribution penalty rules.</td><td><span class="tag tag-must">MUST</span></td><td>Core ROSCA model</td></tr>
+<tr><td><code>FR-02</code></td><td>Group invitations SHALL be deliverable via WhatsApp link, SMS, and in-app share. Non-MoMo recipients SHALL be prompted to create a MoMo wallet to join.</td><td><span class="tag tag-must">MUST</span></td><td>Member acquisition driver</td></tr>
+<tr><td><code>FR-03</code></td><td>A group pool MoMo wallet SHALL be created automatically on group activation, held in trust by MTN MoMo, inaccessible to any individual member including the group admin until the configured payout date.</td><td><span class="tag tag-must">MUST</span></td><td>Eliminates treasurer risk</td></tr>
+<tr><td><code>FR-04</code></td><td>Member departure SHALL be handled via AI-mediated process: departing member's position filled by waitlist candidate or group votes to restructure. Partial contribution refund calculated per group rules.</td><td><span class="tag tag-should">SHOULD</span></td><td>Cultural sensitivity required</td></tr>
+<tr><td><code>FR-05</code></td><td>The system SHALL support multiple group types as configurable templates: SA grocery stokvel, SA investment stokvel, SA burial society, Kenya chama (ROSCA + investment), Nigeria esusu, Nigeria ajo (competitive), West Africa tontine.</td><td><span class="tag tag-must">MUST</span></td><td>Cultural rule customisation</td></tr>
+</tbody>
+</table>
+<h3>5.2 AI Contribution Management &amp; Reminders</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-06</code></td><td>AI reminder engine SHALL send personalised contribution reminders at T-7 days and T-3 days before due date via WhatsApp (primary) and SMS (fallback). Reminder SHALL include one-tap payment link.</td><td><span class="tag tag-must">MUST</span></td><td>Contribution timeliness critical</td></tr>
+<tr><td><code>FR-07</code></td><td>Overdue contributions SHALL trigger escalating notifications: T+1 day (member notification), T+2 days (admin notification), T+5 days (group notification with resolution options).</td><td><span class="tag tag-must">MUST</span></td><td>Transparent accountability</td></tr>
+<tr><td><code>FR-08</code></td><td>Late contribution penalties SHALL be calculated and applied automatically per group rules (configurable: fixed fee, percentage, payout position demotion) with transparent calculation shown to member.</td><td><span class="tag tag-should">SHOULD</span></td><td>Group rule customisation</td></tr>
+</tbody>
+</table>
+<h3>5.3 Dual Interface — WhatsApp &amp; USSD</h3>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th><th>Priority</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>FR-09</code></td><td>All core ROSCA actions (check balance, view rotation, make contribution, view payout status) SHALL be accessible via WhatsApp chatbot in English, Zulu, Swahili, Hausa, Yoruba, French.</td><td><span class="tag tag-must">MUST</span></td><td>WhatsApp primary for ROSCA groups</td></tr>
+<tr><td><code>FR-10</code></td><td>USSD fallback (*165*STOKVEL# or equivalent) SHALL support contribution payment, balance check, and next payout date query for feature-phone members.</td><td><span class="tag tag-must">MUST</span></td><td>Digital equity requirement</td></tr>
+<tr><td><code>FR-11</code></td><td>Group admin dashboard in MoMo app SHALL show: all member contribution status, group pool balance, payout schedule, dispute log, and export to CSV/PDF for record-keeping.</td><td><span class="tag tag-should">SHOULD</span></td><td>Treasurer replacement functionality</td></tr>
+</tbody>
+</table>
 
-  function reset(){
-    if(!confirm('Reset all edits to original content? This cannot be undone.')) return;
-    try { localStorage.removeItem(KEY); } catch(e){}
-    location.reload();
-  }
+      </section>
+      <section class="doc-section" id="s6">
+        <div class="section-header">
+          <div class="section-num">6</div>
+          <h2 class="section-title">Technical Architecture</h2>
+        </div>
+        
 
-  function exportDoc(){
-    // Temporarily disable editing for clean export
-    var wasMode = mode;
-    if(wasMode) disable();
-    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    // Remove the editable toolbar and injected system from export
-    html = html.replace(/<style[^>]*data-editable-system[^>]*>[\s\S]*?<\/style>/,'');
-    html = html.replace(/<script[^>]*data-editable-system[^>]*>[\s\S]*?<\/script>/,'');
-    html = html.replace(/<div id="__etb"[^>]*>[\s\S]*?<\/div>/,'');
-    html = html.replace(/<!-- EDITABLE DOCUMENT SYSTEM -->/g,'');
-    html = html.replace(/\sdata-eid="\d+"/g,'');
-    html = html.replace(/\scontenteditable="[^"]*"/g,'');
-    var blob = new Blob([html], {type:'text/html'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = (location.pathname.split('/').pop() || 'document') + '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    if(wasMode) enable();
-    msg('Exported ✓');
-  }
+<div class="arch-layers">
+<div class="arch-layer">
+<div class="arch-layer-label">User Interfaces</div>
+<div class="arch-layer-content">WhatsApp Business API chatbot (6 languages) → MoMo App (Group Dashboard, Admin Portal) → USSD *165*STOKVEL# → SMS fallback → Web portal (admin)</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">AI Community Manager</div>
+<div class="arch-layer-content">NL Intent Engine → Contribution Reminder Engine (personalised timing) → AI Dispute Mediator → Payout Calculator (penalty logic, FX conversion) → Rule Engine (cultural templates)</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Group Finance Layer</div>
+<div class="arch-layer-content">Group Pool Wallet (MoMo Trust Account) → Contribution Ledger (immutable) → Rotation Schedule Manager → Payout Executor → Multi-currency FX Handler → Investment Pool (Chama)</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Notification &amp; Engagement</div>
+<div class="arch-layer-content">WhatsApp Business API → SMS Gateway → Push Notification Service → Personalised reminder scheduler → Group broadcast notifications → Dispute escalation alerts</div>
+</div>
+<div class="arch-layer">
+<div class="arch-layer-label">Data &amp; Compliance</div>
+<div class="arch-layer-content">Group ledger (append-only, all members readable) → Per-market data residency → KYC verification for cross-border groups → POPIA consent per member → AML transaction monitoring</div>
+</div>
+</div>
+<h3>Cultural Rule Variations by Market</h3>
+<table>
+<thead><tr><th>Market</th><th>ROSCA Name</th><th>Key Variations</th><th>Template Built</th></tr></thead>
+<tbody>
+<tr><td>South Africa</td><td>Stokvel</td><td>Grocery (bulk purchase), Investment, Burial society with death benefit</td><td>Phase 1</td></tr>
+<tr><td>Kenya</td><td>Chama</td><td>ROSCA + investment pool hybrid; table banking; formal registration common</td><td>Phase 1</td></tr>
+<tr><td>Nigeria</td><td>Esusu / Ajo</td><td>Competitive bidding variant; daily contribution variant (ajo); rotating payout</td><td>Phase 1</td></tr>
+<tr><td>Ghana</td><td>Susu</td><td>Daily contributions via susu collector; lump sum return at cycle end</td><td>Phase 2</td></tr>
+<tr><td>West Africa (CI, Benin, Guinea)</td><td>Tontine</td><td>Competitive interest bidding for rotation priority; group feast tradition</td><td>Phase 2</td></tr>
+<tr><td>Uganda / Rwanda</td><td>Chilembe / Likilimba</td><td>Similar to stokvel; burial society overlap; women's groups dominant</td><td>Phase 2</td></tr>
+<tr><td>Ethiopia</td><td>Iqub / Idir</td><td>Iqub (ROSCA) + Idir (mutual insurance/burial); often coexist in same group</td><td>Phase 3</td></tr>
+<tr><td>Zambia</td><td>Chilimba</td><td>Community burial society; savings rotation; church group often the organiser</td><td>Phase 3</td></tr>
+</tbody>
+</table>
 
-  function msg(t){
-    var el = document.getElementById('__etb-msg');
-    if(el){ el.textContent = t; clearTimeout(el._t); if(t==='Saved ✓'||t==='Exported ✓') el._t=setTimeout(function(){el.textContent='';},2500); }
-  }
+      </section>
+      <section class="doc-section" id="s7">
+        <div class="section-header">
+          <div class="section-num">7</div>
+          <h2 class="section-title">Data & AI Model Requirements</h2>
+        </div>
+        
 
-  function refresh(){
-    var btn = document.getElementById('__etb-btn');
-    var acts = document.getElementById('__etb-acts');
-    if(btn){ btn.textContent = mode ? '🔒 Lock' : '✏️ Edit'; btn.style.background = mode ? '#2d1f5e' : '#1f2937'; btn.style.color = mode ? '#c4b5fd' : '#a78bfa'; }
-    if(acts) acts.style.display = mode ? 'flex' : 'none';
-  }
+<div class="card">
+<div class="card-title">AI Contribution Reminder Personalisation</div>
+<div class="card-content">Behavioural model per member: optimal reminder timing (when the member historically responds fastest), preferred channel (WhatsApp vs SMS), payment device (smartphone vs feature phone). Reminder timing personalised based on member payment history to maximise on-time contribution rate. No cross-member data sharing — each member's model built from their own interaction history.</div>
+</div>
+<div class="card teal">
+<div class="card-title">AI Dispute Mediator</div>
+<div class="card-content">Rules-based + NL approach: objective ledger data presented first (contribution records, timestamps, amounts). NL generation produces neutral, culturally appropriate dispute summary in member's language. Resolution options generated from group rule set. Escalation classifier identifies disputes likely to require human arbitration (e.g., theft allegations, admin misconduct) and routes immediately to MTN customer service.</div>
+</div>
+<div class="card violet">
+<div class="card-title">Non-Payment Prediction</div>
+<div class="card-content">Member-level risk model predicting likelihood of non-payment for upcoming contribution based on: payment history (on-time rate, average days late), MoMo wallet activity (balance trends, transaction frequency), contribution size relative to typical wallet balance. High-risk members receive earlier reminders and optional partial payment options. Model retrained monthly per group.</div>
+</div>
+<h3>Ethnographic Research Requirements (Pre-Development)</h3>
+<div class="card amber">
+<div class="card-title">Next Step: Ethnographic Research Programme</div>
+<div class="card-content">Before development begins, MTN must commission ethnographic research across South Africa, Kenya, and Nigeria to map the full variation in stokvel/chama/esusu rule sets, social dynamics, dispute resolution customs, and cultural norms around money in group settings. Research questions: What are the boundaries of acceptable AI mediation? What decisions must remain human? How do groups handle death of a member, pregnancy leave, or financial emergency? What are the taboos around group money management? This research directly informs the cultural rule template library and dispute mediation protocols. Estimated: 3-month programme, 50 focus groups across 3 markets.</div>
+</div>
 
-  function buildToolbar(){
-    var t = document.createElement('div');
-    t.id = '__etb';
-    t.innerHTML =
-      '<span style="font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-right:2px">Document</span>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-edit" id="__etb-btn" onclick="window.__edm.toggle()">✏️ Edit</button>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-share" onclick="window.__edm.share()" title="Copy shareable link">🔗 Share</button>'+
-      '<button class="etb-print" onclick="window.__edm.print()" title="Print / Save as PDF">🖨 Print</button>'+
-      '<div id="__etb-acts" style="display:none;gap:5px;align-items:center">'+
-        '<span class="etb-msg" id="__etb-msg"></span>'+
-        '<button class="etb-save" onclick="window.__edm.save()">💾 Save</button>'+
-        '<button class="etb-reset" onclick="window.__edm.reset()">↺ Reset</button>'+
-        '<button class="etb-export" onclick="window.__edm.export()">⬇ Export</button>'+
-      '</div>';
-    document.body.appendChild(t);
-  }
+      </section>
+      <section class="doc-section" id="s8">
+        <div class="section-header">
+          <div class="section-num">8</div>
+          <h2 class="section-title">Compliance & Regulatory</h2>
+        </div>
+        
 
-  function shareDoc(){
-    var base = 'https://fintech-tracker-web.vercel.app';
-    var url = base + location.pathname;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ msg('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
-    } else { prompt('Copy this link:',url); }
-  }
-  function printDoc(){
-    var wasMode = mode;
-    if(wasMode) disable();
-    window.print();
-    if(wasMode) setTimeout(function(){ enable(); }, 500);
-  }
-  window.__edm = {
-    toggle: function(){ mode ? disable() : enable(); },
-    save:   function(){ persist(); },
-    reset:  function(){ reset(); },
-    export: function(){ exportDoc(); },
-    share:  function(){ shareDoc(); },
-    print:  function(){ printDoc(); }
-  };
+<div class="card amber">
+<div class="card-title">Collective Investment Scheme Risk (South Africa)</div>
+<div class="card-content">Investment stokvels that pool member funds for collective investment may be classified as Collective Investment Schemes (CIS) under the Collective Investment Schemes Control Act (CISCA), requiring registration with the FSCA. MTN must obtain legal opinion on whether the platform constitutes CIS management or merely provides payment infrastructure for self-directed groups. Recommended approach: platform provides payment rails and record-keeping only; investment decisions remain entirely with group members; no platform recommendation of investment products.</div>
+</div>
+<div class="card amber">
+<div class="card-title">Trust Account Obligations</div>
+<div class="card-content">Group pool wallets holding member contributions in trust must comply with trust account regulations in each market. In South Africa, holding client funds in trust triggers obligations under the Financial Sector Regulation Act. The trust account model must be reviewed by Group Legal to ensure MTN MoMo's e-money licence covers the group pooling model. Alternative structure: each member pays directly to the payout recipient on payout date, bypassing pooling entirely.</div>
+</div>
+<div class="card amber">
+<div class="card-title">AML / KYC for Cross-Border Groups</div>
+<div class="card-content">Cross-border ROSCA groups with members in multiple countries trigger cross-border payment compliance: FICA (SA), EFCC regulations (Nigeria), CBK foreign exchange rules (Kenya). KYC verification is mandatory for all members of cross-border groups. Transaction monitoring must flag unusual patterns (e.g., rapid succession of large cross-border contributions). The FIC Act (SA) requires reporting of cross-border transactions above ZAR 10,000 equivalent.</div>
+</div>
+<h3>Per-Member POPIA Consent Requirements</h3>
+<ul>
+<li>Each group member must provide individual POPIA consent for: processing of their contribution data, sharing of their payment status with other group members, AI reminder processing, dispute mediation using their transaction records</li>
+<li>Group admin has additional consent scope: access to all member contribution records for admin purposes</li>
+<li>Member withdrawal from group must trigger right-to-erasure process for their personal data while preserving the group ledger integrity (contribution amounts without personal identifiers may be retained)</li>
+<li>WhatsApp-based interactions subject to Meta's data processing terms; members must be informed of WhatsApp data sharing in addition to MTN POPIA consent</li>
+</ul>
 
-  function init(){
-    buildToolbar();
-    stamp();
-    var had = restore();
-    if(had) msg('Edits loaded');
-  }
+      </section>
+      <section class="doc-section" id="s9">
+        <div class="section-header">
+          <div class="section-num">9</div>
+          <h2 class="section-title">Sprint Plan & Roadmap</h2>
+        </div>
+        
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+<h3>Sprint 1 (Weeks 1–3): Research, Foundation &amp; Core ROSCA</h3>
+<div class="card teal">
+<div class="card-title">Sprint 1 Deliverables</div>
+<div class="card-content">
+<ul>
+<li>Ethnographic research programme kick-off: partner selection, research protocol, market access (SA, Kenya, Nigeria)</li>
+<li>Group creation wizard: MoMo app + web, 3 initial templates (SA grocery stokvel, Kenya chama, Nigeria esusu)</li>
+<li>Group pool MoMo wallet creation (trust account model review completed)</li>
+<li>Member invitation flow: WhatsApp Business API integration, MoMo new-user registration prompts</li>
+<li>Contribution collection: one-tap WhatsApp payment link, MoMo wallet auto-debit on due date</li>
+<li>Immutable group ledger: contribution records, payout history, all-member read access</li>
+<li>USSD fallback: *165*STOKVEL# contribution and balance check</li>
+</ul>
+</div>
+</div>
+<h3>Sprint 2 (Weeks 4–6): AI Features, Reminders &amp; Dispute Resolution</h3>
+<div class="card teal">
+<div class="card-title">Sprint 2 Deliverables</div>
+<div class="card-content">
+<ul>
+<li>AI reminder engine: personalised timing, WhatsApp + SMS dual channel, escalating overdue notifications</li>
+<li>Rotating payout automation: payout calculator (penalties, FX), automatic MoMo transfer on payout date</li>
+<li>AI dispute mediator v1: ledger-based evidence presentation, rules-based resolution options, member voting</li>
+<li>Non-payment prediction model: per-member risk scoring, early intervention triggers</li>
+<li>WhatsApp chatbot: 6-language support, core ROSCA queries, contribution prompts</li>
+<li>Admin dashboard: contribution status, payout schedule, dispute log, CSV export</li>
+<li>POPIA consent flows: per-member consent, WhatsApp data disclosure, withdrawal mechanism</li>
+</ul>
+</div>
+</div>
+<h3>Sprint 3 (Weeks 7–9): Multi-Currency, Pilot &amp; Compliance</h3>
+<div class="card teal">
+<div class="card-title">Sprint 3 Deliverables</div>
+<div class="card-content">
+<ul>
+<li>Multi-currency support: FX conversion for cross-border groups, CBK/SARB/CBN compliance</li>
+<li>Chama investment pool module: equity tracking, MoMo Invest integration, monthly return reports</li>
+<li>Competitive bidding (ajo/tontine) rule engine: sealed bid management, auction mechanics</li>
+<li>Pilot: MTN South Africa (1,000 stokvel groups), MTN Kenya (500 chama groups), MTN Nigeria (500 esusu groups)</li>
+<li>Legal opinion: CIS classification risk, trust account model, AML for cross-border groups</li>
+<li>Ethnographic research synthesis: cultural rule library expansion based on field findings</li>
+<li>Group acquisition metrics: new MoMo wallet activations attributed to ROSCA group membership</li>
+</ul>
+</div>
+</div>
+
+      </section>
+      <section class="doc-section" id="s10">
+        <div class="section-header">
+          <div class="section-num">10</div>
+          <h2 class="section-title">Risk Register</h2>
+        </div>
+        
+
+<table>
+<thead><tr><th>ID</th><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+<tbody>
+<tr><td><code>R-01</code></td><td>FSCA classifies investment stokvel/chama pooling as unlicensed collective investment scheme</td><td class="priority-med">Medium</td><td class="priority-high">Very High</td><td>Obtain FSCA legal opinion before launch. Phase 1 excludes investment pool features (SA only). Payment rail + record-keeping model minimises CIS exposure. Engage FSCA proactively to confirm regulatory position.</td></tr>
+<tr><td><code>R-02</code></td><td>Cultural misalignment: platform rules do not accommodate important local ROSCA variants discovered in ethnographic research</td><td class="priority-high">High</td><td class="priority-med">Medium</td><td>Ethnographic research programme mandatory precursor to development. Rule engine designed for maximum configurability. Post-research template library iteration before launch. Community co-design pilots with actual stokvel/chama groups.</td></tr>
+<tr><td><code>R-03</code></td><td>Member non-payment causes group payout failure, damaging trust in platform and MTN brand</td><td class="priority-high">High</td><td class="priority-high">High</td><td>Non-payment prediction model enables early intervention. Platform must not be seen to "promise" payout — it executes what the group has contributed. Clear communication: platform facilitates, does not guarantee. Option: MTN liquidity bridge for shortfalls (commercial decision).</td></tr>
+<tr><td><code>R-04</code></td><td>WhatsApp Business API policy changes disrupt primary communication channel for group management</td><td class="priority-med">Low-Medium</td><td class="priority-high">High</td><td>SMS as co-primary channel from day one. USSD backup for all core functions. In-app notifications as tertiary channel. API dependency risk included in commercial risk register.</td></tr>
+<tr><td><code>R-05</code></td><td>Trust account model creates regulatory liability for MTN MoMo as trustee of group pool funds</td><td class="priority-med">Medium</td><td class="priority-high">High</td><td>Legal review of trust account model before launch. Alternative payment flow (direct member-to-recipient) evaluated. Trustee liability insurance obtained. Group pool wallets clearly structured as client money, separated from MTN operational funds.</td></tr>
+</tbody>
+</table>
+
+      </section>
+    </main>
+
+  </div><!-- /doc-layout -->
+
+</div><!-- /doc-shell -->
 
 </body>
 </html>

@@ -1,503 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UC-04: AI-Based Test Automation Script Generation</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif; background-color: #0d1117; color: #e6edf3; line-height: 1.6; padding: 40px 20px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #1c2128 0%, #161b22 100%); border: 1px solid #30363d; border-radius: 8px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .header h1 { font-size: 2.2em; margin-bottom: 15px; color: #58a6ff; }
-        .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; font-size: 0.95em; margin-top: 20px; }
-        .meta-item { display: flex; align-items: center; gap: 8px; }
-        .meta-label { color: #8b949e; font-weight: 600; }
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
-        .badge-success { background-color: rgba(3, 102, 71, 0.3); color: #3fb950; border: 1px solid #238636; }
-        .badge-p2 { background-color: rgba(79, 90, 102, 0.3); color: #8b949e; border: 1px solid #30363d; }
-        .section { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 25px; margin-bottom: 25px; }
-        .section h2 { color: #58a6ff; font-size: 1.5em; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #30363d; }
-        .section h3 { color: #79c0ff; font-size: 1.1em; margin: 20px 0 12px 0; }
-        p, li { color: #e6edf3; margin-bottom: 12px; }
-        ul, ol { margin-left: 25px; margin-bottom: 15px; }
-        .persona-card { background: #0d1117; border-left: 4px solid #58a6ff; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
-        .persona-card strong { color: #79c0ff; }
-        .user-story { background: #0d1117; border-left: 4px solid #3fb950; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
-        .user-story.must-have { border-left-color: #f85149; }
-        .user-story.should-have { border-left-color: #d29922; }
-        .story-id { color: #8b949e; font-size: 0.85em; font-weight: 600; margin-bottom: 8px; }
-        .story-text { color: #e6edf3; margin-bottom: 8px; font-style: italic; }
-        .story-priority { display: inline-block; padding: 2px 8px; font-size: 0.75em; border-radius: 4px; font-weight: 600; }
-        .priority-must { background: rgba(248, 81, 73, 0.2); color: #f85149; }
-        .priority-should { background: rgba(210, 153, 34, 0.2); color: #d29922; }
-        .req-item { background: #0d1117; border-left: 4px solid #1f6feb; padding: 12px 15px; margin-bottom: 12px; border-radius: 4px; }
-        .req-id { color: #79c0ff; font-weight: 600; margin-right: 10px; }
-        .acceptance-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #238636; border-radius: 4px; }
-        .dependency-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #9e6a03; border-radius: 4px; }
-        .exclusion-item { background: #0d1117; padding: 12px 15px; margin-bottom: 12px; border-left: 4px solid #d1242f; border-radius: 4px; }
-        .checklist { list-style: none; }
-        .checklist li { padding-left: 25px; position: relative; }
-        .checklist li:before { content: "☐"; position: absolute; left: 0; color: #3fb950; }
-        strong { color: #79c0ff; }
-        .version-date { color: #8b949e; font-size: 0.9em; margin-top: 20px; padding-top: 15px; border-top: 1px solid #30363d; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UC-04: AI-Based Test Automation Script Generation</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F8FAFC;--surface:#FFFFFF;--surface-alt:#F1F5F9;
+  --border:rgba(226,232,240,0.9);--border-strong:#CBD5E1;
+  --text-primary:#0F172A;--text-secondary:#334155;--text-muted:#64748B;
+  --accent:#7C3AED;--accent-d:#6D28D9;--accent-light:#EDE9FE;--accent-border:rgba(124,58,237,0.2);
+  --blue:#2563EB;--blue-light:#DBEAFE;
+  --red:#DC2626;--red-light:#FEE2E2;
+  --green:#16A34A;--green-light:#DCFCE7;
+  --amber:#D97706;--amber-light:#FEF3C7;
+  --r:16px;--rs:10px;
+  --shadow-sm:0 1px 4px rgba(15,23,42,0.06),0 2px 8px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.08),0 2px 6px rgba(15,23,42,0.04);
+}
+html{scroll-behavior:smooth;font-size:15px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text-primary);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── Sticky Header ── */
+.doc-header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(255,255,255,0.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;height:58px;
+}
+.hdr-left{display:flex;align-items:center;gap:16px}
+.back-link{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:var(--text-muted);
+  text-decoration:none;padding:5px 10px;border-radius:8px;
+  border:1px solid var(--border);transition:all 0.15s;
+}
+.back-link:hover{color:var(--accent);border-color:var(--accent-border);background:var(--accent-light)}
+.hdr-breadcrumb{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.hdr-sep{color:var(--border-strong)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.hdr-btn{
+  font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);
+  cursor:pointer;transition:all 0.15s;font-family:inherit;
+}
+.hdr-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
+.hdr-btn.violet{background:var(--accent);color:#fff;border-color:var(--accent)}
+.hdr-btn.violet:hover{background:var(--accent-d)}
+
+/* ── Shell ── */
+.doc-shell{max-width:1220px;margin:0 auto;padding:0 40px 100px}
+
+/* ── Hero ── */
+.doc-hero{padding:52px 0 32px;max-width:800px}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:18px;
+}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.hero-title{
+  font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-1.2px;
+  background:linear-gradient(140deg,#0F172A 0%,#312E81 50%,#7C3AED 90%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;margin-bottom:14px;
+}
+.hero-subtitle{font-size:16px;color:var(--text-secondary);line-height:1.7;margin-bottom:22px;max-width:680px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;font-weight:700;letter-spacing:0.04em;
+  padding:4px 12px;border-radius:20px;
+}
+.badge-p1{background:#FEE2E2;color:#B91C1C}
+.badge-p2{background:#FEF3C7;color:#92400E}
+.badge-progress{background:#FEF3C7;color:#92400E}
+.badge-in-progress{background:#FEF3C7;color:#92400E}
+.badge-done,.badge-complete,.badge-built{background:#D1FAE5;color:#065F46}
+.badge-platform{background:var(--accent-light);color:var(--accent)}
+.badge-neutral{background:var(--surface-alt);color:var(--text-muted);border:1px solid var(--border)}
+.badge-must{background:#FEE2E2;color:#B91C1C;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-should{background:#FEF3C7;color:#92400E;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+.badge-nice{background:#D1FAE5;color:#065F46;font-size:10px;letter-spacing:0.04em;padding:2px 8px;border-radius:4px}
+
+/* ── Meta Strip ── */
+.meta-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
+  gap:12px;margin-bottom:36px;
+}
+.meta-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--rs);padding:14px 16px;
+  box-shadow:var(--shadow-sm);transition:all 0.2s;
+}
+.meta-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.meta-label{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px}
+.meta-value{font-size:13px;font-weight:700;color:var(--text-primary)}
+.meta-value.violet{color:var(--accent)}
+
+/* ── Progress Bar ── */
+.progress-section{margin:0 0 36px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px 24px;box-shadow:var(--shadow-sm)}
+.progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.progress-label{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.progress-pct{font-size:14px;font-weight:800;color:var(--accent)}
+.progress-track{height:8px;background:var(--surface-alt);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:8px;transition:width 0.6s ease}
+.progress-note{font-size:12px;color:var(--text-muted);line-height:1.6}
+
+/* ── Doc Layout ── */
+.doc-layout{display:grid;grid-template-columns:210px 1fr;gap:36px;align-items:start}
+@media(max-width:900px){.doc-layout{grid-template-columns:1fr}.doc-toc{display:none}}
+
+/* ── ToC ── */
+.doc-toc{position:sticky;top:76px}
+.toc-inner{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow-sm)}
+.toc-title{font-size:10px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.toc-link{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;text-decoration:none;color:var(--text-secondary);font-size:12px;font-weight:500;transition:all 0.15s;margin-bottom:2px}
+.toc-link:hover{background:var(--accent-light);color:var(--accent)}
+.toc-num{font-size:10px;font-weight:700;color:var(--text-muted);min-width:20px}
+
+/* ── Sections ── */
+.doc-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 36px;margin-bottom:24px;box-shadow:var(--shadow-sm)}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--border)}
+.section-num{width:30px;height:30px;border-radius:8px;background:var(--accent-light);color:var(--accent);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+h2.section-title{font-size:18px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+h3{font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);margin-top:24px;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+p{color:var(--text-secondary);margin-bottom:13px;line-height:1.75;font-size:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--text-primary);font-weight:600}
+ul,ol{color:var(--text-secondary);margin:0 0 14px 20px;line-height:1.75;font-size:14px}
+li{margin-bottom:5px}
+li strong{color:var(--text-primary)}
+
+/* ── KPI Grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.kpi-card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;text-align:center;transition:all 0.2s}
+.kpi-card:hover{background:var(--accent-light);border-color:var(--accent-border);transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.kpi-value{font-size:26px;font-weight:800;color:var(--accent);letter-spacing:-0.8px;line-height:1;margin-bottom:6px}
+.kpi-label{font-size:11px;font-weight:500;color:var(--text-muted);line-height:1.4}
+
+/* ── Callouts ── */
+.info-box,.accent-box,.callout-blue{
+  background:var(--blue-light);border:1px solid rgba(37,99,235,0.18);
+  border-left:3px solid var(--blue);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#1E40AF;line-height:1.65;
+}
+.info-box a,.accent-box a,.callout-blue a{color:var(--blue);font-weight:600;text-decoration:none}
+.warning-box,.callout-red{
+  background:#FFF5F5;border:1px solid rgba(220,38,38,0.18);
+  border-left:3px solid var(--red);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#7F1D1D;line-height:1.65;
+}
+.warning-box ul,.callout-red ul{color:#7F1D1D}
+.callout-violet{
+  background:var(--accent-light);border:1px solid var(--accent-border);
+  border-left:3px solid var(--accent);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#3B0764;line-height:1.65;
+}
+.callout-green{
+  background:var(--green-light);border:1px solid rgba(22,163,74,0.2);
+  border-left:3px solid var(--green);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#14532D;line-height:1.65;
+}
+.callout-amber{
+  background:var(--amber-light);border:1px solid rgba(217,119,6,0.2);
+  border-left:3px solid var(--amber);border-radius:var(--rs);
+  padding:15px 17px;margin:16px 0;font-size:13.5px;color:#78350F;line-height:1.65;
+}
+
+/* ── Cards / Items ── */
+.card{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:16px 18px;margin-bottom:10px;transition:all 0.15s}
+.card:hover{border-color:var(--accent-border);background:var(--surface)}
+.card-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:7px}
+.card-content{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Requirements ── */
+.requirement{border-left:3px solid var(--border-strong);padding:10px 14px;margin-bottom:8px;border-radius:0 var(--rs) var(--rs) 0;background:var(--surface-alt)}
+.requirement:hover{border-left-color:var(--accent)}
+.req-body{font-size:13.5px;color:var(--text-secondary);line-height:1.65}
+
+/* ── Tables ── */
+table,.doc-table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px}
+th{background:var(--surface-alt);border:1px solid var(--border);padding:10px 14px;font-weight:700;color:var(--text-primary);text-align:left;font-size:11px;letter-spacing:0.05em;text-transform:uppercase}
+td{border:1px solid var(--border);padding:10px 14px;color:var(--text-secondary);vertical-align:top;line-height:1.6}
+tr:hover td{background:var(--surface-alt)}
+
+/* ── User Stories ── */
+.story{background:var(--surface-alt);border:1px solid var(--border);border-radius:var(--rs);padding:18px;margin-bottom:12px}
+.story-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:8px}
+.story-text{font-size:13.5px;color:var(--text-secondary);line-height:1.65;margin-bottom:10px}
+.story-ac{font-size:12.5px;color:var(--text-muted);line-height:1.6;padding:10px 12px;background:var(--surface);border-radius:7px;border:1px solid var(--border)}
+
+/* ── Dependencies ── */
+.dep-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.dep-item:last-child{border-bottom:none}
+.dep-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--surface-alt);border:1px solid var(--border)}
+.dep-body{flex:1}
+.dep-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.dep-desc{font-size:12.5px;color:var(--text-muted)}
+
+/* ── Print ── */
+@media print{.doc-header,.doc-toc{display:none!important}.doc-layout{grid-template-columns:1fr}.doc-section{break-inside:avoid}}
+@media(max-width:768px){.doc-shell{padding:0 16px 60px}.doc-hero{padding:32px 0 20px}.doc-section{padding:22px 18px}}
+
+  </style>
 </head>
 <body>
-<a href="../index.html" style="position:fixed;top:16px;left:16px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:#161b22;border:1px solid #30363d;color:#8b949e;font-family:system-ui,sans-serif;font-size:12px;font-weight:600;text-decoration:none;transition:all .15s;box-shadow:0 2px 8px rgba(0,0,0,.4)" onmouseover="this.style.background='#21262d';this.style.color='#e6edf3';this.style.borderColor='#0073ea'" onmouseout="this.style.background='#161b22';this.style.color='#8b949e';this.style.borderColor='#30363d'"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg> Back to Tracker</a>
 
-    <div class="container">
-        <div class="header">
-            <h1>AI-Based Test Automation Script Generation</h1>
-            <div class="meta">
-                <div class="meta-item"><span class="meta-label">ID:</span><span>UC-04</span></div>
-                <div class="meta-item"><span class="meta-label">Owner:</span><span>Anupam Sharma</span></div>
-                <div class="meta-item"><span class="meta-label">Status:</span><span class="badge badge-success">Done (100%)</span></div>
-                <div class="meta-item"><span class="meta-label">Priority:</span><span class="badge badge-p2">P2</span></div>
-                <div class="meta-item"><span class="meta-label">Version:</span><span>v1.0</span></div>
-                <div class="meta-item"><span class="meta-label">Date:</span><span>May 2026</span></div>
-                <div class="meta-item">
-                    <span class="meta-label">Author</span>
-                    <span style="color:#60a5fa;font-weight:700;">Malcolm Govender</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">Role</span>
-                    <span style="color:#a78bfa;font-weight:600;">Head of AI &amp; Engineering</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Problem Statement</h2>
-            <p>Converting test cases into runnable automation scripts requires specialized knowledge of each testing framework (Playwright, Cypress, Jest, Pytest), boilerplate code structure, and best practices for selectors, assertions, and error handling. QA engineers frequently:</p>
-            <ul>
-                <li>Spend 60–80% of automation time writing boilerplate setup, teardown, and helper functions</li>
-                <li>Struggle with framework-specific syntax, leading to slow script development and inconsistent patterns</li>
-                <li>Duplicate fixture logic and assertion patterns across test files</li>
-                <li>Cannot quickly switch between frameworks when projects require different tech stacks</li>
-                <li>Face delays when learning new frameworks, blocking feature testing</li>
-            </ul>
-            <p>For SentinelQA, enabling rapid, framework-agnostic test script generation unlocks faster automation cycles, reduces ramp-up time for new team members, and allows QA to focus on test logic rather than boilerplate engineering.</p>
-        </div>
-
-        <div class="section">
-            <h2>Target Users & Personas</h2>
-
-            <div class="persona-card">
-                <strong>1. Jordan Lee – Mid-Level Automation Engineer</strong><br>
-                <strong>Role:</strong> Writes and maintains Playwright/Cypress scripts<br>
-                <strong>Goals:</strong> Convert test cases to runnable scripts in <15 minutes, reduce context-switching between frameworks, maintain code consistency<br>
-                <strong>Frustrations:</strong> Spends hours writing boilerplate; forgot Cypress syntax when switching projects; inconsistent CSS selector patterns
-            </div>
-
-            <div class="persona-card">
-                <strong>2. Alex Rodriguez – Senior SDET (Senior Development Engineer in Test)</strong><br>
-                <strong>Role:</strong> Owns test framework architecture and CI/CD integration<br>
-                <strong>Goals:</strong> Standardize script generation across projects, enforce coding standards, reduce tech debt from inconsistent scripts<br>
-                <strong>Frustrations:</strong> Too many script style variations; difficult to maintain; new team members write inefficient code
-            </div>
-
-            <div class="persona-card">
-                <strong>3. Lisa Zhang – QA Engineer with Python Background</strong><br>
-                <strong>Role:</strong> Primarily writes Pytest scripts, occasionally needs JavaScript (Playwright)<br>
-                <strong>Goals:</strong> Generate JavaScript/Playwright scripts without learning syntax, reuse Python-based fixtures in JavaScript, fast ramp-up<br>
-                <strong>Frustrations:</strong> Doesn't know JavaScript well; typing errors; copy-paste frustration; can't quickly contribute to Playwright tests
-            </div>
-
-            <div class="persona-card">
-                <strong>4. CTO/Engineering Lead – Multi-Framework Fintech Org</strong><br>
-                <strong>Role:</strong> Sets testing standards across backend (Pytest), API (Playwright), and UI (Cypress) teams<br>
-                <strong>Goals:</strong> Ensure consistent test quality across frameworks, reduce onboarding friction, speed up test coverage<br>
-                <strong>Frustrations:</strong> Different teams write tests differently; hard to enforce best practices; slow to scale QA
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>User Stories</h2>
-
-            <div class="user-story must-have">
-                <div class="story-id">US-10</div>
-                <div class="story-text">As a QA engineer, I want to input plain-English test steps and select a target framework (Playwright/Cypress/Jest/Pytest), and have the system generate fully runnable, syntax-correct scripts with proper selectors and assertions, so that I can reduce script writing time from 2 hours to 15 minutes per test.</div>
-                <span class="story-priority priority-must">Must Have</span>
-            </div>
-
-            <div class="user-story must-have">
-                <div class="story-id">US-11</div>
-                <div class="story-text">As an SDET, I want generated scripts to follow a project-specific coding standard (custom naming conventions, assertion library, fixture patterns), so that all auto-generated scripts maintain consistent quality and are mergeable without linting failures.</div>
-                <span class="story-priority priority-must">Must Have</span>
-            </div>
-
-            <div class="user-story must-have">
-                <div class="story-id">US-12</div>
-                <div class="story-text">As a QA engineer, I want generated Playwright/Cypress scripts to include smart element selectors (robust CSS/XPath, data attributes, ARIA labels), so that tests are resilient to minor UI changes and don't fail on layout updates.</div>
-                <span class="story-priority priority-must">Must Have</span>
-            </div>
-
-            <div class="user-story must-have">
-                <div class="story-id">US-13</div>
-                <div class="story-text">As a QA engineer, I want to push generated scripts to GitHub as draft PRs (like test cases), review them, and merge them into the test suite without manual file creation, so that the automation pipeline is streamlined end-to-end.</div>
-                <span class="story-priority priority-must">Must Have</span>
-            </div>
-
-            <div class="user-story should-have">
-                <div class="story-id">US-14</div>
-                <div class="story-text">As a QA engineer, I want generated scripts to support parameterised tests (data-driven) with CSV/JSON fixture import, so that I can test multiple data combinations without duplicating test code.</div>
-                <span class="story-priority priority-should">Should Have</span>
-            </div>
-
-            <div class="user-story should-have">
-                <div class="story-id">US-15</div>
-                <div class="story-text">As an SDET, I want to define reusable helper functions (page objects, common actions) and have generated scripts automatically use them, so that fixture duplication is eliminated and maintenance burden is reduced.</div>
-                <span class="story-priority priority-should">Should Have</span>
-            </div>
-
-            <div class="user-story should-have">
-                <div class="story-id">US-16</div>
-                <div class="story-text">As a QA engineer, I want generated scripts to include error handling, retry logic, and timeouts configured per project standards, so that tests are resilient and don't fail on transient issues.</div>
-                <span class="story-priority priority-should">Should Have</span>
-            </div>
-
-            <div class="user-story should-have">
-                <div class="story-id">US-17</div>
-                <div class="story-text">As a Python QA engineer, I want Pytest scripts to be auto-generated with fixtures, markers, and assertions matching my team's standards, so that I contribute to Pytest automation without ramp-up time.</div>
-                <span class="story-priority priority-should">Should Have</span>
-            </div>
-        </div>
-
-        <div class="section">
-            <h2>Functional Requirements</h2>
-
-            <div class="req-item"><span class="req-id">FR-16</span>Accept test steps in plain English and generate syntactically-correct, runnable scripts in Playwright, Cypress, Jest, or Pytest based on user selection.</div>
-
-            <div class="req-item"><span class="req-id">FR-17</span>Generate element selectors using a priority strategy: data attributes > ARIA attributes > CSS ID > robust CSS classes > XPath; fall back to computer vision if no selectors found.</div>
-
-            <div class="req-item"><span class="req-id">FR-18</span>Support project-level configuration: custom naming conventions, assertion library (Chai, Jest Matchers, pytest assertions), base URLs, timeouts, retry policies.</div>
-
-            <div class="req-item"><span class="req-id">FR-19</span>Generate parameterised tests that accept CSV/JSON fixture files and loop over test data; output proper test naming per iteration (e.g., test_login[user1], test_login[user2]).</div>
-
-            <div class="req-item"><span class="req-id">FR-20</span>Detect common patterns in test steps and auto-generate reusable page objects / helper functions with proper documentation.</div>
-
-            <div class="req-item"><span class="req-id">FR-21</span>Include error handling, timeout configuration, retry logic, and failure screenshots/videos in generated scripts.</div>
-
-            <div class="req-item"><span class="req-id">FR-22</span>Generate API test scripts (Pytest requests, Jest supertest) with proper authentication, header/body validation, and schema checking.</div>
-
-            <div class="req-item"><span class="req-id">FR-23</span>Support batch script generation: convert 50+ test cases to scripts in one async job with progress tracking and email notification.</div>
-
-            <div class="req-item"><span class="req-id">FR-24</span>Create GitHub draft PRs with generated scripts, allowing review, edit, and merge into feature/main branch.</div>
-
-            <div class="req-item"><span class="req-id">FR-25</span>Allow engineers to edit generated scripts, mark as approved/rejected, and use feedback to refine generation for future scripts.</div>
-
-            <div class="req-item"><span class="req-id">FR-26</span>Export scripts with proper file structure: organized folders per feature, shared fixtures in common/ folder, CI config templates.</div>
-
-            <div class="req-item"><span class="req-id">FR-27</span>Validate generated scripts for syntax errors and test-ability (can be parsed and dry-run without execution) before PR creation.</div>
-        </div>
-
-        <div class="section">
-            <h2>Non-Functional Requirements</h2>
-
-            <div class="req-item"><span class="req-id">NFR-09</span><strong>Performance:</strong> Generate 10 scripts from test cases in <5 seconds; support batch conversion of 100 scripts in <60 seconds (async).</div>
-
-            <div class="req-item"><span class="req-id">NFR-10</span><strong>Code Quality:</strong> Generated scripts must pass linting (ESLint for JS, pylint for Python) and adhere to code style standards without manual fixes.</div>
-
-            <div class="req-item"><span class="req-id">NFR-11</span><strong>Consistency:</strong> All generated scripts for a project follow identical patterns; fixture reuse across scripts is automatic; no boilerplate duplication.</div>
-
-            <div class="req-item"><span class="req-id">NFR-12</span><strong>Extensibility:</strong> Support for custom fixtures and helper functions defined in project templates; framework-agnostic generation logic.</div>
-
-            <div class="req-item"><span class="req-id">NFR-13</span><strong>Security:</strong> Sanitise sensitive data in scripts (no hardcoded passwords, API keys, or PII); support secret injection via environment variables.</div>
-
-            <div class="req-item"><span class="req-id">NFR-14</span><strong>Maintainability:</strong> Generated scripts include comments explaining steps, selectors, and assertions for future maintenance.</div>
-
-            <div class="req-item"><span class="req-id">NFR-15</span><strong>Auditability:</strong> Log all script generation with framework version, AI model version, project config, and output checksum for reproducibility.</div>
-        </div>
-
-        <div class="section">
-            <h2>Acceptance Criteria</h2>
-
-            <h3>Feature: Test Case → Script Generation</h3>
-            <div class="acceptance-item">Given a test case with steps (e.g., "Click Login button, Enter email, Click Submit"), when selected for Playwright generation, then a syntactically-valid Playwright script is produced with correct selectors, locators, and assertions within 5 seconds.</div>
-            <div class="acceptance-item">Given a test case and Pytest selected, when converted, then a properly-structured Pytest file is generated with fixtures, setup/teardown, and assert statements matching team conventions.</div>
-            <div class="acceptance-item">Given a generated script, when linted with ESLint (JS) or pylint (Python), then zero linting errors are reported without manual edits.</div>
-
-            <h3>Feature: Parameterised Test Generation</h3>
-            <div class="acceptance-item">Given a test case and a CSV with 5 user rows, when converted to Playwright, then 5 separate test variations are generated with proper naming (test_login[row1], test_login[row2], etc.).</div>
-            <div class="acceptance-item">Given parameterised Pytest, when run, then all parameter combinations execute and report independently.</div>
-
-            <h3>Feature: GitHub PR Creation</h3>
-            <div class="acceptance-item">Given 20 generated scripts, when "Create PR" is selected, then a single draft PR is created with all scripts in organized folder structure and a clear commit message.</div>
-            <div class="acceptance-item">Given a generated script in a PR, when viewed on GitHub, then it includes comments explaining test purpose and key assertions.</div>
-
-            <h3>Feature: Project Configuration Compliance</h3>
-            <div class="acceptance-item">Given a project config with custom assertion style and timeout settings, when scripts are generated, then all scripts use the specified style without exceptions.</div>
-        </div>
-
-        <div class="section">
-            <h2>Dependencies & Integrations</h2>
-
-            <div class="dependency-item"><strong>SentinelQA Test Studio:</strong> Retrieve test cases from Test Studio DB; store generated scripts as artifacts. Status: Existing integration.</div>
-
-            <div class="dependency-item"><strong>GitHub API:</strong> Create draft PRs with generated script files. Status: Existing integration.</div>
-
-            <div class="dependency-item"><strong>Framework-Specific Parsers:</strong> Validate Playwright, Cypress, Jest, Pytest syntax. Recommendation: 'playwright-inspector' (JS), 'py_compile' (Python). Status: To be integrated.</div>
-
-            <div class="dependency-item"><strong>Linting Tools (ESLint, pylint):</strong> Validate generated code for style compliance. Status: Integration required.</div>
-
-            <div class="dependency-item"><strong>AI Language Model:</strong> For test case parsing, script generation, and code optimization. Status: Existing (Claude 3.5 Sonnet).</div>
-
-            <div class="dependency-item"><strong>Project Config Storage:</strong> Store project-specific generation rules (naming, assertion style, fixtures). Status: To be implemented (database table or YAML config files).</div>
-
-            <div class="dependency-item"><strong>CloudWatch / DataDog:</strong> Logging, metrics, performance tracking. Status: Existing infrastructure.</div>
-        </div>
-
-        <div class="section">
-            <h2>Assumptions & Constraints</h2>
-
-            <h3>Assumptions</h3>
-            <ul>
-                <li>Test cases are structured with clear steps; vague or ambiguous steps will produce lower-quality scripts.</li>
-                <li>Project configurations (naming conventions, assertion styles) are defined upfront by SDETs.</li>
-                <li>Generated scripts will be reviewed and refined by engineers; AI output is a starting point.</li>
-                <li>Element selectors are stable and can be identified from UI screenshots or provided in test case metadata.</li>
-                <li>Engineers have basic familiarity with the generated framework (no starter course required).</li>
-            </ul>
-
-            <h3>Constraints</h3>
-            <ul>
-                <li><strong>Framework Coverage:</strong> v1 supports Playwright, Cypress, Jest, Pytest only; other frameworks (Selenium, TestCafe) not supported in v1.</li>
-                <li><strong>Selector Robustness:</strong> AI-generated selectors may fail on significant UI redesigns; manual adjustment required for complex dynamic elements.</li>
-                <li><strong>Custom Fixtures:</strong> If project uses proprietary fixture patterns, custom templates must be provided upfront.</li>
-                <li><strong>API Rate Limits:</strong> GitHub API rate limiting applies to batch PR creation; queue management required for 100+ scripts.</li>
-                <li><strong>Secret Management:</strong> Generated scripts must not include hardcoded credentials; environment variable injection required for local testing.</li>
-            </ul>
-        </div>
-
-        <div class="section">
-            <h2>Out of Scope (v1.0)</h2>
-
-            <div class="exclusion-item">Test execution or result reporting (handled by CI/CD pipelines).</div>
-
-            <div class="exclusion-item">Mobile app automation (Appium, XCUITest) – web-only in v1.</div>
-
-            <div class="exclusion-item">Visual regression testing or computer vision-based selectors (fallback only, not primary).</div>
-
-            <div class="exclusion-item">Automatic migration of existing manual scripts to AI-generated format.</div>
-
-            <div class="exclusion-item">Support for languages beyond English for test case input.</div>
-
-            <div class="exclusion-item">Integration with ALM/test management tools beyond GitHub (Jira, Azure DevOps plugins planned for v1.1).</div>
-
-            <div class="exclusion-item">Code review automation or approval workflows (manual QA review required).</div>
-        </div>
-
-        <div class="section">
-            <h2>Definition of Done</h2>
-
-            <ul class="checklist">
-                <li>All user stories (US-10 to US-17) validated with personas in UAT</li>
-                <li>FR-16 to FR-27 implemented with unit tests (>85% coverage)</li>
-                <li>NFR-09 to NFR-15 verified via performance testing, linting validation, security audit</li>
-                <li>Generated scripts pass linting (ESLint, pylint) without manual fixes</li>
-                <li>End-to-end integration test: test case → script generation → GitHub PR → script review</li>
-                <li>Performance target met: 10 scripts in <5 seconds, 100 scripts in <60 seconds</li>
-                <li>Project configuration system implemented and documented</li>
-                <li>User documentation (screenshot walkthrough, best practices guide) created</li>
-                <li>Security review: no credential leakage, secret management validated</li>
-                <li>Accessibility audit: UI meets WCAG 2.1 AA standards</li>
-                <li>Cost analysis: AI token usage per script documented and optimized</li>
-                <li>Production deployment plan: database schema, feature flags, rollback procedure</li>
-                <li>Sign-off from Anupam Sharma, SDET lead, and QA team</li>
-            </ul>
-
-            <div class="version-date">
-                <strong>Document Version:</strong> v1.0<br>
-                <strong>Last Updated:</strong> May 2026<br>
-                <strong>Owner:</strong> Anupam Sharma<br><strong>Author:</strong> Malcolm Govender (Head of AI &amp; Engineering)
-            </div>
-        </div>
+<!-- ── Sticky Header ── -->
+<header class="doc-header">
+  <div class="hdr-left">
+    <a href="/index.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13L5 8l5-5"/></svg>
+      Back to Tracker
+    </a>
+    <div class="hdr-breadcrumb">
+      <span style="color:var(--text-muted)">UC-04</span>
+      <span class="hdr-sep">/</span>
+      <b>Requirements &amp; User Stories</b>
     </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+</header>
 
-<!-- EDITABLE DOCUMENT SYSTEM -->
-<style data-editable-system>
-  body.edm [data-eid]:hover{outline:2px dashed rgba(167,139,250,.35)!important;outline-offset:3px;border-radius:3px;cursor:text}
-  body.edm [data-eid]:focus{outline:2px solid #a78bfa!important;outline-offset:3px;border-radius:3px;background:rgba(167,139,250,.07)!important}
-  body.edm [data-eid]:empty::before{content:"Click to add text";color:rgba(167,139,250,.4);font-style:italic;pointer-events:none}
-  #__etb{position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:6px;align-items:center;background:#111827;border:1px solid #374151;border-radius:12px;padding:9px 14px;box-shadow:0 8px 32px rgba(0,0,0,.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backdrop-filter:blur(8px)}
-  #__etb button{padding:5px 11px;border-radius:7px;border:1px solid #374151;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .15s;background:#1f2937;color:#d1d5db}
-  #__etb button:hover{border-color:#a78bfa;color:#e8eaff}
-  #__etb .etb-edit{color:#a78bfa}
-  #__etb .etb-save{color:#34d399}
-  #__etb .etb-reset{color:#f87171}
-  #__etb .etb-export{color:#38bdf8}
-  #__etb .etb-msg{font-size:10.5px;color:#6b7280;min-width:90px;text-align:right}
-  #__etb .etb-sep{width:1px;height:20px;background:#374151;margin:0 2px}
-</style>
-<script data-editable-system>
-(function(){
-  'use strict';
-  var KEY = 'edm:' + (location.pathname || location.href);
-  var SELS = 'p,h1,h2,h3,h4,h5,li,td,th,blockquote,.card-content,.card-title,.meta-value,.hero-meta-value,.summary-card p,.risk-detail,.risk-title,.phase-desc,.gap-value,.kpi-val,.kpi-lbl,.story-text,.card-content p,.dependency-detail,.dependency-system,.checklist li,.warning-box,.info-box,.code-block,.gap-item .gap-value,.status-badge,.badge,.tech-tag,.hero-subtitle,caption,dt,dd,.requirement,.storyid';
-  var mode = false, timer = null, ids = [];
+<!-- ── Page Shell ── -->
+<div class="doc-shell">
 
-  function elems(){
-    return [].slice.call(document.querySelectorAll(SELS)).filter(function(el){
-      return !el.closest('#__etb') && !el.closest('script') && !el.closest('style') && !el.closest('noscript');
-    });
-  }
+  <!-- ── Hero ── -->
+  <div class="doc-hero">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-dot"></div>
+      AI Programme · UC-04
+    </div>
+    <h1 class="hero-title">AI-Based Test Automation Script Generation</h1>
+    <p class="hero-subtitle"></p>
+    <div class="hero-badges">
+      <span class="badge badge-done">Done (100%)</span>
+      <span class="badge badge-p2">P2</span>
+    </div>
+  </div>
 
-  function stamp(){
-    ids = [];
-    elems().forEach(function(el,i){
-      el.setAttribute('data-eid', i);
-      ids.push(i);
-    });
-  }
+  <!-- ── Metadata Strip ── -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-label">Use Case ID</div>
+      <div class="meta-value ">UC-04</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Owner</div>
+      <div class="meta-value ">Anupam Sharma</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Version</div>
+      <div class="meta-value ">v1.0</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Date</div>
+      <div class="meta-value ">May 2026</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Author</div>
+      <div class="meta-value violet">Malcolm Govender</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Role</div>
+      <div class="meta-value violet">Head of AI & Engineering</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">ID</div>
+      <div class="meta-value">UC-04</div>
+    </div>
+    <div class="meta-card">
+      <div class="meta-label">Status</div>
+      <div class="meta-value">Done (100%)</div>
+    </div>
+  </div>
 
-  function enable(){
-    mode = true;
-    document.body.classList.add('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'true';
-      el.spellcheck = false;
-    });
-    document.addEventListener('input', onInput);
-    refresh();
-  }
+  
 
-  function disable(){
-    mode = false;
-    document.body.classList.remove('edm');
-    elems().forEach(function(el){
-      el.contentEditable = 'false';
-      el.blur();
-    });
-    document.removeEventListener('input', onInput);
-    refresh();
-  }
+  <!-- ── Document Layout ── -->
+  <div class="doc-layout">
 
-  function onInput(){
-    clearTimeout(timer);
-    msg('Unsaved…');
-    timer = setTimeout(persist, 900);
-  }
+    <!-- ToC -->
+    <aside class="doc-toc">
+      <div class="toc-inner">
+        <div class="toc-title">Contents</div>
+        <a href="#s1" class="toc-link"><span class="toc-num">01</span>Document Content</a>
+      </div>
+    </aside>
 
-  function persist(){
-    var store = {};
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null) store[id] = el.innerHTML;
-    });
-    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){}
-    msg('Saved ✓');
-  }
+    <!-- Main Content -->
+    <main class="doc-content">
+      <section class="doc-section" id="s1">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <h2 class="section-title">Document Content</h2>
+        </div>
+        
+<div class="header">
+<h1>AI-Based Test Automation Script Generation</h1>
+<div class="meta">
+<div class="meta-item"><span>UC-04</span></div>
+<div class="meta-item"><span>Anupam Sharma</span></div>
+<div class="meta-item"><span class="badge badge-success">Done (100%)</span></div>
+<div class="meta-item"><span class="badge badge-p2">P2</span></div>
+<div class="meta-item"><span>v1.0</span></div>
+<div class="meta-item"><span>May 2026</span></div>
+<div class="meta-item">
 
-  function restore(){
-    var raw; try { raw = localStorage.getItem(KEY); } catch(e){}
-    if(!raw) return false;
-    var store; try { store = JSON.parse(raw); } catch(e){ return false; }
-    stamp();
-    elems().forEach(function(el){
-      var id = el.getAttribute('data-eid');
-      if(id !== null && store[id] !== undefined) el.innerHTML = store[id];
-    });
-    return true;
-  }
+<span >Malcolm Govender</span>
+</div>
+<div class="meta-item">
 
-  function reset(){
-    if(!confirm('Reset all edits to original content? This cannot be undone.')) return;
-    try { localStorage.removeItem(KEY); } catch(e){}
-    location.reload();
-  }
+<span >Head of AI &amp; Engineering</span>
+</div>
+</div>
+</div>
+<div class="section">
+<h2>Problem Statement</h2>
+<p>Converting test cases into runnable automation scripts requires specialized knowledge of each testing framework (Playwright, Cypress, Jest, Pytest), boilerplate code structure, and best practices for selectors, assertions, and error handling. QA engineers frequently:</p>
+<ul>
+<li>Spend 60–80% of automation time writing boilerplate setup, teardown, and helper functions</li>
+<li>Struggle with framework-specific syntax, leading to slow script development and inconsistent patterns</li>
+<li>Duplicate fixture logic and assertion patterns across test files</li>
+<li>Cannot quickly switch between frameworks when projects require different tech stacks</li>
+<li>Face delays when learning new frameworks, blocking feature testing</li>
+</ul>
+<p>For SentinelQA, enabling rapid, framework-agnostic test script generation unlocks faster automation cycles, reduces ramp-up time for new team members, and allows QA to focus on test logic rather than boilerplate engineering.</p>
+</div>
+<div class="section">
+<h2>Target Users &amp; Personas</h2>
+<div class="persona-card">
+<strong>1. Jordan Lee – Mid-Level Automation Engineer</strong><br/>
+<strong>Role:</strong> Writes and maintains Playwright/Cypress scripts<br/>
+<strong>Goals:</strong> Convert test cases to runnable scripts in &lt;15 minutes, reduce context-switching between frameworks, maintain code consistency<br/>
+<strong>Frustrations:</strong> Spends hours writing boilerplate; forgot Cypress syntax when switching projects; inconsistent CSS selector patterns
+            </div>
+<div class="persona-card">
+<strong>2. Alex Rodriguez – Senior SDET (Senior Development Engineer in Test)</strong><br/>
+<strong>Role:</strong> Owns test framework architecture and CI/CD integration<br/>
+<strong>Goals:</strong> Standardize script generation across projects, enforce coding standards, reduce tech debt from inconsistent scripts<br/>
+<strong>Frustrations:</strong> Too many script style variations; difficult to maintain; new team members write inefficient code
+            </div>
+<div class="persona-card">
+<strong>3. Lisa Zhang – QA Engineer with Python Background</strong><br/>
+<strong>Role:</strong> Primarily writes Pytest scripts, occasionally needs JavaScript (Playwright)<br/>
+<strong>Goals:</strong> Generate JavaScript/Playwright scripts without learning syntax, reuse Python-based fixtures in JavaScript, fast ramp-up<br/>
+<strong>Frustrations:</strong> Doesn't know JavaScript well; typing errors; copy-paste frustration; can't quickly contribute to Playwright tests
+            </div>
+<div class="persona-card">
+<strong>4. CTO/Engineering Lead – Multi-Framework Fintech Org</strong><br/>
+<strong>Role:</strong> Sets testing standards across backend (Pytest), API (Playwright), and UI (Cypress) teams<br/>
+<strong>Goals:</strong> Ensure consistent test quality across frameworks, reduce onboarding friction, speed up test coverage<br/>
+<strong>Frustrations:</strong> Different teams write tests differently; hard to enforce best practices; slow to scale QA
+            </div>
+</div>
+<div class="section">
+<h2>User Stories</h2>
+<div class="user-story must-have">
+<div class="story-id">US-10</div>
+<div class="story-text">As a QA engineer, I want to input plain-English test steps and select a target framework (Playwright/Cypress/Jest/Pytest), and have the system generate fully runnable, syntax-correct scripts with proper selectors and assertions, so that I can reduce script writing time from 2 hours to 15 minutes per test.</div>
+<span class="story-priority priority-must">Must Have</span>
+</div>
+<div class="user-story must-have">
+<div class="story-id">US-11</div>
+<div class="story-text">As an SDET, I want generated scripts to follow a project-specific coding standard (custom naming conventions, assertion library, fixture patterns), so that all auto-generated scripts maintain consistent quality and are mergeable without linting failures.</div>
+<span class="story-priority priority-must">Must Have</span>
+</div>
+<div class="user-story must-have">
+<div class="story-id">US-12</div>
+<div class="story-text">As a QA engineer, I want generated Playwright/Cypress scripts to include smart element selectors (robust CSS/XPath, data attributes, ARIA labels), so that tests are resilient to minor UI changes and don't fail on layout updates.</div>
+<span class="story-priority priority-must">Must Have</span>
+</div>
+<div class="user-story must-have">
+<div class="story-id">US-13</div>
+<div class="story-text">As a QA engineer, I want to push generated scripts to GitHub as draft PRs (like test cases), review them, and merge them into the test suite without manual file creation, so that the automation pipeline is streamlined end-to-end.</div>
+<span class="story-priority priority-must">Must Have</span>
+</div>
+<div class="user-story should-have">
+<div class="story-id">US-14</div>
+<div class="story-text">As a QA engineer, I want generated scripts to support parameterised tests (data-driven) with CSV/JSON fixture import, so that I can test multiple data combinations without duplicating test code.</div>
+<span class="story-priority priority-should">Should Have</span>
+</div>
+<div class="user-story should-have">
+<div class="story-id">US-15</div>
+<div class="story-text">As an SDET, I want to define reusable helper functions (page objects, common actions) and have generated scripts automatically use them, so that fixture duplication is eliminated and maintenance burden is reduced.</div>
+<span class="story-priority priority-should">Should Have</span>
+</div>
+<div class="user-story should-have">
+<div class="story-id">US-16</div>
+<div class="story-text">As a QA engineer, I want generated scripts to include error handling, retry logic, and timeouts configured per project standards, so that tests are resilient and don't fail on transient issues.</div>
+<span class="story-priority priority-should">Should Have</span>
+</div>
+<div class="user-story should-have">
+<div class="story-id">US-17</div>
+<div class="story-text">As a Python QA engineer, I want Pytest scripts to be auto-generated with fixtures, markers, and assertions matching my team's standards, so that I contribute to Pytest automation without ramp-up time.</div>
+<span class="story-priority priority-should">Should Have</span>
+</div>
+</div>
+<div class="section">
+<h2>Functional Requirements</h2>
+<div class="req-item"><span class="req-id">FR-16</span>Accept test steps in plain English and generate syntactically-correct, runnable scripts in Playwright, Cypress, Jest, or Pytest based on user selection.</div>
+<div class="req-item"><span class="req-id">FR-17</span>Generate element selectors using a priority strategy: data attributes &gt; ARIA attributes &gt; CSS ID &gt; robust CSS classes &gt; XPath; fall back to computer vision if no selectors found.</div>
+<div class="req-item"><span class="req-id">FR-18</span>Support project-level configuration: custom naming conventions, assertion library (Chai, Jest Matchers, pytest assertions), base URLs, timeouts, retry policies.</div>
+<div class="req-item"><span class="req-id">FR-19</span>Generate parameterised tests that accept CSV/JSON fixture files and loop over test data; output proper test naming per iteration (e.g., test_login[user1], test_login[user2]).</div>
+<div class="req-item"><span class="req-id">FR-20</span>Detect common patterns in test steps and auto-generate reusable page objects / helper functions with proper documentation.</div>
+<div class="req-item"><span class="req-id">FR-21</span>Include error handling, timeout configuration, retry logic, and failure screenshots/videos in generated scripts.</div>
+<div class="req-item"><span class="req-id">FR-22</span>Generate API test scripts (Pytest requests, Jest supertest) with proper authentication, header/body validation, and schema checking.</div>
+<div class="req-item"><span class="req-id">FR-23</span>Support batch script generation: convert 50+ test cases to scripts in one async job with progress tracking and email notification.</div>
+<div class="req-item"><span class="req-id">FR-24</span>Create GitHub draft PRs with generated scripts, allowing review, edit, and merge into feature/main branch.</div>
+<div class="req-item"><span class="req-id">FR-25</span>Allow engineers to edit generated scripts, mark as approved/rejected, and use feedback to refine generation for future scripts.</div>
+<div class="req-item"><span class="req-id">FR-26</span>Export scripts with proper file structure: organized folders per feature, shared fixtures in common/ folder, CI config templates.</div>
+<div class="req-item"><span class="req-id">FR-27</span>Validate generated scripts for syntax errors and test-ability (can be parsed and dry-run without execution) before PR creation.</div>
+</div>
+<div class="section">
+<h2>Non-Functional Requirements</h2>
+<div class="req-item"><span class="req-id">NFR-09</span><strong>Performance:</strong> Generate 10 scripts from test cases in &lt;5 seconds; support batch conversion of 100 scripts in &lt;60 seconds (async).</div>
+<div class="req-item"><span class="req-id">NFR-10</span><strong>Code Quality:</strong> Generated scripts must pass linting (ESLint for JS, pylint for Python) and adhere to code style standards without manual fixes.</div>
+<div class="req-item"><span class="req-id">NFR-11</span><strong>Consistency:</strong> All generated scripts for a project follow identical patterns; fixture reuse across scripts is automatic; no boilerplate duplication.</div>
+<div class="req-item"><span class="req-id">NFR-12</span><strong>Extensibility:</strong> Support for custom fixtures and helper functions defined in project templates; framework-agnostic generation logic.</div>
+<div class="req-item"><span class="req-id">NFR-13</span><strong>Security:</strong> Sanitise sensitive data in scripts (no hardcoded passwords, API keys, or PII); support secret injection via environment variables.</div>
+<div class="req-item"><span class="req-id">NFR-14</span><strong>Maintainability:</strong> Generated scripts include comments explaining steps, selectors, and assertions for future maintenance.</div>
+<div class="req-item"><span class="req-id">NFR-15</span><strong>Auditability:</strong> Log all script generation with framework version, AI model version, project config, and output checksum for reproducibility.</div>
+</div>
+<div class="section">
+<h2>Acceptance Criteria</h2>
+<h3>Feature: Test Case → Script Generation</h3>
+<div class="acceptance-item">Given a test case with steps (e.g., "Click Login button, Enter email, Click Submit"), when selected for Playwright generation, then a syntactically-valid Playwright script is produced with correct selectors, locators, and assertions within 5 seconds.</div>
+<div class="acceptance-item">Given a test case and Pytest selected, when converted, then a properly-structured Pytest file is generated with fixtures, setup/teardown, and assert statements matching team conventions.</div>
+<div class="acceptance-item">Given a generated script, when linted with ESLint (JS) or pylint (Python), then zero linting errors are reported without manual edits.</div>
+<h3>Feature: Parameterised Test Generation</h3>
+<div class="acceptance-item">Given a test case and a CSV with 5 user rows, when converted to Playwright, then 5 separate test variations are generated with proper naming (test_login[row1], test_login[row2], etc.).</div>
+<div class="acceptance-item">Given parameterised Pytest, when run, then all parameter combinations execute and report independently.</div>
+<h3>Feature: GitHub PR Creation</h3>
+<div class="acceptance-item">Given 20 generated scripts, when "Create PR" is selected, then a single draft PR is created with all scripts in organized folder structure and a clear commit message.</div>
+<div class="acceptance-item">Given a generated script in a PR, when viewed on GitHub, then it includes comments explaining test purpose and key assertions.</div>
+<h3>Feature: Project Configuration Compliance</h3>
+<div class="acceptance-item">Given a project config with custom assertion style and timeout settings, when scripts are generated, then all scripts use the specified style without exceptions.</div>
+</div>
+<div class="section">
+<h2>Dependencies &amp; Integrations</h2>
+<div class="dependency-item"><strong>SentinelQA Test Studio:</strong> Retrieve test cases from Test Studio DB; store generated scripts as artifacts. Status: Existing integration.</div>
+<div class="dependency-item"><strong>GitHub API:</strong> Create draft PRs with generated script files. Status: Existing integration.</div>
+<div class="dependency-item"><strong>Framework-Specific Parsers:</strong> Validate Playwright, Cypress, Jest, Pytest syntax. Recommendation: 'playwright-inspector' (JS), 'py_compile' (Python). Status: To be integrated.</div>
+<div class="dependency-item"><strong>Linting Tools (ESLint, pylint):</strong> Validate generated code for style compliance. Status: Integration required.</div>
+<div class="dependency-item"><strong>AI Language Model:</strong> For test case parsing, script generation, and code optimization. Status: Existing (Claude 3.5 Sonnet).</div>
+<div class="dependency-item"><strong>Project Config Storage:</strong> Store project-specific generation rules (naming, assertion style, fixtures). Status: To be implemented (database table or YAML config files).</div>
+<div class="dependency-item"><strong>CloudWatch / DataDog:</strong> Logging, metrics, performance tracking. Status: Existing infrastructure.</div>
+</div>
+<div class="section">
+<h2>Assumptions &amp; Constraints</h2>
+<h3>Assumptions</h3>
+<ul>
+<li>Test cases are structured with clear steps; vague or ambiguous steps will produce lower-quality scripts.</li>
+<li>Project configurations (naming conventions, assertion styles) are defined upfront by SDETs.</li>
+<li>Generated scripts will be reviewed and refined by engineers; AI output is a starting point.</li>
+<li>Element selectors are stable and can be identified from UI screenshots or provided in test case metadata.</li>
+<li>Engineers have basic familiarity with the generated framework (no starter course required).</li>
+</ul>
+<h3>Constraints</h3>
+<ul>
+<li><strong>Framework Coverage:</strong> v1 supports Playwright, Cypress, Jest, Pytest only; other frameworks (Selenium, TestCafe) not supported in v1.</li>
+<li><strong>Selector Robustness:</strong> AI-generated selectors may fail on significant UI redesigns; manual adjustment required for complex dynamic elements.</li>
+<li><strong>Custom Fixtures:</strong> If project uses proprietary fixture patterns, custom templates must be provided upfront.</li>
+<li><strong>API Rate Limits:</strong> GitHub API rate limiting applies to batch PR creation; queue management required for 100+ scripts.</li>
+<li><strong>Secret Management:</strong> Generated scripts must not include hardcoded credentials; environment variable injection required for local testing.</li>
+</ul>
+</div>
+<div class="section">
+<h2>Out of Scope (v1.0)</h2>
+<div class="exclusion-item">Test execution or result reporting (handled by CI/CD pipelines).</div>
+<div class="exclusion-item">Mobile app automation (Appium, XCUITest) – web-only in v1.</div>
+<div class="exclusion-item">Visual regression testing or computer vision-based selectors (fallback only, not primary).</div>
+<div class="exclusion-item">Automatic migration of existing manual scripts to AI-generated format.</div>
+<div class="exclusion-item">Support for languages beyond English for test case input.</div>
+<div class="exclusion-item">Integration with ALM/test management tools beyond GitHub (Jira, Azure DevOps plugins planned for v1.1).</div>
+<div class="exclusion-item">Code review automation or approval workflows (manual QA review required).</div>
+</div>
+<div class="section">
+<h2>Definition of Done</h2>
+<ul class="checklist">
+<li>All user stories (US-10 to US-17) validated with personas in UAT</li>
+<li>FR-16 to FR-27 implemented with unit tests (&gt;85% coverage)</li>
+<li>NFR-09 to NFR-15 verified via performance testing, linting validation, security audit</li>
+<li>Generated scripts pass linting (ESLint, pylint) without manual fixes</li>
+<li>End-to-end integration test: test case → script generation → GitHub PR → script review</li>
+<li>Performance target met: 10 scripts in &lt;5 seconds, 100 scripts in &lt;60 seconds</li>
+<li>Project configuration system implemented and documented</li>
+<li>User documentation (screenshot walkthrough, best practices guide) created</li>
+<li>Security review: no credential leakage, secret management validated</li>
+<li>Accessibility audit: UI meets WCAG 2.1 AA standards</li>
+<li>Cost analysis: AI token usage per script documented and optimized</li>
+<li>Production deployment plan: database schema, feature flags, rollback procedure</li>
+<li>Sign-off from Anupam Sharma, SDET lead, and QA team</li>
+</ul>
+<div class="version-date">
+<strong>Document Version:</strong> v1.0<br/>
+<strong>Last Updated:</strong> May 2026<br/>
+<strong>Owner:</strong> Anupam Sharma<br/><strong>Author:</strong> Malcolm Govender (Head of AI &amp; Engineering)
+            </div>
+</div>
 
-  function exportDoc(){
-    // Temporarily disable editing for clean export
-    var wasMode = mode;
-    if(wasMode) disable();
-    var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-    // Remove the editable toolbar and injected system from export
-    html = html.replace(/<style[^>]*data-editable-system[^>]*>[\s\S]*?<\/style>/,'');
-    html = html.replace(/<script[^>]*data-editable-system[^>]*>[\s\S]*?<\/script>/,'');
-    html = html.replace(/<div id="__etb"[^>]*>[\s\S]*?<\/div>/,'');
-    html = html.replace(/<!-- EDITABLE DOCUMENT SYSTEM -->/g,'');
-    html = html.replace(/\sdata-eid="\d+"/g,'');
-    html = html.replace(/\scontenteditable="[^"]*"/g,'');
-    var blob = new Blob([html], {type:'text/html'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = (location.pathname.split('/').pop() || 'document') + '';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
-    if(wasMode) enable();
-    msg('Exported ✓');
-  }
+      </section>
+    </main>
 
-  function msg(t){
-    var el = document.getElementById('__etb-msg');
-    if(el){ el.textContent = t; clearTimeout(el._t); if(t==='Saved ✓'||t==='Exported ✓') el._t=setTimeout(function(){el.textContent='';},2500); }
-  }
+  </div><!-- /doc-layout -->
 
-  function refresh(){
-    var btn = document.getElementById('__etb-btn');
-    var acts = document.getElementById('__etb-acts');
-    if(btn){ btn.textContent = mode ? '🔒 Lock' : '✏️ Edit'; btn.style.background = mode ? '#2d1f5e' : '#1f2937'; btn.style.color = mode ? '#c4b5fd' : '#a78bfa'; }
-    if(acts) acts.style.display = mode ? 'flex' : 'none';
-  }
-
-  function buildToolbar(){
-    var t = document.createElement('div');
-    t.id = '__etb';
-    t.innerHTML =
-      '<span style="font-size:10px;color:#4b5563;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-right:2px">Document</span>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-edit" id="__etb-btn" onclick="window.__edm.toggle()">✏️ Edit</button>'+
-      '<div class="etb-sep"></div>'+
-      '<button class="etb-share" onclick="window.__edm.share()" title="Copy shareable link">🔗 Share</button>'+
-      '<button class="etb-print" onclick="window.__edm.print()" title="Print / Save as PDF">🖨 Print</button>'+
-      '<div id="__etb-acts" style="display:none;gap:5px;align-items:center">'+
-        '<span class="etb-msg" id="__etb-msg"></span>'+
-        '<button class="etb-save" onclick="window.__edm.save()">💾 Save</button>'+
-        '<button class="etb-reset" onclick="window.__edm.reset()">↺ Reset</button>'+
-        '<button class="etb-export" onclick="window.__edm.export()">⬇ Export</button>'+
-      '</div>';
-    document.body.appendChild(t);
-  }
-
-  function shareDoc(){
-    var base = 'https://fintech-tracker-web.vercel.app';
-    var url = base + location.pathname;
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){ msg('Link copied ✓'); }).catch(function(){ prompt('Copy this link:',url); });
-    } else { prompt('Copy this link:',url); }
-  }
-  function printDoc(){
-    var wasMode = mode;
-    if(wasMode) disable();
-    window.print();
-    if(wasMode) setTimeout(function(){ enable(); }, 500);
-  }
-  window.__edm = {
-    toggle: function(){ mode ? disable() : enable(); },
-    save:   function(){ persist(); },
-    reset:  function(){ reset(); },
-    export: function(){ exportDoc(); },
-    share:  function(){ shareDoc(); },
-    print:  function(){ printDoc(); }
-  };
-
-  function init(){
-    buildToolbar();
-    stamp();
-    var had = restore();
-    if(had) msg('Edits loaded');
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-})();
-</script>
+</div><!-- /doc-shell -->
 
 </body>
 </html>
