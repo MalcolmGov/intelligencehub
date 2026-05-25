@@ -2051,14 +2051,12 @@ tbody tr.data-row td a { cursor: auto; }
 .bv-value { font-size: 11px; font-weight: 700; color: #4ade80; margin-top: 3px; display: block; }
 
 /* ── Auth gate ───────────────────────────────────────────── */
-#auth-gate {
   position: fixed; inset: 0; z-index: 99999;
   background: #0a0d1a;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   transition: opacity .35s ease;
 }
-#auth-gate.fade-out { opacity: 0; pointer-events: none; }
 .auth-card {
   width: 100%; max-width: 400px; margin: 0 20px;
   background: #161b2e;
@@ -2379,86 +2377,8 @@ body.present-mode #btn-present     { background:rgba(96,165,250,.12); border-col
      To change your password:
        1. Open Terminal and run:
           echo -n "YourNewPassword" | shasum -a 256
-       2. Copy the hash and replace the AUTH_HASH value below.
      ═══════════════════════════════════════════════════════ -->
-<div id="auth-gate">
-  <div class="auth-card" id="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-icon">🏦</div>
-      <div>
-        <div class="auth-logo-text">Fintech AI Tracker</div>
-        <div class="auth-logo-sub">Intelligence Hub · Private</div>
-      </div>
-    </div>
-    <div class="auth-heading">Secure Access</div>
-    <div class="auth-sub">This tracker contains confidential AI programme data. Enter your password to continue.</div>
-    <div class="auth-field">
-      <input type="password" id="auth-input" placeholder="Enter password" autocomplete="current-password" />
-      <button class="auth-eye" type="button" id="auth-eye-btn" title="Show/hide password">👁</button>
-    </div>
-    <div class="auth-error" id="auth-error">Incorrect password. Please try again.</div>
-    <button class="auth-btn" id="auth-btn" type="button">Unlock Tracker</button>
-    <div class="auth-footer">🔒 Protected · Malcolm Govender · Confidential</div>
-  </div>
-</div>
 
-<script>
-(function() {
-  // ── SHA-256 hash of the access password ──────────────────
-  // To change: echo -n 'NewPassword' | shasum -a 256  (use SINGLE quotes in Terminal)
-  const AUTH_HASH = '40c65208e182b326e4b4103e5110cca41eceb6c6d6bb8e47da653d8af5434f50';
-  const SESSION_KEY = 'ft_auth_v1';
-
-  async function sha256(str) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-
-  function unlock() {
-    const gate = document.getElementById('auth-gate');
-    gate.classList.add('fade-out');
-    setTimeout(() => gate.remove(), 380);
-  }
-
-  // Already authenticated? (localStorage persists across tabs and sessions)
-  if (localStorage.getItem(SESSION_KEY) === AUTH_HASH) { unlock(); return; }
-
-  // Wire up form
-  document.addEventListener('DOMContentLoaded', function() {
-    const input  = document.getElementById('auth-input');
-    const btn    = document.getElementById('auth-btn');
-    const err    = document.getElementById('auth-error');
-    const card   = document.getElementById('auth-card');
-    const eyeBtn = document.getElementById('auth-eye-btn');
-
-    eyeBtn.addEventListener('click', function() {
-      input.type = input.type === 'password' ? 'text' : 'password';
-    });
-
-    async function attempt() {
-      btn.disabled = true;
-      err.classList.remove('show');
-      const hash = await sha256(input.value.trim());
-      if (hash === AUTH_HASH) {
-        localStorage.setItem(SESSION_KEY, AUTH_HASH);
-        unlock();
-      } else {
-        card.classList.remove('shake');
-        void card.offsetWidth; // reflow to restart animation
-        card.classList.add('shake');
-        err.classList.add('show');
-        input.value = '';
-        input.focus();
-        btn.disabled = false;
-      }
-    }
-
-    btn.addEventListener('click', attempt);
-    input.addEventListener('keydown', function(e) { if (e.key === 'Enter') attempt(); });
-    input.focus();
-  });
-})();
-</script>
 
 <!-- Monday.com-style cursor spotlight glow -->
 <div id="cursor-glow"></div>
